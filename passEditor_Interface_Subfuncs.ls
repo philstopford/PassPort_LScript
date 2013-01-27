@@ -335,34 +335,54 @@ editSelectedOverride
 					affectDiffuseSetts = integer(settingsArray[7]);
 					affectSpecularSetts = integer(settingsArray[8]);
 					affectOpenGLSetts = integer(settingsArray[9]);
-					//lensFlareSetts = integer(settingsArray[10]);
-					//volumetricLightingSetts = integer(settingsArray[11]);
+					lensFlareSetts = integer(settingsArray[10]);
+					volumetricLightingSetts = integer(settingsArray[11]);
 					lightColorSettsArray = <lightColorSettsArrays[1], lightColorSettsArrays[2], lightColorSettsArrays[3]>;
 					
-					
 					doKeys = 0;
-					reqbegin("New Light Override");
-					reqsize(275,175);
-					c20 = ctlstring("Override Name",newName,131);
-					ctlposition(c20,15,5);
+					reqbegin("Edit Light Override");
+					reqsize(LgtProp_ui_window_w, 240);
+
+					c20 = ctlstring("Override Name",newName, 131);
+					ctlposition(c20, LgtProp_gad_x, LgtProp_gad_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+
+					ui_offset_y = LgtProp_ui_offset_y + LgtProp_ui_row_offset;
+
 					c22 = ctlcolor("Light Color", lightColorSettsArray);
-					ctlposition(c22,24,30);
+					ctlposition(c22, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+
+					ui_offset_y += LgtProp_ui_row_offset;
+
 					c23 = ctlpercent("Light Intensity", lightIntensitySetts);
-					ctlposition(c23,15,55);
-					s20 = ctlsep();
-					ctlposition(s20,5,80);
+					ctlposition(c23, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w - 22, LgtProp_gad_h, LgtProp_gad_text_offset);
+
+					ui_offset_y += LgtProp_ui_row_offset + 12;
+					s20 = ctlsep(0, LgtProp_ui_seperator_w + 4);
+					ctlposition(s20, -2, ui_offset_y);
+					ui_offset_y += LgtProp_ui_spacing_y + 2;
+
 					c24 = ctlcheckbox("Affect Diffuse          ",affectDiffuseSetts);
-					ctlposition(c24,10,90);
+					ctlposition(c24, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+
+					ui_offset_y += LgtProp_ui_row_offset;
+
 					c25 = ctlcheckbox("Affect Specular     ",affectSpecularSetts);
-					ctlposition(c25,145,90);
+					ctlposition(c25, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+
+					ui_offset_y += LgtProp_ui_row_offset;
+
 					c26 = ctlcheckbox("Affect OpenGL          ",affectOpenGLSetts);
-					ctlposition(c26,10,115);
-					//s21 = ctlsep();
-					//ctlposition(s21,5,145);
-					//c27 = ctlcheckbox("Lens Flare               ",lensFlareSetts);
-					//ctlposition(c27,90,155);
-					//c28 = ctlcheckbox("Volumetric Lighting",volumetricLightingSetts);
-					//ctlposition(c28,90,180);
+					ctlposition(c26, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+
+					ui_offset_y += LgtProp_ui_row_offset;
+
+					c27 = ctlcheckbox("Lens Flare               ",lensFlareSetts);
+					ctlposition(c27, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+
+					ui_offset_y += LgtProp_ui_row_offset;
+
+					c28 = ctlcheckbox("Volumetric Lighting",volumetricLightingSetts);
+					ctlposition(c28, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
 					if(reqpost())
 					{
 						newName = getvalue(c20);
@@ -372,8 +392,8 @@ editSelectedOverride
 						affectDiffuseSetts = getvalue(c24);
 						affectSpecularSetts = getvalue(c25);
 						affectOpenGLSetts = getvalue(c26);
-						//lensFlareSetts = getvalue(c27);
-						//volumetricLightingSetts = getvalue(c28);
+						lensFlareSetts = getvalue(c27);
+						volumetricLightingSetts = getvalue(c28);
 						doUpdate = 1;
 					}
 					else
@@ -387,7 +407,7 @@ editSelectedOverride
 						pass = currentChosenPass;
 						newNumber = sel;
 						overrideNames[newNumber] = newName + "   (light properties)";
-					    overrideSettings[newNumber] = newName + "||" + "type5" + "||" +	string(lightColorSettsArray.x) +  "||" + string(lightColorSettsArray.y) + "||" + string(lightColorSettsArray.z) + "||" + string(lightIntensitySetts) + "||" + string(affectDiffuseSetts) + "||" + string(affectSpecularSetts) + "||" + string(affectOpenGLSetts);
+					    overrideSettings[newNumber] = newName + "||" + "type5" + "||" +	string(lightColorSettsArray.x) +  "||" + string(lightColorSettsArray.y) + "||" + string(lightColorSettsArray.z) + "||" + string(lightIntensitySetts) + "||" + string(affectDiffuseSetts) + "||" + string(affectSpecularSetts) + "||" + string(affectOpenGLSetts) + "||" + string(lensFlareSetts)  + "||" + string(volumetricLightingSetts);
 				
 					}
 					reProcess();
@@ -416,33 +436,69 @@ editSelectedOverride
 					tempAlphaArray[3] = "Constant Black";
 					
 					doKeys = 0;
+					
 					reqbegin("Edit ObjProps Override");
-					reqsize(275,260);
+					reqsize(ObjProp_ui_window_w,320);
+
 					c20 = ctlstring("Override Name:",newName);
+					ctlposition(c20, ObjProp_gad_x, ObjProp_gad_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+					
+					ui_offset_y = ObjProp_ui_offset_y + ObjProp_ui_row_offset;
+
 					c21 = ctlcheckbox("Matte Object",matteObjectSetts);
-					ctlposition(c21,9,30);
-					c21_5 = ctlcolor("Color", matteColorSettsArray);
-					ctlposition(c21_5,105,30);
+					ctlposition(c21, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+
+					ui_offset_y += ObjProp_ui_row_offset;
+
+					c21_5 = ctlcolor("Color",matteColorSettsArray);
+					ctlposition(c21_5, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+
+					ui_offset_y += ObjProp_ui_row_offset;
+
 					c22 = ctlpopup("Alpha Channel",alphaChannelSetts,tempAlphaArray);
-					ctlposition(c22,13,55);
-					s20 = ctlsep();
-					ctlposition(s20,5,80);
+					ctlposition(c22, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+
+					ui_offset_y += ObjProp_ui_row_offset + 12;
+					s20 = ctlsep(0, ObjProp_ui_seperator_w + 4);
+					ctlposition(s20, -2, ui_offset_y);
+					ui_offset_y += ObjProp_ui_spacing_y + 2;
+
 					c23 = ctlcheckbox("Unseen by Rays      ",unseenByRaysSetts);
-					ctlposition(c23,10,85);
+					ctlposition(c23, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+
+					ui_offset_y += ObjProp_ui_row_offset;
+
 					c24 = ctlcheckbox("Unseen by Camera",unseenByCameraSetts);
-					ctlposition(c24,145,85);
+					ctlposition(c24, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+
+					ui_offset_y += ObjProp_ui_row_offset;
+
 					c25 = ctlcheckbox("Unseen by Radiosity",unseenByRadiositySetts);
-					ctlposition(c25,10,110);
+					ctlposition(c25, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+
+					ui_offset_y += ObjProp_ui_row_offset;
+
 					c26 = ctlcheckbox("Unaffected by Fog  ",unseenByFogSetts);
-					ctlposition(c26,145,110);
-					s21 = ctlsep();
-					ctlposition(s21,5,137);
+					ctlposition(c26, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+
+					ui_offset_y += ObjProp_ui_row_offset + 12;
+					s21 = ctlsep(0, ObjProp_ui_seperator_w + 4);
+					ctlposition(s21, -2, ui_offset_y);
+					ui_offset_y += ObjProp_ui_spacing_y + 2;
+
 					c27 = ctlcheckbox("Self Shadow     ",selfShadowSetts);
-					ctlposition(c27,90,145);
+					ctlposition(c27, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+
+					ui_offset_y += ObjProp_ui_row_offset;
+
 					c28 = ctlcheckbox("Cast Shadow     ",castShadowSetts);
-					ctlposition(c28,90,170);
+					ctlposition(c28, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+
+					ui_offset_y += ObjProp_ui_row_offset;
+
 					c29 = ctlcheckbox("Receive Shadow",receiveShadowSetts);
-					ctlposition(c29,90,195);
+					ctlposition(c29, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+					
 					if(reqpost())
 					{
 						newName = getvalue(c20);
@@ -567,11 +623,26 @@ editSelectedOverride
 					lightListArray[plusTwo] = "Caustics";
 					
 					doKeys = 0;
-					reqbegin("New Light Exclusion Override");
+					
+					reqbegin("Edit Light Exclusion Override");
 					c20 = ctlstring("Override Name",newName,131);
+					ctlposition(c20, LgtExcl_gad_x, LgtExcl_gad_y, LgtExcl_gad_w, LgtExcl_gad_h, LgtExcl_gad_text_offset);
+
+					ui_offset_y = LgtExcl_ui_offset_y + LgtExcl_ui_row_offset;
+
 					light21 = ctlpopup("Select Light:", 1, lightListArray);
+					ctlposition(light21, LgtExcl_gad_x, LgtExcl_gad_y + ui_offset_y, LgtExcl_gad_w, LgtExcl_gad_h, LgtExcl_gad_text_offset);
+
+					ui_offset_y += LgtExcl_ui_row_offset;
+
 					c22 = ctlbutton("Add Light",100,"lightExclusionAddLight");
+					ctlposition(c22, LgtExcl_gad_x, LgtExcl_gad_y + ui_offset_y, LgtExcl_gad_w, LgtExcl_gad_h, LgtExcl_gad_text_offset);
+
+					ui_offset_y += LgtExcl_ui_row_offset;
+
 					light23 = ctlstring("Excluded Lights:",tempLightTransferring,200);
+					ctlposition(light23, LgtExcl_gad_x, LgtExcl_gad_y + ui_offset_y, LgtExcl_gad_w, LgtExcl_gad_h, LgtExcl_gad_text_offset);
+					
 					if(reqpost())
 					{
 						newName = getvalue(c20);
@@ -617,16 +688,51 @@ editSelectedOverride
 					
 					
 					doKeys = 0;
-					reqbegin("Scene Master Override");
+					
+					reqbegin("Edit Scene Master Override");
+					reqsize(ScnMst_ui_window_w, 240);
+
 					c20 = ctlstring("Override Name:",newName);
+					ctlposition(c20, ScnMst_gad_x, ScnMst_gad_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+					
+					ui_offset_y = ScnMst_ui_offset_y + ScnMst_ui_row_offset;
+
 					c20_5 = ctlpopup("Resolution Multiplier",resolutionMultiplierSetts,tempMultiplierArray);
+					ctlposition(c20_5, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+					ui_offset_y += ScnMst_ui_row_offset;
+
 					c21 = ctlpopup("Render Mode",renderModeSetts,tempTypeArray);
+					ctlposition(c21, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+					ui_offset_y += ScnMst_ui_row_offset;
+
 					c22 = ctlcheckbox("Depth Buffer AA",depthBufferAASetts);
+					ctlposition(c22, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+					ui_offset_y += ScnMst_ui_row_offset;
+
 					c23 = ctlcheckbox("Render Lines",renderLinesSetts);
+					ctlposition(c23, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+					ui_offset_y += ScnMst_ui_row_offset;
+
 					c24 = ctlminislider("Ray Recursion Limit", rayRecursionLimitSetts, 0, 24);
-					s1 = ctlsep();
+					ctlposition(c24, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w - 22, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+					ui_offset_y += ScnMst_ui_row_offset + 12;
+					s21 = ctlsep(0, ScnMst_ui_seperator_w + 4);
+					ctlposition(s21, -2, ScnMst_ui_offset_y);
+					ui_offset_y += ScnMst_ui_spacing_y + 2;
+
 					c25 = ctlcheckbox("Redirect Buffer Export Paths",redirectBuffersSetts);
+					ctlposition(c25, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+					ui_offset_y += ScnMst_ui_row_offset;
+
 					c26 = ctlcheckbox("Disable all AA",disableAASetts);
+					ctlposition(c26, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+					
 					if(reqpost())
 					{
 						newName = getvalue(c20);
@@ -666,10 +772,6 @@ editSelectedOverride
     }
 }
 
-
-
-
-
 lightExclusionAddLight
 {
 	lightInteger = getvalue(light21);
@@ -703,50 +805,25 @@ createLightExclusionOverride
 	
 	doKeys = 0;
 	
-	// User Interface Layout Variables - Matt Gorner
-	gad_x				= 6;													// Gadget X coord
-	gad_y				= 6;													// Gadget Y coord
-	gad_w				= 280;													// Gadget width
-	gad_h				= 19;													// Gadget height
-	gad_text_offset		= 105;													// Gadget text offset
-
-	num_gads			= 11;													// Total number of gadgets vertically (for calculating the max window height)
-	num_spacers			= 1;													// Total number of 'normal' spacers
-	num_text_spacers	= 0;													// Total number of spacers with text associated with them
-
-	ui_spacing_y		= 3;													// Spacing gap size Y
-	ui_spacing_x		= 3;													// Spacing gap size X
-
-	ui_offset_x 		= 0;													// Main X offset from 0
-	ui_offset_y 		= 6;													// Main Y offset from 0
-	ui_row				= 0;													// Row number
-	ui_column			= 0;													// Column number
-	ui_tab_offset		= ui_offset_y + 23;										// Offset for tab height
-	ui_row_offset		= gad_h + ui_spacing_y;									// Row offset
-
-	ui_window_w			= 295;													// Window width
-	ui_window_h			= (ui_row_offset*num_gads) + 11;						// Window height
-	ui_seperator_w		= ui_window_w + 2;										// Width of seperators
-
 	reqbegin("New Light Exclusion Override");
 
 	c20 = ctlstring("Override Name","LgtExclusion",131);
-	ctlposition(c20, gad_x, gad_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c20, LgtExcl_gad_x, LgtExcl_gad_y, LgtExcl_gad_w, LgtExcl_gad_h, LgtExcl_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y = LgtExcl_ui_offset_y + LgtExcl_ui_row_offset;
 
 	light21 = ctlpopup("Select Light:", 1, lightListArray);
-	ctlposition(light21, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(light21, LgtExcl_gad_x, LgtExcl_gad_y + ui_offset_y, LgtExcl_gad_w, LgtExcl_gad_h, LgtExcl_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += LgtExcl_ui_row_offset;
 
 	c22 = ctlbutton("Add Light",100,"lightExclusionAddLight");
-	ctlposition(c22, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c22, LgtExcl_gad_x, LgtExcl_gad_y + ui_offset_y, LgtExcl_gad_w, LgtExcl_gad_h, LgtExcl_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += LgtExcl_ui_row_offset;
 
 	light23 = ctlstring("Excluded Lights:",tempLightTransferring,200);
-	ctlposition(light23, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(light23, LgtExcl_gad_x, LgtExcl_gad_y + ui_offset_y, LgtExcl_gad_w, LgtExcl_gad_h, LgtExcl_gad_text_offset);
 
 	if(reqpost())
 	{
@@ -787,79 +864,49 @@ createLightExclusionOverride
 createLgtPropOverride
 {
 	doKeys = 0;
-
-	// User Interface Layout Variables - Matt Gorner
-	gad_x				= 6;													// Gadget X coord
-	gad_y				= 6;													// Gadget Y coord
-	gad_w				= 260;													// Gadget width
-	gad_h				= 19;													// Gadget height
-	gad_text_offset		= 80;													// Gadget text offset
-
-	num_gads			= 11;													// Total number of gadgets vertically (for calculating the max window height)
-	num_spacers			= 1;													// Total number of 'normal' spacers
-	num_text_spacers	= 0;													// Total number of spacers with text associated with them
-
-	ui_spacing_y		= 3;													// Spacing gap size Y
-	ui_spacing_x		= 3;													// Spacing gap size X
-
-	ui_offset_x 		= 0;													// Main X offset from 0
-	ui_offset_y 		= 6;													// Main Y offset from 0
-	ui_row				= 0;													// Row number
-	ui_column			= 0;													// Column number
-	ui_tab_offset		= ui_offset_y + 23;										// Offset for tab height
-	ui_row_offset		= gad_h + ui_spacing_y;									// Row offset
-
-	ui_window_w			= 275;													// Window width
-	ui_window_h			= (ui_row_offset*num_gads) + 11;						// Window height
-	ui_seperator_w		= ui_window_w + 2;										// Width of seperators
-
 	reqbegin("New Light Override");
-	reqsize(ui_window_w, 193);
+	reqsize(LgtProp_ui_window_w, 240);
 
 	c20 = ctlstring("Override Name","LgtPropsOverride", 131);
-	ctlposition(c20, gad_x, gad_y, gad_w, gad_h, gad_text_offset);
-	//ctlposition(c20,15,5);
+	ctlposition(c20, LgtProp_gad_x, LgtProp_gad_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y = LgtProp_ui_offset_y + LgtProp_ui_row_offset;
 
 	c22 = ctlcolor("Light Color", 255);
-	ctlposition(c22, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	//ctlposition(c22,24,30);
+	ctlposition(c22, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += LgtProp_ui_row_offset;
 
 	c23 = ctlpercent("Light Intensity", 1);
-	ctlposition(c23, gad_x, gad_y + ui_offset_y, gad_w - 22, gad_h, gad_text_offset);
-	//ctlposition(c23,15,55);
+	ctlposition(c23, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w - 22, LgtProp_gad_h, LgtProp_gad_text_offset);
 
- 	ui_offset_y += ui_row_offset + 12;
-	s20 = ctlsep(0, ui_seperator_w + 4);
+ 	ui_offset_y += LgtProp_ui_row_offset + 12;
+	s20 = ctlsep(0, LgtProp_ui_seperator_w + 4);
 	ctlposition(s20, -2, ui_offset_y);
-	ui_offset_y += ui_spacing_y + 2;
-	//ctlposition(s20,5,80);
+	ui_offset_y += LgtProp_ui_spacing_y + 2;
 
 	c24 = ctlcheckbox("Affect Diffuse          ",1);
-	ctlposition(c24, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	//ctlposition(c24,10,90);
+	ctlposition(c24, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += LgtProp_ui_row_offset;
 
 	c25 = ctlcheckbox("Affect Specular     ",1);
-	ctlposition(c25, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	//ctlposition(c25,145,90);
+	ctlposition(c25, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += LgtProp_ui_row_offset;
 
 	c26 = ctlcheckbox("Affect OpenGL          ",1);
-	ctlposition(c26, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c26, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
 
-	//ctlposition(c26,10,115);
-	//s21 = ctlsep();
-	//ctlposition(s21,5,145);
-	//c27 = ctlcheckbox("Lens Flare               ",0);
-	//ctlposition(c27,90,155);
-	//c28 = ctlcheckbox("Volumetric Lighting",0);
-	//ctlposition(c28,90,180);
+	ui_offset_y += LgtProp_ui_row_offset;
+
+	c27 = ctlcheckbox("Lens Flare               ",0);
+	ctlposition(c27, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+
+	ui_offset_y += LgtProp_ui_row_offset;
+
+	c28 = ctlcheckbox("Volumetric Lighting",0);
+	ctlposition(c28, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
 
 	if(reqpost())
 	{
@@ -870,8 +917,8 @@ createLgtPropOverride
 		affectDiffuseSetts = getvalue(c24);
 		affectSpecularSetts = getvalue(c25);
 		affectOpenGLSetts = getvalue(c26);
-		//lensFlareSetts = getvalue(c27);
-		//volumetricLightingSetts = getvalue(c28);
+		lensFlareSetts = getvalue(c27);
+		volumetricLightingSetts = getvalue(c28);
 		doUpdate = 1;
 	}
 	else
@@ -898,7 +945,7 @@ createLgtPropOverride
 	    {
 	    	passOverrideItems[y][newNumber] = "";
 	    }
-	    overrideSettings[newNumber] = newName + "||" + "type5" + "||" +	string(lightColorSettsArray.x) +  "||" + string(lightColorSettsArray.y) + "||" + string(lightColorSettsArray.z) + "||" + string(lightIntensitySetts) + "||" + string(affectDiffuseSetts) + "||" + string(affectSpecularSetts) + "||" + string(affectOpenGLSetts);
+	    overrideSettings[newNumber] = newName + "||" + "type5" + "||" +	string(lightColorSettsArray.x) +  "||" + string(lightColorSettsArray.y) + "||" + string(lightColorSettsArray.z) + "||" + string(lightIntensitySetts) + "||" + string(affectDiffuseSetts) + "||" + string(affectSpecularSetts) + "||" + string(affectOpenGLSetts)  + "||" + string(lensFlareSetts)  + "||" + string(volumetricLightingSetts);
 
 		reProcess();
 	}
@@ -913,104 +960,67 @@ createObjPropOverride
 	
 	doKeys = 0;
 
-	// User Interface Layout Variables - Matt Gorner
-	gad_x				= 6;													// Gadget X coord
-	gad_y				= 6;													// Gadget Y coord
-	gad_w				= 260;													// Gadget width
-	gad_h				= 19;													// Gadget height
-	gad_text_offset		= 80;													// Gadget text offset
-
-	num_gads			= 11;													// Total number of gadgets vertically (for calculating the max window height)
-	num_spacers			= 1;													// Total number of 'normal' spacers
-	num_text_spacers	= 0;													// Total number of spacers with text associated with them
-
-	ui_spacing_y		= 3;													// Spacing gap size Y
-	ui_spacing_x		= 3;													// Spacing gap size X
-
-	ui_offset_x 		= 0;													// Main X offset from 0
-	ui_offset_y 		= 6;													// Main Y offset from 0
-	ui_row				= 0;													// Row number
-	ui_column			= 0;													// Column number
-	ui_tab_offset		= ui_offset_y + 23;										// Offset for tab height
-	ui_row_offset		= gad_h + ui_spacing_y;									// Row offset
-
-	ui_window_w			= 275;													// Window width
-	ui_window_h			= (ui_row_offset*num_gads) + 11;						// Window height
-	ui_seperator_w		= ui_window_w + 2;										// Width of seperators
-
 	reqbegin("New ObjProps Override");
-	reqsize(ui_window_w,320);
+	reqsize(ObjProp_ui_window_w,320);
 
 	c20 = ctlstring("Override Name:","ObjPropsOverride");
-	ctlposition(c20, gad_x, gad_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c20, ObjProp_gad_x, ObjProp_gad_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
 	
-	ui_offset_y += ui_row_offset;
+	ui_offset_y = ObjProp_ui_offset_y + ObjProp_ui_row_offset;
 
 	c21 = ctlcheckbox("Matte Object",0);
-	ctlposition(c21, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	// ctlposition(c21,9,30);
+	ctlposition(c21, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += ObjProp_ui_row_offset;
 
 	c21_5 = ctlcolor("Color",0);
-	ctlposition(c21_5, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	// ctlposition(c21_5,105,30);
+	ctlposition(c21_5, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += ObjProp_ui_row_offset;
 
 	c22 = ctlpopup("Alpha Channel",1,tempAlphaArray);
-	ctlposition(c22, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	// ctlposition(c22,13,55);
+	ctlposition(c22, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
 
- 	ui_offset_y += ui_row_offset + 12;
-	s20 = ctlsep(0, ui_seperator_w + 4);
+ 	ui_offset_y += ObjProp_ui_row_offset + 12;
+	s20 = ctlsep(0, ObjProp_ui_seperator_w + 4);
 	ctlposition(s20, -2, ui_offset_y);
-	ui_offset_y += ui_spacing_y + 2;
-	// ctlposition(s20,5,80);
+	ui_offset_y += ObjProp_ui_spacing_y + 2;
 
 	c23 = ctlcheckbox("Unseen by Rays      ",0);
-	ctlposition(c23, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	//ctlposition(c23,10,85);
+	ctlposition(c23, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += ObjProp_ui_row_offset;
 
 	c24 = ctlcheckbox("Unseen by Camera",0);
-	ctlposition(c24, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	//ctlposition(c24,145,85);
+	ctlposition(c24, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += ObjProp_ui_row_offset;
 
 	c25 = ctlcheckbox("Unseen by Radiosity",0);
-	ctlposition(c25, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	//ctlposition(c25,10,110);
+	ctlposition(c25, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += ObjProp_ui_row_offset;
 
 	c26 = ctlcheckbox("Unaffected by Fog  ",0);
-	ctlposition(c26, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	//ctlposition(c26,145,110);
+	ctlposition(c26, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
 
- 	ui_offset_y += ui_row_offset + 12;
-	s21 = ctlsep(0, ui_seperator_w + 4);
+ 	ui_offset_y += ObjProp_ui_row_offset + 12;
+	s21 = ctlsep(0, ObjProp_ui_seperator_w + 4);
 	ctlposition(s21, -2, ui_offset_y);
-	ui_offset_y += ui_spacing_y + 2;
-	//ctlposition(s21,5,137);
+	ui_offset_y += ObjProp_ui_spacing_y + 2;
 
 	c27 = ctlcheckbox("Self Shadow     ",1);
-	ctlposition(c27, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	//ctlposition(c27,90,145);
+	ctlposition(c27, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += ObjProp_ui_row_offset;
 
 	c28 = ctlcheckbox("Cast Shadow     ",1);
-	ctlposition(c28, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	//ctlposition(c28,90,170);
+	ctlposition(c28, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += ObjProp_ui_row_offset;
 
 	c29 = ctlcheckbox("Receive Shadow",1);
-	ctlposition(c29, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
-	//ctlposition(c29,90,195);
+	ctlposition(c29, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
 
 	if(reqpost())
 	{
@@ -1204,77 +1214,51 @@ createSceneMasterOverride
 	tempMultiplierArray[4] = "200 %";
 	tempMultiplierArray[5] = "400 %";
 	
-	
 	doKeys = 0;
 
-	// User Interface Layout Variables - Matt Gorner
-	gad_x				= 6;													// Gadget X coord
-	gad_y				= 6;													// Gadget Y coord
-	gad_w				= 280;													// Gadget width
-	gad_h				= 19;													// Gadget height
-	gad_text_offset		= 105;													// Gadget text offset
-
-	num_gads			= 11;													// Total number of gadgets vertically (for calculating the max window height)
-	num_spacers			= 1;													// Total number of 'normal' spacers
-	num_text_spacers	= 0;													// Total number of spacers with text associated with them
-
-	ui_spacing_y		= 3;													// Spacing gap size Y
-	ui_spacing_x		= 3;													// Spacing gap size X
-
-	ui_offset_x 		= 0;													// Main X offset from 0
-	ui_offset_y 		= 6;													// Main Y offset from 0
-	ui_row				= 0;													// Row number
-	ui_column			= 0;													// Column number
-	ui_tab_offset		= ui_offset_y + 23;										// Offset for tab height
-	ui_row_offset		= gad_h + ui_spacing_y;									// Row offset
-
-	ui_window_w			= 295;													// Window width
-	ui_window_h			= (ui_row_offset*num_gads) + 11;						// Window height
-	ui_seperator_w		= ui_window_w + 2;										// Width of seperators
-
-	reqbegin("Scene Master Override");
-	reqsize(ui_window_w, 240);
+	reqbegin("New Scene Master Override");
+	reqsize(ScnMst_ui_window_w, 240);
 
 	c20 = ctlstring("Override Name:","SceneMasterOverride");
-	ctlposition(c20, gad_x, gad_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c20, ScnMst_gad_x, ScnMst_gad_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 	
-	ui_offset_y += ui_row_offset;
+	ui_offset_y = ScnMst_ui_offset_y + ScnMst_ui_row_offset;
 
 	c20_5 = ctlpopup("Resolution Multiplier",3,tempMultiplierArray);
-	ctlposition(c20_5, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c20_5, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += ScnMst_ui_row_offset;
 
 	c21 = ctlpopup("Render Mode",3,tempTypeArray);
-	ctlposition(c21, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c21, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += ScnMst_ui_row_offset;
 
 	c22 = ctlcheckbox("Depth Buffer AA",0);
-	ctlposition(c22, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c22, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += ScnMst_ui_row_offset;
 
 	c23 = ctlcheckbox("Render Lines",1);
-	ctlposition(c23, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c23, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += ScnMst_ui_row_offset;
 
 	c24 = ctlminislider("Ray Recursion Limit", 16, 0, 24);
-	ctlposition(c24, gad_x, gad_y + ui_offset_y, gad_w - 22, gad_h, gad_text_offset);
+	ctlposition(c24, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w - 22, ScnMst_gad_h, ScnMst_gad_text_offset);
 
- 	ui_offset_y += ui_row_offset + 12;
-	s21 = ctlsep(0, ui_seperator_w + 4);
-	ctlposition(s21, -2, ui_offset_y);
-	ui_offset_y += ui_spacing_y + 2;
+ 	ui_offset_y += ScnMst_ui_row_offset + 12;
+	s21 = ctlsep(0, ScnMst_ui_seperator_w + 4);
+	ctlposition(s21, -2, ScnMst_ui_offset_y);
+	ui_offset_y += ScnMst_ui_spacing_y + 2;
 
 	c25 = ctlcheckbox("Redirect Buffer Export Paths",0);
-	ctlposition(c25, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c25, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += ScnMst_ui_row_offset;
 
 	c26 = ctlcheckbox("Disable all AA",0);
-	ctlposition(c26, gad_x, gad_y + ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c26, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 	if(reqpost())
 	{
@@ -1391,38 +1375,6 @@ platformInformation: platformVar
 
 preferencePanel
 {
-
-	// User Interface Layout Variables - Matt Gorner
-
-	gad_x				= 6;																// Gadget X coord
-	gad_y				= 24;																// Gadget Y coord
-	gad_w				= 400;																// Gadget width
-	gad_h				= 19;																// Gadget height
-	gad_text_offset		= 150;																// Gadget text offset
-	gad_prev_w			= 0;																// Previous gadget width temp variable
-
-	num_gads			= 10;																// Total number of gadgets vertically (for calculating the max window height)
-
-	if(platform() == 9) // MacUB
-	{
-		num_gads ++;
-	}
-
-	ui_banner_height	= 0;																// Height of banner graphic
-	ui_spacing			= 3;																// Spacing gap size
-	ui_spacing_y		= 3;
-	
-	ui_offset_x 		= 0;																// Main X offset from 0
-	ui_offset_y 		= 3 * ui_spacing;													// Main Y offset from 0
-	ui_row				= 0;																// Row number
-	ui_column			= 0;																// Column number
-	ui_tab_offset		= ui_offset_y + 23;													// Offset for tab height
-	ui_row_offset		= gad_h + ui_spacing;												// Row offset
-
-	ui_window_w			= 436;																// Window width
-	ui_window_h			= ui_offset_y + (gad_h*num_gads) + (ui_spacing*(num_gads+1)) + 24;	// Window height
-	ui_seperator_w		= ui_window_w + 2;													// Width of seperators
-
 	resolutionsArray[1] = "640 x 540";
 	resolutionsArray[2] = "640 x 385";
 	resolutionsArray[3] = "457 x 540";
@@ -1438,69 +1390,69 @@ preferencePanel
 	doKeys = 0;
 
 	reqbegin("PassPort Preferences");
-	reqsize(ui_window_w,ui_window_h);
+	reqsize(Pref_ui_window_w,500);
 
 	// c20 = ctlfilename("Select output folder...",userOutputFolder,30,0);
 	c20 = ctlfoldername("Scene Save Location:", userOutputFolder,);
-	ctlposition(c20, gad_x, ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c20, Pref_gad_x, Pref_ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y = Pref_ui_offset_y + Pref_ui_row_offset;
 
 	c21 = ctlstring("Render file prefix",fileOutputPrefix);
-	ctlposition(c21, gad_x, ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c21, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += Pref_ui_row_offset;
 
 	c22 = ctlstring("User",userOutputString);
-	ctlposition(c22, gad_x, ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c22, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
 
-	ui_offset_y += ui_row_offset + 4;
+	ui_offset_y += Pref_ui_row_offset + 4;
 
 	s20 = ctlsep();
 	ctlposition(s20, -2, ui_offset_y);
 
-	ui_offset_y += ui_spacing + 5;
+	ui_offset_y += Pref_ui_row_offset + 5;
 
 	c23 = ctlcheckbox("Enable Confirmation Dialogs",areYouSurePrompts);
-	ctlposition(c23, gad_x, ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c23, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += Pref_ui_row_offset;
 
 	if(platform() == 9)
 	{
 		c24 = ctlcheckbox("Enable auto close/reopen updates of Editor", useHackyUpdates);
-		ctlposition(c24, gad_x, ui_offset_y, gad_w, gad_h, gad_text_offset);
+		ctlposition(c24, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
 
-		ui_offset_y += ui_row_offset;
+		ui_offset_y += Pref_ui_row_offset;
 	}
 
 	c26 = ctlpopup("Editor UI Size (On Reopen)",editorResolution,resolutionsArray);
-	ctlposition(c26, gad_x, ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c26, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
 
-	ui_offset_y += ui_row_offset + 4;
+	ui_offset_y += Pref_ui_row_offset + 4;
 
 	s21 = ctlsep();
 	ctlposition(s21, -2, ui_offset_y);
 
-	ui_offset_y += ui_spacing + 5;
+	ui_offset_y += Pref_ui_spacing + 5;
 
 	c25 = ctlpopup("Sequence Render RGB Type",rgbSaveType,image_formats_array);
-	ctlposition(c25, gad_x, ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c25, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
 
-	ui_offset_y += ui_row_offset + 4;
+	ui_offset_y += Pref_ui_row_offset + 4;
 
 	s22 = ctlsep();
 	ctlposition(s22, -2, ui_offset_y);
 
-	ui_offset_y += ui_spacing + 5;
+	ui_offset_y += Pref_ui_spacing + 5;
 
 	c28 = ctlpopup("Test Resolution Multiplier",testResMultiplier,tempMultiplierArray);
-	ctlposition(c28, gad_x, ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c28, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
 
-	ui_offset_y += ui_row_offset;
+	ui_offset_y += Pref_ui_row_offset;
 
 	c29 = ctlpopup("Test Render RGB Type", testRgbSaveType, image_formats_array);
-	ctlposition(c29, gad_x, ui_offset_y, gad_w, gad_h, gad_text_offset);
+	ctlposition(c29, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
 
 	if(reqpost())
 	{
@@ -1524,7 +1476,7 @@ preferencePanel
 
 savePassAsScene
 {
-	savePassScene = generatePassSeqScene(currentChosenPass);
+	savePassScene = generatePassFile("seq", currentChosenPass);
 	
 	doKeys = 0;
 	reqbegin("Save Pass As Scene...");
@@ -1550,9 +1502,7 @@ savePassAsScene
 
 saveAllPassesAsScenes
 {
-	
-	
-	//savePassScene = generatePassSeqScene(currentChosenPass);
+	//savePassScene = generatePassFile("seq", currentChosenPass);
 	
 	doKeys = 0;
 	reqbegin("Save All Passes As Scene...");
@@ -1572,7 +1522,7 @@ saveAllPassesAsScenes
 	{	
 		for(x = 1; x <= size(passNames); x++)
 		{
-			saveAllPassesScenes[x] = generatePassSeqScene(x);
+			saveAllPassesScenes[x] = generatePassFile("seq", x);
 			
 			lwsFileSplit = split(lwsFile);
 			if(lwsFileSplit != nil)
@@ -1594,19 +1544,15 @@ saveAllPassesAsScenes
 			{
 				error("Invalid save location.");
 			}
-			
-			
 		}
-		
 	}
 	doKeys = 1;
-	
 }
 
 
 renderPassFrame
 {
-	frameRenderScene = generatePassFrameScene(currentChosenPass);
+	frameRenderScene = generatePassFile("frame", currentChosenPass);
 
 
 	// windows frame rendering
@@ -1624,14 +1570,13 @@ renderPassFrame
 
 renderPassScene
 {
-	seqRenderScene = generatePassSeqScene(currentChosenPass);
+	seqRenderScene = generatePassFile("seq", currentChosenPass);
 	
 	// windows scene rendering
 	if(platformVar == 1 || platformVar == 10)
 	{
 		win_bg_sceneRender(seqRenderScene,seqOutputPath);
 	}
-	
 	
 	// mac UB scene rendering
 	if(platformVar == 9)
@@ -1644,7 +1589,7 @@ renderAllScene
 {
 	for(x = 1; x <= size(passNames); x++)
 	{
-		seqRenderScene[x] = generatePassSeqScene(x);
+		seqRenderScene[x] = generatePassFile("seq", x);
 	}
 	
 	// windows all scene rendering
@@ -1658,7 +1603,6 @@ renderAllScene
 	{
 		UB_bg_allSceneRender(seqRenderScene,seqOutputPath);
 	}
-
 }
 
 
@@ -1671,7 +1615,6 @@ getImageFormats
 	switch(platformVar)
 	{
 		case 5:
-			// Future proofing, don't hard code the LightWave version number - Matt Gorner
 			tempString = config_dir + getsep() + "LightWave Extensions " + vers + " Prefs";
 			input = File(tempString);
 			break;
@@ -1680,8 +1623,6 @@ getImageFormats
 			// Special case check for LW Extensions due to the "extension cache" file
 			if(integer(hostVersion()) >= 10)
 			{
-				//tempString = config_dir + getsep() + "Extensions 10";
-
 				tempString = config_dir + getsep() + "Extensions " + vers;
 				input = File(tempString);
 				(a,c,m,s,l,u,g) = filestat(tempString);
@@ -1697,7 +1638,6 @@ getImageFormats
 				}
 			}else
 			{
-				// Future proofing, don't hard code the LightWave version number - Matt Gorner
 				tempString = config_dir + getsep() + "Extensions " + vers;
 				input = File(tempString);
 			}
@@ -1706,7 +1646,6 @@ getImageFormats
 		case 1:
 			if(integer(hostVersion()) >= 10)
 			{
-				//tempString = config_dir + getsep() + "LWEXT10.CFG";
 				tempString = config_dir + getsep() + "LWEXT" + vers + ".CFG";
 				input = File(tempString);
 				(a,c,m,s,l,u,g) = filestat(tempString);
@@ -1730,7 +1669,6 @@ getImageFormats
 		case 10:
 			if(integer(hostVersion()) >= 10)
 			{
-				//tempString = config_dir + getsep() + "LWEXT10-64.CFG";
 				tempString = config_dir + getsep() + "LWEXT" + vers + "-64.CFG";
 				input = File(tempString);
 				(a,c,m,s,l,u,g) = filestat(tempString);
@@ -1765,7 +1703,6 @@ getImageFormats
 			line = input.read();
 			if(line == searchstring)
 			{
-
 				wholeline[x] = input.read();
 				wholelinesize = sizeof(wholeline[x]);
 				wholeline_right = strright(wholeline[x],wholelinesize - 8);
@@ -1781,7 +1718,6 @@ getImageFormats
 				error("Can't parse 'LWEXT*.cfg' file, turn off 'Autoscan Plugins' and manually scan plugin directory");
 				return(nil);
 			}
-
 		}
 		if(input)
 			input.close();
@@ -1791,7 +1727,6 @@ getImageFormats
 		error("Can't locate 'LWEXT",vers,".cfg' file");
 		return(nil);
 	}
-
 }
 
 doHackyReplacing
@@ -1853,7 +1788,6 @@ doHackyReplacing
 	
 	inputFile.close();
 	outputFile.close();
-	
 	filedelete(tempFilePath);
 }
 
@@ -1861,7 +1795,6 @@ doHackyReplacing
 // override subfunctions
 checkForOverrideAssignments: currentID, pass
 {
-
 	// pass = currentChosenPass;
 	if(overrideNames[1] != "empty")
 	{
@@ -1883,7 +1816,6 @@ checkForOverrideAssignments: currentID, pass
 			}
 		}
 	}
-
 	return( assignedArray );
 }
 
@@ -1937,7 +1869,6 @@ addSelButton
 		setvalue(c3,nil);
     	requpdate();
 	}
-
 }
 
 clearSelButton
@@ -1999,7 +1930,6 @@ clearSelButton
 			setvalue(c3,nil);
 	    	requpdate();
 		}
-	
     }
 	else
     {
@@ -2058,7 +1988,6 @@ o_addSelButton
 		setvalue(c3_5,nil);
     	requpdate();
 	}
-
 }
 
 o_clearSelButton
@@ -2130,33 +2059,10 @@ o_clearSelButton
 		setvalue(c3_5,nil);
     	requpdate();
 	}
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStartLine
 {
-	
 	// figure out which mesh object agent we're dealing with here so we can do the surfacing
 	for(x = 1; x <= size(meshIDs); x++)
 	{
@@ -2250,30 +2156,27 @@ generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStar
 			tempLWOPath = outputFolder[1] + "CG" + getsep() + "temp" + getsep() + "tempScenes" + getsep() + "tempObjects" + getsep() + string(srfLWOInputID) + "_" + srfInputTempArray[3] + "_" + userOutputString + "_" + passNames[pass] + ".lwo";
 		}
 		
-		
-		
 		srf_file_path = split(srfInputTemp);
 		surfaceList = Surface(meshAgents[selectedMeshID]);
 		for(x = 1; x <= size(surfaceList); x++)
 		{
-				progressString = string((x/size(surfaceList))/2);
-				msgString = "{" + progressString + "}Overriding Surfaces on " + meshNames[selectedMeshID] + "...";
-				StatusMsg(msgString);
-				
-				// deal with both layer names and clones
-				meshBaseName = split(meshAgents[selectedMeshID].filename); 
-				if(meshBaseName[3] != nil)
-				{
-					nameOfObject = meshBaseName[3];
-				}
-				else
-				{
-					error("Unable to override surfaces on current object.");
-				}
-				
-				
-				commandAdd = "Surf_SetSurf \"" + surfaceList[x] + "\" \"" + nameOfObject + "\"";
-				//info(commandAdd);
+			progressString = string((x/size(surfaceList))/2);
+			msgString = "{" + progressString + "}Overriding Surfaces on " + meshNames[selectedMeshID] + "...";
+			StatusMsg(msgString);
+			
+			// deal with both layer names and clones
+			meshBaseName = split(meshAgents[selectedMeshID].filename); 
+			if(meshBaseName[3] != nil)
+			{
+				nameOfObject = meshBaseName[3];
+			}
+			else
+			{
+				error("Unable to override surfaces on current object.");
+			}
+			
+			commandAdd = "Surf_SetSurf \"" + surfaceList[x] + "\" \"" + nameOfObject + "\"";
+			//info(commandAdd);
 
 			CommandInput(commandAdd);
 			commandAdd = "Surf_Save \"surfaceForReturning_" + x + "_.srf\"";
@@ -2281,15 +2184,12 @@ generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStar
 			commandAdd = "Surf_Load \"" + srfInputTemp + "\"";
 			CommandInput(commandAdd);
 			sleep(1);
-			
 		}
-		
 		
 		//SelectItem(srfLWOInputID);
 		SelectByName(meshNames[selectedMeshID]);
 		SaveObjectCopy(tempLWOPath);
-	
-		
+
 		for(x = 1; x <= size(surfaceList); x++)
 		{
 			if((((x/size(surfaceList))/2) + 0.5) < 1)
@@ -2321,8 +2221,6 @@ generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStar
 			sleep(1);
 			filedelete("surfaceForReturning_" + x + "_.srf");
 		}
-
-			
 		return(tempLWOPath);
 	}
 }
@@ -2334,7 +2232,6 @@ makeStringGood: string
 	stringAdd = "";
 	for(x = 1; x <= stringSize; x++)
 	{
-		
 		if(string[x].isAlnum())
 		{
 			stringAdd = stringAdd + string[x];
@@ -2370,7 +2267,6 @@ makeStringGood: string
 		return(stringAdd);
 	}
 }
-
 
 resizePanel: w, h
 {
@@ -2457,7 +2353,6 @@ saveCurrentPassesSettings
 		io.writeln(overrideNamesSize);
 		io.writeln(overrideNames[1]);
 		
-		
 		if(overrideNames[1] != "empty")
 		{
 			io.writeln(overrideSettings[1]);
@@ -2497,11 +2392,6 @@ saveCurrentPassesSettings
 		globalstore("passEditoruseHackyUpdates",useHackyUpdates);
 		globalstore("passEditorrgbSaveType",rgbSaveType);
 		globalstore("passEditoreditorResolution",editorResolution);
-		
-		
-		//
-		//
-		//
 		
 		if(areYouSurePrompts == 1)
 		{
@@ -2772,12 +2662,8 @@ loadPassesSettings
 				reProcess();
 				requpdate();
 			}
-
 		}
-		
 	}
-
-
 }
 	
 moveOverrideToBottom
@@ -2863,9 +2749,7 @@ moveOverrideToBottom
 						    		}
 						    	}
 				    		}
-					    	
-					    	
-						    	
+
 						    for(passInt = 1; passInt <= size(passNames); passInt++)
 				    		{
 						    	passOverrideItems[passInt][topNumber] = movedPassOverrideItems[passInt];
@@ -2966,8 +2850,6 @@ moveOverrideToBottom
 					    	}
 			    		}
 				    	
-				    	
-					    	
 					    for(passInt = 1; passInt <= size(passNames); passInt++)
 			    		{
 					    	passOverrideItems[passInt][topNumber] = movedPassOverrideItems[passInt];
@@ -2979,10 +2861,8 @@ moveOverrideToBottom
 		    }
 		    reProcess();
 		    requpdate();
-
 		}
 	}
-
 }
 
 fixPathForWin32: path
@@ -3028,9 +2908,7 @@ fixPathForWin32: path
 	{
 		newPathFixed = "\"" + newPathFixed + "\"";
 	}
-	
 	return(newPathFixed);
-	
 }
 
 hackyCloseReopenToggle: value
@@ -3040,7 +2918,6 @@ hackyCloseReopenToggle: value
 
 getCommand: event,data
 {
-	
 	if(event != nil)
 	{
 		switch(event)
@@ -3324,7 +3201,7 @@ getCommand: event,data
 				{
 					if(comRingCommand[2] != nil && comRingCommand[2] != "")
 					{
-						savePassScene = generatePassSeqScene(currentChosenPass);
+						savePassScene = generatePassFile("seq", currentChosenPass);
 						filecopy(savePassScene,comRingCommand[2]);
 						filedelete(savePassScene);
 					}
@@ -3356,7 +3233,6 @@ getCommand: event,data
 						overrideNamesSize = size(overrideNames);
 						io.writeln(overrideNamesSize);
 						io.writeln(overrideNames[1]);
-						
 						
 						if(overrideNames[1] != "empty")
 						{

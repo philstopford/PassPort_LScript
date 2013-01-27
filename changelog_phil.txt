@@ -14,6 +14,18 @@ PP-Phil_20121128
 - Moved UDF code to a dedicated file.
 - Worked around About box corruption by disabling drawline calls in the req_redraw function. Added an explicit line drawing call in the about box function instead.
 
+20121129
+========
+
+- Trying to re-enable disabled lens flare and volumetric properties support for lights. Untested.
+- Major optimisation of the SceneGen code :
+	- Started by splitting code and looking for differences between frame and sequence mode. Based on differences, added a 'mode' switch ("frame" or "seq"). This then drives the output string formatting and naming. This allowed the majority of the simplification.
+	- Added a new internal function called generatePath that takes inputs common to all of the SaverPath generation steps. This reduces duplication in the save code to function calls with similar parameters. The save function utilises mode to determine how to construct the final path.
+	- Reduced code by 20 KB. Redundant saverPath code will be removed once experimental changes for generic path construction have been validated.
+- Pushing UI layout variables into new passEditor_UIglobals.ls file, to be able to easily share layout settings between edit and create override dialogs, for example. All dialogs migrated and tested. Moved 7 KB of variable definitions out of the Interface_Subfuncs file. Some code increase due to the revised dialog in the editing section, but at least it is all now consistent. Will consider a further optimisation in a future revision.
+- Minor coding style fixes.
+
+	
 Reference :
 -----------
 

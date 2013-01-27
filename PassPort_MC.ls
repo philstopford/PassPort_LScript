@@ -63,6 +63,7 @@
 @if dev == TRUE
 @if platform == MACUB
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_globals.ls"
+@insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UIglobals.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_Interface_Subfuncs.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_render_Subfuncs.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_sceneGen_Subfuncs.ls"
@@ -71,6 +72,7 @@
 @end
 @if platform == INTEL
 @insert "E:/PassPort/Source/passEditor_globals.ls"
+@insert "E:/PassPort/Source/passEditor_UIglobals.ls"
 @insert "E:/PassPort/Source/passEditor_Interface_Subfuncs.ls"
 @insert "E:/PassPort/Source/passEditor_render_Subfuncs.ls"
 @insert "E:/PassPort/Source/passEditor_sceneGen_Subfuncs.ls"
@@ -79,6 +81,7 @@
 @end
 @else
 @insert "@passEditor_globals.ls"
+@insert "@passEditor_UIglobals.ls"
 @insert "@passEditor_Interface_Subfuncs.ls"
 @insert "@passEditor_render_Subfuncs.ls"
 @insert "@passEditor_sceneGen_Subfuncs.ls"
@@ -181,31 +184,18 @@ bullet_icon = @ "................",
 @define CTRLR 7
 @define BULLET 8
 
-// UI layout variables for main screen
-// Matt Gorner
-
-var banner_height	= 64;
-var button_height	= 19;
-var spacer_height	= 3;
-var ui_y_spacer		= 4;
-var ui_gap			= 5;
-
 // typical interface functions for master script here
 create
 {
 	loadingInProgress = 0;
 	justReopened = 0;
 
-	panelWidth = integer(globalrecall("passEditorpanelWidth", 640));
-	panelHeight = integer(globalrecall("passEditorpanelHeight", 540));
-	panelWidthOnOpen = panelWidth;
-
 	// 22 = List gadget scrollbar
-	listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-	listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+	listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+	listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 
 	// New UI layout code - Matt Gorner
-	listOneHeight = panelHeight - ( 3 * button_height) - banner_height - spacer_height - ( 5 * ui_y_spacer);
+	listOneHeight = Main_panelHeight - ( 3 * Main_button_height) - Main_banner_height - Main_spacer_height - ( 5 * Main_ui_y_spacer);
 
 	icon[BLANK] = Icon(blank_icon);
 	icon[ENTERKEY] = Icon(enterkey_icon);
@@ -259,7 +249,6 @@ options
 		reqend();
 	}
 
-
 	this_script = split(SCRIPTID);
 	this_script_path = this_script[1] + this_script[2];
 
@@ -272,9 +261,8 @@ options
 	}
 
 	reqbegin("PassPort Editor " + versionString);
-	reqsize(panelWidth,panelHeight);
+	reqsize(Main_panelWidth,Main_panelHeight);
 
-	// New UI layout code - Matt Gorner
 	// Banner Graphic
 	if(compiled)
 	{
@@ -329,31 +317,29 @@ options
 
 	ctlposition(c_banner,0,0);
 
-	buttonHeight = 19;
-
 	file_popup_menu = ctlmenu("File...           " + icon[DOWNARROW],fileMenu_items,"fileMenu_select","fileMenu_active");
-	ctlposition(file_popup_menu, ui_gap, banner_height + 5);
+	ctlposition(file_popup_menu, Main_ui_gap, Main_banner_height + 5);
 	
 	c0_5 = ctltab("Passes","Overrides");
 	ctlposition(c0_5, 0, banner_height + 35);
 
 	gad_PassesListview = ctllistbox("Render Passes",listOneWidth,listOneHeight,"passeslb_count","passeslb_name","passeslb_event");
-	ctlposition(gad_PassesListview, ui_gap, banner_height + 55);
+	ctlposition(gad_PassesListview, Main_ui_gap, Main_banner_height + 55);
 
 	gad_OverridesListview = ctllistbox("Item Overrides",listOneWidth,listOneHeight,"overrideslb_count","overrideslb_name","overrideslb_event");
-	ctlposition(gad_OverridesListview, ui_gap, banner_height + 55);
+	ctlposition(gad_OverridesListview, Main_ui_gap, Main_banner_height + 55);
 
 	c3 = ctllistbox("Scene Items",listTwoWidth,listOneHeight,"itemslb_count","itemslb_name","itemslb_event");
-	ctlposition(c3,listTwoPosition, banner_height + 55);
+	ctlposition(c3,listTwoPosition, Main_banner_height + 55);
 
 	c3_5 = ctllistbox("Scene Items",listTwoWidth,listOneHeight,"o_itemslb_count","o_itemslb_name","o_itemslb_event");
-	ctlposition(c3_5,listTwoPosition, banner_height + 55);
+	ctlposition(c3_5,listTwoPosition, Main_banner_height + 55);
 
 	c4 = ctlmenu(newPassButtonString,passMenu_items,"passMenu_select","passMenu_active");
-	ctlposition(c4,newPassButtonXposition,bottomPosition,newPassButtonWidth,button_height);
+	ctlposition(c4,newPassButtonXposition,bottomPosition,newPassButtonWidth,Main_button_height);
 
 	c5 = ctlmenu(newOverrideButtonString,overrideMenu_items,"overrideMenu_select","overrideMenu_active");
-	ctlposition(c5,newOverrideButtonXposition,bottomPosition,newOverrideButtonWidth,button_height);
+	ctlposition(c5,newOverrideButtonXposition,bottomPosition,newOverrideButtonWidth,Main_button_height);
 
 	c5_01 = ctlbutton(editSelectedButtonString,editSelectedButtonWidth,"editSelectedPass");
 	ctlposition(c5_01,editSelectedButtonXposition,bottomPosition);
@@ -392,7 +378,7 @@ options
 	ctlposition(c5_45,clearSelButtonXposition,bottomPosition);
 
 	gad_SelectedPass = ctlpopup("Current Pass :",currentChosenPass,"currentPassMenu_update");
-	ctlposition(gad_SelectedPass, 100, banner_height + 5, 300, buttonHeight);
+	ctlposition(gad_SelectedPass, 100, Main_banner_height + 5, 300, Main_button_height);
 	ctlrefresh(gad_SelectedPass, "currentPassMenu_refresh");
 
 	//c7 = ctltext(currentChosenPassString,"");
@@ -866,32 +852,32 @@ process: event, command
 		switch(editorResolution)
 		{
 			case 1:
-				panelWidth = 640;
-				panelHeight = 540;
+				Main_panelWidth = Main_res1_panelWidth;
+				Main_panelHeight = Main_res1_panelHeight;
 				
 				// 22 = List gadget scrollbar
-				listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-				listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+				listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+				listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 
-				w = integer(( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 3) + 1 );
+				w = integer(( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 3) + 1 );
 
 				newPassButtonString = "New Pass...      " + icon[DOWNARROW];
 				newPassButtonWidth = w;
-				newPassButtonXposition = ui_gap;
+				newPassButtonXposition = Main_ui_gap;
 
 				newOverrideButtonString = "New Override... " + icon[DOWNARROW];
 				newOverrideButtonWidth = w;
-				newOverrideButtonXposition = ui_gap;
+				newOverrideButtonXposition = Main_ui_gap;
 
 				editSelectedButtonString = "Edit Selected  " + icon[ENTERKEY];
 				editSelectedButtonWidth = w;
-				editSelectedButtonXposition = ui_gap + w + (ui_gap / 2);
+				editSelectedButtonXposition = Main_ui_gap + w + (Main_ui_gap / 2);
 
 				deleteSelectedButtonString = "Del Selected   " + icon[DELETEKEY];
 				deleteSelectedButtonWidth = w;
-				deleteSelectedButtonXposition = ui_gap + 2 * (w + (ui_gap / 2));
+				deleteSelectedButtonXposition = Main_ui_gap + 2 * (w + (Main_ui_gap / 2));
 
-				w = integer( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 4 );
+				w = integer( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 4 );
 
 				addAllButtonString = "Add All    "+ icon[CTRLA];
 				addAllButtonWidth = w;
@@ -899,27 +885,27 @@ process: event, command
 
 				addSelButtonString = "Add Sel    ";
 				addSelButtonWidth = w;
-				addSelButtonXposition = listTwoPosition + w + (ui_gap / 2);
+				addSelButtonXposition = listTwoPosition + w + (Main_ui_gap / 2);
 
 				clearAllButtonString = "Clear All";
 				clearAllButtonWidth = w;
-				clearAllButtonXposition = listTwoPosition + 2 * (w + (ui_gap / 2));
+				clearAllButtonXposition = listTwoPosition + 2 * (w + (Main_ui_gap / 2));
 
 				clearSelButtonString = "Clear Sel";
 				clearSelButtonWidth = w;
-				clearSelButtonXposition = listTwoPosition + 3 * (w + (ui_gap / 2));
+				clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
 				break;
 				
 			case 2:
-				panelWidth = 640;
-				panelHeight = 385;
+				Main_panelWidth = Main_res2_panelWidth;
+				Main_panelHeight = Main_res2_panelHeight;
 
 				// 22 = List gadget scrollbar
-				listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-				listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+				listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+				listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 
-				w = integer(( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 3) + 1 );
+				w = integer(( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 3) + 1 );
 
 				newPassButtonString = "New Pass...      " + icon[DOWNARROW];
 				newPassButtonWidth = w;
@@ -931,13 +917,13 @@ process: event, command
 
 				editSelectedButtonString = "Edit Selected  " + icon[ENTERKEY];
 				editSelectedButtonWidth = w;
-				editSelectedButtonXposition = ui_gap + w + (ui_gap / 2);
+				editSelectedButtonXposition = Main_ui_gap + w + (Main_ui_gap / 2);
 
 				deleteSelectedButtonString = "Del Selected   " + icon[DELETEKEY];
 				deleteSelectedButtonWidth = w;
-				deleteSelectedButtonXposition = ui_gap + 2 * (w + (ui_gap / 2));
+				deleteSelectedButtonXposition = Main_ui_gap + 2 * (w + (Main_ui_gap / 2));
 
-				w = integer( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 4 );
+				w = integer( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 4 );
 
 				addAllButtonString = "Add All    "+ icon[CTRLA];
 				addAllButtonWidth = w;
@@ -945,45 +931,45 @@ process: event, command
 
 				addSelButtonString = "Add Sel    ";
 				addSelButtonWidth = w;
-				addSelButtonXposition = listTwoPosition + w + (ui_gap / 2);
+				addSelButtonXposition = listTwoPosition + w + (Main_ui_gap / 2);
 
 				clearAllButtonString = "Clear All";
 				clearAllButtonWidth = w;
-				clearAllButtonXposition = listTwoPosition + 2 * (w + (ui_gap / 2));
+				clearAllButtonXposition = listTwoPosition + 2 * (w + (Main_ui_gap / 2));
 
 				clearSelButtonString = "Clear Sel";
 				clearSelButtonWidth = w;
-				clearSelButtonXposition = listTwoPosition + 3 * (w + (ui_gap / 2));
+				clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
 				break;
 
 			case 3:
-				panelWidth = 457;
-				panelHeight = 540;
+				Main_panelWidth = Main_res3_panelWidth;
+				Main_panelHeight = Main_res3_panelHeight;
 
 				// 22 = List gadget scrollbar
-				listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-				listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+				listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+				listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 				
-				w = integer(( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 3) + 1 );
+				w = integer(( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 3) + 1 );
 
 				newPassButtonString = "+Pass...   " + icon[DOWNARROW];
 				newPassButtonWidth = w;
-				newPassButtonXposition = ui_gap;
+				newPassButtonXposition = Main_ui_gap;
 
 				newOverrideButtonString = "+Override" + icon[DOWNARROW];
 				newOverrideButtonWidth = w;
-				newOverrideButtonXposition = ui_gap;
+				newOverrideButtonXposition = Main_ui_gap;
 
 				editSelectedButtonString = "Edit " + icon[ENTERKEY];
 				editSelectedButtonWidth = w;
-				editSelectedButtonXposition = ui_gap + w + (ui_gap / 2);
+				editSelectedButtonXposition = Main_ui_gap + w + (Main_ui_gap / 2);
 
 				deleteSelectedButtonString = "Del " + icon[DELETEKEY];
 				deleteSelectedButtonWidth = w;
-				deleteSelectedButtonXposition = ui_gap + 2 * (w + (ui_gap / 2));
+				deleteSelectedButtonXposition = Main_ui_gap + 2 * (w + (Main_ui_gap / 2));
 
-				w = integer( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 4 );
+				w = integer( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 4 );
 
 				addAllButtonString = "+All "+ icon[CTRLA];
 				addAllButtonWidth = w;
@@ -991,45 +977,45 @@ process: event, command
 
 				addSelButtonString = "+Sel";
 				addSelButtonWidth = w;
-				addSelButtonXposition = listTwoPosition + w + (ui_gap / 2);
+				addSelButtonXposition = listTwoPosition + w + (Main_ui_gap / 2);
 
 				clearAllButtonString = "-All";
 				clearAllButtonWidth = w;
-				clearAllButtonXposition = listTwoPosition + 2 * (w + (ui_gap / 2));
+				clearAllButtonXposition = listTwoPosition + 2 * (w + (Main_ui_gap / 2));
 
 				clearSelButtonString = "-Sel";
 				clearSelButtonWidth = w;
-				clearSelButtonXposition = listTwoPosition + 3 * (w + (ui_gap / 2));
+				clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
 				break;
 				
 			case 4:
-				panelWidth = 457;
-				panelHeight = 385;
+				Main_panelWidth = Main_res4_panelWidth;
+				Main_panelHeight = Main_res4_panelHeight;
 
 				// 22 = List gadget scrollbar
-				listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-				listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+				listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+				listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 
-				w = integer(( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 3) + 1 );
+				w = integer(( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 3) + 1 );
 
 				newPassButtonString = "+Pass...   " + icon[DOWNARROW];
 				newPassButtonWidth = w;
-				newPassButtonXposition = ui_gap;
+				newPassButtonXposition = Main_ui_gap;
 
 				newOverrideButtonString = "+Override" + icon[DOWNARROW];
 				newOverrideButtonWidth = w;
-				newOverrideButtonXposition = ui_gap;
+				newOverrideButtonXposition = Main_ui_gap;
 
 				editSelectedButtonString = "Edit " + icon[ENTERKEY];
 				editSelectedButtonWidth = w;
-				editSelectedButtonXposition = ui_gap + w + (ui_gap / 2);
+				editSelectedButtonXposition = Main_ui_gap + w + (Main_ui_gap / 2);
 
 				deleteSelectedButtonString = "Del " + icon[DELETEKEY];
 				deleteSelectedButtonWidth = w;
-				deleteSelectedButtonXposition = ui_gap + 2 * (w + (ui_gap / 2));
+				deleteSelectedButtonXposition = Main_ui_gap + 2 * (w + (Main_ui_gap / 2));
 
-				w = integer( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 4 );
+				w = integer( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 4 );
 
 				addAllButtonString = "+All "+ icon[CTRLA];
 				addAllButtonWidth = w;
@@ -1037,45 +1023,45 @@ process: event, command
 
 				addSelButtonString = "+Sel";
 				addSelButtonWidth = w;
-				addSelButtonXposition = listTwoPosition + w + (ui_gap / 2);
+				addSelButtonXposition = listTwoPosition + w + (Main_ui_gap / 2);
 
 				clearAllButtonString = "-All";
 				clearAllButtonWidth = w;
-				clearAllButtonXposition = listTwoPosition + 2 * (w + (ui_gap / 2));
+				clearAllButtonXposition = listTwoPosition + 2 * (w + (Main_ui_gap / 2));
 
 				clearSelButtonString = "-Sel";
 				clearSelButtonWidth = w;
-				clearSelButtonXposition = listTwoPosition + 3 * (w + (ui_gap / 2));
+				clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
 				break;
 				
 			default:
-				panelWidth = 640;
-				panelHeight = 540;
+				Main_panelWidth = Main_res1_panelWidth;
+				Main_panelHeight = Main_res1_panelHeight;
 
 				// 22 = List gadget scrollbar
-				listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-				listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+				listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+				listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 
-				w = integer(( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 3) + 1 );
+				w = integer(( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 3) + 1 );
 
 				newPassButtonString = "New Pass...      " + icon[DOWNARROW];
 				newPassButtonWidth = w;
-				newPassButtonXposition = ui_gap;
+				newPassButtonXposition = Main_ui_gap;
 
 				newOverrideButtonString = "New Override... " + icon[DOWNARROW];
 				newOverrideButtonWidth = w;
-				newOverrideButtonXposition = ui_gap;
+				newOverrideButtonXposition = Main_ui_gap;
 
 				editSelectedButtonString = "Edit Selected  " + icon[ENTERKEY];
 				editSelectedButtonWidth = w;
-				editSelectedButtonXposition = ui_gap + w + (ui_gap / 2);
+				editSelectedButtonXposition = Main_ui_gap + w + (Main_ui_gap / 2);
 
 				deleteSelectedButtonString = "Del Selected   " + icon[DELETEKEY];
 				deleteSelectedButtonWidth = w;
-				deleteSelectedButtonXposition = ui_gap + 2 * (w + (ui_gap / 2));
+				deleteSelectedButtonXposition = Main_ui_gap + 2 * (w + (Main_ui_gap / 2));
 
-				w = integer( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 4 );
+				w = integer( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 4 );
 
 				addAllButtonString = "Add All    "+ icon[CTRLA];
 				addAllButtonWidth = w;
@@ -1083,28 +1069,28 @@ process: event, command
 
 				addSelButtonString = "Add Sel    ";
 				addSelButtonWidth = w;
-				addSelButtonXposition = listTwoPosition + w + (ui_gap / 2);
+				addSelButtonXposition = listTwoPosition + w + (Main_ui_gap / 2);
 
 				clearAllButtonString = "Clear All";
 				clearAllButtonWidth = w;
-				clearAllButtonXposition = listTwoPosition + 2 * (w + (ui_gap / 2));
+				clearAllButtonXposition = listTwoPosition + 2 * (w + (Main_ui_gap / 2));
 
 				clearSelButtonString = "Clear Sel";
 				clearSelButtonWidth = w;
-				clearSelButtonXposition = listTwoPosition + 3 * (w + (ui_gap / 2));
+				clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
 				break;
 		}
 
 	// 22 = List gadget scrollbar
-	listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-	listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+	listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+	listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 
 	// New UI layout code - Matt Gorner
-	listOneHeight = panelHeight - ( 3 * button_height) - banner_height - spacer_height - ( 5 * ui_y_spacer);
+	listOneHeight = Main_panelHeight - ( 3 * Main_button_height) - Main_banner_height - Main_spacer_height - ( 5 * Main_ui_y_spacer);
 
 	// New UI layout code - Matt Gorner
-	bottomPosition = panelHeight - button_height - ui_y_spacer;
+	bottomPosition = Main_panelHeight - Main_button_height - Main_ui_y_spacer;
 
 	doKeys = 1;
 
@@ -1328,32 +1314,32 @@ reProcess
 		switch(editorResolution)
 		{
 			case 1:
-				panelWidth = 640;
-				panelHeight = 540;
+				Main_panelWidth = Main_res1_panelWidth;
+				Main_panelHeight = Main_res1_panelHeight;
 				
 				// 22 = List gadget scrollbar
-				listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-				listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+				listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+				listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 
-				w = integer(( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 3) + 1 );
+				w = integer(( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 3) + 1 );
 
 				newPassButtonString = "New Pass...      " + icon[DOWNARROW];
 				newPassButtonWidth = w;
-				newPassButtonXposition = ui_gap;
+				newPassButtonXposition = Main_ui_gap;
 
 				newOverrideButtonString = "New Override... " + icon[DOWNARROW];
 				newOverrideButtonWidth = w;
-				newOverrideButtonXposition = ui_gap;
+				newOverrideButtonXposition = Main_ui_gap;
 
 				editSelectedButtonString = "Edit Selected  " + icon[ENTERKEY];
 				editSelectedButtonWidth = w;
-				editSelectedButtonXposition = ui_gap + w + (ui_gap / 2);
+				editSelectedButtonXposition = Main_ui_gap + w + (Main_ui_gap / 2);
 
 				deleteSelectedButtonString = "Del Selected   " + icon[DELETEKEY];
 				deleteSelectedButtonWidth = w;
-				deleteSelectedButtonXposition = ui_gap + 2 * (w + (ui_gap / 2));
+				deleteSelectedButtonXposition = Main_ui_gap + 2 * (w + (Main_ui_gap / 2));
 
-				w = integer( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 4 );
+				w = integer( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 4 );
 
 				addAllButtonString = "Add All    "+ icon[CTRLA];
 				addAllButtonWidth = w;
@@ -1361,45 +1347,45 @@ reProcess
 
 				addSelButtonString = "Add Sel    ";
 				addSelButtonWidth = w;
-				addSelButtonXposition = listTwoPosition + w + (ui_gap / 2);
+				addSelButtonXposition = listTwoPosition + w + (Main_ui_gap / 2);
 
 				clearAllButtonString = "Clear All";
 				clearAllButtonWidth = w;
-				clearAllButtonXposition = listTwoPosition + 2 * (w + (ui_gap / 2));
+				clearAllButtonXposition = listTwoPosition + 2 * (w + (Main_ui_gap / 2));
 
 				clearSelButtonString = "Clear Sel";
 				clearSelButtonWidth = w;
-				clearSelButtonXposition = listTwoPosition + 3 * (w + (ui_gap / 2));
+				clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
 				break;
 				
 			case 2:
-				panelWidth = 640;
-				panelHeight = 385;
+				Main_panelWidth = Main_res2_panelWidth;
+				Main_panelHeight = Main_res2_panelHeight;
 
 				// 22 = List gadget scrollbar
-				listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-				listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+				listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+				listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 
-				w = integer(( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 3) + 1 );
+				w = integer(( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 3) + 1 );
 
 				newPassButtonString = "New Pass...      " + icon[DOWNARROW];
 				newPassButtonWidth = w;
-				newPassButtonXposition = ui_gap;
+				newPassButtonXposition = Main_ui_gap;
 
 				newOverrideButtonString = "New Override... " + icon[DOWNARROW];
 				newOverrideButtonWidth = w;
-				newOverrideButtonXposition = ui_gap;
+				newOverrideButtonXposition = Main_ui_gap;
 
 				editSelectedButtonString = "Edit Selected  " + icon[ENTERKEY];
 				editSelectedButtonWidth = w;
-				editSelectedButtonXposition = ui_gap + w + (ui_gap / 2);
+				editSelectedButtonXposition = Main_ui_gap + w + (Main_ui_gap / 2);
 
 				deleteSelectedButtonString = "Del Selected   " + icon[DELETEKEY];
 				deleteSelectedButtonWidth = w;
-				deleteSelectedButtonXposition = ui_gap + 2 * (w + (ui_gap / 2));
+				deleteSelectedButtonXposition = Main_ui_gap + 2 * (w + (Main_ui_gap / 2));
 
-				w = integer( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 4 );
+				w = integer( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 4 );
 
 				addAllButtonString = "Add All    "+ icon[CTRLA];
 				addAllButtonWidth = w;
@@ -1407,27 +1393,27 @@ reProcess
 
 				addSelButtonString = "Add Sel    ";
 				addSelButtonWidth = w;
-				addSelButtonXposition = listTwoPosition + w + (ui_gap / 2);
+				addSelButtonXposition = listTwoPosition + w + (Main_ui_gap / 2);
 
 				clearAllButtonString = "Clear All";
 				clearAllButtonWidth = w;
-				clearAllButtonXposition = listTwoPosition + 2 * (w + (ui_gap / 2));
+				clearAllButtonXposition = listTwoPosition + 2 * (w + (Main_ui_gap / 2));
 
 				clearSelButtonString = "Clear Sel";
 				clearSelButtonWidth = w;
-				clearSelButtonXposition = listTwoPosition + 3 * (w + (ui_gap / 2));
+				clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
 				break;
 
 			case 3:
-				panelWidth = 457;
-				panelHeight = 540;
+				Main_panelWidth = Main_res3_panelWidth;
+				Main_panelHeight = Main_res3_panelHeight;
 
 				// 22 = List gadget scrollbar
-				listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-				listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+				listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+				listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 				
-				w = integer(( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 3) + 1 );
+				w = integer(( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 3) + 1 );
 
 				newPassButtonString = "+Pass...   " + icon[DOWNARROW];
 				newPassButtonWidth = w;
@@ -1435,17 +1421,17 @@ reProcess
 
 				newOverrideButtonString = "+Override" + icon[DOWNARROW];
 				newOverrideButtonWidth = w;
-				newOverrideButtonXposition = ui_gap;
+				newOverrideButtonXposition = Main_ui_gap;
 
 				editSelectedButtonString = "Edit " + icon[ENTERKEY];
 				editSelectedButtonWidth = w;
-				editSelectedButtonXposition = ui_gap + w + (ui_gap / 2);
+				editSelectedButtonXposition = Main_ui_gap + w + (Main_ui_gap / 2);
 
 				deleteSelectedButtonString = "Del " + icon[DELETEKEY];
 				deleteSelectedButtonWidth = w;
-				deleteSelectedButtonXposition = ui_gap + 2 * (w + (ui_gap / 2));
+				deleteSelectedButtonXposition = Main_ui_gap + 2 * (w + (Main_ui_gap / 2));
 
-				w = integer( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 4 );
+				w = integer( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 4 );
 
 				addAllButtonString = "+All "+ icon[CTRLA];
 				addAllButtonWidth = w;
@@ -1453,45 +1439,45 @@ reProcess
 
 				addSelButtonString = "+Sel";
 				addSelButtonWidth = w;
-				addSelButtonXposition = listTwoPosition + w + (ui_gap / 2);
+				addSelButtonXposition = listTwoPosition + w + (Main_ui_gap / 2);
 
 				clearAllButtonString = "-All";
 				clearAllButtonWidth = w;
-				clearAllButtonXposition = listTwoPosition + 2 * (w + (ui_gap / 2));
+				clearAllButtonXposition = listTwoPosition + 2 * (w + (Main_ui_gap / 2));
 
 				clearSelButtonString = "-Sel";
 				clearSelButtonWidth = w;
-				clearSelButtonXposition = listTwoPosition + 3 * (w + (ui_gap / 2));
+				clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
 				break;
 				
 			case 4:
-				panelWidth = 457;
-				panelHeight = 385;
+				Main_panelWidth = Main_res4_panelWidth;
+				Main_panelHeight = Main_res4_panelHeight;
 
 				// 22 = List gadget scrollbar
-				listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-				listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+				listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+				listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 
-				w = integer(( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 3) + 1 );
+				w = integer(( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 3) + 1 );
 
 				newPassButtonString = "+Pass...   " + icon[DOWNARROW];
 				newPassButtonWidth = w;
-				newPassButtonXposition = ui_gap;
+				newPassButtonXposition = Main_ui_gap;
 
 				newOverrideButtonString = "+Override" + icon[DOWNARROW];
 				newOverrideButtonWidth = w;
-				newOverrideButtonXposition = ui_gap;
+				newOverrideButtonXposition = Main_ui_gap;
 
 				editSelectedButtonString = "Edit " + icon[ENTERKEY];
 				editSelectedButtonWidth = w;
-				editSelectedButtonXposition = ui_gap + w + (ui_gap / 2);
+				editSelectedButtonXposition = Main_ui_gap + w + (Main_ui_gap / 2);
 
 				deleteSelectedButtonString = "Del " + icon[DELETEKEY];
 				deleteSelectedButtonWidth = w;
-				deleteSelectedButtonXposition = ui_gap + 2 * (w + (ui_gap / 2));
+				deleteSelectedButtonXposition = Main_ui_gap + 2 * (w + (Main_ui_gap / 2));
 
-				w = integer( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 4 );
+				w = integer( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 4 );
 
 				addAllButtonString = "+All "+ icon[CTRLA];
 				addAllButtonWidth = w;
@@ -1499,45 +1485,45 @@ reProcess
 
 				addSelButtonString = "+Sel";
 				addSelButtonWidth = w;
-				addSelButtonXposition = listTwoPosition + w + (ui_gap / 2);
+				addSelButtonXposition = listTwoPosition + w + (Main_ui_gap / 2);
 
 				clearAllButtonString = "-All";
 				clearAllButtonWidth = w;
-				clearAllButtonXposition = listTwoPosition + 2 * (w + (ui_gap / 2));
+				clearAllButtonXposition = listTwoPosition + 2 * (w + (Main_ui_gap / 2));
 
 				clearSelButtonString = "-Sel";
 				clearSelButtonWidth = w;
-				clearSelButtonXposition = listTwoPosition + 3 * (w + (ui_gap / 2));
+				clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
 				break;
 				
 			default:
-				panelWidth = 640;
-				panelHeight = 540;
+				Main_panelWidth = Main_res1_panelWidth;
+				Main_panelHeight = Main_res1_panelHeight;
 
 				// 22 = List gadget scrollbar
-				listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-				listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+				listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+				listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 
-				w = integer(( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 3) + 1 );
+				w = integer(( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 3) + 1 );
 
 				newPassButtonString = "New Pass...      " + icon[DOWNARROW];
 				newPassButtonWidth = w;
-				newPassButtonXposition = ui_gap;
+				newPassButtonXposition = Main_ui_gap;
 
 				newOverrideButtonString = "New Override... " + icon[DOWNARROW];
 				newOverrideButtonWidth = w;
-				newOverrideButtonXposition = ui_gap;
+				newOverrideButtonXposition = Main_ui_gap;
 
 				editSelectedButtonString = "Edit Selected  " + icon[ENTERKEY];
 				editSelectedButtonWidth = w;
-				editSelectedButtonXposition = ui_gap + w + (ui_gap / 2);
+				editSelectedButtonXposition = Main_ui_gap + w + (Main_ui_gap / 2);
 
 				deleteSelectedButtonString = "Del Selected   " + icon[DELETEKEY];
 				deleteSelectedButtonWidth = w;
-				deleteSelectedButtonXposition = ui_gap + 2 * (w + (ui_gap / 2));
+				deleteSelectedButtonXposition = Main_ui_gap + 2 * (w + (Main_ui_gap / 2));
 
-				w = integer( (listOneWidth + 22 - (3 * ( ui_gap / 2) ) ) / 4 );
+				w = integer( (listOneWidth + 22 - (3 * ( Main_ui_gap / 2) ) ) / 4 );
 
 				addAllButtonString = "Add All    "+ icon[CTRLA];
 				addAllButtonWidth = w;
@@ -1545,29 +1531,29 @@ reProcess
 
 				addSelButtonString = "Add Sel    ";
 				addSelButtonWidth = w;
-				addSelButtonXposition = listTwoPosition + w + (ui_gap / 2);
+				addSelButtonXposition = listTwoPosition + w + (Main_ui_gap / 2);
 
 				clearAllButtonString = "Clear All";
 				clearAllButtonWidth = w;
-				clearAllButtonXposition = listTwoPosition + 2 * (w + (ui_gap / 2));
+				clearAllButtonXposition = listTwoPosition + 2 * (w + (Main_ui_gap / 2));
 
 				clearSelButtonString = "Clear Sel";
 				clearSelButtonWidth = w;
-				clearSelButtonXposition = listTwoPosition + 3 * (w + (ui_gap / 2));
+				clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
 				break;
 		}
 
 
 	// 22 = List gadget scrollbar
-	listOneWidth = listTwoWidth = integer( ( (panelWidth - (3 * ui_gap) ) - 44) / 2);
-	listTwoPosition = listTwoWidth + 22 + (2 * ui_gap);
+	listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+	listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
 
 	// New UI layout code - Matt Gorner
-	listOneHeight = panelHeight - ( 3 * button_height) - banner_height - spacer_height - ( 5 * ui_y_spacer);
+	listOneHeight = Main_panelHeight - ( 3 * Main_button_height) - Main_banner_height - Main_spacer_height - ( 5 * Main_ui_y_spacer);
 
 	// New UI layout code - Matt Gorner
-	bottomPosition = panelHeight - button_height - ui_y_spacer;
+	bottomPosition = Main_panelHeight - Main_button_height - Main_ui_y_spacer;
 
 	doKeys = 1;
 }
