@@ -45,7 +45,6 @@ generatePassFile: mode, pass
     
         if(assignmentsArray != nil)
         {
-			info("assignmentsArray != nil");
             doOverride[x] = 1;
             a = assignmentsArray[1];
             settingsArray = parse("||", overrideSettings[a]);
@@ -92,13 +91,13 @@ generatePassFile: mode, pass
                 {
                     affectOpenglLine = "";
                 }
-                if(settingsArray[10] == "0")
+                if(settingsArray[10] == "1")
                 {
-                    LensFlareLine = "LensFlare 0\n";
+                    LensFlareLine = "LensFlare 1\n";
                 }
                 else
                 {
-                    LensFlareLine = "LensFlare 1\n";
+                    LensFlareLine = "LensFlare 0\n";
                 }
                 if(settingsArray[11] == "0")
                 {
@@ -109,7 +108,7 @@ generatePassFile: mode, pass
                     VolumetricsLine = "VolumetricLighting 1\n";
                 }
                 
-                lightSettingsPartOne[x] = lightColorLine + lightIntensityLine + affectDiffuseLine + affectSpecularLine;
+                lightSettingsPartOne[x] = lightColorLine + lightIntensityLine + affectDiffuseLine + affectSpecularLine + LensFlareLine + VolumetricsLine;
                 lightSettingsPartTwo[x] = affectOpenglLine;
                 
                 motInputTemp[x] = nil;
@@ -450,8 +449,7 @@ generatePassFile: mode, pass
         }
         else
         {
-			info("assignmentsArray was nil");
-            doOverride[x] = 0;
+			doOverride[x] = 0;
             overrideType[x] = 0;
         }
         if(size(doOverride) < x)
@@ -659,7 +657,7 @@ generatePassFile: mode, pass
         newScenePath = outputFolder[1] + getsep() + "CG" + getsep() + "temp" + getsep() + "tempScenes" + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + ".lws";
     }
 
-    if(platformVar == INTEL || platformVar == WIN32 || platformVar == WIN64)
+    if(platformVar == WIN32 || platformVar == WIN64)
     {
         
         tempFixedPath = fixPathForWin32(newScenePath);
@@ -1829,7 +1827,7 @@ generatePassFile: mode, pass
                                             bufferBaseName = baseNameArray[size(baseNameArray)];
                                             updatedBufferSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], bufferBaseName);
 
-                                            if(platformVar == INTEL || platformVar == WIN32 || platformVar == WIN64)
+                                            if(platformVar == WIN32 || platformVar == WIN64)
                                             {
                                                 
                                                 tempFixedPath = fixPathForWin32(updatedBufferSaverPath);
@@ -1868,7 +1866,7 @@ generatePassFile: mode, pass
                                             psdBaseName = baseNameArray[size(baseNameArray)];
                                             updatedPsdSaverPath = "Path \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], psdBaseName);
 
-                                            if(platformVar == INTEL || platformVar == WIN32 || platformVar == WIN64)
+                                            if(platformVar == WIN32 || platformVar == WIN64)
                                             {
 												noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], psdBaseName);
 												tempFixedPath = fixPathForWin32(noIntroPath);

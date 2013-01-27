@@ -1,8 +1,32 @@
+20121228b
+=========
+
+- Shifting override panel UIs out to a dedicated file, with edit/new modes merged.
+ - Major optimization of the UI code and simplication.
+ - Moved edit and new value assignments to controls nearer to the controls in the code.
+- Fixed Win 64 platform handling.
+
+20121228
+========
+
+- Thinking about how to more intelligently implement the UI update for bullets :
+    overrideNames[x] = " " + icon[BULLET] + " " + overrideNames[x];
+- Returning to implementation of new stuff : 
+ - Fixes for the new additions to the light override. Fixed volumetric toggle. Lens flare toggle still not working as expected...
+
+20121224
+========
+
+- Removed some obsolete info() calls
+- Added limitation entry regarding current usage expectation that doesn't involve LScript/RT.
+- Identified additional failure mode - if user output path is invalid / inaccessible.
+
 20121220
 =========
 
 - Preprocessor full of flaky, so went for a different approach to track supported platforms.
 - Dropped absolute paths for the @insert statements, gone for all-relative. Seems to no longer blow up.
+- Removed various info() statements.
 
 20121214b
 =========
@@ -189,6 +213,12 @@ p0012 : Rebuilding lists causes script to explode. (Fixed)
 p0013 : Selecting second item in list causes highlight to be drawn (on repaint) for 1st item. (Fixed)
 p0014 : Uncompiled version crashes out on Mac and fails to start-up roughly 70% of the time on WinXP. (closed, LScript bug)
 p0015 : Overrides with assigned items don't get bullet point until the lists are updated, or some major redraw occurs (also in original code)
+
+###############
+# Limitations #
+###############
+
+1. Plugin expects to be used as 'Passport_MC', not through the LScript/RT intermediate layer.
 
 :::::::::::::::::::
 : Issues to check :

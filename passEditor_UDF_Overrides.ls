@@ -57,6 +57,7 @@ o_itemslb_event: o_items // Add items to the selected override; need to filter d
 		setvalue(gad_SceneItems_forOverrides_Listview,nil);
 		req_update();
 	}
+	req_update();
 }
 
 o_parseListItems: overrideItemsString
@@ -118,7 +119,14 @@ overrideslb_name: index
 {
     if(overrideNames[1] != "empty")
     {
-        return(overrideNames[index]);
+		if(getvalue(gad_OverridesListview).asInt() >= 1)
+		{
+			if(passOverrideItems[currentChosenPass][getvalue(gad_OverridesListview).asInt()] != "" && overrideNames[1] != "empty")
+			{
+				return(" " + icon[BULLET] + " " + overrideNames[index]);
+			}
+		}
+		return(overrideNames[index]);
     }
     else
     {

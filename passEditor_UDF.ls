@@ -1083,7 +1083,7 @@ overrideMenu_active: overrideMenu_item
 reqkeyboard: key
 {
     // win hotkeys
-    if(platformVar == INTEL || platformVar == WIN32 || platformVar == WIN64)
+    if(platformVar == WIN32 || platformVar == WIN64)
     {
         
         // undo selections

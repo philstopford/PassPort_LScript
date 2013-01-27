@@ -23,7 +23,7 @@ getPassEditorStartLine: inputPath
 	currentLine = 1;
 	input.line(startLine);
 
-	{
+	while (currentLine <= endLine) {
 		line = input.read();
 		lineArray = parse(" ", line);
 		if(size(lineArray) >= 4)
@@ -34,6 +34,7 @@ getPassEditorStartLine: inputPath
 				return(currentLine);
 			}
 		}
+		currentLine++;
 	}
 
 	input.close();

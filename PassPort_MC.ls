@@ -69,6 +69,7 @@ var supportedplatform = 0;
 @insert "@passEditor_globals.ls"
 @insert "@passEditor_UIglobals.ls"
 @insert "@passEditor_Interface_Subfuncs.ls"
+@insert "@passEditor_Interface_Subfuncs_UI.ls"
 @insert "@passEditor_render_Subfuncs.ls"
 @insert "@passEditor_sceneGen_Subfuncs.ls"
 @insert "@passEditor_sceneParse_Subfuncs.ls"
@@ -179,7 +180,6 @@ platformcheck
 		case MAC64:
 		case WIN32:
 		case WIN64:
-		case INTEL:
 			supportedplatform = 1;
 			break;
 		default:

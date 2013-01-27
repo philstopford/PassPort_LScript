@@ -130,15 +130,16 @@ Pref_gad_text_offset		= 150;													// Gadget text offset
 Pref_gad_prev_w				= 0;													// Previous gadget width temp variable
 Pref_num_gads				= 10;													// Total number of gadgets vertically (for calculating the max window height)
 
-Pref_ui_banner_height		= 0;																						// Height of banner graphic
-Pref_ui_spacing				= 3;																						// Spacing gap size
-Pref_ui_offset_x 			= 0;																						// Main X offset from 0
-Pref_ui_offset_y 			= 3 * Pref_ui_spacing;																		// Main Y offset from 0
-Pref_ui_row					= 0;																						// Row number
-Pref_ui_column				= 0;																						// Column number
-Pref_ui_tab_offset			= Pref_ui_offset_y + 23;																	// Offset for tab height
-Pref_ui_row_offset			= Pref_gad_h + Pref_ui_spacing;																// Row offset
-Pref_ui_window_w			= 436;																						// Window width
-Pref_ui_window_h			= Pref_ui_offset_y + (Pref_gad_h*Pref_num_gads) + (Pref_ui_spacing*(Pref_num_gads+1)) + 24;	// Window height
-Pref_ui_seperator_w			= Pref_ui_window_w + 2;																		// Width of seperators
+Pref_ui_banner_height		= 0;													// Height of banner graphic
+Pref_ui_spacing				= 3;													// Spacing gap size
+Pref_ui_offset_x 			= 0;													// Main X offset from 0
+Pref_ui_offset_y 			= 3 * Pref_ui_spacing;									// Main Y offset from 0
+Pref_ui_row					= 0;													// Row number
+Pref_ui_column				= 0;													// Column number
+Pref_ui_tab_offset			= Pref_ui_offset_y + 23;								// Offset for tab height
+Pref_ui_row_offset			= Pref_gad_h + Pref_ui_spacing;							// Row offset
+Pref_ui_window_w			= 436;													// Window width
+Pref_ui_window_h			= Pref_ui_offset_y + (Pref_gad_h*Pref_num_gads)
+							+ (Pref_ui_spacing*(Pref_num_gads+1)) + 24;				// Window height
+Pref_ui_seperator_w			= Pref_ui_window_w + 2;									// Width of seperators
 
