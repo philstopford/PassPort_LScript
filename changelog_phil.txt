@@ -1,10 +1,15 @@
+20130119 (beta 3 - safe to ignore settings warnings from beta 1 and beta 2)
+========
+
+- Autoscan configuration is now supported (p0025). The original code assumed that configuration files were an either/or thing. You'd either have the regular EXT file or the Extension Cache. That's not true, though. You can have both. To that end, we now parse both or either as we find them. That may lead to some side-effects, but there's no other mechanism available. Note added to the documentation.
+
 20130119 (beta 2 - safe to ignore settings warnings from beta 1)
 ========
 
-- Fixed an obscure issue in the conditionals to the render function. Will need to revisit this because the failure makes little sense.
-- Fix to internals in the case that the output folder is invalid. We now throw up an error and ask the user to fix the output path selected.
-- Thanks to Luis Lopes: found and fixed an issue with 11.0 scenes where writeHeader failed to find its endLine. Added fix and countermeasures.
-- Fix to insert SaveRGB and filename format lines. Will need to add a preference for the output format.
+- Fixed an obscure issue in the conditionals to the render function. Will need to revisit this because the failure makes little sense. (p0024)
+- Fix to internals in the case that the output folder is invalid. We now throw up an error and ask the user to fix the output path selected. (p0023)
+- Thanks to Luis Lopes: found and fixed an issue (p0021) with 11.0 scenes where writeHeader failed to find its endLine. Added fix and countermeasures.
+- Fix to insert SaveRGB and filename format lines. Will need to add a preference for the output format. p0022, found in working on p0021
 - Fix to lwsn path on Windows.
 
 20130118 (beta 1)
@@ -446,6 +451,11 @@ p0017 : Scene override fails during scene generation. Wrong line cited on OS X, 
 p0018 : Light override causes no image to be saved. (Fixed)
 p0019 : Another prepareInputFiles() already called error for alternative object override. (Fixed)
 p0020 : Line 2162 and 2168 errors with light override. (Fixed)
+p0021 : Broken operation on 11.0.x (Fixed, beta 2). This was complex. We had missed a block end marker change from 11.0 to 11.5 that needed to be adjusted.
+p0022 : SaveRGB and filename format lines were missed in scene generation. (Fixed)
+p0023 : crash with incorrect output folder (Fixed, beta 2)
+p0024 : Windows LW 11.0.x seemed to struggle with the conditional operators. Tweaked the approach (Fixed, beta2)
+p0025 : Autoscan plugins operation is broken, leading to issues (Fixed, beta3)
 
 ###############
 # Limitations #
@@ -466,7 +476,6 @@ p0020 : Line 2162 and 2168 errors with light override. (Fixed)
 - Active camera override in Scene Override.
 - Extend light override (caustics).
 - Fog support.
-- Added noAppend flag for writeOverride to avoid changing/appending lines if needed (e.g. FiberFX safety measure).
 
 -------------
 - Reference -

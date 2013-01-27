@@ -1061,46 +1061,24 @@ getImageFormats
 	{
 		case MACUB:
 		case MAC64:
-			// Special case check for LW Extensions due to the "extension cache" file
 			tempString = config_dir + getsep() + "Extensions " + vers;
 			input = File(tempString);
-			(a,c,m,s,l,u,g) = filestat(tempString);
-			// Check for LW 10 'Autoscan Plugins'.  When it is on, LWEXT*.cfg is NOT filled in, but plugins are stored in 'Extension Cache' file instead
-			if(s.asNum() == 0)
-			{
-				if(input)
-					input.close();
-				tempString = config_dir + getsep() + "Extension Cache";
-				input = File(tempString);
-			}
+			tempString_AS = config_dir + getsep() + "Extension Cache";
+			input_AS = File(tempString_AS);
 			break;
 
 		case WIN32:
 			tempString = config_dir + getsep() + "LWEXT" + vers + ".CFG";
 			input = File(tempString);
-			(a,c,m,s,l,u,g) = filestat(tempString);
-			// Check for LW 10 'Autoscan Plugins'.  When it is on, LWEXT*.cfg is NOT filled in, but plugins are stored in 'Extension Cache' file instead
-			if(s.asNum() == 0)
-			{
-				if(input)
-					input.close();
-				tempString = config_dir + getsep() + "Extension Cache";
-				input = File(tempString);
-			}
+			tempString_AS = config_dir + getsep() + "Extension Cache";
+			input_AS = File(tempString_AS);
 			break;
 
 		case WIN64:
 			tempString = config_dir + getsep() + "LWEXT" + vers + "-64.CFG";
 			input = File(tempString);
-			(a,c,m,s,l,u,g) = filestat(tempString);
-			// Check for LW 10 'Autoscan Plugins'.  When it is on, LWEXT*.cfg is NOT filled in, but plugins are stored in 'Extension Cache' file instead
-			if(s.asNum() == 0)
-			{
-				if(input)
-					input.close();
-				tempString = config_dir + getsep() + "Extension Cache-64";
-				input = File(tempString);
-			}
+			tempString_AS = config_dir + getsep() + "Extension Cache-64";
+			input_AS = File(tempString_AS);
 			break;
 
 		default:
@@ -1110,35 +1088,57 @@ getImageFormats
 
 	searchstring = "  Class \"ImageSaver\"";
 	x = 1;
-	if(input)
+	errorReport = 0;
+	nextline;
+	if(input || input_AS)
 	{
-		while(!input.eof())
-		{
-			line = input.read();
-			if(line == searchstring)
-			{
-				wholeline[x] = input.read();
-				wholelinesize = sizeof(wholeline[x]);
-				wholeline_right = strright(wholeline[x],wholelinesize - 8);
-				wholeline_left = strleft(wholeline_right,(sizeof(wholeline_right) - 1));
-				nextline[x] = wholeline_left;
-				x++;
-			}else if(line == NULL)
-			{
-				// Double-check for LW 10 'Autoscan Plugins'.  When it is on, LWEXT*.cfg is NOT filled in, but plugins are stored in 'Extension Cache' file instead
-				// Not sure of the General Options flag to test, so if the read line is NULL, it means it's not been filled in, and so Extension Cache is being used instead (probably)
-				if(input)
-					input.close();
-				error("Can't parse 'LWEXT*.cfg' file, turn off 'Autoscan Plugins' and manually scan plugin directory");
-				return(nil);
-			}
-		}
 		if(input)
+		{
+			while(!input.eof()) // general config file
+			{
+				line = input.read();
+				if(line == searchstring)
+				{
+					wholeline[x] = input.read();
+					wholelinesize = sizeof(wholeline[x]);
+					wholeline_right = strright(wholeline[x],wholelinesize - 8);
+					wholeline_left = strleft(wholeline_right,(sizeof(wholeline_right) - 1));
+					nextline[x] = wholeline_left;
+					x++;
+				}
+			}
 			input.close();
-		return(nextline);
-	}else
-	{
-		error("Can't locate 'LWEXT",vers,".cfg' file");
+		} else {
+			errorReport++;
+		}
+		if(input_AS)
+		{
+			while(!input_AS.eof()) // autoscan config file
+			{
+				line = input_AS.read();
+				if(line == searchstring)
+				{
+					wholeline[x] = input_AS.read();
+					wholelinesize = sizeof(wholeline[x]);
+					wholeline_right = strright(wholeline[x],wholelinesize - 8);
+					wholeline_left = strleft(wholeline_right,(sizeof(wholeline_right) - 1));
+					nextline[x] = wholeline_left;
+					x++;
+				}
+			}
+			input_AS.close();		
+		} else {
+			errorReport++;
+		}
+		if(errorReport != 2 && nextline.count() != 0)
+		{
+			return(nextline);
+		} else {
+			info("Could not find any image saver data in either configuration file!");
+			return nil;
+		}
+	} else {
+		error("Can't locate any configuration files for LightWave!");
 		return(nil);
 	}
 }
