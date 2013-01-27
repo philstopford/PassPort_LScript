@@ -153,6 +153,16 @@ ScnMst_ui_seperator_w		= ScnMst_gad_x3 + 2;			// Width of seperators (was ScnMst
 ScnMst_dividerline_y1		= 0;
 ScnMst_dividerline_y2		= 0;
 
+// rad Flags
+radFlg_gad_x				= 6;													// Gadget X coord
+radFlg_gad_y				= 6;													// Gadget Y coord
+radFlg_gad_w				= 280;													// Gadget width
+radFlg_gad_h				= 19;													// Gadget height
+radFlg_gad_text_offset		= 105;													// Gadget text offset
+radFlg_ui_spacing_y			= 3;													// Spacing gap size Y
+
+radFlg_ui_row_offset		= radFlg_gad_h + radFlg_ui_spacing_y;					// Row offset
+
 // Preferences UI
 
 Pref_gad_x					= 6;													// Gadget X coord

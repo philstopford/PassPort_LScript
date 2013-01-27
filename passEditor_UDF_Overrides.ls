@@ -174,6 +174,8 @@ overrideslb_event: overrides_list
 
 o_Filter: overrides_list
 {
+        passItemsIDsArray = parse("||",passAssItems[currentChosenPass]);
+
 		overrides_sel = overrides_list[1]; // index of selected override in list.
 		o_tempSettingsArray = parse("||",overrideSettings[overrides_sel]);
 		tempOverrideType = o_tempSettingsArray[2];
@@ -187,11 +189,17 @@ o_Filter: overrides_list
 		{	// object-genus specific overrides : only objects permitted. Type 4 debatable whether object-specific....
 			filtered = 1;
 			for (i = 2; i <= o_displayNames.size(); i++) { // no point considering the scene master in [1]
-				if (o_displayGenus[i] == MESH)
+				if (o_displayGenus[i] == MESH) // Last check is to only show items assigned to the currently selected pass.
 				{
-					o_displayNamesFiltered[o_displayFilterIndex] = o_displayNames[i];
-					o_displayIDsFiltered[o_displayFilterIndex] = o_displayIDs[i];
-					o_displayFilterIndex++;
+                    for(j = 1; j <= passItemsIDsArray.size(); j++)
+                    {
+                        if(string(passItemsIDsArray[j]) == string(o_displayIDs[i]))
+                        {
+        					o_displayNamesFiltered[o_displayFilterIndex] = o_displayNames[i];
+        					o_displayIDsFiltered[o_displayFilterIndex] = o_displayIDs[i];
+        					o_displayFilterIndex++;
+                        }
+                    }
 				}
 			}
 		}
@@ -200,11 +208,17 @@ o_Filter: overrides_list
 		{	// light/object-genus specific overrides : only lights/objects/cameras permitted
 			filtered = 1;
 			for (i = 2; i <= o_displayNames.size(); i++) { // no point considering the scene master in [1]
-				if (o_displayGenus[i] == MESH || o_displayGenus[i] == LIGHT  || o_displayGenus[i] == CAMERA)
+				if (o_displayGenus[i] == MESH || o_displayGenus[i] == LIGHT  || o_displayGenus[i] == CAMERA) // Last check is to only show items assigned to the currently selected pass.
 				{
-					o_displayNamesFiltered[o_displayFilterIndex] = o_displayNames[i];
-					o_displayIDsFiltered[o_displayFilterIndex] = o_displayIDs[i];
-					o_displayFilterIndex++;
+                    for(j = 1; j <= passItemsIDsArray.size(); j++)
+                    {
+                        if(string(passItemsIDsArray[j]) == string(o_displayIDs[i]))
+                        {
+        					o_displayNamesFiltered[o_displayFilterIndex] = o_displayNames[i];
+        					o_displayIDsFiltered[o_displayFilterIndex] = o_displayIDs[i];
+        					o_displayFilterIndex++;
+                        }
+                    }
 				}
 			}
 		}
@@ -213,11 +227,17 @@ o_Filter: overrides_list
 		{	// light-genus specific overrides : only lights permitted
 			filtered = 1;
 			for (i = 2; i <= o_displayNames.size(); i++) { // no point considering the scene master in [1]
-				if (o_displayGenus[i] == LIGHT)
+				if (o_displayGenus[i] == LIGHT) // Last check is to only show items assigned to the currently selected pass.
 				{
-					o_displayNamesFiltered[o_displayFilterIndex] = o_displayNames[i];
-					o_displayIDsFiltered[o_displayFilterIndex] = o_displayIDs[i];
-					o_displayFilterIndex++;
+                    for(j = 1; j <= passItemsIDsArray.size(); j++)
+                    {
+                        if(string(passItemsIDsArray[j]) == string(o_displayIDs[i]))
+                        {
+                            o_displayNamesFiltered[o_displayFilterIndex] = o_displayNames[i];
+                            o_displayIDsFiltered[o_displayFilterIndex] = o_displayIDs[i];
+                            o_displayFilterIndex++;
+                        }
+                    }
 				}
 			}
 		}
@@ -226,11 +246,17 @@ o_Filter: overrides_list
 		{	// camera-genus specific overrides : only cameras permitted
 			filtered = 1;
 			for (i = 2; i <= o_displayNames.size(); i++) { // no point considering the scene master in [1]
-				if (o_displayGenus[i] == CAMERA)
+				if (o_displayGenus[i] == CAMERA) // Last check is to only show items assigned to the currently selected pass.
 				{
-					o_displayNamesFiltered[o_displayFilterIndex] = o_displayNames[i];
-					o_displayIDsFiltered[o_displayFilterIndex] = o_displayIDs[i];
-					o_displayFilterIndex++;
+                    for(j = 1; j <= passItemsIDsArray.size(); j++)
+                    {
+                        if(string(passItemsIDsArray[j]) == string(o_displayIDs[i]))
+                        {
+        					o_displayNamesFiltered[o_displayFilterIndex] = o_displayNames[i];
+        					o_displayIDsFiltered[o_displayFilterIndex] = o_displayIDs[i];
+        					o_displayFilterIndex++;
+                        }
+                    }
 				}
 			}
 		}

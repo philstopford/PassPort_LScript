@@ -49,9 +49,16 @@
 <li><a href="#overrides_motion">Motion File</a></li>
 <li><a href="#overrides_surface">Surface File</a></li>
 <li><a href="#overrides_light">Light Properties</a></li>
+<li><a href="#overrides_camera">Camera</a></li>
 <li><a href="#overrides_scene">Scene Master</a></li>
 <li><a href="#overrides_lightexcl">Light Exclusion</a></li>
 </ul>
+</ul>
+<li><strong><a href="#dragons">Things to Be Aware Of</a></strong></li>
+<ul>
+<li><strong><a href="#dragons_ffx">FiberFX</a></strong></li>
+<li><strong><a href="#dragons_hv3">Hypervoxels</a></strong></li>
+<li><strong><a href="#dragons_dependencies">Dependencies</a></strong></li>
 </ul>
 <li><strong><a href="#troubleshooting">Troubleshooting.</a></strong></li>
 <li><strong><a href="#credits">Credits.</a></strong></li>
@@ -68,7 +75,7 @@
 	<li>Operation on Mac is now possible without crashing.</li>
 	<li>Growl support on Mac is optional, and disabled by default</li>
 	<li>Operation with the renamed and relocated 'lwsn' binary (previously called ScreamerNet on Mac)</li>
-	<li>The item list for overrides is now filtered to only show scene items compatible with the selected override type (e.g. lights for light-specific overrides, objects for object-specific overrides)</li>
+	<li>The item list for overrides is now filtered to only show scene items assigned to the current pass and that are compatible with the selected override type (e.g. lights for light-specific overrides, objects for object-specific overrides)</li>
 	<li>The Scene Master override has been massively overhauled and is now aligned with the LightWave 11.0 feature set:</li>
 	<ul>
 		<li>Render instance setting under LightWave 3D 11.5</li>
@@ -78,16 +85,17 @@
 		<li>Volumetric AA can be overridden</li>
 		<li>Render mode can be overridden</li>
 		<li>Caustics and radiosity values can all be overridden</li>
-		<li>Fog, background and backdrop properties can be override. Not all aspects are implemented yet.</li>
+		<li>Fog, background and backdrop properties can be overriden.</li>
+		<li>Radiosity flags can be applied through the scene master as well. Useful for testing different configurations for GI renders.</li>
 	</ul>
 	<li>The light override now permits disabling of lens flares and volumetrics. Creation is not enabled due to complexities in supporting these. Lens flare creation support may appear in a future revision, though.</li>
 	<li>Camera overrides are now available, for the first time. Limited settings are available in this initial public release, and no specialised propeties for 3rd party cameras are available at this time.</li>
-	<li>Pass generation for FiberFX has been enabled. Overrides are not available for FiberFX at this time.</li>
+	<li>Pass generation for FiberFX has been enabled. Overrides are not available for FiberFX at this time. Please see the workflow note below regarding FiberFX pass generation.</li>
 	<li>PassPort has been made LWSN-safe as well. Previously, it used to crash the process.</li>
 	<li>Rendering at frame 0 is now supported. Previously, it used to fail to save an image for review.</li>
 	<li>Autoscan plugin operation is much improved.</li>
 	<li>Buffer Redirect Export extended to work with exrTrader and LightWave's Compositing Buffer Export image filters (experimental, beta 8)</li>
-	<li>(Experimental build of beta 8) Passes can now be configured to activate/deactivate supported image filters.</li>
+	<li>Passes can now be configured to activate/deactivate supported image filters.</li>
 	<li>RPE files now contain version information (the RPE version, the PassPort version, the LightWave version).</li>
 </ul>
 <p></p>
@@ -139,17 +147,20 @@
 <p>Bottom items correspond to the listbox above them. Those on the left are for the left listbox (either passes or overrides, depending on which tab is selected), and those on the right are for the right listbox.  Under the right listbox, you’ll find quick methods of adding and removing multiple items to each pass or override assignment. Add All is self explanatory. Add Sel gets the item(s) selected in Layout and adds only those items to the existing, compatible, assignments. The Clear All and Clear Sel functions are obviously the inverse of the add buttons.</p>
 
 <p><a name="workingwithpasses"></a><strong>Working With Passes</strong></p>
+<p>If you’ve ever had to create an object copy just for a data pass and then had to create a copy of the scene for all your object copies, you know how difficult a multi-pass workflow is in LightWave. With PassPort Renewed, these problems are greatly reduced. There's no need to have ten copies of your object for your passes (even if they have different surfaces - including nodal systems), nor is there a need for scenes with various lights or objects omitted. PassPort Renewed massively extends this to most common camera setting variations and to the vast majority of rendering settings, as well as FiberFX pass generation. Somewhat counterintuitively perhaps, you need to add cameras to the pass in order for the override system to handle them. There are some reasons for this - PassPort cannot currently determine which camera is the active camera in the scene and you may not want all cameras to be contained in the scene sent to render. Be aware that any cameras not in the pass will be omitted - this means that you must ensure that your active camera is contained in the pass otherwise the renderer will not work.</p>
+<p>You can create a full scene pass (with all scene items assigned to it), an empty pass (nothing is assigned to the new pass), create a pass containing the items currently selected in Layout or duplicate an existing pass using the menu.</p>
 <p align="center"><img src="images/passes_menu.png" height="80" width="175" alt="Passes Menu"></p>
-<p>If you’ve ever had to create an object copy just for a data pass and then had to create a copy of the scene for all your object copies, you know how difficult a multi-pass workflow is in LightWave. With PassPort Renewed, these problems are greatly reduced. There's no need to have ten copies of your object for your passes (even if they have different surfaces - including nodal systems), nor is there a need for scenes with various lights or objects omitted. PassPort Renewed massively extends this to most common camera setting variations and to the vast majority of rendering settings, as well as FiberFX pass generation.</p>
+<p>When you choose an option, such as the new full scene pass, from this menu, you will be presented with a dialog like the one below. Here, you can name your pass. If you have set up image filter-based exporters in the scene (e.g. LW 11's Compositing Buffer Exporter, exrTrader, etc.), you can also tell PassPort whether or not you want them to be used to save renders for this pass. An active checkbox enables the respective filter for the pass. A cleared checkbox will disable the respective filter for the pass. The top-most checkbox allows you to control whether or not the subsequent checkboxes should have any effect - it's a convenience in case you want switch the handling on or off without losing your settings. If you enable a checkbox, but the filter is not present in the scene, there will be no effect - PassPort only works on those filters you have set-up. Note that this works with the buffer redirect option so any images from these filters will contain the pass name, as you would expect.</p>
+<p align="center"><img src="images/passes_dialog.png" height="347" width="436" alt="Passes Dialog"></p>
 <p>When it comes time to render, just use the PassPort Editor to render the sequence. If you’ve got access to a render farm, choose Save Pass as Scene... and that pass will be used to create a standard LightWave scene file that you can submit to your render farm at will.</p>
-<p>The method is simple. Select a pass, then select an object or light on the right listbox. That newly highlighted object is now a part of the selected pass.  CTRL click the item again to remove it from the pass.</p>
+<p>The method is simple. Select a pass, then select an object, camera or light on the right listbox. That newly highlighted item is now a part of the selected pass.  CTRL click the item again to remove it from the pass.</p>
 
 <p><a name="workingwithoverrides"></a><strong>Working With Overrides</strong></p>
 <p align="center"><img src="images/passport_overrides.png" height="562" width="640" alt="Overrides Interface"></p>
 <p>Here’s where the real power of the PassPort Editor comes in. In each pass, you can specify a combination of Overrides that change an item’s properties or appearance, but just for that pass. So if you’re doing a shadow pass, you can have the shadow casting objects Unseen By Camera, even though that is not the case in the LightWave scene.</p>
 <p>There are eight types of overrides.</p>
 <p align="center"><img src="images/override_menu.png" height="178" width="177" alt="Overrides Menu"></p>
-<p>When applied, these will override any parameter they cover. In other words, if the parameter exists in any state in the overrides, the override parameter will be used instead of the native LightWave parameter (please refer to the light override note for the volumetric setting). Also, there’s a bit of common sense in working with these. The PassPort Editor won’t allow you to assign an Alternative Object... override to a light, or light overrides to non-lights, etc. The Motion File... override will work on all items except the Scene Master.</p>
+<p>When applied, these will override any parameter they cover. In other words, if the parameter exists in any state in the overrides, the override parameter will be used instead of the native LightWave parameter (please refer to the light override note for the volumetric setting). Also, there’s a bit of common sense in working with these. The PassPort Editor will only show items that are compatible with the selected override.</p>
 <ul>
 	<p><a name="overrides_objprops"></a><strong>Object Properties</strong></p>
 	<p align="center"><img src="images/override_objprops.png" height="342" width="275" alt="Object Properties Override"></p>
@@ -163,7 +174,7 @@
 	<p align="center"><img src="images/override_light.png" height="262" width="275" alt="Light Properties"></p>
 	<p>Please note that, due to the way that LightWave 11 currently generates its scene files, the volumetric toggle will only work if the light being overridden had its volumetric properties set up through the main LW interface. The volumetrics can be deactivated within LW afterwards for that light - this override will then work fine. This is because LightWave will not write out the volumetric settings properly unless you have set them. There's also an element of common sense here - unless you've configured the volumetric light behaviour ahead of time on the light, how will the renderer know what to do. Note that the Scene Master override provides support for globally enabling/disabling volumetric lights (corresponding to the setting in LW's own render control panel).</p>
 	<p>In this version, the lens flare override is limited to a toggle. This may be supplemented by other options in a future revision. Note that the Scene Master override provides support for globally enabling/disabling lens flare (corresponding to the setting in LW's own render control panel).</p>
-	<p><a name="overrides_scene"></a><strong>Camera Properties</strong></p>
+	<p><a name="overrides_camera"></a><strong>Camera Properties</strong></p>
 	<p align="center"><img src="images/override_camera.png" height="347" width="590" alt="Camera Override"></p>
 	<p><a name="overrides_scene"></a><strong>Scene Master</strong></p>
 	<p align="center"><img src="images/override_scene.png" height="747" width="885" alt="Scene Master Override"></p>
@@ -179,11 +190,22 @@
 		<li>LightWave's Aura 2.5 Export</li>
 		<li>iDOF Channel Export</li>
 	</ul>
-	<p>This panel offers a toggle for LightWave's Adaptive Sampling. In LightWave, this is a global setting, affecting all cameras. The threshold value is camera-specific and can be overridden using a camera override.</p>
+	<p>This panel also offers a toggle for LightWave's Adaptive Sampling. In LightWave, this is a global setting, affecting all cameras. The threshold value is camera-specific and can be overridden using a camera override.</p>
+	<p>A pass and override system is not just for final renders. It can be very useful to try and determine the best render conditions for a given scene. To that end, PassPort Renewed also allows you to apply Radiosity Flag settings in the Scene Master override. You can then explore how different GI settings affect the renderer in LW in a systematic manner.</p>
+	<p align="center"><img src="images/override_scene_radflags.png" height="254" width="306" alt="Scene Master Radiosity Flags Override"></p>
 	<p><a name="overrides_lightexcl"></a><strong>Light Exclusion</strong></p>
 	<p align="center"><img src="images/override_lightexcl.png" height="158" width="306" alt="Light Exclusion"></p>
 	<p>The Light Exclusions override allows you to specify per-pass light exclusions. Assigning it to an object will exclude that object from any lights in the override settings in that pass. The Light Exclusions override is unique in that it can be assigned in addition to another override. So if you want to use a surface override AND a light exclusion override, you’d simply have the surface override higher in the overrides listbox and assign both to an object. If you ever find that the light exclusion is higher in the listbox than another override (and therefore preventing its stack-ability), simply hit Page Down on your keyboard to move the selected override to the bottom of the listbox.</p>
 </ul>
+</ul>
+<h3><a name="dragons"></a>Things to be Aware Of</h3>
+<ul>
+	<h4><a name="dragons_ffx"></a>FiberFX</h4>
+<p>FiberFX, as of 11.5, permits its contributions to be written out to external files. We allow you to override the destination. However, by-design, FiberFX will write out all contributions from elements in the frame to a single file. At this time, due to issues in FiberFX, <strong>*all*</strong> configured FiberFX elements <strong>*must*</strong> be in the same pass. If this is not the case, FiberFX will fail to render any of its contributions. A bug has been filed with NewTek, but the way that PassPort operates on the scene file to drop out elements not contained in the current pass is not really expected by LightWave. Assigning the element to the pass and using an override to affect object visibility to the camera/rays might yield a better result.</p>
+<h4><a name="dragons_hv3"></a>Hypervoxels</h4>
+<p>Like FiberFX, the way that PassPort omits elements from the pass scene file causes compatibility issues with HV3. Unlike FiberFX, though, the missing item that has HVs applied in some manner will typically result in the rendered image containing an HV blob at the origin. Like FiberFX, there may be a mitigation using an override to make the object invisible to the camera and rays within the pass.</p>
+<h4><a name="dragons_dependencies"></a>Dependencies</h4>
+<p>Any item not contained in a pass will be omitted from the pass scene file that is generated by PassPort. This means that any dependencies on that item will be broken in that scene, such expressions. You can typically find a different methodology using an override to hide the item from the renderer (visibility flags, motion overrides, etc.)</p>
 </ul>
 <h3><a name="troubleshooting"></a>Troubleshooting</h3>
 <p>Overrides cannot be stacked on an object in a pass (with the exception of the Light Exclusions override).  For example, you cannot apply both a motion override and a surface override to the same object in the same pass. Note that this will cause a failure even if the issue is located in a pass other than the one you are rendering. The error message will also be very ugly and scary. You'll have to manually figure out what you did wrong, fix it up and try again.</p>
@@ -194,6 +216,7 @@
 <h3><a name="credits"></a>Credits</h3>
 </div>
 <p>PassPort Renewed would not exist without the original PassPort code that was so generously open-sourced by its creator, Jeremy Hardin</p>
+<p>PassPort Renewed would also not exist without the patient understanding of my wife, Pallavi Menon</p>
 <p>Matt Gorner's work to make the original PassPort compatible with LightWave through 10.0 is much appreciated, as well as his effort to get the source uploaded to SourceForge. I'm also very grateful for his help in showing me some of the UI tricks that could be performed in LScript.</p>
 <p>I also have to thank James Willmott and Lernie Ang for their help as I fought my way to understanding (somewhat) LScript and its quirks. Jeremy gets another nod here for sending me his notes and insight.</p>
 <p>Deuce Bennett , patient master bug wrangler at NT - thanks ever so much for fielding various bug reports along the way.</p>

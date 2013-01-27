@@ -4,7 +4,6 @@ cameraOverride_UI: action
 	// action should be either 'new' or 'edit'
 	if (action == "new" || action == "edit")
 	{
-		doUpdate;
 		if(action == "edit")
 		{
 			sel = getvalue(gad_OverridesListview).asInt();
@@ -290,16 +289,6 @@ cameraOverride_UI: action
 			minimumSamples			= getvalue(c34);
 			maximumSamples			= getvalue(c36);
 
-			doUpdate 				= 1;
-		}
-		else
-		{
-			doUpdate = 0;
-		}
-		reqend();
-		
-		if(doUpdate == 1)
-		{
 			newNumber = sel;
 			if(action == "new")
 			{
@@ -330,6 +319,7 @@ cameraOverride_UI: action
 										+ 	sampler					+ "||" + 	adaptiveThreshold	+ "||"
 										+ 	minimumSamples			+ "||" + 	maximumSamples;
 		}
+		reqend();
 	} else {
 		error("cameraOverride_UI: incorrect, or no, action passed");
 	}
@@ -342,7 +332,6 @@ srfOverride_UI: action
 	// action should be either 'new' or 'edit'
 	if (action == "new" || action == "edit")
 	{
-		doUpdate;
 		if(action == "edit")
 		{
 		    sel = getvalue(gad_OverridesListview).asInt();
@@ -377,16 +366,7 @@ srfOverride_UI: action
 			newName = getvalue(c20);
 			newName = makeStringGood(newName);
 			srfFile = getvalue(c21);
-			doUpdate = 1;
-		}
-		else
-		{
-			doUpdate = 0;
-		}
-		reqend();
-		
-		if(doUpdate == 1)
-		{
+
 			newNumber = sel;
 			if(action == "new")
 			{
@@ -408,6 +388,7 @@ srfOverride_UI: action
 			overrideNames[newNumber] = newName + "   (.srf file)";
 			overrideSettings[newNumber] = newName + "||" + "type1" + "||" + string(srfFile);
 		}
+		reqend();
 	} else {
 		error("srfOverride_UI: incorrect, or no, action passed");
 	}
@@ -420,20 +401,22 @@ lightOverride_UI: action
 	// action should be either 'new' or 'edit'
 	if (action == "new" || action == "edit")
 	{
-		doUpdate;
 		if(action == "edit")
 		{
 		    sel = getvalue(gad_OverridesListview).asInt();
 			settingsArray = parseOverrideSettings(overrideSettings[sel]);
+
 			lightColorSettsArrays[1] = integer(settingsArray[3]);
 			lightColorSettsArrays[2] = integer(settingsArray[4]);
 			lightColorSettsArrays[3] = integer(settingsArray[5]);
+			lightColorSettsArray = <lightColorSettsArrays[1], lightColorSettsArrays[2], lightColorSettsArrays[3]>;
+
 			lightIntensitySetts = number(settingsArray[6]);
 			affectDiffuseSetts = integer(settingsArray[7]);
 			affectSpecularSetts = integer(settingsArray[8]);
-			lensFlareSetts = integer(settingsArray[9]);
-			volumetricLightingSetts = integer(settingsArray[10]);
-			lightColorSettsArray = <lightColorSettsArrays[1], lightColorSettsArrays[2], lightColorSettsArrays[3]>;
+			affectCausticsSetts = integer(settingsArray[9]);
+			lensFlareSetts = integer(settingsArray[10]);
+			volumetricLightingSetts = integer(settingsArray[11]);
 		}
 		
 		doKeys = 0;
@@ -499,6 +482,16 @@ lightOverride_UI: action
 
 		ui_offset_y += LgtProp_ui_row_offset;
 
+		c26val = 1;
+		if(action == "edit")
+		{
+			c26val = affectCausticsSetts;
+		}
+		c26 = ctlcheckbox("Affect Caustics     ",c26val);
+		ctlposition(c26, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+
+		ui_offset_y += LgtProp_ui_row_offset;
+
 		c27val = 0;
 		if(action == "edit")
 		{
@@ -525,19 +518,10 @@ lightOverride_UI: action
 			lightIntensitySetts = getvalue(c23);
 			affectDiffuseSetts = getvalue(c24);
 			affectSpecularSetts = getvalue(c25);
+			affectCausticsSetts = getvalue(c26);
 			lensFlareSetts = getvalue(c27);
 			volumetricLightingSetts = getvalue(c28);
-			doUpdate = 1;
-		}
-		else
-		{
-			doUpdate = 0;
-		}
-		reqend();
-		
-		if(doUpdate == 1)
-		{	
-			newNumber;
+
 			pass = currentChosenPass;
 			newNumber = sel;
 			if(action == "new")
@@ -557,8 +541,9 @@ lightOverride_UI: action
 				}
 			}
 			overrideNames[newNumber] = newName + "   (light properties)";
-			overrideSettings[newNumber] = newName + "||" + "type5" + "||" +	string(lightColorSettsArray.x) +  "||" + string(lightColorSettsArray.y) + "||" + string(lightColorSettsArray.z) + "||" + string(lightIntensitySetts) + "||" + string(affectDiffuseSetts) + "||" + string(affectSpecularSetts) + "||" + string(lensFlareSetts)  + "||" + string(volumetricLightingSetts);
+			overrideSettings[newNumber] = newName + "||" + "type5" + "||" +	string(lightColorSettsArray.x) +  "||" + string(lightColorSettsArray.y) + "||" + string(lightColorSettsArray.z) + "||" + string(lightIntensitySetts) + "||" + string(affectDiffuseSetts) + "||" + string(affectSpecularSetts) + "||" + string(affectCausticsSetts) + "||" + string(lensFlareSetts)  + "||" + string(volumetricLightingSetts);
 		}
+		reqend();
 	} else {
 		error("lightOverride_UI: incorrect, or no, action passed");
 	}
@@ -571,7 +556,6 @@ objpropsOverride_UI: action
 	// action should be either 'new' or 'edit'
 	if (action == "new" || action == "edit")
 	{
-		doUpdate;
 		if(action == "edit")
 		{
 		    sel = getvalue(gad_OverridesListview).asInt();
@@ -747,16 +731,6 @@ objpropsOverride_UI: action
 			receiveShadowSetts = getvalue(c29);
 			matteColorSettsArray = getvalue(c21_5);
 			
-			doUpdate = 1;
-		}
-		else
-		{
-			doUpdate = 0;
-		}
-		reqend();
-
-		if(doUpdate == 1)
-		{
 			newNumber = sel;
 			if(action == "new")
 			{
@@ -778,6 +752,7 @@ objpropsOverride_UI: action
 			overrideNames[newNumber] = newName + "   (object properties)";
 			overrideSettings[newNumber] = newName + "||" + "type2" + "||" + string(matteObjectSetts) + "||" + string(alphaChannelSetts) + "||" + string(unseenByRaysSetts) + "||" + string(unseenByCameraSetts) + "||" + string(unseenByRadiositySetts) + "||" + string(unseenByFogSetts) + "||" + string(selfShadowSetts) + "||" + string(castShadowSetts) + "||" + string(receiveShadowSetts) + "||" + string(matteColorSettsArray.x) + "||" + string(matteColorSettsArray.y) + "||" + string(matteColorSettsArray.z);
 		}
+		reqend();
 	} else {
 		error("objpropsOverride_UI: incorrect, or no, action passed");
 	}
@@ -795,7 +770,6 @@ motOverride_UI: action
 		    sel = getvalue(gad_OverridesListview).asInt();
 			settingsArray = parseOverrideSettings(overrideSettings[sel]);
 		}
-		doUpdate;
 		doKeys = 0;
 
 		reqbeginstr = "New .mot Override";
@@ -823,16 +797,7 @@ motOverride_UI: action
 			newName = getvalue(c20);
 			newName = makeStringGood(newName);
 			motFile = getvalue(c21);
-			doUpdate = 1;
-		}
-		else
-		{
-			doUpdate = 0;
-		}
-		reqend();
-		
-		if(doUpdate == 1)
-		{
+
 			newNumber = sel;
 			if(action == "new")
 			{
@@ -854,6 +819,7 @@ motOverride_UI: action
 			overrideNames[newNumber] = newName + "   (.mot file)";
 			overrideSettings[newNumber] = newName + "||" + "type3" + "||" + string(motFile);
 		}
+		reqend();
 	} else {
 		error("motOverride_UI: incorrect, or no, action passed");
 	}
@@ -871,7 +837,6 @@ lwoOverride_UI: action
 		    sel = getvalue(gad_OverridesListview).asInt();
 			settingsArray = parseOverrideSettings(overrideSettings[sel]);
 		}
-		doUpdate;
 		doKeys = 0;
 
 		reqbeginstr = "New .lwo Override";
@@ -900,16 +865,7 @@ lwoOverride_UI: action
 			newName = getvalue(c20);
 			newName = makeStringGood(newName);
 			lwoFile = getvalue(c21);
-			doUpdate = 1;
-		}
-		else
-		{
-			doUpdate = 0;
-		}
-		reqend();
-		
-		if(doUpdate == 1)
-		{
+
 			newNumber = sel;
 			if(action == "new")
 			{
@@ -931,6 +887,7 @@ lwoOverride_UI: action
 			overrideNames[newNumber] = newName + "   (.lwo file)";
 			overrideSettings[newNumber] = newName + "||" + "type4" + "||" + string(lwoFile);
 		}
+		reqend();
 	} else {
 		error("lwoOverride_UI: incorrect, or no, action passed");
 	}
@@ -948,7 +905,6 @@ lightexclOverride_UI: action
 		    sel = getvalue(gad_OverridesListview).asInt();
 			settingsArray = parseOverrideSettings(overrideSettings[sel]);
 		}
-		doUpdate;
 		for(x = 0; x < size(lightNames); x++)
 		{
 			xInverse = size(lightNames) - x;
@@ -1006,16 +962,7 @@ lightexclOverride_UI: action
 			newName = getvalue(c20);
 			newName = makeStringGood(newName);
 			excludedLightsSetts = getvalue(light23);
-			doUpdate = 1;
-		}
-		else
-		{
-			doUpdate = 0;
-		}
-		reqend();
-		
-		if(doUpdate == 1)
-		{
+
 			newNumber = sel;
 			if(action == "new")
 			{
@@ -1037,6 +984,7 @@ lightexclOverride_UI: action
 			overrideNames[newNumber] = newName + "   (light exclusion)";
 			overrideSettings[newNumber] = newName + "||" + "type7" + "||" + string(excludedLightsSetts);
 		}
+		reqend();
 	} else {
 		error("lightexclOverride_UI: incorrect, or no, action passed");
 	}

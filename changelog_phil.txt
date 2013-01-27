@@ -1,3 +1,17 @@
+20130125 (RC 1 - major changes in light override, scene master for final 1.0 feature delivery)
+========
+
+- Gradient backdrop toggle and color overrides added to scene master.
+- Caustics toggle added to light override.
+- Radiosity flag support added to the native renderer scene master override and scene master override UI.
+- Tweaked override item display filter code to screen out items not assigned to the current pass.
+- Hoped for FiberFX workflow not available. FiberFX won't permit breakouts for different elements - it fails if any of its settings reference an element not present in the scene file. Note added to documentation.
+ - Planned to add passname to the FiberFX output name automatically. Given the workflow limitation, it may not make sense at this time.
+- FiberFX function called when no scene override in existence. Fixed.
+- Enabled new feature for testing. Passed all tests in QA.
+- Various tweaks internally regarding reqpost() actions to reduce activity if the user does nothing at all.
+- More code clean-up. Retiring doUpdate usage.
+
 20130123 (beta 8 - no override changes since beta 7; major change in the experimental build)
 ========
 
@@ -555,7 +569,6 @@ p0034 : LScript bug needed working around. (Fixed, beta8 respin)
 
 - Need to check if growl interaction works with current growl versions.
 - 3rd party lights/cameras end of block detection.
-- Extend light override (caustics).
 - Overriding multiple surfaces on an object. Doable?
 - Save/load override configuration files.
 

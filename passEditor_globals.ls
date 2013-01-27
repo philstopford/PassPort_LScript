@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130123_b8";
+var versionString = "20130125_RC1";
 var rpeVersion = "1.0";
 var parch = "Unknown";
 var icon;
@@ -186,4 +186,5 @@ var samplerArray = @"Low-discrepancy","Fixed","Classic"@;
 var reconFilterArray = @"Classic","Box","Box (Soft)","Box (Sharp)","Gaussian","Gaussian (Soft)","Gaussian (Sharp)","Mitchell","Mitchell (Soft)","Mitchell (Sharp)","Lanczos","Lanczos (Soft)","Lanczos (Sharp)"@;
 var fieldRenderArray = @"Off","Even/Upper First","Odd/Lower First"@;
 var fogTypeArray = @"Off","Linear","Nonlinear 1","Nonlinear 2","Realistic"@;
-
+var radFlags_Default = @0,0,0,0,0,0,0,0@;
+var radFlags_Array;

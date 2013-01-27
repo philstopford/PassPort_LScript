@@ -6,7 +6,7 @@
 
 // EXPERIMENTAL features
 // @define enableKray 1;
-// @define enablePBS 1; // only for post-1.0.
+@define enablePBS 1; // only for post-1.0.
 
 var supportedplatform = 1;
 

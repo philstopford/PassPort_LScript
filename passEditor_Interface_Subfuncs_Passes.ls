@@ -21,7 +21,6 @@ createNewPassFromSelection
 passHandler: action, mode
 {
 	doKeys = 0;
-	doUpdate = 0;
 
 	if(!action)
 		error("passHandler called without arguments");
@@ -189,12 +188,6 @@ passHandler: action, mode
         auraToggle              = string(getvalue(c28));
         iDOFToggle              = string(getvalue(c29));
 @end // PBS
-		doUpdate = 1;
-
-	}
-	reqend();
-	if(doUpdate == 1)
-	{
 
 @if enablePBS == 1
         passBufferExporters[newNumber] = changeImageFilterState + "||" + compBufferToggle + "||" + exrTraderToggle + "||" + specBuffToggle + "||" + psdToggle
@@ -273,7 +266,8 @@ passHandler: action, mode
 			}
 		}
         req_update();
-    }
+	}
+	reqend();
     req_update();
 }
 
@@ -491,27 +485,17 @@ duplicateSelectedPass
 
 savePassAsScene
 {
-	savePassScene = generatePassFile("seq", currentChosenPass);
-	
 	doKeys = 0;
 	reqbegin("Save Pass As Scene...");
 	c21 = ctlfilename("Save .lws file...", "*.lws",30,0);
 	if(reqpost())
 	{
+		savePassScene = generatePassFile("seq", currentChosenPass);
 		lwsFile = getvalue(c21);
-		doUpdate = 1;
-	}
-	else
-	{
-		doUpdate = 0;
-	}
-	reqend();
-	
-	if(doUpdate == 1)
-	{
 		filecopy(savePassScene,lwsFile);
+		filedelete(savePassScene);
 	}
-	filedelete(savePassScene);
+	reqend();	
 	doKeys = 1;
 }
 
@@ -523,16 +507,7 @@ saveAllPassesAsScenes
 	if(reqpost())
 	{
 		lwsFile = getvalue(c21);
-		doUpdate = 1;
-	}
-	else
-	{
-		doUpdate = 0;
-	}
-	reqend();
-	
-	if(doUpdate == 1)
-	{	
+
 		for(x = 1; x <= size(passNames); x++)
 		{
 			saveAllPassesScenes[x] = generatePassFile("seq", x);
@@ -563,6 +538,7 @@ saveAllPassesAsScenes
 			}
 		}
 	}
+	reqend();
 	doKeys = 1;
 }
 
@@ -615,16 +591,7 @@ saveCurrentPassesSettings
 	if(reqpost())
 	{
 		rpeFile = getvalue(c21);
-		doUpdate = 1;
-	}
-	else
-	{
-		doUpdate = 0;
-	}
-	reqend();
-	
-	if(doUpdate == 1)
-	{
+
 		// do the saving here
 		if(rpeFile == nil || rpeFile == "*.rpe")
 		{
@@ -706,6 +673,8 @@ saveCurrentPassesSettings
 			info("Settings saved successfully.");
 		}
 	}
+	else
+	reqend();
 }
 
 loadPassesSettings
@@ -718,16 +687,7 @@ loadPassesSettings
 	{
 		rpeFile = getvalue(c21);
 		replaceChoice = getvalue(c22);
-		doUpdate = 1;
-	}
-	else
-	{
-		doUpdate = 0;
-	}
-	reqend();
-	
-	if(doUpdate == 1)
-	{
+
 		if(replaceChoice == 1)
 		{
 			if(rpeFile == nil || rpeFile == "*.rpe")
@@ -981,4 +941,5 @@ loadPassesSettings
 			req_update();
 		}
 	}
+	reqend();
 }

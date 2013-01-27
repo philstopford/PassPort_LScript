@@ -16,7 +16,6 @@ scnmasterOverride_UI_kray25: action
 	// action should be either 'new' or 'edit'
 	if (action == "new" || action == "edit")
 	{
-		doUpdate;
 		if(action == "edit")
 		{
 			sel = getvalue(gad_OverridesListview).asInt();
@@ -47,15 +46,7 @@ scnmasterOverride_UI_kray25: action
 			newName 						= getvalue(c20);
 			newName 						= makeStringGood(newName);
 			overrideRenderer				= 2; // hard-coded.
-			doUpdate = 1;	
-		}
-		else
-		{
-			doUpdate = 0;
-		}
-		reqend();
-		if(doUpdate == 1)
-		{
+
 			newNumber = sel;
 			if(action == "new")
 			{
@@ -76,8 +67,9 @@ scnmasterOverride_UI_kray25: action
 			}
 			overrideNames[newNumber] = newName + "   (scene properties)";
 			overrideSettings[newNumber] = newName 								+ 	"||" 	+ "type6" 						+ 	"||"
-										+ string(overrideRenderer); 	
+										+ string(overrideRenderer);
 		}
+		reqend();
 	} else {
 		error("scnmasterOverride_UI: incorrect, or no, action passed");
 	}

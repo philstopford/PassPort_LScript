@@ -100,7 +100,15 @@ generatePassFile: mode, pass
                 {
                     affectSpecularLine = "";
                 }
-                if(settingsArray[9] == "0") // deliberately omit carriage returns.
+                if(settingsArray[9] == "0")
+                {
+                    affectCausticsLine = "AffectCaustics 0\n";
+                }
+                else
+                {
+                    affectCausticsLine = "AffectCaustics 1\n";
+                }
+                if(settingsArray[10] == "0") // deliberately omit carriage returns.
                 {
                     LensFlareLine = "LensFlare 0";
                 }
@@ -108,7 +116,7 @@ generatePassFile: mode, pass
                 {
                     LensFlareLine = "LensFlare 1";
                 }
-                if(settingsArray[10] == "0") // deliberately omit carriage returns.
+                if(settingsArray[11] == "0") // deliberately omit carriage returns.
                 {
                     VolumetricsLine = "VolumetricLighting 0";
                 }
@@ -117,7 +125,7 @@ generatePassFile: mode, pass
                     VolumetricsLine = "VolumetricLighting 1";
                 }
                 
-                lightSettingsPartOne[passItem] = lightColorLine + lightIntensityLine + affectDiffuseLine + affectSpecularLine;
+                lightSettingsPartOne[passItem] = lightColorLine + lightIntensityLine + affectDiffuseLine + affectSpecularLine + affectCausticsLine;
                 lightSettingsPartTwo[passItem] = LensFlareLine;
                 lightSettingsPartThree[passItem] = VolumetricsLine;
             
@@ -497,7 +505,7 @@ generatePassFile: mode, pass
             objEnd[passItem] = getObjectEndLine(objStartPlusOne,displayOldIDs[tempNumber],currentScenePath);
             objMotStart[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"NumChannels",currentScenePath);
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
-            // Happily, the line was retrieved above by the getPartialLine call, so it's availble for use.
+            // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
             // We use parse to split the line by spaces, the second is assumed to be the number of channels. We cast that to an integer.
             noc_Array = parse(" ",readSpecificLine(objMotStart[passItem],currentScenePath));
             numberOfChannels = integer(noc_Array[2]);
@@ -519,7 +527,7 @@ generatePassFile: mode, pass
             objEnd[passItem] = getLightEndLine(objStartPlusOne,displayOldIDs[tempNumber],currentScenePath);
             objMotStart[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"NumChannels",currentScenePath);
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
-            // Happily, the line was retrieved above by the getPartialLine call, so it's availble for use.
+            // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
             // We use parse to split the line by spaces, the second is assumed to be the number of channels. We cast that to an integer.
             noc_Array = parse(" ",readSpecificLine(objMotStart[passItem],currentScenePath));
             numberOfChannels = integer(noc_Array[2]);
@@ -551,7 +559,7 @@ generatePassFile: mode, pass
             objEnd[passItem] = getCameraEndLine(objStartPlusOne,displayOldIDs[tempNumber],currentScenePath);
             objMotStart[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"NumChannels",currentScenePath);
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
-            // Happily, the line was retrieved above by the getPartialLine call, so it's availble for use.
+            // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
             // We use parse to split the line by spaces, the second is assumed to be the number of channels. We cast that to an integer.
             noc_Array = parse(" ",readSpecificLine(objMotStart[passItem],currentScenePath));
             numberOfChannels = integer(noc_Array[2]);
@@ -679,10 +687,10 @@ generatePassFile: mode, pass
     outputFile = File(newScenePath, "w");
 
     // write out the header stuff
-    writeHeader(currentScenePath, inputFile, outputFile);
+    writeHeader(currentScenePath, inputFile, outputFile, passNames, pass);
     
     // write out the objects
-    writeObjects(inputFile, outputFile, lastObject);
+    writeObjects(inputFile, outputFile, passNames, pass, lastObject);
 
     // write out the stuff between the lights and objects
     lineNumber = ambientColorLine;
@@ -695,10 +703,10 @@ generatePassFile: mode, pass
     }
     
     // write out the lights
-    writeLights(inputFile, outputFile, lastObject, lastLight, IKInitialState, objLightTypeLine, objAffectCausticsLine, objLensFlareLine, objVolLightLine, lightSettingsPartOne, lightSettingsPartTwo, lightSettingsPartThree);
+    writeLights(inputFile, outputFile, passNames, pass, lastObject, lastLight, IKInitialState, objLightTypeLine, objAffectCausticsLine, objLensFlareLine, objVolLightLine, lightSettingsPartOne, lightSettingsPartTwo, lightSettingsPartThree);
 
     // write out the cameras
-    writeCameras(inputFile, outputFile, lastObject, lastLight, lastCamera);
+    writeCameras(inputFile, outputFile, passNames, pass, lastObject, lastLight, lastCamera);
 
     lineNumber = objEnd[lastLight + lastObject + lastCamera];
     inputFile.line(lineNumber);
@@ -855,28 +863,21 @@ generatePassFile: mode, pass
 				scnGen_native(updatedCurrentScenePath, newScenePath);
 				break;
 			}
+            // FiberFX stuff. Due to poor parameter naming, we need to do this in a more specific manner.
+            fiberFX(newScenePath, passNames, pass);
 		}
     }
 
-	// FiberFX stuff. Due to poor parameter naming, we need to do this in a more specific manner.
-	if(fiberFX(newScenePath) == 1)
-	{
-		// We made some changes, so let's align the files again
-		filecopy(newScenePath, updatedCurrentScenePath);
-	}
-
 	// deal with the buffer savers now.
-	handleBuffers(updatedCurrentScenePath);
+	handleBuffers(newScenePath, passNames, pass);
     
 	// and as a tack-on fix, replace motion-mixer stuff for overridden objects. Calls finishFiles() for us.
-	motionMixerStuff(updatedCurrentScenePath);
-
-	filedelete(updatedCurrentScenePath);
+	motionMixerStuff(newScenePath, passNames, pass);
 
     return(newScenePath);
 } // generatePass
 
-writeHeader: inputFileName, inputFile, outputFile
+writeHeader: inputFileName, inputFile, outputFile, passNames, pass
 {
     lineNumber = 1;
     endLine;
@@ -912,7 +913,7 @@ writeHeader: inputFileName, inputFile, outputFile
     outputFile.writeln("");
 }
 
-writeCameras: inputFile, outputFile, lastObject, lastLight, lastCamera
+writeCameras: inputFile, outputFile, passNames, pass, lastObject, lastLight, lastCamera
 {
     for(cameraCounter = lastObject + lastLight + 1; cameraCounter <= lastObject + lastLight + lastCamera; cameraCounter++)
     {
@@ -1110,7 +1111,7 @@ writeCameras: inputFile, outputFile, lastObject, lastLight, lastCamera
     }
 }
 
-writeObjects: inputFile, outputFile, lastObject
+writeObjects: inputFile, outputFile, passNames, pass, lastObject
 {
     if(lastObject != nil)
     {
@@ -1521,7 +1522,7 @@ writeObjects: inputFile, outputFile, lastObject
     }
 }
 
-writeLights: inputFile, outputFile, lastObject, lastLight, IKInitialState, objLightTypeLine, objAffectCausticsLine, objLensFlareLine, objVolLightLine, lightSettingsPartOne, lightSettingsPartTwo, lightSettingsPartThree
+writeLights: inputFile, outputFile, passNames, pass, lastObject, lastLight, IKInitialState, objLightTypeLine, objAffectCausticsLine, objLensFlareLine, objVolLightLine, lightSettingsPartOne, lightSettingsPartTwo, lightSettingsPartThree
 {
     for(lightCounter = lastObject + 1; lightCounter <= lastObject + lastLight; lightCounter++)
     {
@@ -1711,7 +1712,7 @@ writeLights: inputFile, outputFile, lastObject, lastLight, IKInitialState, objLi
     outputFile.writeln("");
 }
 
-fiberFX: ffFile
+fiberFX: ffFile, passNames, pass
 {
 	// Let's check if FiberFX was even applied.
 	ffLine = getPartialLine(0,0,"Plugin PixelFilterHandler 1 FiberFilter",ffFile);
@@ -1761,7 +1762,7 @@ fiberFX: ffFile
 	return 1; // notify caller that we changed something.
 }
 
-handleBuffers: hbFile // if you edit this, don't forget to extend defaultBufferExporters as well and the new/edit pass dialog to set the values accordingly. You'll also need to bump the version due to mismatches.
+handleBuffers: hbFile, passNames, pass // if you edit this, don't forget to extend defaultBufferExporters as well and the new/edit pass dialog to set the values accordingly. You'll also need to bump the version due to mismatches.
 {
 	if(redirectBuffersSetts == 1)
 	{
@@ -2061,13 +2062,13 @@ handleBuffers: hbFile // if you edit this, don't forget to extend defaultBufferE
 	}
 
 @if enablePBS == 1
-    passBufferSetup(hbFile);
+    passBufferSetup(hbFile, passNames, pass);
 @end
 }
 
 @if enablePBS == 1
 // This function is called from handleBuffers and it works to (de)activate buffer exporters (image filters) for the current pass. It's highly experimental and not scheduled for the 1.0 release.
-passBufferSetup: pbsFile
+passBufferSetup: pbsFile, passNames, pass
 {
     pbsSettings = parse("||",passBufferExporters[pass]);
 
@@ -2102,6 +2103,7 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
     scanFile = File(pbsFile, "r"); // We know this file exists - we got here from our caller function that validated its existence.
 
     imageFilterLinesIndex = 0;
+    lineNumber = 1;
     while(!scanFile.eof())
     {
         line = scanFile.read();
@@ -2119,11 +2121,12 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
                 if(pbsTestLineParse[4] == imageFilterString)
                 {
                     imageFilterLinesIndex++;
-                    endPluginLine = getPartialLine(line,0,"EndPlugin", pbsFile);
+                    endPluginLine = getPartialLine(lineNumber,0,"EndPlugin", pbsFile);
                     imageFilterLines[imageFilterLinesIndex] = endPluginLine;
                 }
             }
         }
+        lineNumber++;
     }
     
     if(imageFilterLinesIndex >= 1) // We detected at least one buffer exporter of this type.
@@ -2133,6 +2136,7 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
 
         tempFilePBS = tempDirectory + getsep() + "tempPassportFilePBS.lws";
         filecopy(pbsFile, tempFilePBS);
+
         for(i = 1; i <= imageFilterLinesIndex; i++)
         {
             // Assume plugin is currently enabled.
@@ -2148,6 +2152,7 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
             // Now we know what state the plugin is in. Let's find out if we need to do something.
             if(imageFilterSetting != state)
             {
+                makeChange = 1;
                 if(state == 0)
                 {
                     changeScnLine("PluginEnabled 1", tempFilePBS, imageFilterLines[i] + 1 + lineOffset);
@@ -2155,9 +2160,13 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
                     insertScnLine("PluginEnabled 0", tempFilePBS, imageFilterLines[i] + lineOffset);
                     lineOffset++;
                 }
+                info("hold");
             }
         }
-        filecopy(tempFilePBS, pbsFile);
+        if(makeChange == 1)
+        {
+            filecopy(tempFilePBS, pbsFile);
+        }
         filedelete(tempFilePBS);
     }
 
@@ -2166,7 +2175,7 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
 }
 @end // PBS
 
-motionMixerStuff: mmFile
+motionMixerStuff: mmFile, passNames, pass
 {
 	if(overriddenObjectID != nil)
 	{
