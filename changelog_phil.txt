@@ -1,3 +1,19 @@
+20130101
+========
+
+- Make use of runningUnder() to see if lwsn crashes can be avoided.
+- Tweaked hard-coded, obsolete, reference to ScreamerNet.
+- First run under OS X!
+- Bumped minimum requirement to LW 11.0.
+- Further tweaks to refine operation.
+- Moved Motion Mixer handling to a separate function to reduce complexity.
+- Moved buffer handling code to a separate function to reduce complexity.
+- Modified writeOverrideString function to handle 'special' case of FrameSize and GlobalFrameSize settings.
+- Deployed improved scene file writing code. Probably broken build for now. Will debug over time :)
+- NT helped with guidance to avoid the arithmetic error on OS X. It's that this_script[1] in the main file.
+ - Reworked this code per NT's guidance.
+ - Have followed up the reply with a query about why the error location is always wrong.
+
 20121229
 ========
 
@@ -280,6 +296,7 @@ p0015 : Overrides with assigned items don't get bullet point until the lists are
 - Lens flare toggle isn't working.
 - SceneGen code could be optimised to walk the array and use loops to greatly simplify the code.
 - Add Camera override, for camera settings.
+- Autoscan plugin operation.
 
 -------------
 - Reference -

@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20121229";
+var versionString = "20130101";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -115,4 +115,7 @@ var beingEscaped;
 var overriddenObjectID;
 var overriddenObjectName;
 
+// file variables.
 var newScenePath;
+var inputFileName;
+var filesPrepared = 0;

@@ -1519,119 +1519,29 @@ generatePassFile: mode, pass
                     break;
             }
             
-            inputFile = File(newScenePath,"r");
-            tempOutput = File("TEMPTESTRESMULTSCENE.LWS","w");
+			writeOverrideString(currentScenePath, newScenePath, "FrameSize ", resMult);
 
-            while(!inputFile.eof())
-            {
-                line = inputFile.read();
-                mystring = "FrameSize ";
-                mystring_len = size(mystring);
-                if(size(line) > mystring_len)
-                {
-                    if(strleft(line,mystring_len) == mystring)
-                    {
-                        parsingArray = parse(" ",line);
-                        newResWidth = integer(integer(parsingArray[2]) * resMult);
-                        newResHeight = integer(integer(parsingArray[3]) * resMult);
-                        toWrite = mystring + string(newResWidth) + " " + string(newResHeight);
-                    }
-                    else
-                    {
-                        toWrite = line;
-                    }
-                }
-                else
-                {
-                    toWrite = line;
-                }
-                tempOutput.writeln(toWrite);
-            }
-            inputFile.close();
-            tempOutput.close();
-
-            inputFile = File("TEMPTESTRESMULTSCENE.LWS","r");
-            tempOutput = File(newScenePath,"w");
-            
-            while(!inputFile.eof())
-            {
-                line = inputFile.read();
-                mystring = "GlobalFrameSize ";
-                mystring_len = size(mystring);
-                if(size(line) > mystring_len)
-                {
-                    if(strleft(line,mystring_len) == mystring)
-                    {
-                        parsingArray = parse(" ",line);
-                        newResWidth = integer(integer(parsingArray[2]) * resMult);
-                        newResHeight = integer(integer(parsingArray[3]) * resMult);
-                        toWrite = mystring + string(newResWidth) + " " + string(newResHeight);
-                    }
-                    else
-                    {
-                        toWrite = line;
-                    }
-                }
-                else
-                {
-                    toWrite = line;
-                }
-                tempOutput.writeln(toWrite);
-            }
-            inputFile.close();
-            tempOutput.close();
+			writeOverrideString(currentScenePath, newScenePath, "GlobalFrameSize ", resMult);
+						
+			renderModeSetts = integer(settingsArray[4]);
+			writeOverrideString(currentScenePath, newScenePath, "RenderMode ", renderModeSetts);
 
 			renderModeSetts = integer(settingsArray[4]);
-			writeOverrideString("RenderMode ", renderModeSetts);
-
-			renderModeSetts = integer(settingsArray[4]);
-			writeOverrideString("RenderMode ", renderModeSetts);
+			writeOverrideString(currentScenePath, newScenePath, "RenderMode ", renderModeSetts);
             
 			depthBufferAASetts = integer(settingsArray[5]);
-			writeOverrideString("DepthBufferAA ", depthBufferAASetts);
+			writeOverrideString(currentScenePath, newScenePath, "DepthBufferAA ", depthBufferAASetts);
             
 			renderLinesSetts = integer(settingsArray[6]);
-			writeOverrideString("RenderLines ", renderLinesSetts);
+			writeOverrideString(currentScenePath, newScenePath, "RenderLines ", renderLinesSetts);
 
 			rayRecursionLimitSetts = integer(settingsArray[7]);
-			writeOverrideString("RayRecursionLimit ", rayRecursionLimitSetts);
-            
-        // dropping the AA samples
-            inputFile = File(newScenePath,"r");
-            tempOutput = File("TEMPTESTRESMULTSCENE.LWS","w");
-            
-            while(!inputFile.eof())
-            {
-                line = inputFile.read();
-                mystring = "AASamples ";
-                mystring_len = size(mystring);
-                if(size(line) > mystring_len)
-                {
-                    if(strleft(line,mystring_len) == mystring)
-                    {
-                        if(disableAASetts == 1)
-                        {
-                            toWrite = mystring + "1";
-                        }
-                        else
-                        {
-                            toWrite = line;
-                        }
-                    }
-                    else
-                    {
-                        toWrite = line;
-                    }
-                }
-                else
-                {
-                    toWrite = line;
-                }
-                tempOutput.writeln(toWrite);
-            }
-            inputFile.close();
-            tempOutput.close();
+			writeOverrideString(currentScenePath, newScenePath, "RayRecursionLimit ", rayRecursionLimitSetts);
 
+			if(disableAASetts == 1) {
+				writeOverrideString(currentScenePath, newScenePath, "AASamples ", "1");
+			}
+			
 			raytraceShadows				= integer(settingsArray[10]);
 			raytraceShadows_Flag		= 1;
 			raytraceFlags				= (raytraceShadows * raytraceShadows_Flag);
@@ -1652,612 +1562,132 @@ generatePassFile: mode, pass
 			raytraceOccl_Flag			= 16;
 			raytraceFlags				+= (raytraceOccl * raytraceOccl_Flag);
 			
-     		writeOverrideString("RayTraceEffects ", raytraceFlags);
+     		writeOverrideString(currentScenePath, newScenePath, "RayTraceEffects ", raytraceFlags);
 
    			volumetricAA = integer(settingsArray[15]);
-     		writeOverrideString("VolumetricAA ", volumetricAA);
+     		writeOverrideString(currentScenePath, newScenePath, "VolumetricAA ", volumetricAA);
 
    			gLensFlares = integer(settingsArray[16]);
-     		writeOverrideString("EnableLensFlares ", gLensFlares);
+     		writeOverrideString(currentScenePath, newScenePath, "EnableLensFlares ", gLensFlares);
 
    			shadowMaps = integer(settingsArray[17]);
-     		writeOverrideString("EnableShadowMaps ", shadowMaps);
+     		writeOverrideString(currentScenePath, newScenePath, "EnableShadowMaps ", shadowMaps);
   
-            inputFile = File("TEMPTESTRESMULTSCENE.LWS","r");
-            tempOutput = File(newScenePath,"w");
-            
    			volLights = integer(settingsArray[18]);
-     		writeOverrideString("EnableVolumetricLights ", volLights);
+     		writeOverrideString(currentScenePath, newScenePath, "EnableVolumetricLights ", volLights);
 
    			twoSidedALgts = integer(settingsArray[19]);
-     		writeOverrideString("DoubleSidedAreaLights ", twoSidedALgts);
+     		writeOverrideString(currentScenePath, newScenePath, "DoubleSidedAreaLights ", twoSidedALgts);
 
    			renderInstances = integer(settingsArray[20]);
-     		writeOverrideString("RenderInstances ", renderInstances);
+     		writeOverrideString(currentScenePath, newScenePath, "RenderInstances ", renderInstances);
 
    			rayPrecision = number(settingsArray[21]);
-     		writeOverrideString("RayPrecision ", rayPrecision);
+     		writeOverrideString(currentScenePath, newScenePath, "RayPrecision ", rayPrecision);
 
    			rayCutoff = number(settingsArray[22]);
-     		writeOverrideString("RayCutoff ", rayCutoff);
+     		writeOverrideString(currentScenePath, newScenePath, "RayCutoff ", rayCutoff);
 
    			shadingSamples = integer(settingsArray[23]);
-     		writeOverrideString("ShadingSamples ", shadingSamples);
+     		writeOverrideString(currentScenePath, newScenePath, "ShadingSamples ", shadingSamples);
   
      		lightSamples = integer(settingsArray[24]);
-     		writeOverrideString("LightSamples ", lightSamples);
+     		writeOverrideString(currentScenePath, newScenePath, "LightSamples ", lightSamples);
 
      		gLightIntensity = number(settingsArray[25]);
-     		writeOverrideString("GlobalLightIntensity ", gLightIntensity);
+     		writeOverrideString(currentScenePath, newScenePath, "GlobalLightIntensity ", gLightIntensity);
 
      		gFlareIntensity = number(settingsArray[26]);
-     		writeOverrideString("GlobalFlareIntensity ", gFlareIntensity);
+     		writeOverrideString(currentScenePath, newScenePath, "GlobalFlareIntensity ", gFlareIntensity);
 
      		enableGI = number(settingsArray[27]);
-     		writeOverrideString("EnableRadiosity ", enableGI);
+     		writeOverrideString(currentScenePath, newScenePath, "EnableRadiosity ", enableGI);
 
      		giMode = integer(settingsArray[28]);
      		giMode = giMode - 1; // decrement by one to match index in LW. Menus are 1-indexed.
-     		writeOverrideString("RadiosityType ", giMode);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityType ", giMode);
 
      		interpolateGI = integer(settingsArray[29]);
-     		writeOverrideString("RadiosityInterpolated ", interpolateGI);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityInterpolated ", interpolateGI);
 
      		blurBGGI = integer(settingsArray[30]);
-     		writeOverrideString("BlurRadiosity ", blurBGGI);
+     		writeOverrideString(currentScenePath, newScenePath, "BlurRadiosity ", blurBGGI);
  
       		transparencyGI = integer(settingsArray[31]);
-     		writeOverrideString("RadiosityTransparency ", transparencyGI);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityTransparency ", transparencyGI);
 
       		volumetricGI = integer(settingsArray[32]);
-     		writeOverrideString("VolumetricRadiosity ", volumetricGI);
+     		writeOverrideString(currentScenePath, newScenePath, "VolumetricRadiosity ", volumetricGI);
 
       		ambOcclGI = integer(settingsArray[33]);
-     		writeOverrideString("RadiosityUseAmbient ", ambOcclGI);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityUseAmbient ", ambOcclGI);
 
       		directionalGI = integer(settingsArray[34]);
-     		writeOverrideString("RadiosityDirectionalRays ", directionalGI);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityDirectionalRays ", directionalGI);
 
       		gradientsGI = integer(settingsArray[35]);
-     		writeOverrideString("RadiosityUseGradients ", gradientsGI);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityUseGradients ", gradientsGI);
 
       		behindTestGI = integer(settingsArray[36]);
-     		writeOverrideString("RadiosityUseBehindTest ", behindTestGI);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityUseBehindTest ", behindTestGI);
 
       		useBumpsGI = integer(settingsArray[37]);
       		useBumpsGI = useBumpsGI * (-2147483648);
-     		writeOverrideString("RadiosityFlags ", useBumpsGI);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityFlags ", useBumpsGI);
 
       		giIntensity = integer(settingsArray[38]);
-     		writeOverrideString("RadiosityIntensity ", giIntensity);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityIntensity ", giIntensity);
 
       		giAngTol = integer(settingsArray[39]);
-     		writeOverrideString("RadiosityTolerance ", giAngTol);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityTolerance ", giAngTol);
 
       		giIndBounces = integer(settingsArray[40]);
-     		writeOverrideString("IndirectBounces ", giIndBounces);
+     		writeOverrideString(currentScenePath, newScenePath, "IndirectBounces ", giIndBounces);
             
             giMinSpacing = number(settingsArray[41]);
-     		writeOverrideString("RadiosityMinPixelSpacing ", giMinSpacing);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityMinPixelSpacing ", giMinSpacing);
 
             giRPE = number(settingsArray[42]);
-     		writeOverrideString("RadiosityRays ", giRPE);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityRays ", giRPE);
 
             giMaxSpacing = number(settingsArray[43]);
-     		writeOverrideString("RadiosityMaxPixelSpacing ", giMaxSpacing);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityMaxPixelSpacing ", giMaxSpacing);
 
             gi2ndBounces = integer(settingsArray[44]);
-     		writeOverrideString("SecondaryBounceRays ", gi2ndBounces);
+     		writeOverrideString(currentScenePath, newScenePath, "SecondaryBounceRays ", gi2ndBounces);
 
             giMultiplier = number(settingsArray[45]);
-     		writeOverrideString("RadiosityMultiplier ", giMultiplier);
+     		writeOverrideString(currentScenePath, newScenePath, "RadiosityMultiplier ", giMultiplier);
 
             enableCaustics = number(settingsArray[46]);
-     		writeOverrideString("EnableCaustics ", enableCaustics);
+     		writeOverrideString(currentScenePath, newScenePath, "EnableCaustics ", enableCaustics);
 
             causticsAccuracy = integer(settingsArray[47]);
-     		writeOverrideString("CausticAccuracy ", causticsAccuracy);
+     		writeOverrideString(currentScenePath, newScenePath, "CausticAccuracy ", causticsAccuracy);
 
             causticsIntensity = number(settingsArray[48]);
-     		writeOverrideString("CausticIntensity ", causticsIntensity);
+     		writeOverrideString(currentScenePath, newScenePath, "CausticIntensity ", causticsIntensity);
 
             causticsSoftness = number(settingsArray[49]);
-     		writeOverrideString("CausticSoftness ", causticsSoftness);
+     		writeOverrideString(currentScenePath, newScenePath, "CausticSoftness ", causticsSoftness);
                                    
-            inputFile = File("TEMPTESTRESMULTSCENE.LWS","r");
-            tempOutput = File(newScenePath,"w");
-
 			// FIXME : Move to camera override.
 			disableAASetts = integer(settingsArray[9]);
 			if(disableAASetts == 1)
 				disableAASetts = 0;
-     		writeOverrideString("Antialiasing ", disableAASetts);
+     		writeOverrideString(currentScenePath, newScenePath, "Antialiasing ", disableAASetts);
+
+     		writeOverrideString(currentScenePath, newScenePath, "AntiAliasingLevel ", "-1");
             
-            inputFile = File(newScenePath,"r");
-            tempOutput = File("TEMPTESTRESMULTSCENE.LWS","w");
-            
+			finishFiles();
 
-			// FIXME : Migrate to camera override.
-            while(!inputFile.eof())
-            {
-                line = inputFile.read();
-                mystring = "AntiAliasingLevel ";
-                mystring_len = size(mystring);
-                if(size(line) > mystring_len)
-                {
-                    if(strleft(line,mystring_len) == mystring)
-                    {
-                        if(disableAASetts == 1)
-                        {
-                            toWrite = mystring + "-1";
-                        }
-                        else
-                        {
-                            toWrite = line;
-                        }
-                    }
-                    else
-                    {
-                        toWrite = line;
-                    }
-                }
-                else
-                {
-                    toWrite = line;
-                }
-                tempOutput.writeln(toWrite);
-            }
-            inputFile.close();
-            tempOutput.close();
-            filecopy("TEMPTESTRESMULTSCENE.LWS",newScenePath);
-            filedelete("TEMPTESTRESMULTSCENE.LWS");
-            
-        // deal with the buffer savers now.
-            if(redirectBuffersSetts == 1)
-            {
-                inputFile = File(newScenePath,"r");
-                tempOutput = File("TEMPTESTRESMULTSCENE.LWS","w");
-                
-                while(!inputFile.eof())
-                {
-                    line = inputFile.read();
-                    if(size(line) > 26)
-                    {
-                        if(strleft(line,26) == "Plugin ImageFilterHandler ")
-                        {
-                            // the stock render buffer exporter
-                                bufferTestLineParse = parse(" ",line);
-                                if(bufferTestLineParse[4] == "LW_SpecialBuffers")
-                                {
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    if(line == "0")
-                                    {
-                                        tempOutput.writeln(line);
-                                        line = inputFile.read();
-                                        baseNameArray = parse(getsep(),line);
-                                        if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-                                        {
-                                            bufferBaseName = baseNameArray[size(baseNameArray)];
-                                            updatedBufferSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], bufferBaseName);
-
-                                            if(platformVar == WIN32 || platformVar == WIN64)
-                                            {
-                                                
-                                                tempFixedPath = fixPathForWin32(updatedBufferSaverPath);
-                                                newPathFixed = tempFixedPath;
-                                                toWrite = newPathFixed;
-                                            }
-                                            else
-                                            {
-                                                toWrite = updatedBufferSaverPath;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            toWrite = line;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        toWrite = line;
-                                    }
-                                }
-                            // end of the stock render buffer exporter
-                            
-                            // the psd exporter
-                                if(bufferTestLineParse[4] == "LW_PSDExport")
-                                {
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    if(strleft(line,5) == "Path ")
-                                    {
-                                        baseNameArray = parse(getsep(),line);
-                                        if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-                                        {
-                                            psdBaseName = baseNameArray[size(baseNameArray)];
-                                            updatedPsdSaverPath = "Path \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], psdBaseName);
-
-                                            if(platformVar == WIN32 || platformVar == WIN64)
-                                            {
-												noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], psdBaseName);
-												tempFixedPath = fixPathForWin32(noIntroPath);
-                                                noIntroPath = tempFixedPath;
-                                                newPathFixed = "Path " + noIntroPath;
-                
-                                                toWrite = newPathFixed;
-                                            }
-                                            else
-                                            {
-                                                toWrite = updatedPsdSaverPath;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            toWrite = line;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        toWrite = line;
-                                    }
-                                }
-                            // end of the psd exporter
-                            
-                            // the rla exporter
-                                if(bufferTestLineParse[4] == "LW_ExtendedRLAExport")
-                                {
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    if(strleft(line,1) != "")
-                                    {
-                                        baseNameArray = parse(getsep(),line);
-                                        if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-                                        {
-                                            rlaBaseName = baseNameArray[size(baseNameArray)];
-                                            updatedRlaSaverPath = generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], rlaBaseName);
-                                            toWrite = updatedRlaSaverPath;
-                                        }
-                                        else
-                                        {
-                                            toWrite = line;
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        toWrite = line;
-                                    }   
-                                }
-                            // end of the rla exporter
-                            
-                            // the rpf exporter
-                                if(bufferTestLineParse[4] == "LW_ExtendedRPFExport")
-                                {
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    if(strleft(line,1) != "")
-                                    {
-                                        baseNameArray = parse(getsep(),line);
-                                        if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-                                        {
-                                            rpfBaseName = baseNameArray[size(baseNameArray)];
-                                            updatedRpfSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], rpfBaseName);
-                                            toWrite = updatedRpfSaverPath;
-                                        }
-                                        else
-                                        {
-                                            toWrite = line;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        toWrite = line;
-                                    }   
-                                }
-                            // end of the rpf exporter
-                            
-                            // the aura exporter
-                                if(bufferTestLineParse[4] == "Aura25Export")
-                                {
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    if(strleft(line,1) == "\"")
-                                    {
-                                        baseNameArray = parse(getsep(),line);
-                                        if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-                                        {
-                                            auraBaseName = baseNameArray[size(baseNameArray)];
-                                            updatedAuraSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], auraBaseName);
-                                            toWrite = updatedAuraSaverPath;
-                                        }
-                                        else
-                                        {
-                                            toWrite = line;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        toWrite = line;
-                                    }   
-                                }
-                            // end of the aura exporter
-                            
-                            // idof channels
-                                if(bufferTestLineParse[4] == "iDof_channels_IF")
-                                {
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    tempOutput.writeln(line);
-                                    line = inputFile.read();
-                                    if(strleft(line,1) != "")
-                                    {
-                                        baseNameArray = parse(getsep(),line);
-                                        if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-                                        {
-                                            idofBaseName = baseNameArray[size(baseNameArray)];
-                                            updatedIdofSaverPath = generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], idofBaseName);
-                                            toWrite = updatedIdofSaverPath;
-                                        }
-                                        else
-                                        {
-                                            toWrite = line;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        toWrite = line;
-                                    }
-                                }                               
-                            // end of idof channels
-                        }
-                        else
-                        {
-                            toWrite = line;
-                        }
-                    }
-                    else
-                    {
-                        toWrite = line;
-                    }
-                    tempOutput.writeln(toWrite);
-                }
-                
-                inputFile.close();
-                tempOutput.close();
-                filecopy("TEMPTESTRESMULTSCENE.LWS",newScenePath);
-                filedelete("TEMPTESTRESMULTSCENE.LWS");
-                
-            }
-    
-            // mm stuff used to be right here
-            
-            filedelete("TEMPTESTRESMULTSCENE.LWS");
-
+	        // deal with the buffer savers now.
+	        handleBuffers();
         }
     }
     
-        // and as a tack-on fix, replace motion-mixer stuff for overridden objects
-            if(overriddenObjectID != nil)
-            {
-                // check for clones of motion mixer items
-                clonedMMItems = false;
-                for(x = 1; x <= size(overriddenObjectID); x++)
-                {
-                    for(y = 1; y <= size(overriddenObjectID); y++)
-                    {
-                        if(x != y && overriddenObjectID[x] == overriddenObjectID[y])
-                        {
-                            clonedMMItems = true;
-                        }
-                    }
-                }
-                
-                //filecopy("TEMPTESTRESMULTSCENE.LWS",newScenePath);
-                
-                for(x = 1; x <= size(overriddenObjectID); x++)
-                {
-                    inputFile = File(newScenePath,"r");
-                    tempOutput = File("TEMPTESTRESMULTSCENE.LWS","w");
-                    
-                    inputFile.line(1);
-                    
-                    mmItemIDLine = nil;
-                    // find the line in the motion mixer stuff if it exists...
-                    while(!inputFile.eof())
-                    {
-                        line = inputFile.read();
-                        if(size(line) >= 22)
-                        {
-                            stringTempAdd = "      ItemAdd " + string(overriddenObjectID[x]);
-                            if(strleft(line,22) == stringTempAdd)
-                            {
-                                mmItemIDLine = inputFile.line();
-                                //info(stringTempAdd);
-                            }
-                        }
-                    }
-
-                    // if the item line exists in the motion mixer stuff, read the line before it to get the object name
-                    if(mmItemIDLine != nil)
-                    {
-                        if(clonedMMItems == true)
-                        {
-                            error("PassPort has found clones being overridden in a scene with Motion Mixer.  Please resolve clone naming.");
-                        }
-                        
-                        inputFile.line(mmItemIDLine - 2);
-                        mmItemToReplace = inputFile.read();
-                        mmItemStringArray = parse("\"",mmItemToReplace);
-                        mmItemString = mmItemStringArray[2];
-                        
-                        checkForLayers = parse(":",mmItemString);
-                        if(size(checkForLayers) > 1)
-                        {
-                            nameOfObject = checkForLayers[1];
-                        }
-                        else
-                        {
-                            nameOfObject = mmItemString;
-                        }
-                        
-                        replaceStringOne = "      ItemName \"" + nameOfObject;
-                        replaceStringTwo = "          ItemName \"" + nameOfObject;
-                        replaceStringThree = "            ChannelName \"" + nameOfObject;
-                        replaceStringFour = "              TrackMotionItemName \"" + nameOfObject;
-                        
-                        replacementStringOne = "      ItemName \"" + overriddenObjectName[x];
-                        replacementStringTwo = "          ItemName \"" + overriddenObjectName[x];
-                        replacementStringThree = "            ChannelName \"" + overriddenObjectName[x];
-                        replacementStringFour = "              TrackMotionItemName \"" + overriddenObjectName[x];
-                        
-                        inputFile.line(1);
-                        
-                        while(!inputFile.eof())
-						{
-							line = inputFile.read();
-							linesize = size(line);
-							stringsize = size(replaceStringOne);
-							if(linesize >= stringsize)
-							{
-								if(strleft(line,size(replaceStringOne)) == replaceStringOne)
-								{
-									n = size(line) - size(replaceStringOne);
-									lineTemp = replacementStringOne + strright(line,n);
-									line = lineTemp;
-								}
-							}
-							tempOutput.writeln(line);
-						}
-                        
-                        inputFile.close();
-                        tempOutput.close();
-        
-                        filecopy("TEMPTESTRESMULTSCENE.LWS",newScenePath);
-                        filedelete("TEMPTESTRESMULTSCENE.LWS");
-        
-                        inputFile = File(newScenePath,"r");
-                        tempOutput = File("TEMPTESTRESMULTSCENE.LWS","w");
-                        
-                        inputFile.line(1);
-                        
-						while(!inputFile.eof())
-						{
-							line = inputFile.read();
-							if(size(line) > size(replaceStringTwo))
-							{
-								if(strleft(line,size(replaceStringTwo)) == replaceStringTwo)
-								{
-									n = size(line) - size(replaceStringTwo);
-									lineTemp = replacementStringTwo + strright(line,n);
-									line = lineTemp;
-								}
-							}
-							tempOutput.writeln(line);
-						}
-						inputFile.close();
-                        tempOutput.close();
-                        
-                        filecopy("TEMPTESTRESMULTSCENE.LWS",newScenePath);
-                        filedelete("TEMPTESTRESMULTSCENE.LWS");
-        
-                        inputFile = File(newScenePath,"r");
-                        tempOutput = File("TEMPTESTRESMULTSCENE.LWS","w");
-                        
-                        inputFile.line(1);
-                        
-						while(!inputFile.eof())
-						{
-							line = inputFile.read();
-							if(size(line) > size(replaceStringThree))
-							{
-								if(strleft(line,size(replaceStringThree)) == replaceStringThree)
-								{
-									n = size(line) - size(replaceStringThree);
-									lineTemp = replacementStringThree + strright(line,n);
-									line = lineTemp;
-								}
-							}
-							tempOutput.writeln(line);
-						}
-						inputFile.close();
-                        tempOutput.close();
-                        
-                        filecopy("TEMPTESTRESMULTSCENE.LWS",newScenePath);
-                        filedelete("TEMPTESTRESMULTSCENE.LWS");
-        
-                        inputFile = File(newScenePath,"r");
-                        tempOutput = File("TEMPTESTRESMULTSCENE.LWS","w");
-                        
-                        inputFile.line(1);
-                        
-						while(!inputFile.eof())
-						{
-							line = inputFile.read();
-							if(size(line) > size(replaceStringFour))
-							{
-								if(strleft(line,size(replaceStringFour)) == replaceStringFour)
-								{
-									n = size(line) - size(replaceStringFour);
-									lineTemp = replacementStringFour + strright(line,n);
-									line = lineTemp;
-								}
-							}
-							tempOutput.writeln(line);
-						}
-                        inputFile.close();
-                        tempOutput.close();
-                        
-                        filecopy("TEMPTESTRESMULTSCENE.LWS",newScenePath);
-                        filedelete("TEMPTESTRESMULTSCENE.LWS");
-                        
-                    }
-                    else
-                    {
-                        inputFile.close();
-                        tempOutput.close();
-                        filedelete("TEMPTESTRESMULTSCENE.LWS");
-                    }
-                    
-                    // end of the mm if and else statement here
-                    
-                    
-                    
-                    // write out the scene, replacing the motion mixer stuff with the object name with the overridden info
-                    
-                    
-                }
-                //inputFile.close();
-                //tempOutput.close();
-                
-                //filecopy("TEMPTESTRESMULTSCENE.LWS",newScenePath);
-                
-            //end of all the mm stuff
-            }
+	// and as a tack-on fix, replace motion-mixer stuff for overridden objects
+	motionMixerStuff();
 
     // and the test frame resolution multiplier stuff
     switch(testResMultiplier)
@@ -2286,66 +1716,10 @@ generatePassFile: mode, pass
             break;
     }
     
-    inputFile = File(newScenePath,"r");
-    tempOutput = File("TEMPTESTRESMULTSCENE.LWS","w");
-    
-    while(!inputFile.eof())
-    {
-        line = inputFile.read();
-        if(size(line) > 9)
-        {
-            if(strleft(line,9) == "FrameSize")
-            {
-                parsingArray = parse(" ",line);
-                newResWidth = integer(integer(parsingArray[2]) * resMult);
-                newResHeight = integer(integer(parsingArray[3]) * resMult);
-                toWrite = "FrameSize " + string(newResWidth) + " " + string(newResHeight);
-            }
-            else
-            {
-                toWrite = line;
-            }
-        }
-        else
-        {
-            toWrite = line;
-        }
-        tempOutput.writeln(toWrite);
-    }
-    inputFile.close();
-    tempOutput.close();
-    
-    inputFile = File("TEMPTESTRESMULTSCENE.LWS","r");
-    tempOutput = File(newScenePath,"w");
-    
-    while(!inputFile.eof())
-    {
-        line = inputFile.read();
-        if(size(line) > 16)
-        {
-            if(strleft(line,16) == "GlobalFrameSize ")
-            {
-                parsingArray = parse(" ",line);
-                newResWidth = integer(integer(parsingArray[2]) * resMult);
-                newResHeight = integer(integer(parsingArray[3]) * resMult);
-                toWrite = "GlobalFrameSize " + string(newResWidth) + " " + string(newResHeight);
-            }
-            else
-            {
-                toWrite = line;
-            }
-        }
-        else
-        {
-            toWrite = line;
-        }
-        tempOutput.writeln(toWrite);
-    }
-    inputFile.close();
-    tempOutput.close();
-    
-    filedelete("TEMPTESTRESMULTSCENE.LWS");
 
+	writeOverrideString(currentScenePath, newScenePath, "FrameSize ", resMult);
+	writeOverrideString(currentScenePath, newScenePath, "GlobalFrameSize ", resMult);
+	
     return(newScenePath);
 
 } // generatePass
@@ -2366,15 +1740,451 @@ generatePath: mode, outputFolder, outputStr, fileOutputPrefix, userOutputString,
     return genPath;
 }
 
-writeOverrideString: outputString, outputValue
+handleBuffers
 {
-	inputFile = File("TEMPTESTRESMULTSCENE.LWS","r");
+	inputFileName = prepareInputFile(currentScenePath);
+	inputFile = File(inputFileName, "r");
 	tempOutput = File(newScenePath,"w");
+	if(redirectBuffersSetts == 1)
+	{
+		while(!inputFile.eof())
+		{
+			line = inputFile.read();
+			if(size(line) > 26)
+			{
+				if(strleft(line,26) == "Plugin ImageFilterHandler ")
+				{
+					// the stock render buffer exporter
+						bufferTestLineParse = parse(" ",line);
+						if(bufferTestLineParse[4] == "LW_SpecialBuffers")
+						{
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							if(line == "0")
+							{
+								tempOutput.writeln(line);
+								line = inputFile.read();
+								baseNameArray = parse(getsep(),line);
+								if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+								{
+									bufferBaseName = baseNameArray[size(baseNameArray)];
+									updatedBufferSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], bufferBaseName);
+
+									if(platformVar == WIN32 || platformVar == WIN64)
+									{
+										
+										tempFixedPath = fixPathForWin32(updatedBufferSaverPath);
+										newPathFixed = tempFixedPath;
+										toWrite = newPathFixed;
+									}
+									else
+									{
+										toWrite = updatedBufferSaverPath;
+									}
+								}
+								else
+								{
+									toWrite = line;
+								}
+							}
+							else
+							{
+								toWrite = line;
+							}
+						}
+					// end of the stock render buffer exporter
+					
+					// the psd exporter
+						if(bufferTestLineParse[4] == "LW_PSDExport")
+						{
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							if(strleft(line,5) == "Path ")
+							{
+								baseNameArray = parse(getsep(),line);
+								if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+								{
+									psdBaseName = baseNameArray[size(baseNameArray)];
+									updatedPsdSaverPath = "Path \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], psdBaseName);
+
+									if(platformVar == WIN32 || platformVar == WIN64)
+									{
+										noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], psdBaseName);
+										tempFixedPath = fixPathForWin32(noIntroPath);
+										noIntroPath = tempFixedPath;
+										newPathFixed = "Path " + noIntroPath;
+		
+										toWrite = newPathFixed;
+									}
+									else
+									{
+										toWrite = updatedPsdSaverPath;
+									}
+								}
+								else
+								{
+									toWrite = line;
+								}
+							}
+							else
+							{
+								toWrite = line;
+							}
+						}
+					// end of the psd exporter
+					
+					// the rla exporter
+						if(bufferTestLineParse[4] == "LW_ExtendedRLAExport")
+						{
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							if(strleft(line,1) != "")
+							{
+								baseNameArray = parse(getsep(),line);
+								if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+								{
+									rlaBaseName = baseNameArray[size(baseNameArray)];
+									updatedRlaSaverPath = generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], rlaBaseName);
+									toWrite = updatedRlaSaverPath;
+								}
+								else
+								{
+									toWrite = line;
+								}
+
+							}
+							else
+							{
+								toWrite = line;
+							}   
+						}
+					// end of the rla exporter
+					
+					// the rpf exporter
+						if(bufferTestLineParse[4] == "LW_ExtendedRPFExport")
+						{
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							if(strleft(line,1) != "")
+							{
+								baseNameArray = parse(getsep(),line);
+								if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+								{
+									rpfBaseName = baseNameArray[size(baseNameArray)];
+									updatedRpfSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], rpfBaseName);
+									toWrite = updatedRpfSaverPath;
+								}
+								else
+								{
+									toWrite = line;
+								}
+							}
+							else
+							{
+								toWrite = line;
+							}   
+						}
+					// end of the rpf exporter
+					
+					// the aura exporter
+						if(bufferTestLineParse[4] == "Aura25Export")
+						{
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							if(strleft(line,1) == "\"")
+							{
+								baseNameArray = parse(getsep(),line);
+								if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+								{
+									auraBaseName = baseNameArray[size(baseNameArray)];
+									updatedAuraSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], auraBaseName);
+									toWrite = updatedAuraSaverPath;
+								}
+								else
+								{
+									toWrite = line;
+								}
+							}
+							else
+							{
+								toWrite = line;
+							}   
+						}
+					// end of the aura exporter
+					
+					// idof channels
+						if(bufferTestLineParse[4] == "iDof_channels_IF")
+						{
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							tempOutput.writeln(line);
+							line = inputFile.read();
+							if(strleft(line,1) != "")
+							{
+								baseNameArray = parse(getsep(),line);
+								if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+								{
+									idofBaseName = baseNameArray[size(baseNameArray)];
+									updatedIdofSaverPath = generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], idofBaseName);
+									toWrite = updatedIdofSaverPath;
+								}
+								else
+								{
+									toWrite = line;
+								}
+							}
+							else
+							{
+								toWrite = line;
+							}
+						}                               
+					// end of idof channels
+				}
+				else
+				{
+					toWrite = line;
+				}
+			}
+			else
+			{
+				toWrite = line;
+			}
+			tempOutput.writeln(toWrite);
+		}
+		
+		inputFile.close();
+		tempOutput.close();
+		finishFiles();
+	}
+}
+
+motionMixerStuff
+{
+	if(overriddenObjectID != nil)
+	{
+		// check for clones of motion mixer items
+		clonedMMItems = false;
+		for(x = 1; x <= size(overriddenObjectID); x++)
+		{
+			for(y = 1; y <= size(overriddenObjectID); y++)
+			{
+				if(x != y && overriddenObjectID[x] == overriddenObjectID[y])
+				{
+					clonedMMItems = true;
+				}
+			}
+		}
+		
+		for(x = 1; x <= size(overriddenObjectID); x++)
+		{
+			inputFileName = prepareInputFile(currentScenePath);
+			inputFile = File(inputFileName, "r");
+			tempOutput = File(newScenePath,"w");
+			
+			inputFile.line(1);
+			
+			mmItemIDLine = nil;
+			// find the line in the motion mixer stuff if it exists...
+			while(!inputFile.eof())
+			{
+				line = inputFile.read();
+				if(size(line) >= 22)
+				{
+					stringTempAdd = "      ItemAdd " + string(overriddenObjectID[x]);
+					if(strleft(line,22) == stringTempAdd)
+					{
+						mmItemIDLine = inputFile.line();
+						//info(stringTempAdd);
+					}
+				}
+			}
+
+			// if the item line exists in the motion mixer stuff, read the line before it to get the object name
+			if(mmItemIDLine != nil)
+			{
+				if(clonedMMItems == true)
+				{
+					error("PassPort has found clones being overridden in a scene with Motion Mixer.  Please resolve clone naming.");
+				}
+				
+				inputFile.line(mmItemIDLine - 2);
+				mmItemToReplace = inputFile.read();
+				mmItemStringArray = parse("\"",mmItemToReplace);
+				mmItemString = mmItemStringArray[2];
+				
+				checkForLayers = parse(":",mmItemString);
+				if(size(checkForLayers) > 1)
+				{
+					nameOfObject = checkForLayers[1];
+				}
+				else
+				{
+					nameOfObject = mmItemString;
+				}
+				
+				replaceStringOne = "      ItemName \"" + nameOfObject;
+				replaceStringTwo = "          ItemName \"" + nameOfObject;
+				replaceStringThree = "            ChannelName \"" + nameOfObject;
+				replaceStringFour = "              TrackMotionItemName \"" + nameOfObject;
+				
+				replacementStringOne = "      ItemName \"" + overriddenObjectName[x];
+				replacementStringTwo = "          ItemName \"" + overriddenObjectName[x];
+				replacementStringThree = "            ChannelName \"" + overriddenObjectName[x];
+				replacementStringFour = "              TrackMotionItemName \"" + overriddenObjectName[x];
+				
+				inputFile.line(1);
+				
+				while(!inputFile.eof())
+				{
+					line = inputFile.read();
+					linesize = size(line);
+					stringsize = size(replaceStringOne);
+					if(linesize >= stringsize)
+					{
+						if(strleft(line,size(replaceStringOne)) == replaceStringOne)
+						{
+							n = size(line) - size(replaceStringOne);
+							lineTemp = replacementStringOne + strright(line,n);
+							line = lineTemp;
+						}
+					}
+					tempOutput.writeln(line);
+				}
+				
+				inputFile.close();
+				tempOutput.close();
+				finishFiles();
+
+				inputFileName = prepareInputFile(currentScenePath);
+				inputFile = File(inputFileName, "r");
+				tempOutput = File(newScenePath,"w");
+				
+				inputFile.line(1);
+				
+				while(!inputFile.eof())
+				{
+					line = inputFile.read();
+					if(size(line) > size(replaceStringTwo))
+					{
+						if(strleft(line,size(replaceStringTwo)) == replaceStringTwo)
+						{
+							n = size(line) - size(replaceStringTwo);
+							lineTemp = replacementStringTwo + strright(line,n);
+							line = lineTemp;
+						}
+					}
+					tempOutput.writeln(line);
+				}
+				inputFile.close();
+				tempOutput.close();
+				
+				inputFile.close();
+				tempOutput.close();
+				finishFiles();
+
+				inputFileName = prepareInputFile(currentScenePath);
+				inputFile = File(inputFileName, "r");
+				tempOutput = File(newScenePath,"w");
+				
+				inputFile.line(1);
+				
+				while(!inputFile.eof())
+				{
+					line = inputFile.read();
+					if(size(line) > size(replaceStringThree))
+					{
+						if(strleft(line,size(replaceStringThree)) == replaceStringThree)
+						{
+							n = size(line) - size(replaceStringThree);
+							lineTemp = replacementStringThree + strright(line,n);
+							line = lineTemp;
+						}
+					}
+					tempOutput.writeln(line);
+				}
+				inputFile.close();
+				tempOutput.close();
+				finishFiles();
+
+				inputFileName = prepareInputFile(currentScenePath);
+				inputFile = File(inputFileName, "r");
+				tempOutput = File(newScenePath,"w");
+				
+				inputFile.line(1);
+				
+				while(!inputFile.eof())
+				{
+					line = inputFile.read();
+					if(size(line) > size(replaceStringFour))
+					{
+						if(strleft(line,size(replaceStringFour)) == replaceStringFour)
+						{
+							n = size(line) - size(replaceStringFour);
+							lineTemp = replacementStringFour + strright(line,n);
+							line = lineTemp;
+						}
+					}
+					tempOutput.writeln(line);
+				}
+				inputFile.close();
+				tempOutput.close();
+				finishFiles();
+			}
+			else
+			{
+				inputFile.close();
+				tempOutput.close();
+				finishFiles();
+			}
+			
+			// end of the mm if and else statement here
+			// write out the scene, replacing the motion mixer stuff with the object name with the overridden info
+			
+			
+		}
+		
+	//end of all the mm stuff
+	}
+}
+
+writeOverrideString: inputFileName, outputFileName, outputString, outputValue
+{
+	if(filesPrepared == 0)
+	{
+		// We get back a different string - don't be fooled!
+		inputFileName = prepareInputFile(inputFileName);
+	}
 	
+	inputFile = File(inputFileName, "r");
+	tempOutput = File(outputFileName, "w");
+
 	parameterFound = 0;
 	while(!inputFile.eof())
 	{
-		toWrite;
 		line = inputFile.read();
 		outputString_len = size(outputString);
 		if(size(line) > outputString_len)
@@ -2383,6 +2193,17 @@ writeOverrideString: outputString, outputValue
 			{
 				parameterFound = 1;
 				toWrite = outputString + string(outputValue);
+
+				// Special case handling for outputString == FrameSize or GlobalFrameSize
+				// in these cases we need to do some math and also misuse the outputValue to pass in
+				// the multipler to process the resolution values.
+				if((outputString == "FrameSize ") || (outputString == "GlobalFrameSize "))
+				{
+				    parsingArray = parse(" ",line);
+        	        newResWidth = integer(integer(parsingArray[2]) * outputValue);
+    	            newResHeight = integer(integer(parsingArray[3]) * outputValue);
+	                toWrite = outputString + string(newResWidth) + " " + string(newResHeight);
+				}
 			}
 			else
 			{
@@ -2395,13 +2216,48 @@ writeOverrideString: outputString, outputValue
 		}
 		tempOutput.writeln(toWrite);
 	}
+	
+	// Finished with our input file, so close it.
+	inputFile.close();
+	
+	// Didn't find the string, so assume it's one of those settings that LW drops from the scene file
+	// and opt to append it to force the condition.
 	if (parameterFound == 0)
 	{
-		// One of those annoying settings that disappear from the scene file when LW does its stuff. We'll have to append it to the end of the scene file.
-		tempOutput.line(tempOutput.linecount());
+		tempOutput.reopen("a"); // append mode.
 		toWrite  = outputString + string(outputValue);
 		tempOutput.writeln(toWrite);
 	}
-	inputFile.close();
-	tempOutput.close(); 
+
+	// reset parameterFound.
+	if (parameterFound == 1)
+	{
+		parameterFound = 0;
+	}
+
+	// Finished with our output file, so close it.
+	tempOutput.close();
+	filecopy(outputFileName, inputFileName); // write back to the temporary input file in case of subsequent writeOverride events.
+}
+
+// Duplicate user's input file to a temp file and send back the path to the temp file to process elsewhere..
+prepareInputFile: inputFileName
+{
+	if(filesPrepared == 1)
+		error("Internal error - prepareInputFile() already called.");
+    tempDirectory = getdir("Temp");	
+	tempFileName = tempDirectory + getsep() + "tempPassportInputFile.lws";
+	filecopy(inputFileName, tempFileName);
+	filesPrepared = 1;
+	return tempFileName;
+}
+
+finishFiles
+{
+	if(filesPrepared == 0)
+		error("Internal error - finishFiles() already called.");
+    tempDirectory = getdir("Temp");	
+	tempFileName = tempDirectory + getsep() + "tempPassportInputFile.lws";
+	filedelete(tempFileName);
+	filesPrepared = 0;
 }

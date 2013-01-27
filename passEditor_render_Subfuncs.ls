@@ -262,7 +262,7 @@ UB_bg_frameRender: sceneFile, frameOutputPath
 	growlScriptOutput.close();
        
     bashOutput = File(bashFilePath,"w");
-   	outputLine = install_dir + getsep() + "Screamernet -3 -c" + config_dir + " -d" + content_dir + " " + sceneFile + " " + currentframe + " " + currentframe + " " + "1\;\n" + "open " + actualImageOutput + "\;";
+   	outputLine = install_dir + getsep() + "bin/lwsn -3 -c" + config_dir + " -d" + content_dir + " " + sceneFile + " " + currentframe + " " + currentframe + " " + "1\;\n" + "open " + actualImageOutput + "\;";
     bashOutput.writeln(outputLine);
     bashOutput.writeln("rm " + bashFilePath);
     bashOutput.writeln("osascript \"" + growlAppleScriptPath + "\"");
@@ -280,13 +280,7 @@ UB_bg_frameRender: sceneFile, frameOutputPath
        
     result = system(systemCommand); 
     filedelete(scriptFilePath);
-    
-    
-    /*
-    /Applications/Newtek/9x_beta/LightWave/ScreamerNet -3 -c/Applications/Newtek/9x_beta/config/ -d/Users/jezza/Documents/Projects/Production/MISSP/lw/ /Users/jezza/Documents/Projects/Production/MISSP/lw/Scenes/bak/bg_renderTesting.lws 31 31 1;
-	open /Users/jezza/Documents/Projects/Production/LWG_Texture_Contest/July_07/images/renders/CG/bgRenderTesting_frame_0050.jpg;
-	*/
-    
+        
 }
 
 UB_bg_sceneRender: sceneFile, frameOutputPath
@@ -330,7 +324,7 @@ UB_bg_sceneRender: sceneFile, frameOutputPath
 	growlScriptOutput.close();
        
     bashOutput = File(bashFilePath,"w");
-   	outputLine = install_dir + getsep() + "Screamernet -3 -c" + config_dir + " -d" + content_dir + " " + sceneFile + " " + renderStart + " " + renderEnd + " " + renderStep + "\;\n";
+   	outputLine = install_dir + getsep() + "bin/lwsn -3 -c" + config_dir + " -d" + content_dir + " " + sceneFile + " " + renderStart + " " + renderEnd + " " + renderStep + "\;\n";
     bashOutput.writeln(outputLine);
     bashOutput.writeln("rm " + bashFilePath);
     bashOutput.writeln("osascript \"" + growlAppleScriptPath + "\"");
@@ -387,7 +381,7 @@ UB_bg_allSceneRender: sceneFile, frameOutputPath
 
 	for(x = 1; x <= size(sceneFile); x++)
 	{
-		outputLine = install_dir + getsep() + "Screamernet -3 -c" + config_dir + " -d" + content_dir + " " + sceneFile[x] + " " + renderStart + " " + renderEnd + " " + renderStep + "\;\n";
+		outputLine = install_dir + getsep() + "bin/lwsn -3 -c" + config_dir + " -d" + content_dir + " " + sceneFile[x] + " " + renderStart + " " + renderEnd + " " + renderStep + "\;\n";
 	    bashOutput.writeln(outputLine);
 	}
 	

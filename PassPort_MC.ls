@@ -64,7 +64,7 @@
 @name "PassPort_MC"
 @define dev 1
 
-var supportedplatform = 0;
+var supportedplatform = 1;
 
 @insert "@passEditor_globals.ls"
 @insert "@passEditor_UIglobals.ls"
@@ -174,24 +174,10 @@ bullet_icon = @ "................",
 
 platformcheck
 {
-	switch(platform())
-	{
-		case MACUB:
-		case MAC64:
-		case WIN32:
-		case WIN64:
-			supportedplatform = 1;
-			break;
-		default:
-			supportedplatform = 0;
-			break;
-	}
-	if (supportedplatform != 1)
-		error("Unsupported platform: " + platform().asStr());
-
     // Check to block operation on old LW versions - permitted removal of needHackySaving!
-    if (hostBuild() < 1281) {
-        error("PassPort requires at least LightWave 3D 9.3.");
+    if (hostBuild() < 2238) {
+    	supportedplatform = 0;
+        error("This version of PassPort requires at least LightWave 3D 11.0.");
     }
 
 	return;
@@ -200,37 +186,44 @@ platformcheck
 // typical interface functions for master script here
 create
 {
-	platformcheck();
-
-    loadingInProgress = 0;
-    justReopened = 0;
-    // 22 = List gadget scrollbar
-    listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
-    listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
-    listOneHeight = Main_panelHeight - ( 3 * Main_button_height) - Main_banner_height - Main_spacer_height - ( 5 * Main_ui_y_spacer);
-
-    icon[BLANK] = Icon(blank_icon);
-    icon[ENTERKEY] = Icon(enterkey_icon);
-    icon[DELETEKEY] = Icon(deletekey_icon);
-    icon[CTRLA] = Icon(ctrlA_icon);
-    icon[DOWNARROW] = Icon(downarrow_icon);
-    icon[LETTERO] = Icon(lettero_icon);
-    icon[CTRLR] = Icon(ctrlR_icon);
-    icon[BULLET] = Icon(bullet_icon);
-    setdesc("PassPort " + versionString);
-    sceneJustLoaded = 0;
-    
-    fileMenu_items = @"Save Pass as Scene...","Save All Passes As Scenes...","Render Pass Frame","Render Pass Scene","Render All Passes","==","Update Lists Now      "+ icon[CTRLR],"Preferences...          " + icon[LETTERO],"Render Globals...","==","Save Current Settings...","Load Settings...","About PassPort..."@;
-
-    //preProcess();
-    comringattach("LW_PassPort","getCommand");
+	// Attempt to avoid failures under LWSN.
+	if(runningUnder() == LAYOUT)
+	{
+		platformcheck();
+	
+		loadingInProgress = 0;
+		justReopened = 0;
+		// 22 = List gadget scrollbar
+		listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
+		listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
+		listOneHeight = Main_panelHeight - ( 3 * Main_button_height) - Main_banner_height - Main_spacer_height - ( 5 * Main_ui_y_spacer);
+	
+		icon[BLANK] = Icon(blank_icon);
+		icon[ENTERKEY] = Icon(enterkey_icon);
+		icon[DELETEKEY] = Icon(deletekey_icon);
+		icon[CTRLA] = Icon(ctrlA_icon);
+		icon[DOWNARROW] = Icon(downarrow_icon);
+		icon[LETTERO] = Icon(lettero_icon);
+		icon[CTRLR] = Icon(ctrlR_icon);
+		icon[BULLET] = Icon(bullet_icon);
+		setdesc("PassPort " + versionString);
+		sceneJustLoaded = 0;
+		
+		fileMenu_items = @"Save Pass as Scene...","Save All Passes As Scenes...","Render Pass Frame","Render Pass Scene","Render All Passes","==","Update Lists Now      "+ icon[CTRLR],"Preferences...          " + icon[LETTERO],"Render Globals...","==","Save Current Settings...","Load Settings...","About PassPort..."@;
+	
+		//preProcess();
+		comringattach("LW_PassPort","getCommand");
+    }
 }
 
 destroy
 {
-	if(supportedplatform != 1)
-		return;
-	unProcess();
+	if(runningUnder() == LAYOUT)
+	{
+		if(supportedplatform != 1)
+			return;
+		unProcess();
+	}
 }
 
 options
@@ -254,9 +247,13 @@ options
         reqend();
     }
 
-    this_script = split(SCRIPTID);
-    this_script_path = this_script[1] + this_script[2];
-
+	// Original code always anticipated a drive letter this_script[1].
+	// On Mac, this is nil and the arithmetic fails. So we adjust this as below.
+	this_script = split(SCRIPTID);
+	this_script_path = this_script[2];
+	if(this_script[1])
+		this_script_path = this_script[1] + this_script[2] + getsep();
+       
     // Check if the script is compiled, if so, don't need to find the banner images on disk
     compiled = 1;
     s = strsub(this_script[4], size(this_script[4]), 1);
