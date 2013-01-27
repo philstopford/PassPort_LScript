@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130107";
+var versionString = "20130108";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -127,3 +127,8 @@ var tempDirectory = getdir("Temp");
 // Mac stuff
 var useGrowl = 0; // shut off Growl by default.
 var usegrowl;
+
+// Renderer support extension - prototype!
+var renderers = @"Native","Kray 2.5(ALPHA)"@;
+var overrideRenderer = 1; // default, native.
+var settingsArray;

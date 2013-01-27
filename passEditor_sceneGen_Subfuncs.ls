@@ -30,21 +30,21 @@ generatePassFile: mode, pass
     // get the item start and stop lines for copying
     setItems = parseListItems(passAssItems[pass]);
 	
-    for(x = 1; x <= size(setItems); x++)
+    for(passItem = 1; passItem <= size(setItems); passItem++)
     {
-        progressString = string((x / size(setItems)) / 2);
+        progressString = string((passItem / size(setItems)) / 2);
         msgString = "{" + progressString + "}Generating Render Scene:  Cataloging Items and Overrides...";
         StatusMsg(msgString);
         sleep(1);
 
         // first the object lines
-        tempNumber = setItems[x];
-        tempObjectNames[x] = displayNames[tempNumber];
+        tempNumber = setItems[passItem];
+        tempObjectNames[passItem] = displayNames[tempNumber];
         assignmentsArray = checkForOverrideAssignments(displayIDs[tempNumber], pass);
     
         if(assignmentsArray != nil)
         {
-            doOverride[x] = 1;
+            doOverride[passItem] = 1;
             a = assignmentsArray[1];
             settingsArray = parse("||", overrideSettings[a]);
             if( size(assignmentsArray) > 1)
@@ -57,13 +57,13 @@ generatePassFile: mode, pass
 			if(settingsArray[2] == "type6")
 			{
 				assignmentsArray = nil;
-				doOverride[x] = 0;
-				overrideType[x] = 0;
+				doOverride[passItem] = 0;
+				overrideType[passItem] = 0;
 			}
 			
             if(settingsArray[2] == "type5")
             {
-                overrideType[x] = 5;
+                overrideType[passItem] = 5;
                 lightColorLine = "LightColor " + string(number(settingsArray[3]) / 255) + " " + string(number(settingsArray[4]) / 255) + " " + string(number(settingsArray[5]) / 255) + "\n";
                 lightIntensityLine = "LightIntensity " + settingsArray[6] + "\n";
                 if(settingsArray[7] == "0")
@@ -99,63 +99,64 @@ generatePassFile: mode, pass
                     VolumetricsLine = "VolumetricLighting 1\n";
                 }
                 
-                lightSettingsPartOne[x] = lightColorLine + lightIntensityLine + affectDiffuseLine + affectSpecularLine;
-                lightSettingsPartTwo[x] = LensFlareLine;
-                lightSettingsPartThree[x] = VolumetricsLine;
+                lightSettingsPartOne[passItem] = lightColorLine + lightIntensityLine + affectDiffuseLine + affectSpecularLine;
+                lightSettingsPartTwo[passItem] = LensFlareLine;
+                lightSettingsPartThree[passItem] = VolumetricsLine;
                 
-                motInputTemp[x] = nil;
-                lwoInputTemp[x] = nil;
-                srfLWOInputID[x] = nil;
-                srfInputTemp[x] = nil;
-                objPropOverrideSets[x] = nil;
-                objPropOverrideShadowOpts[x] = nil;
+                motInputTemp[passItem] = nil;
+                lwoInputTemp[passItem] = nil;
+                srfLWOInputID[passItem] = nil;
+                srfInputTemp[passItem] = nil;
+                objPropOverrideSets[passItem] = nil;
+                objPropOverrideShadowOpts[passItem] = nil;
 
             }
 
             if(settingsArray[2] == "type1")
             {
-                overrideType[x] = 1;
-                motInputTemp[x] = nil;
-                lwoInputTemp[x] = nil;
-                srfLWOInputID[x] = displayIDs[tempNumber];
-                srfInputTemp[x] = settingsArray[3];
-                objPropOverrideSets[x] = nil;
-                objPropOverrideShadowOpts[x] = nil;
-                lightSettingsPartOne[x] = nil;
-                lightSettingsPartTwo[x] = nil;
-                lightSettingsPartThree[x] = nil;
+                overrideType[passItem] = 1;
+                motInputTemp[passItem] = nil;
+                lwoInputTemp[passItem] = nil;
+                srfLWOInputID[passItem] = displayIDs[tempNumber];
+                srfInputTemp[passItem] = settingsArray[3];
+                objPropOverrideSets[passItem] = nil;
+                objPropOverrideShadowOpts[passItem] = nil;
+                lightSettingsPartOne[passItem] = nil;
+                lightSettingsPartTwo[passItem] = nil;
+                lightSettingsPartThree[passItem] = nil;
 
             }   
 
             if(settingsArray[2] == "type4")
             {
-                overrideType[x] = 4;
-                motInputTemp[x] = nil;
-                lwoInputTemp[x] = settingsArray[3];
-                srfLWOInputID[x] = nil;
-                srfInputTemp[x] = nil;
-                objPropOverrideSets[x] = nil;
-                objPropOverrideShadowOpts[x] = nil;
-                lightSettingsPartOne[x] = nil;
-                lightSettingsPartTwo[x] = nil;
-                lightSettingsPartThree[x] = nil;
+                overrideType[passItem] = 4;
+                motInputTemp[passItem] = nil;
+                lwoInputTemp[passItem] = settingsArray[3];
+                srfLWOInputID[passItem] = nil;
+                srfInputTemp[passItem] = nil;
+                objPropOverrideSets[passItem] = nil;
+                objPropOverrideShadowOpts[passItem] = nil;
+                lightSettingsPartOne[passItem] = nil;
+                lightSettingsPartTwo[passItem] = nil;
+                lightSettingsPartThree[passItem] = nil;
             }   
+
             if(settingsArray[2] == "type3")
             {
-                overrideType[x] = 3;
-                motInputTemp[x] = File(settingsArray[3],"r");
-                lwoInputTemp[x] = nil;
-                srfLWOInputID[x] = nil;
-                srfInputTemp[x] = nil;
-                objPropOverrideSets[x] = nil;
-                objPropOverrideShadowOpts[x] = nil;
-                lightSettingsPartOne[x] = nil;
-                lightSettingsPartTwo[x] = nil;
-                lightSettingsPartThree[x] = nil;
+                overrideType[passItem] = 3;
+                motInputTemp[passItem] = File(settingsArray[3],"r");
+                lwoInputTemp[passItem] = nil;
+                srfLWOInputID[passItem] = nil;
+                srfInputTemp[passItem] = nil;
+                objPropOverrideSets[passItem] = nil;
+                objPropOverrideShadowOpts[passItem] = nil;
+                lightSettingsPartOne[passItem] = nil;
+                lightSettingsPartTwo[passItem] = nil;
+                lightSettingsPartThree[passItem] = nil;
             }   
             if(settingsArray[2] == "type2")
             {
-                overrideType[x] = 2;
+                overrideType[passItem] = 2;
                 if(settingsArray[3] == "1")
                 {
                     //matteObjectLine = "MatteObject 1\nMatteColor 0 0 0\n";
@@ -278,19 +279,19 @@ generatePassFile: mode, pass
 
                     */
                 }
-                motInputTemp[x] = nil;
-                lwoInputTemp[x] = nil;
-                srfLWOInputID[x] = nil;
-                srfInputTemp[x] = nil;
-                objPropOverrideSets[x] = matteObjectLine + unseenByFogLine + unseenByRadiosityLine + unseenByRaysLine + unseenByCameraLine + alphaLine;
-                objPropOverrideShadowOpts[x] = shadowOptionsLine;
-                lightSettingsPartOne[x] = nil;
-                lightSettingsPartTwo[x] = nil;
-                lightSettingsPartThree[x] = nil;
+				motInputTemp[passItem] = nil;
+                lwoInputTemp[passItem] = nil;
+                srfLWOInputID[passItem] = nil;
+                srfInputTemp[passItem] = nil;
+                objPropOverrideSets[passItem] = matteObjectLine + unseenByFogLine + unseenByRadiosityLine + unseenByRaysLine + unseenByCameraLine + alphaLine;
+                objPropOverrideShadowOpts[passItem] = shadowOptionsLine;
+                lightSettingsPartOne[passItem] = nil;
+                lightSettingsPartTwo[passItem] = nil;
+                lightSettingsPartThree[passItem] = nil;
             }
             if(settingsArray[2] == "type7")
             {
-                overrideType[x] = 7;
+                overrideType[passItem] = 7;
                 if(size(settingsArray) >= 3)
                 {
                     if(settingsArray[3] != nil && settingsArray[3] != "")
@@ -308,7 +309,7 @@ generatePassFile: mode, pass
                 }
                 if(excludedLightNames != nil && excludedLightNames != "")
                 {
-                    lightExclusion[x] = nil;
+                    lightExclusion[passItem] = nil;
                     doneRad = 0;
                     doneCaus = 0;                   
                     for(k = 1; k <= size(lightNames); k++)
@@ -318,7 +319,7 @@ generatePassFile: mode, pass
                             if(lightNames[k] == excludedLightNames[m])
                             {
                                 tempID = lightOldIDs[k];
-                                lightExclusion[x] = string(lightExclusion[x]) + "ExcludeLight " + string(tempID) + "\n";
+                                lightExclusion[passItem] = string(lightExclusion[passItem]) + "ExcludeLight " + string(tempID) + "\n";
                             }
                             else
                             {
@@ -326,7 +327,7 @@ generatePassFile: mode, pass
                                 {
                                     if(doneRad == 0)
                                     {
-                                        lightExclusion[x] = string(lightExclusion[x]) + "ExcludeLight 21000000\n";
+                                        lightExclusion[passItem] = string(lightExclusion[passItem]) + "ExcludeLight 21000000\n";
                                         doneRad = 1;
                                     }
                                 }
@@ -336,7 +337,7 @@ generatePassFile: mode, pass
                                     {
                                         if(doneCaus == 0)
                                         {
-                                            lightExclusion[x] = string(lightExclusion[x]) + "ExcludeLight 22000000\n";
+                                            lightExclusion[passItem] = string(lightExclusion[passItem]) + "ExcludeLight 22000000\n";
                                             doneCaus = 1;
                                         }
                                     }
@@ -347,28 +348,27 @@ generatePassFile: mode, pass
                 }
                 else
                 {
-                    lightExclusion[x] = nil;
+                    lightExclusion[passItem] = nil;
                 }
                 
-                
                 //tempIDArray = parse("x",hex(number(settingsArray[4])));
-                //lightExclusion[x] = "ExcludeLight " + tempIDArray[2] + "\n";
+                //lightExclusion[passItem] = "ExcludeLight " + tempIDArray[2] + "\n";
                 
-                motInputTemp[x] = nil;
-                lwoInputTemp[x] = nil;
-                srfLWOInputID[x] = nil;
-                srfInputTemp[x] = nil;
-                objPropOverrideSets[x] = nil;
-                objPropOverrideShadowOpts[x] = nil;
-                lightSettingsPartOne[x] = nil;
-                lightSettingsPartTwo[x] = nil;
-                lightSettingsPartThree[x] = nil;
+                motInputTemp[passItem] = nil;
+                lwoInputTemp[passItem] = nil;
+                srfLWOInputID[passItem] = nil;
+                srfInputTemp[passItem] = nil;
+                objPropOverrideSets[passItem] = nil;
+                objPropOverrideShadowOpts[passItem] = nil;
+                lightSettingsPartOne[passItem] = nil;
+                lightSettingsPartTwo[passItem] = nil;
+                lightSettingsPartThree[passItem] = nil;
             }
             if(assignmentsArray != nil && size(assignmentsArray) > 1)
             {
                 if(secondSettingsArray[2] == "type7")
                 {
-                    secondOverrideType[x] = 7;
+                    secondOverrideType[passItem] = 7;
                     if(size(secondSettingsArray) >= 3)
                     {
                         if(secondSettingsArray[3] != nil && secondSettingsArray[3] != "")
@@ -386,7 +386,7 @@ generatePassFile: mode, pass
                     }
                     if(excludedLightNames != nil && excludedLightNames != "")
                     {
-                        lightExclusion[x] = nil;
+                        lightExclusion[passItem] = nil;
                         doneRad = 0;
                         doneCaus = 0;                   
                         for(k = 1; k <= size(lightNames); k++)
@@ -396,7 +396,7 @@ generatePassFile: mode, pass
                                 if(lightNames[k] == excludedLightNames[m])
                                 {
                                     tempID = lightOldIDs[k];
-                                    lightExclusion[x] = string(lightExclusion[x]) + "ExcludeLight " + string(tempID) + "\n";
+                                    lightExclusion[passItem] = string(lightExclusion[passItem]) + "ExcludeLight " + string(tempID) + "\n";
                                 }
                                 else
                                 {
@@ -404,7 +404,7 @@ generatePassFile: mode, pass
                                     {
                                         if(doneRad == 0)
                                         {
-                                            lightExclusion[x] = string(lightExclusion[x]) + "ExcludeLight 21000000\n";
+                                            lightExclusion[passItem] = string(lightExclusion[passItem]) + "ExcludeLight 21000000\n";
                                             doneRad = 1;
                                         }
                                     }
@@ -414,7 +414,7 @@ generatePassFile: mode, pass
                                         {
                                             if(doneCaus == 0)
                                             {
-                                                lightExclusion[x] = string(lightExclusion[x]) + "ExcludeLight 22000000\n";
+                                                lightExclusion[passItem] = string(lightExclusion[passItem]) + "ExcludeLight 22000000\n";
                                                 doneCaus = 1;
                                             }
                                         }
@@ -425,87 +425,84 @@ generatePassFile: mode, pass
                     }
                     else
                     {
-                        lightExclusion[x] = nil;
+                        lightExclusion[passItem] = nil;
                     }
                     
                     //tempIDArray = parse("x",hex(number(secondSettingsArray[4])));
-                    //lightExclusion[x] = "ExcludeLight " + tempIDArray[2] + "\n";
+                    //lightExclusion[passItem] = "ExcludeLight " + tempIDArray[2] + "\n";
                 }
                 else
                 {
-                    secondOverrideType[x] = nil;
+                    secondOverrideType[passItem] = nil;
                 }
             }
             else
             {
-                secondOverrideType[x] = nil;
+                secondOverrideType[passItem] = nil;
             }
             
         }
         else
         {
-			doOverride[x] = 0;
-            overrideType[x] = 0;
+			doOverride[passItem] = 0;
+            overrideType[passItem] = 0;
         }
-        if(size(doOverride) < x)
+        if(size(doOverride) < passItem)
         {
-            doOverride[x] = 0;
+            doOverride[passItem] = 0;
         }
-        if(overrideType == nil || size(overrideType) < x)
+        if(overrideType == nil || size(overrideType) < passItem)
         {
 			errorString = "An internal error has been detected: overrideType is: " + overrideType;
 			info(errorString);
 			errorString = "Will render a full pass of type '" + mode + "' instead. Sorry.";
 			info(errorString);
-			doOverride[x] = 0;
-            overrideType[x] = 0;
+			doOverride[passItem] = 0;
+            overrideType[passItem] = 0;
         }
         
-
         if(strleft(string(displayOldIDs[tempNumber]),1) == "1")
         {
-            objStart[x] = getObjectLines(passEditorEndLine + 1,0,displayOldIDs[tempNumber],currentScenePath);
-            objStartTemp = number(objStart[x]);
+            objStart[passItem] = getObjectLines(passEditorEndLine + 1,0,displayOldIDs[tempNumber],currentScenePath);
+            objStartTemp = number(objStart[passItem]);
             objStartPlusOne = objStartTemp + 1;
-            objEnd[x] = getObjectEndLine(objStartPlusOne,0,displayOldIDs[tempNumber],currentScenePath);
-            objMotStart[x] = getPartialLine(objStart[x],objEnd[x],"NumChannels",currentScenePath);
-            objMotEnd[x] = objMotStart[x];
+            objEnd[passItem] = getObjectEndLine(objStartPlusOne,0,displayOldIDs[tempNumber],currentScenePath);
+            objMotStart[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"NumChannels",currentScenePath);
+            objMotEnd[passItem] = objMotStart[passItem];
             for(b = 1; b <= 9; b++)
             {
-                objMotEnd[x] = getPartialLine((objMotEnd[x] + 1),objEnd[x],"}",currentScenePath);
+                objMotEnd[passItem] = getPartialLine((objMotEnd[passItem] + 1),objEnd[passItem],"}",currentScenePath);
             }
-            lastObject = x;
+            lastObject = passItem;
         }
 
         // then the light lines
         if(strleft(string(displayOldIDs[tempNumber]),1) == "2")
         {
-            objStart[x] = getLightLines(passEditorEndLine + 1,0,displayOldIDs[tempNumber],currentScenePath);
-            objStartTemp = number(objStart[x]);
+            objStart[passItem] = getLightLines(passEditorEndLine + 1,0,displayOldIDs[tempNumber],currentScenePath);
+            objStartTemp = number(objStart[passItem]);
             objStartPlusOne = objStartTemp + 1;
-            objEnd[x] = getLightEndLine(objStartPlusOne,0,displayOldIDs[tempNumber],currentScenePath);
-            objMotStart[x] = getPartialLine(objStart[x],objEnd[x],"NumChannels",currentScenePath);
-            objMotEnd[x] = objMotStart[x];
+            objEnd[passItem] = getLightEndLine(objStartPlusOne,0,displayOldIDs[tempNumber],currentScenePath);
+            objMotStart[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"NumChannels",currentScenePath);
+            objMotEnd[passItem] = objMotStart[passItem];
             for(b = 1; b <= 9; b++)
             {
-                objMotEnd[x] = getPartialLine((objMotEnd[x] + 1),objEnd[x],"}",currentScenePath);
+                objMotEnd[passItem] = getPartialLine((objMotEnd[passItem] + 1),objEnd[passItem],"}",currentScenePath);
             }
-            objPathAlignReliableDistLine[x] = getPartialLine(objStart[x],objEnd[x],"PathAlignReliableDist",currentScenePath);
-            if(getPartialLine(objStart[x],objEnd[x],"AffectCaustics",currentScenePath) > 0)
+            objPathAlignReliableDistLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"PathAlignReliableDist",currentScenePath);
+            if(getPartialLine(objStart[passItem],objEnd[passItem],"AffectCaustics",currentScenePath) > 0)
             {
-                objAffectCausticsLine[x] = getPartialLine(objStart[x],objEnd[x],"AffectCaustics",currentScenePath);
+                objAffectCausticsLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"AffectCaustics",currentScenePath);
             }
             else
             {
-                objAffectCausticsLine[x] = nil;
+                objAffectCausticsLine[passItem] = nil;
             }
-            objLightTypeLine[x] = getPartialLine(objStart[x],objEnd[x],"LightType ",currentScenePath);
-            objLensFlareLine[x] = getPartialLine(objStart[x],objEnd[x],"LensFlare ",currentScenePath);
-            objVolLightLine[x] = getPartialLine(objStart[x],objEnd[x],"VolumetricLighting ",currentScenePath);
+            objLightTypeLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"LightType ",currentScenePath);
+            objLensFlareLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"LensFlare ",currentScenePath);
+            objVolLightLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"VolumetricLighting ",currentScenePath);
         }
-
-
-    }
+	}
 
     // then the ambient color line
     ambientColorLine = getPartialLine(0,0,"AmbientColor",currentScenePath);
@@ -553,25 +550,25 @@ generatePassFile: mode, pass
             hvObjectEndLine[1] = hvObjectEndLineTemp + 5;
             if(hvObjectTotal > 1)
             {
-                for(x = 2; x <= integer(hvObjectTotal); x++)
+                for(hvCount = 2; hvCount <= integer(hvObjectTotal); hvCount++)
                 {
-                    xMinusOne = x - 1;
+                    xMinusOne = hvCount - 1;
                     linePlusOne = hvObjectLine[xMinusOne] + 1;
-                    hvObjectLine[x] = getPartialLine(linePlusOne,0,"  { HVObject",currentScenePath);
-                    hvObjectEndLineTemp = getPartialLine(hvObjectLine[x],0,"    { HVoxelCache",currentScenePath);
-                    hvObjectEndLine[x] = hvObjectEndLineTemp + 5;
+                    hvObjectLine[hvCount] = getPartialLine(linePlusOne,0,"  { HVObject",currentScenePath);
+                    hvObjectEndLineTemp = getPartialLine(hvObjectLine[hvCount],0,"    { HVoxelCache",currentScenePath);
+                    hvObjectEndLine[hvCount] = hvObjectEndLineTemp + 5;
 
                 }
             }
 
             inputTemp = File(currentScenePath,"r");
-            for(x = 1; x <= integer(hvObjectTotal); x++)
+            for(hvCount = 1; hvCount <= integer(hvObjectTotal); hvCount++)
             {
-                lineTempNumber = hvObjectLine[x] + 2;
+                lineTempNumber = hvObjectLine[hvCount] + 2;
                 inputTemp.line(lineTempNumber);
                 hvObjectNameTemp = inputTemp.read();
                 tempNameArray = parse("\"",hvObjectNameTemp);
-                hvObjectName[x] = tempNameArray[2];
+                hvObjectName[hvCount] = tempNameArray[2];
             }
             inputTemp.close();
 
@@ -653,7 +650,7 @@ generatePassFile: mode, pass
         newScenePath = outputFolder[1] + getsep() + "CG" + getsep() + "temp" + getsep() + "tempScenes" + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + ".lws";
     }
 
-    if(platformVar == WIN32 || platformVar == WIN64)
+    if(platform() == INTEL)
     {
         
         tempFixedPath = fixPathForWin32(newScenePath);
@@ -682,25 +679,25 @@ generatePassFile: mode, pass
     if(lastObject != nil)
     {
         mmInt = 1;
-        for(x = 1; x <= lastObject; x++)
+        for(objectCounter = 1; objectCounter <= lastObject; objectCounter++)
         {
-            progressString = string(((x/size(lastObject))/4) + 0.5);
+            progressString = string(((objectCounter/size(lastObject))/4) + 0.5);
             msgString = "{" + progressString + "}Generating Render Scene:  Writing Objects...";
             StatusMsg(msgString);
             sleep(1);
             
-            if(doOverride[x] == 1)
+            if(doOverride[objectCounter] == 1)
             {
-                switch(overrideType[x])
+                switch(overrideType[objectCounter])
                 {
                     case 1:
                         // begin case 1 here, which is the surface type
-                        if(srfInputTemp[x] != nil && srfLWOInputID[x] != nil)
+                        if(srfInputTemp[objectCounter] != nil && srfLWOInputID[objectCounter] != nil)
                         {
-                            surfacedLWO = generateSurfaceObjects(pass,srfLWOInputID[x],srfInputTemp[x],currentScenePath,objStart[x]);
+                            surfacedLWO = generateSurfaceObjects(pass,srfLWOInputID[objectCounter],srfInputTemp[objectCounter],currentScenePath,objStart[objectCounter]);
                             if(surfacedLWO != nil)
                             {
-                                inputFile.line(objStart[x]);
+                                inputFile.line(objStart[objectCounter]);
                                 line = inputFile.read();
                                 if(line != nil && line != "")
                                 {
@@ -723,20 +720,20 @@ generatePassFile: mode, pass
                                 {
                                     line = inputFile.read();
                                     outputFile.writeln(line);
-                                    if(inputFile.line() == (objEnd[x] - 2))
+                                    if(inputFile.line() == (objEnd[objectCounter] - 2))
                                     {
                                         done = true;
                                         break;
                                     }
                                 }
-                                inputFile.line(objEnd[x] - 2);
+                                inputFile.line(objEnd[objectCounter] - 2);
                                 line = inputFile.read();
                                 outputFile.writeln(line);
                                 if(lightExclusion)
                                 {
-                                    if(lightExclusion[x] != nil)
+                                    if(lightExclusion[objectCounter] != nil)
                                     {
-                                        outputFile.write(lightExclusion[x]);
+                                        outputFile.write(lightExclusion[objectCounter]);
                                     }
                                 }
     
@@ -744,26 +741,26 @@ generatePassFile: mode, pass
                             }
                             else
                             {
-                                inputFile.line(objStart[x]);
+                                inputFile.line(objStart[objectCounter]);
                                 done = nil;
                                 while(!done)
                                 {
                                     line = inputFile.read();
                                     outputFile.writeln(line);
-                                    if(inputFile.line() == (objEnd[x] - 2))
+                                    if(inputFile.line() == (objEnd[objectCounter] - 2))
                                     {
                                         done = true;
                                         break;
                                     }
                                 }
-                                inputFile.line(objEnd[x] - 2);
+                                inputFile.line(objEnd[objectCounter] - 2);
                                 line = inputFile.read();
                                 outputFile.writeln(line);
                                 if(lightExclusion)
                                 {
-                                    if(lightExclusion[x] != nil)
+                                    if(lightExclusion[objectCounter] != nil)
                                     {
-                                        outputFile.write(lightExclusion[x]);
+                                        outputFile.write(lightExclusion[objectCounter]);
                                     }
                                 }
     
@@ -773,26 +770,26 @@ generatePassFile: mode, pass
                         }
                         else
                         {
-                            inputFile.line(objStart[x]);
+                            inputFile.line(objStart[objectCounter]);
                             done = nil;
                             while(!done)
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == (objEnd[x] - 2))
+                                if(inputFile.line() == (objEnd[objectCounter] - 2))
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            inputFile.line(objEnd[x] - 2);
+                            inputFile.line(objEnd[objectCounter] - 2);
                             line = inputFile.read();
                             outputFile.writeln(line);
                             if(lightExclusion)
                             {
-                                if(lightExclusion[x] != nil)
+                                if(lightExclusion[objectCounter] != nil)
                                 {
-                                    outputFile.write(lightExclusion[x]);
+                                    outputFile.write(lightExclusion[objectCounter]);
                                 }
                             }
 
@@ -803,7 +800,7 @@ generatePassFile: mode, pass
                     
                     case 2:
                         // begin case 2 here, which is the object properties override type
-                        inputFile.line(objStart[x]);
+                        inputFile.line(objStart[objectCounter]);
                         done = nil;
                         excludedLightsTemp = 0;
                         while(!done)
@@ -820,8 +817,8 @@ generatePassFile: mode, pass
                                 }
                                 else
                                 {
-                                    outputFile.write(objPropOverrideSets[x]);
-                                    outputFile.write(objPropOverrideShadowOpts[x]);
+                                    outputFile.write(objPropOverrideSets[objectCounter]);
+                                    outputFile.write(objPropOverrideShadowOpts[objectCounter]);
                                     excludedLightsTemp = 1;
                                 }
                             }
@@ -829,7 +826,7 @@ generatePassFile: mode, pass
                             {
                                 outputFile.writeln(line);
                             }
-                            if(inputFile.line() == (objEnd[x] - 2))
+                            if(inputFile.line() == (objEnd[objectCounter] - 2))
                             {
                                 done = true;
                                 break;
@@ -837,21 +834,21 @@ generatePassFile: mode, pass
                         }
                         if(excludedLightsTemp == 1)
                         {
-                            inputFile.line(objEnd[x] - 2);
+                            inputFile.line(objEnd[objectCounter] - 2);
                             line = inputFile.read();
                             outputFile.writeln(line);
                             outputFile.writeln("");
                         }
                         else
                         {
-                            outputFile.write(objPropOverrideSets[x]);
-                            outputFile.writeln(objPropOverrideShadowOpts[x]);
+                            outputFile.write(objPropOverrideSets[objectCounter]);
+                            outputFile.writeln(objPropOverrideShadowOpts[objectCounter]);
                         }
                         if(lightExclusion)
                         {
-                            if(lightExclusion[x] != nil)
+                            if(lightExclusion[objectCounter] != nil)
                             {
-                                outputFile.write(lightExclusion[x]);
+                                outputFile.write(lightExclusion[objectCounter]);
                             }
                         }
 
@@ -860,73 +857,73 @@ generatePassFile: mode, pass
                         
                     case 3:
                         // begin case 3 here, which is the motion override type
-                        if(motInputTemp[x] != nil)
+                        if(motInputTemp[objectCounter] != nil)
                         {
-                            inputFile.line(objStart[x]);
+                            inputFile.line(objStart[objectCounter]);
                             done = nil;
                             while(!done)
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == (objMotStart[x]))
+                                if(inputFile.line() == (objMotStart[objectCounter]))
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            motInputTemp[x].line(4);
-                            while(!motInputTemp[x].eof())
+                            motInputTemp[objectCounter].line(4);
+                            while(!motInputTemp[objectCounter].eof())
                             {
-                                line = motInputTemp[x].read();
+                                line = motInputTemp[objectCounter].read();
                                 outputFile.writeln(line);
                             }
-                            inputFile.line(objMotEnd[x] + 1);
+                            inputFile.line(objMotEnd[objectCounter] + 1);
                             done = nil;
                             while(!done)
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == (objEnd[x] - 2))
+                                if(inputFile.line() == (objEnd[objectCounter] - 2))
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            motInputTemp[x].close();
-                            inputFile.line(objEnd[x] - 2);
+                            motInputTemp[objectCounter].close();
+                            inputFile.line(objEnd[objectCounter] - 2);
                             line = inputFile.read();
                             outputFile.writeln(line);
                             if(lightExclusion)
                             {
-                                if(lightExclusion[x] != nil)
+                                if(lightExclusion[objectCounter] != nil)
                                 {
-                                    outputFile.write(lightExclusion[x]);
+                                    outputFile.write(lightExclusion[objectCounter]);
                                 }
                             }
                             outputFile.writeln("");
                         }
                         else
                         {
-                            inputFile.line(objStart[x]);
+                            inputFile.line(objStart[objectCounter]);
                             done = nil;
                             while(!done)
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == (objEnd[x] - 2))
+                                if(inputFile.line() == (objEnd[objectCounter] - 2))
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            inputFile.line(objEnd[x] - 2);
+                            inputFile.line(objEnd[objectCounter] - 2);
                             line = inputFile.read();
                             outputFile.writeln(line);
                             if(lightExclusion)
                             {
-                                if(lightExclusion[x] != nil)
+                                if(lightExclusion[objectCounter] != nil)
                                 {
-                                    outputFile.write(lightExclusion[x]);
+                                    outputFile.write(lightExclusion[objectCounter]);
                                 }
                             }
                             outputFile.writeln("");
@@ -936,17 +933,17 @@ generatePassFile: mode, pass
                         
                     case 4:
                         // begin case 4 here, which is the alternate object type
-                        if(lwoInputTemp[x] != nil)
+                        if(lwoInputTemp[objectCounter] != nil)
                         {
-                            inputFile.line(objStart[x]);
+                            inputFile.line(objStart[objectCounter]);
                             line = inputFile.read();
                             if(line != nil && line != "")
                             {
                                 parseObjLineTemp = parse(" ",line);
                                 if(parseObjLineTemp[1] == "LoadObjectLayer")
                                 {
-                                    line = parseObjLineTemp[1] + " 1 " + parseObjLineTemp[3] + " " + lwoInputTemp[x];
-                                    replacedLWO_nameArray = split(lwoInputTemp[x]);
+                                    line = parseObjLineTemp[1] + " 1 " + parseObjLineTemp[3] + " " + lwoInputTemp[objectCounter];
+                                    replacedLWO_nameArray = split(lwoInputTemp[objectCounter]);
                                     replacedLWO_baseName = replacedLWO_nameArray[3];
                                     overriddenObjectID[mmInt] = parseObjLineTemp[3];
                                     overriddenObjectName[mmInt] = replacedLWO_baseName;
@@ -959,20 +956,20 @@ generatePassFile: mode, pass
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == (objEnd[x] - 2))
+                                if(inputFile.line() == (objEnd[objectCounter] - 2))
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            inputFile.line(objEnd[x] - 2);
+                            inputFile.line(objEnd[objectCounter] - 2);
                             line = inputFile.read();
                             outputFile.writeln(line);
                             if(lightExclusion)
                             {
-                                if(lightExclusion[x] != nil)
+                                if(lightExclusion[objectCounter] != nil)
                                 {
-                                    outputFile.write(lightExclusion[x]);
+                                    outputFile.write(lightExclusion[objectCounter]);
                                 }
                             }
                             outputFile.writeln(""); 
@@ -980,26 +977,26 @@ generatePassFile: mode, pass
                         }
                         else
                         {
-                            inputFile.line(objStart[x]);
+                            inputFile.line(objStart[objectCounter]);
                             done = nil;
                             while(!done)
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == (objEnd[x] - 2))
+                                if(inputFile.line() == (objEnd[objectCounter] - 2))
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            inputFile.line(objEnd[x] - 2);
+                            inputFile.line(objEnd[objectCounter] - 2);
                             line = inputFile.read();
                             outputFile.writeln(line);
                             if(lightExclusion)
                             {
-                                if(lightExclusion[x] != nil)
+                                if(lightExclusion[objectCounter] != nil)
                                 {
-                                    outputFile.write(lightExclusion[x]);
+                                    outputFile.write(lightExclusion[objectCounter]);
                                 }
                             }
                             outputFile.writeln(""); 
@@ -1008,45 +1005,45 @@ generatePassFile: mode, pass
                         break;
                         
                     case 7:
-                        inputFile.line(objStart[x]);
+                        inputFile.line(objStart[objectCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[x] - 2))
+                            if(inputFile.line() == (objEnd[objectCounter] - 2))
                             {
                                 done = true;
                                 break;
                             }
                         }
-                        inputFile.line(objEnd[x] - 2);
+                        inputFile.line(objEnd[objectCounter] - 2);
                         line = inputFile.read();
                         outputFile.writeln(line);
                         if(lightExclusion)
                         {
-                            if(lightExclusion[x] != nil)
+                            if(lightExclusion[objectCounter] != nil)
                             {
-                                outputFile.write(lightExclusion[x]);
+                                outputFile.write(lightExclusion[objectCounter]);
                             }
                         }                   
                         outputFile.writeln("");
                         break;
                         
                     default:
-                        inputFile.line(objStart[x]);
+                        inputFile.line(objStart[objectCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[x] - 2))
+                            if(inputFile.line() == (objEnd[objectCounter] - 2))
                             {
                                 done = true;
                                 break;
                             }
                         }
-                        inputFile.line(objEnd[x] - 2);
+                        inputFile.line(objEnd[objectCounter] - 2);
                         line = inputFile.read();
                         outputFile.writeln(line);
                         outputFile.writeln("");
@@ -1058,19 +1055,19 @@ generatePassFile: mode, pass
             }
             else
             {
-                inputFile.line(objStart[x]);
+                inputFile.line(objStart[objectCounter]);
                 done = nil;
                 while(!done)
                 {
                     line = inputFile.read();
                     outputFile.writeln(line);
-                    if(inputFile.line() == (objEnd[x] - 2))
+                    if(inputFile.line() == (objEnd[objectCounter] - 2))
                     {
                         done = true;
                         break;
                     }
                 }
-                inputFile.line(objEnd[x] - 2);
+                inputFile.line(objEnd[objectCounter] - 2);
                 line = inputFile.read();
                 outputFile.writeln(line);
                 outputFile.writeln("");
@@ -1093,31 +1090,29 @@ generatePassFile: mode, pass
     }
     
     // write out the lights
-    for(x = lastObject + 1; x <= size(objStart); x++)
+    for(lightCounter = lastObject + 1; lightCounter <= size(objStart); lightCounter++)
     {
-        
-        progressString = string(((x/size(objStart))/4) + 0.74);
+        progressString = string(((lightCounter/size(objStart))/4) + 0.74);
         msgString = "{" + progressString + "}Generating Render Scene:  Writing Lights...";
         StatusMsg(msgString);
         sleep(1);
         
-        
-        if(doOverride[x] == 1)
+        if(doOverride[lightCounter] == 1)
         {
-            switch(overrideType[x])
+            switch(overrideType[lightCounter])
             {
                 case 5:
                     // begin case 5 here, which is the light properties override type
-                    if(lightSettingsPartOne[x] != nil)
+                    if(lightSettingsPartOne[lightCounter] != nil)
                     {
                         // write out the beginning of the light
-                        inputFile.line(objStart[x]);
+                        inputFile.line(objStart[lightCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objPathAlignReliableDistLine[x]) + 1)
+                            if(inputFile.line() == (objPathAlignReliableDistLine[lightCounter]) + 1)
                             {
                                 done = true;
                                 break;
@@ -1125,51 +1120,53 @@ generatePassFile: mode, pass
                         }
                         
                         // write out the custom parameters
-                        outputFile.write(lightSettingsPartOne[x]);
+                        outputFile.write(lightSettingsPartOne[lightCounter]);
                         
                         // write out the affect caustics line
                         if(objAffectCausticsLine != nil)
                         {
-                            if(objAffectCausticsLine[x] != nil)
+                            if(objAffectCausticsLine[lightCounter] != nil)
                             {
-                                inputFile.line(objAffectCausticsLine[x]);
+                                inputFile.line(objAffectCausticsLine[lightCounter]);
                                 line = inputFile.read();
                                 outputFile.writeln(line);
                             }
                         }
                         
-                        // write out the lens flare line
+                        // write out the lens flare line.
                         if(objLensFlareLine != nil)
                         {
-                            if(objLensFlareLine[x] != nil)
+                            if(objLensFlareLine[lightCounter] != nil)
                             {
-                                inputFile.line(objLensFlareLine[x]);
+								changeScnLine(lightSettingsPartTwo[lightCounter], fileToAdjust, objLensFlareLine[lightCounter]);
+                                inputFile.line(objLensFlareLine[lightCounter]);
                                 line = inputFile.read();
-                                outputFile.writeln(line);
+//                                outputFile.writeln(line);
                             }
                         }
-                        outputFile.write(lightSettingsPartTwo[x]);
+//                        outputFile.write(lightSettingsPartTwo[lightCounter]);
 
                         // write out the volumetric line
                         if(objVolLightLine != nil)
                         {
-                            if(objVolLightLine[x] != nil)
+                            if(objVolLightLine[lightCounter] != nil)
                             {
-                                inputFile.line(objVolLightLine[x]);
+								changeScnLine(lightSettingsPartThree[lightCounter], fileToAdjust, objVolLightLine[lightCounter]);
+                                inputFile.line(objVolLightLine[lightCounter]);
                                 line = inputFile.read();
-                                outputFile.writeln(line);
+//                                outputFile.writeln(line);
                             }
                         }
-                        outputFile.write(lightSettingsPartThree[x]);
+//                        outputFile.write(lightSettingsPartThree[lightCounter]);
                         
                         // write out the rest of the light
-                        inputFile.line(objLightTypeLine[x]);
+                        inputFile.line(objLightTypeLine[lightCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[x]))
+                            if(inputFile.line() == (objEnd[lightCounter]))
                             {
                                 done = true;
                                 break;
@@ -1178,13 +1175,13 @@ generatePassFile: mode, pass
                     }
                     else
                     {
-                        inputFile.line(objStart[x]);
+                        inputFile.line(objStart[lightCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[x]))
+                            if(inputFile.line() == (objEnd[lightCounter]))
                             {
                                 done = true;
                                 break;
@@ -1196,53 +1193,53 @@ generatePassFile: mode, pass
                 
                 case 3:
                     // begin case 3 here, which is the motion override type
-                    if(motInputTemp[x] != nil)
+                    if(motInputTemp[lightCounter] != nil)
                     {
-                        inputFile.line(objStart[x]);
+                        inputFile.line(objStart[lightCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objMotStart[x]))
+                            if(inputFile.line() == (objMotStart[lightCounter]))
                             {
                                 done = true;
                                 break;
                             }
                         }
-                        motInputTemp[x].line(4);
-                        while(!motInputTemp[x].eof())
+                        motInputTemp[lightCounter].line(4);
+                        while(!motInputTemp[lightCounter].eof())
                         {
-                            line = motInputTemp[x].read();
+                            line = motInputTemp[lightCounter].read();
                             outputFile.writeln(line);
                         }
-                        inputFile.line(objMotEnd[x] + 1);
+                        inputFile.line(objMotEnd[lightCounter] + 1);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[x] - 2))
+                            if(inputFile.line() == (objEnd[lightCounter] - 2))
                             {
                                 done = true;
                                 break;
                             }
                         }
-                        motInputTemp[x].close();
-                        inputFile.line(objEnd[x] - 2);
+                        motInputTemp[lightCounter].close();
+                        inputFile.line(objEnd[lightCounter] - 2);
                         line = inputFile.read();
                         outputFile.writeln(line);
                         outputFile.writeln("");
                     }
                     else
                     {
-                        inputFile.line(objStart[x]);
+                        inputFile.line(objStart[lightCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[x]))
+                            if(inputFile.line() == (objEnd[lightCounter]))
                             {
                                 done = true;
                                 break;
@@ -1253,13 +1250,13 @@ generatePassFile: mode, pass
                     break;
                 
                 default:
-                    inputFile.line(objStart[x]);
+                    inputFile.line(objStart[lightCounter]);
                     done = nil;
                     while(!done)
                     {
                         line = inputFile.read();
                         outputFile.writeln(line);
-                        if(inputFile.line() == (objEnd[x]))
+                        if(inputFile.line() == (objEnd[lightCounter]))
                         {
                             done = true;
                             break;
@@ -1270,13 +1267,13 @@ generatePassFile: mode, pass
         }
         else
         {
-            inputFile.line(objStart[x]);
+            inputFile.line(objStart[lightCounter]);
             done = nil;
             while(!done)
             {
                 line = inputFile.read();
                 outputFile.writeln(line);
-                if(inputFile.line() == (objEnd[x]))
+                if(inputFile.line() == (objEnd[lightCounter]))
                 {
                     done = true;
                     break;
@@ -1504,208 +1501,31 @@ generatePassFile: mode, pass
         settingsArray = parse("||",overrideSettings[a]);
         if(settingsArray[2] == "type6")
         {
-			overrideType[x] = 6;
-            resolutionMultiplierSetts	= integer(settingsArray[3]);
-			redirectBuffersSetts 		= integer(settingsArray[8]);
-			disableAASetts 				= integer(settingsArray[9]);
-
-            switch(resolutionMultiplierSetts)
-            {
-                case 1:
-                    resMult = 0.25;
-                    break;
-                
-                case 2:
-                    resMult = 0.5;
-                    break;
-                    
-                case 3:
-                    resMult = 1.0;
-                    break;
-                    
-                case 4:
-                    resMult = 2.0;
-                    break;
-                    
-                case 5:
-                    resMult = 4.0;
-                    break;
-                    
-                default:
-                    break;
-            }
-            
-			writeOverrideString(updatedCurrentScenePath, newScenePath, "FrameSize ", resMult);
-
-// obsolete
-//			writeOverrideString(updatedCurrentScenePath, newScenePath, "GlobalFrameSize ", resMult);
-						
-			renderModeSetts = integer(settingsArray[4]) - 1;
-			writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderMode ", renderModeSetts);
-            
-			depthBufferAASetts = integer(settingsArray[5]);
-			writeOverrideString(updatedCurrentScenePath, newScenePath, "DepthBufferAA ", depthBufferAASetts);
-            
-			renderLinesSetts = integer(settingsArray[6]);
-			writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderLines ", renderLinesSetts);
-
-			rayRecursionLimitSetts = integer(settingsArray[7]);
-			writeOverrideString(updatedCurrentScenePath, newScenePath, "RayRecursionLimit ", rayRecursionLimitSetts);
-
-			if(disableAASetts == 1) {
-				writeOverrideString(updatedCurrentScenePath, newScenePath, "AASamples ", "1");
-			}
-			
-			raytraceShadows				= integer(settingsArray[10]);
-			raytraceShadows_Flag		= 1;
-			raytraceFlags				= (raytraceShadows * raytraceShadows_Flag);
-
-			raytraceReflect				= integer(settingsArray[11]);
-			raytraceReflect_Flag		= 2;
-			raytraceFlags				+= (raytraceReflect * raytraceReflect_Flag);
-
-			raytraceRefract				= integer(settingsArray[12]);
-			raytraceRefract_Flag		= 4;
-			raytraceFlags				+= (raytraceRefract * raytraceRefract_Flag);
-
-			raytraceTrans				= integer(settingsArray[13]);
-			raytraceTrans_Flag			= 8;
-			raytraceFlags				+= (raytraceTrans * raytraceTrans_Flag);
-
-			raytraceOccl				= integer(settingsArray[14]);
-			raytraceOccl_Flag			= 16;
-			raytraceFlags				+= (raytraceOccl * raytraceOccl_Flag);
-			
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RayTraceEffects ", raytraceFlags);
-
-   			volumetricAA = integer(settingsArray[15]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "VolumetricAA ", volumetricAA);
-
-   			gLensFlares = integer(settingsArray[16]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableLensFlares ", gLensFlares);
-
-   			shadowMaps = integer(settingsArray[17]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableShadowMaps ", shadowMaps);
-  
-   			volLights = integer(settingsArray[18]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableVolumetricLights ", volLights);
-
-   			twoSidedALgts = integer(settingsArray[19]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "DoubleSidedAreaLights ", twoSidedALgts);
-
-   			renderInstances = integer(settingsArray[20]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderInstances ", renderInstances);
-
-   			rayPrecision = number(settingsArray[21]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RayPrecision ", rayPrecision);
-
-   			rayCutoff = number(settingsArray[22]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RayCutoff ", rayCutoff);
-
-   			shadingSamples = integer(settingsArray[23]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "ShadingSamples ", shadingSamples);
-  
-     		lightSamples = integer(settingsArray[24]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "LightSamples ", lightSamples);
-
-     		gLightIntensity = number(settingsArray[25]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "GlobalLightIntensity ", gLightIntensity);
-
-     		gFlareIntensity = number(settingsArray[26]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "GlobalFlareIntensity ", gFlareIntensity);
-
-     		enableGI = number(settingsArray[27]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableRadiosity ", enableGI);
-
-     		giMode = integer(settingsArray[28]);
-     		giMode = giMode - 1; // decrement by one to match index in LW. Menus are 1-indexed.
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityType ", giMode);
-
-     		interpolateGI = integer(settingsArray[29]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityInterpolated ", interpolateGI);
-
-     		blurBGGI = integer(settingsArray[30]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "BlurRadiosity ", blurBGGI);
- 
-      		transparencyGI = integer(settingsArray[31]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityTransparency ", transparencyGI);
-
-      		volumetricGI = integer(settingsArray[32]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "VolumetricRadiosity ", volumetricGI);
-
-      		ambOcclGI = integer(settingsArray[33]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityUseAmbient ", ambOcclGI);
-
-      		directionalGI = integer(settingsArray[34]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityDirectionalRays ", directionalGI);
-
-      		gradientsGI = integer(settingsArray[35]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityUseGradients ", gradientsGI);
-
-      		behindTestGI = integer(settingsArray[36]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityUseBehindTest ", behindTestGI);
-
-      		useBumpsGI = integer(settingsArray[37]);
-      		useBumpsGI = useBumpsGI * (-2147483648);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityFlags ", useBumpsGI);
-
-      		giIntensity = integer(settingsArray[38]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityIntensity ", giIntensity);
-
-      		giAngTol = integer(settingsArray[39]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityTolerance ", giAngTol);
-
-      		giIndBounces = integer(settingsArray[40]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "IndirectBounces ", giIndBounces);
-            
-            giMinSpacing = number(settingsArray[41]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityMinPixelSpacing ", giMinSpacing);
-
-            giRPE = number(settingsArray[42]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityRays ", giRPE);
-
-            giMaxSpacing = number(settingsArray[43]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityMaxPixelSpacing ", giMaxSpacing);
-
-            gi2ndBounces = integer(settingsArray[44]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "SecondaryBounceRays ", gi2ndBounces);
-
-            giMultiplier = number(settingsArray[45]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityMultiplier ", giMultiplier);
-
-            enableCaustics = number(settingsArray[46]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableCaustics ", enableCaustics);
-
-            causticsAccuracy = integer(settingsArray[47]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "CausticAccuracy ", causticsAccuracy);
-
-            causticsIntensity = number(settingsArray[48]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "CausticIntensity ", causticsIntensity);
-
-            causticsSoftness = number(settingsArray[49]);
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "CausticSoftness ", causticsSoftness);
-                                   
-			// FIXME : Move to camera override.
-			disableAASetts = integer(settingsArray[9]);
-			if(disableAASetts == 1)
-				disableAASetts = 0;
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "Antialiasing ", disableAASetts);
-
-     		writeOverrideString(updatedCurrentScenePath, newScenePath, "AntiAliasingLevel ", "-1");
-
-			finishFiles();
-
-			// FiberFX stuff. Due to poor parameter naming, we need to do this in a more specific manner.
-			if(fiberFX(newScenePath) == 1)
+			overrideType[passItem] = 6;
+			overrideRenderer = integer(settingsArray[3]);
+			switch(overrideRenderer)
 			{
-				// We made some changes, so let's align the files again
-				filecopy(newScenePath, updatedCurrentScenePath);
+				case 1:
+				// native renderer - call the support
+				scnGen_native(updatedCurrentScenePath, newScenePath);
+				break;
+				
+				default:
+				scnGen_native(updatedCurrentScenePath, newScenePath);
+				break;
 			}
-
-	        // deal with the buffer savers now.
-	        handleBuffers(updatedCurrentScenePath);
-        }
+		}
     }
+
+	// FiberFX stuff. Due to poor parameter naming, we need to do this in a more specific manner.
+	if(fiberFX(newScenePath) == 1)
+	{
+		// We made some changes, so let's align the files again
+		filecopy(newScenePath, updatedCurrentScenePath);
+	}
+
+	// deal with the buffer savers now.
+	handleBuffers(updatedCurrentScenePath);
     
 	// and as a tack-on fix, replace motion-mixer stuff for overridden objects
 	motionMixerStuff(updatedCurrentScenePath);
@@ -1811,6 +1631,8 @@ fiberFX: ffFile
 
 handleBuffers: hbFile
 {
+	if(hbFile == nil)
+		error("hbFile MIA");
 	inputFileName = prepareInputFile(hbFile);
 	inputFile = File(inputFileName, "r");
 	tempOutput = File(newScenePath,"w");
@@ -2069,6 +1891,8 @@ motionMixerStuff: mmFile
 		
 		for(x = 1; x <= size(overriddenObjectID); x++)
 		{
+			if(mmFile == nil)
+				error("mmFile1 MIA");
 			inputFileName = prepareInputFile(mmFile);
 			inputFile = File(inputFileName, "r");
 			tempOutput = File(newScenePath,"w");
@@ -2147,6 +1971,8 @@ motionMixerStuff: mmFile
 				tempOutput.close();
 				finishFiles();
 
+				if(mmFile == nil)
+					error("mmFile2 MIA");
 				inputFileName = prepareInputFile(mmFile);
 				inputFile = File(inputFileName, "r");
 				tempOutput = File(newScenePath,"w");
@@ -2174,6 +2000,8 @@ motionMixerStuff: mmFile
 				tempOutput.close();
 				finishFiles();
 
+				if(mmFile == nil)
+					error("mmFile3 MIA");
 				inputFileName = prepareInputFile(mmFile);
 				inputFile = File(inputFileName, "r");
 				tempOutput = File(newScenePath,"w");
@@ -2198,6 +2026,8 @@ motionMixerStuff: mmFile
 				tempOutput.close();
 				finishFiles();
 
+				if(mmFile == nil)
+					error("mmFile4 MIA");
 				inputFileName = prepareInputFile(mmFile);
 				inputFile = File(inputFileName, "r");
 				tempOutput = File(newScenePath,"w");
@@ -2311,7 +2141,8 @@ prepareInputFile: inputFileName
 		error("Internal error - prepareInputFile() already called.");
 	tempFileName = tempDirectory + getsep() + "tempPassportInputFile.lws";
 	filecopy(inputFileName, tempFileName);
-	prepareRadiosityLines(tempFileName);
+	// Insert missing radiosity lines in the file passed in.
+	radLines_native(tempFileName);
 	filecopy(tempFileName, inputFileName);
 	filesPrepared = 1;
 	return tempFileName;
@@ -2324,58 +2155,6 @@ finishFiles
 	tempFileName = tempDirectory + getsep() + "tempPassportInputFile.lws";
 	filedelete(tempFileName);
 	filesPrepared = 0;
-}
-
-// Insert missing radiosity lines in the file passed in.
-// This is ~annoying. The setting locations in the scene file were determined by manual inspection.
-// I've version-controlled them in case they move/change in future.
-prepareRadiosityLines: radFileName
-{
-	switch (int(hostVersion()))
-	{
-		case 11:
-			prepareRadiosityLines_11(radFileName);
-			break;
-		
-		default:
-			break;
-    }
-}
-
-prepareRadiosityLines_11: radFileName
-{
-	if (getPartialLine(0,0,"EnableRadiosity",radFileName) == nil)
-	{
-		insertScnLine("EnableRadiosity 0",radFileName,(getPartialLine(0,0,"DoubleSidedAreaLights",radFileName)));
-	}
-	if(getPartialLine(0,0,"IndirectBounces",radFileName) == nil)
-	{
-		insertScnLine("IndirectBounces 1",radFileName,(getPartialLine(0,0,"RadiosityMultiplier",radFileName)));
-	}
-	if(getPartialLine(0,0,"VolumetricRadiosity",radFileName) == nil)
-	{
-		insertScnLine("VolumetricRadiosity 0",radFileName,(getPartialLine(0,0,"IndirectBounces",radFileName)));
-	}
-	if(getPartialLine(0,0,"RadiosityUseAmbient",radFileName) == nil)
-	{
-		insertScnLine("RadiosityUseAmbient 0",radFileName,(getPartialLine(0,0,"VolumetricRadiosity",radFileName)));
-	}
-	if(getPartialLine(0,0,"EnableCaustics",radFileName) == nil)
-	{
-		insertScnLine("EnableCaustics 0",radFileName,(getPartialLine(0,0,"PixelFilterForceMT",radFileName)));
-	}
-	if(getPartialLine(0,0,"CausticIntensity",radFileName) == nil)
-	{
-		insertScnLine("CausticIntensity 0",radFileName,(getPartialLine(0,0,"EnableCaustics",radFileName)));
-	}
-	if(getPartialLine(0,0,"CausticAccuracy",radFileName) == nil)
-	{
-		insertScnLine("CausticAccuracy 100",radFileName,(getPartialLine(0,0,"CausticIntensity",radFileName)));
-	}
-	if(getPartialLine(0,0,"CausticSoftness",radFileName) == nil)
-	{
-		insertScnLine("CausticSoftness 20",radFileName,(getPartialLine(0,0,"CausticAccuracy",radFileName)));
-	}
 }
 
 changeScnLine: stringToWrite, fileToAdjust, lineToChange

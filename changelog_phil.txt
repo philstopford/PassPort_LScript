@@ -1,9 +1,22 @@
+20130108
+========
+
+- Trying to put a renderer-choice dialog into createSceneMasterOverride(). Might be borked, so can back this out as needed.
+- Adjusted editSelectedOverride to pick up renderer setting from override settings.
+- Added docs folder containing converted PDFs as .doc files. Will need to update these nearer release.
+- Added misc folder to hold PSD and font stuff that is only useful for developers.
+- Prototype work to support other renderers. Making this modular. Highly experimental and hardly any code exists right now except for the native renderer.
+ - Major change to refactor code and introduce early value into settings array for the type6 override to track renderer in use.
+ - Will need a partial line read to ensure that Kray is applied before manipulating. Should warn the user if the data is not found.
+- Minor refactoring of sceneGen code to clarify array indexer usage.
+- More work on the light override issue (p0018).
+
 20130107
 ========
 
 - Misc bug fixes.
 - tempDirectory now a global since it's used so much.
-- Light override was partially busted.
+- Light override was partially busted (p0018).
  - Reworked to reliably change/handle lens flare and volumetric properties.
 
 20130106
@@ -327,6 +340,7 @@ p0013 : Selecting second item in list causes highlight to be drawn (on repaint) 
 p0014 : Uncompiled version crashes out on Mac and fails to start-up roughly 70% of the time on WinXP. (closed, LScript bug)
 p0015 : Overrides with assigned items don't get bullet point until the lists are updated, or some major redraw occurs (also in original code)
 p0017 : Scene override fails during scene generation. Wrong line cited on OS X, but Win32 reports correct number. Invalid index to passName. Line 1744 of sceneGen code. (Fixed)
+p0018 : Light override causes no image to be saved. (In progress : The issue with this override is that placing VolumetricLighting in anything other than the correct location in the light setting's block causes the renderer to fail to save any image. Odd quirk in LW.)
 
 ###############
 # Limitations #
@@ -338,11 +352,12 @@ p0017 : Scene override fails during scene generation. Wrong line cited on OS X, 
 : Issues to check :
 :::::::::::::::::::
 
-- Lens flare toggle isn't working.
+- Lens flare toggle isn't working. (p0018)
 - SceneGen code could be optimised to walk the array and use loops to greatly simplify the code. (partially done with 20130101)
 - Add Camera override, for camera settings.
 - Autoscan plugin operation.
 - Need to check if growl interaction works with current growl versions.
+- Prototype w/ Kray support.
 
 -------------
 - Reference -

@@ -332,7 +332,8 @@ editSelectedOverride
 
 					
 				case 6:
-					scnmasterOverride_UI("edit");
+					renderer = settingsArray[3];
+					scnmasterOverride_UI(renderer, "edit");
 					reProcess();
 					req_update();
 					break;
@@ -408,7 +409,24 @@ createAltObjOverride
 
 createSceneMasterOverride
 {
-	scnmasterOverride_UI("new");
+	if(renderers.count() >= 2)
+	{
+		reqbeginstr = "Choose Renderer";
+		reqbegin(reqbeginstr);
+		reqsize(200, 200);
+		renderermenu = ctlpopup("Supported Renderers",1,renderers);
+		ctlposition(renderermenu, 25, (200 - ScnMst_gad_h) / 2, 150, ScnMst_gad_h, ScnMst_gad_text_offset);
+				
+		if(reqpost())
+		{
+			scnmasterOverride_UI(int(getvalue(renderermenu)), "new");
+		} else {
+			scnmasterOverride_UI(1, "new"); // native
+		}
+		reqend();
+	} else {
+		scnmasterOverride_UI(1, "new"); // native
+	}
 	reProcess();
 	req_update();
 }

@@ -76,6 +76,7 @@ var supportedplatform = 1;
 @insert "@passEditor_UDF.ls"
 @insert "@passEditor_UDF_Passes.ls"
 @insert "@passEditor_UDF_Overrides.ls"
+@insert "@passEditor_NativeRenderer_Support.ls"
 
 // icons
 blank_icon = @ "................",
