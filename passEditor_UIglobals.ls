@@ -150,6 +150,8 @@ ScnMst_gad_x2				= (ScnMst_ui_window_w / 3) + ScnMst_gad_x;				// Gadget X coord
 ScnMst_gad_x3				= (ScnMst_ui_window_w * 2 / 3) + ScnMst_gad_x;			// Gadget X coord3
 ScnMst_ui_seperator_w		= ScnMst_gad_x3 + 2;			// Width of seperators (was ScnMst_ui_window_w + 2)
 
+ScnMst_dividerline_y1		= 0;
+ScnMst_dividerline_y2		= 0;
 
 // Preferences UI
 

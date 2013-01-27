@@ -62,10 +62,10 @@
 @warnings
 @script master
 @name "PassPort_MC"
-@define dev 1
+// @define dev 1
 
 // EXPERIMENTAL features, enable
-@define enableKray 1;
+// @define enableKray 1;
 
 var supportedplatform = 1;
 
@@ -399,8 +399,8 @@ options
 
     ctlpage(1,gad_PassesListview,gad_SceneItems_forPasses_Listview,gad_New_Pass,gad_EditSel_Passes,gad_DelSel_Passes,gad_AddAll_Passes,gad_AddSelected_Passes,gad_ClearAll_Passes,gad_ClearSel_Passes);
     ctlpage(2,gad_OverridesListview,gad_SceneItems_forOverrides_Listview,gad_New_Override,gad_EditSel_Override,gad_DelSel_Override,gad_AddAll_Override,gad_AddSelected_Override,gad_ClearAll_Override,gad_ClearSel_Override);
-    
-    reqredraw("req_redraw");
+
+    req_update();    
     reqopen();
 } // end options
 
@@ -1709,20 +1709,6 @@ unProcess
     currentChosenPass = nil;
     currentChosenPassString = nil;
     interfaceRunYet = nil;
-
-}
-
-// Redraw custom drawing on requester
-req_redraw
-{
-	if(supportedplatform != 1)
-		return;
-    if(reqisopen())
-    {
-        // Draw divider line (ctlsep kept getting drawn over)
-//      drawline(<038,038,040>, 0, Main_banner_height + 29, panelWidth, Main_banner_height + 29);
-//      drawline(<081,081,083>, 0, Main_banner_height + 31, panelWidth, Main_banner_height + 31);
-    }
 }
 
 req_update

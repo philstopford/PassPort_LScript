@@ -1,3 +1,15 @@
+20130119 (beta 4 - users will need to re-do scene master overrides, they were broken in b1-3.)
+========
+
+- All credit to Luis Lopes for the continuing reports leading to p0026, p0027, p0028
+- Fixed p0027. Was missing cast to integer() in each case.
+- Fixed scene master UI wiring bug that triggered p0028.
+- Fixed p0026.
+- Removed debug info() from the utility code.
+- Tweaking Scene Master interface to tidy it up before new content arrives.
+- Removed DEBUG button from UI for beta builds. No longer needed.
+- Beta 3 shipped with experimental Kray code enabled. This build doesn't - it's not ready for beta at all yet.
+
 20130119 (beta 3 - safe to ignore settings warnings from beta 1 and beta 2)
 ========
 
@@ -456,6 +468,9 @@ p0022 : SaveRGB and filename format lines were missed in scene generation. (Fixe
 p0023 : crash with incorrect output folder (Fixed, beta 2)
 p0024 : Windows LW 11.0.x seemed to struggle with the conditional operators. Tweaked the approach (Fixed, beta2)
 p0025 : Autoscan plugins operation is broken, leading to issues (Fixed, beta3)
+p0026 : 'Save All Passes As Scenes' dialog needs a validation check to ensure the user entered a path, and that it's valid. (Fixed, beta4)
+p0027 : Backdrop color not saved by Scene Master override. (Fixed, beta4)
+p0028 : Wireframe mode change reported for Scene Master override. (Fixed, beta4)
 
 ###############
 # Limitations #
@@ -468,10 +483,8 @@ p0025 : Autoscan plugins operation is broken, leading to issues (Fixed, beta3)
 :::::::::::::::::::
 
 - SceneGen code could be optimised to walk the array and use loops to greatly simplify the code. (partially done with 20130101)
-- Autoscan plugin operation.
 - Need to check if growl interaction works with current growl versions.
 - Check if motion override breaks cameras (9 channels vs 6 for cameras)
-- Versioning of overrides for host application version and Passport version.
 - 3rd party lights/cameras end of block detection.
 - Active camera override in Scene Override.
 - Extend light override (caustics).

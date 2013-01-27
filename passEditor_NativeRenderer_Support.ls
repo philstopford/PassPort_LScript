@@ -68,13 +68,13 @@ scnmasterOverride_UI_native: action
 			fiberFXSaveDepthName		= string(settingsArray[56]);
 			// fog
 			fogType 					= integer(settingsArray[57]);
-			fogColorArray 				= <settingsArray[58], settingsArray[59], settingsArray[60]>;
+			fogColorArray 				= <integer(settingsArray[58]), integer(settingsArray[59]), integer(settingsArray[60])>;
 			fogBackdropColor			= integer(settingsArray[61]);
 			// compositing
 			useBackgroundColor			= integer(settingsArray[62]);
-			backgroundColorArray		= <settingsArray[63], settingsArray[64], settingsArray[65]>;
+			backgroundColorArray		= <integer(settingsArray[63]), integer(settingsArray[64]), integer(settingsArray[65])>;
 			// backdrop
-			backdropColorArray			= <settingsArray[66], settingsArray[67], settingsArray[68]>;
+			backdropColorArray			= <integer(settingsArray[66]), integer(settingsArray[67]), integer(settingsArray[68])>;
 		}
 	
 		doKeys = 0;
@@ -86,6 +86,7 @@ scnmasterOverride_UI_native: action
 		}
 		reqbegin(reqbeginstr);
 		reqsize(ScnMst_ui_window_w, 725);
+		reqredraw("scnmasterOverride_UI_native_redraw");
 
 		newName = "SceneMasterOverride";
 		if(action == "edit")
@@ -100,7 +101,7 @@ scnmasterOverride_UI_native: action
 		resolutionMultiplierSetts = 3;
 		if(action == "edit")
 		{
-			resolutionMultiplierSetts = integer(settingsArray[3]);
+			resolutionMultiplierSetts = integer(settingsArray[4]);
 		}
 		c20_5 = ctlpopup("Resolution Multiplier",resolutionMultiplierSetts,resolutionMultArray);
 		ctlposition(c20_5, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
@@ -108,7 +109,7 @@ scnmasterOverride_UI_native: action
 		renderModeSetts = 3;
 		if(action == "edit")
 		{
-			renderModeSetts = integer(settingsArray[4]);
+			renderModeSetts = integer(settingsArray[5]);
 		}
 		c21 = ctlpopup("Render Mode",renderModeSetts,renderModeArray);
 		ctlposition(c21, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
@@ -120,6 +121,8 @@ scnmasterOverride_UI_native: action
 		}
 		c73 = ctlpopup("Fog Type",fogType,fogTypeArray);
 		ctlposition(c73, ScnMst_gad_x3, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		ScnMst_dividerline_y1 = ScnMst_gad_y + ui_offset_y;
 
 		ui_offset_y += ScnMst_ui_row_offset;
 
@@ -213,7 +216,7 @@ scnmasterOverride_UI_native: action
 		}
 
 		ui_offset_y += ScnMst_ui_row_offset + 2;
-		sep1 = ctlsep(0, ScnMst_ui_seperator_w + 4);
+		sep1 = ctlsep(0, ScnMst_ui_seperator_w - 10);
 		ctlposition(sep1, -2, ScnMst_gad_y + ui_offset_y);
 		ui_offset_y += ScnMst_ui_spacing_y + 2;
 
@@ -285,7 +288,7 @@ scnmasterOverride_UI_native: action
 		ctlposition(c39, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 		ui_offset_y += ScnMst_ui_row_offset + 2;
-		sep2 = ctlsep(0, ScnMst_ui_seperator_w + 4);
+		sep2 = ctlsep(0, ScnMst_ui_seperator_w - 10);
 		ctlposition(sep2, -2, ScnMst_gad_y + ui_offset_y);
 		ui_offset_y += ScnMst_ui_spacing_y + 2;
 
@@ -316,7 +319,7 @@ scnmasterOverride_UI_native: action
 		ctlposition(c32, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 		ui_offset_y += ScnMst_ui_row_offset + 2;
-		sep3 = ctlsep(0, ScnMst_ui_seperator_w + 4);
+		sep3 = ctlsep(0, ScnMst_ui_seperator_w - 10);
 		ctlposition(sep3, -2, ScnMst_gad_y + ui_offset_y);
 		ui_offset_y += ScnMst_ui_spacing_y + 2;
 
@@ -373,7 +376,7 @@ scnmasterOverride_UI_native: action
 		ctlposition(c36, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 		ui_offset_y += ScnMst_ui_row_offset + 2;
-		sep4 = ctlsep(0, ScnMst_ui_seperator_w + 4);
+		sep4 = ctlsep(0, ScnMst_ui_seperator_w - 10);
 		ctlposition(sep4, -2, ScnMst_gad_y + ui_offset_y);
 		ui_offset_y += ScnMst_ui_spacing_y + 2;
 
@@ -558,7 +561,7 @@ scnmasterOverride_UI_native: action
 		ctlposition(c62, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w - 22, ScnMst_gad_h, ScnMst_gad_text_offset);
 		
 		ui_offset_y += ScnMst_ui_row_offset + 2;
-		sep5 = ctlsep(0, ScnMst_ui_seperator_w + 4);
+		sep5 = ctlsep(0, ScnMst_ui_seperator_w - 10);
 		ctlposition(sep5, -2, ScnMst_gad_y + ui_offset_y);
 		ui_offset_y += ScnMst_ui_spacing_y + 2;
 
@@ -597,7 +600,7 @@ scnmasterOverride_UI_native: action
 		ctlposition(c66, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 		ui_offset_y += ScnMst_ui_row_offset + 2;
-		sep6 = ctlsep(0, ScnMst_ui_seperator_w + 4);
+		sep6 = ctlsep(0, ScnMst_ui_seperator_w - 10);
 		ctlposition(sep6, -2, ScnMst_gad_y + ui_offset_y);
 		ui_offset_y += ScnMst_ui_spacing_y + 4;
 
@@ -657,6 +660,7 @@ scnmasterOverride_UI_native: action
 		}
 		c72 = ctlfilename("Save ...", c72val,30,1);
 		ctlposition(c72, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w - 22, ScnMst_gad_h, ScnMst_gad_text_offset);
+		ScnMst_dividerline_y2 = ScnMst_gad_y + ui_offset_y + ScnMst_gad_h;
 
 		if(reqpost())
 		{
@@ -794,6 +798,11 @@ scnmasterOverride_UI_native: action
 	} else {
 		error("scnmasterOverride_UI: incorrect, or no, action passed");
 	}
+}
+
+scnmasterOverride_UI_native_redraw
+{
+	drawline(<038,038,040>, ScnMst_ui_seperator_w - 7, ScnMst_dividerline_y1, ScnMst_ui_seperator_w - 7, ScnMst_dividerline_y2);
 }
 
 scnGen_native:updatedCurrentScenePath, newScenePath
@@ -977,7 +986,7 @@ scnGen_native:updatedCurrentScenePath, newScenePath
 
 	// FiberFX settings are written out in the main scene gen code. At least for now.
 
-	fogType = integer(settingsArray[57]);
+	fogType = integer(settingsArray[57]) - 1;
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "FogType ", fogType);
 
 	fogColorLine = string(number(settingsArray[58]) / 255) + " " + string(number(settingsArray[59]) / 255) + " " + string(number(settingsArray[60]) / 255);

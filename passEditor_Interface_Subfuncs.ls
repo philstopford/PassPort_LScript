@@ -687,10 +687,14 @@ saveAllPassesAsScenes
 			{
 				if(lwsFileSplit[1] != nil)
 			    {
+			    	if(!chdir(lwsFileSplit[1] + lwsFileSplit[2]))
+			    		error("Invalid save location: " + lwsFileSplit[1] + lwsFileSplit[2]);
 			    	newLwsFile = lwsFileSplit[1] + lwsFileSplit[2] + getsep() + passNames[x] + ".lws";
 			    }
 			    else
 			    {
+			    	if(!chdir(lwsFileSplit[2]))
+			    		error("Invalid save location: " + lwsFileSplit[2]);
 			    	newLwsFile = lwsFileSplit[2] + getsep() + passNames[x] + ".lws";
 			    }
 			    

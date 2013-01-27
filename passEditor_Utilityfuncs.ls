@@ -231,7 +231,6 @@ changeScnLine: stringToWrite, fileToAdjust, lineToChange
 	}
 	fileAdjust.close();
 	tempFileAdjust.close();
-	info("boo2");
 	filecopy(tempFileToAdjust, fileToAdjust);
 	filedelete(tempFileToAdjust);
 }
