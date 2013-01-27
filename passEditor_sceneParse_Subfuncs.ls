@@ -10,17 +10,15 @@ getPassEditorStartLine: inputPath
 
 	if(endLine == 0)
 	{
-		/* Changed to .linecount as .eof() only returns a bool value, if the purpose of this is to count the number of lines in the scene file Matt Gorner */
-		// endLine = input.eof();
 		endLine = input.linecount();
 	}
 	
-	/* Changed these variables because they were never getting initialised - Matt Gorner */
 	startLine = 1;
 	endLine = input.linecount();
 
 
 	currentLine = 1;
+	toReturn = nil;
 	input.line(startLine);
 
 	while (currentLine <= endLine) {
@@ -30,17 +28,16 @@ getPassEditorStartLine: inputPath
 		{
 			if(lineArray[2] == "MasterHandler" && lineArray[4] == "PassPort_MC")
 			{
-				currentLine = input.line() - 1;
-				return(currentLine);
+				toReturn = input.line() - 1;
+				break;
 			}
 		}
 		currentLine++;
 	}
 
 	input.close();
+	return(toReturn);
 }
-
-
 
 getObjectLines: startLine,endLine,objID,inputPath
 {
@@ -52,12 +49,11 @@ getObjectLines: startLine,endLine,objID,inputPath
 	}
 	if(endLine == 0)
 	{
-		/* Changed to .linecount as .eof() only returns a bool value, if the purpose of this is to count the number of lines in the scene file Matt Gorner */
-		// endLine = input.eof();
 		endLine = input.linecount();
 	}
 
 	currentLine = 1;
+	toReturn = nil;
 	input.line(startLine);
 
 	while(currentLine != endLine)
@@ -70,19 +66,18 @@ getObjectLines: startLine,endLine,objID,inputPath
 			{
 				if(lineArray[3] == string(objID) || lineArray[2] == string(objID))
 				{
-					currentLine = input.line() - 1;
-					return(currentLine);
+					toReturn = input.line() - 1;
+					break;
 				}
 			}
 		}
 	}
 	input.close();
+	return(toReturn);
 }
 
 getLightLines: startLine,endLine,objID,inputPath
 {
-	// Removed the a of ra, because the file is not being appended to in these functions, and it *seemed* to be causing a crash - Matt Gorner
-	// input = File(inputPath, "r");
 	input = File(inputPath, "r");
 
 	if(startLine == 0 || startLine == nil)
@@ -91,11 +86,10 @@ getLightLines: startLine,endLine,objID,inputPath
 	}
 	if(endLine == 0)
 	{
-		/* Changed to .linecount as .eof() only returns a bool value, if the purpose of this is to count the number of lines in the scene file Matt Gorner */
-		// endLine = input.eof();
 		endLine = input.linecount();
 	}
 	currentLine = 1;
+	toReturn = nil;
 	input.line(startLine);
 	while(currentLine != endLine)
 	{
@@ -105,18 +99,17 @@ getLightLines: startLine,endLine,objID,inputPath
 		{
 			if(lineArray[1] == "AddLight" && lineArray[2] == string(objID))
 			{
-				currentLine = input.line() - 1;
-				return(currentLine);
+				toReturn = input.line() - 1;
+				break;
 			}
 		}
 	}
 	input.close();
+	return(toReturn);
 }
 
-getObjectEndLine: startLine,endLine,objID,inputPath
+getCameraLines: startLine,endLine,objID,inputPath
 {
-	// Removed the a of ra, because the file is not being appended to in these functions, and it *seemed* to be causing a crash - Matt Gorner
-	// input = File(inputPath, "r");
 	input = File(inputPath, "r");
 
 	if(startLine == 0 || startLine == nil)
@@ -125,11 +118,42 @@ getObjectEndLine: startLine,endLine,objID,inputPath
 	}
 	if(endLine == 0)
 	{
-		/* Changed to .linecount as .eof() only returns a bool value, if the purpose of this is to count the number of lines in the scene file Matt Gorner */
-		// endLine = input.eof();
 		endLine = input.linecount();
 	}
 	currentLine = 1;
+	toReturn = nil;
+	input.line(startLine);
+	while(currentLine != endLine)
+	{
+		line = input.read();
+		lineArray = parse(" ",line);
+		if(size(lineArray) >= 2)
+		{
+			if(lineArray[1] == "AddCamera" && lineArray[2] == string(objID))
+			{
+				toReturn = input.line() - 1;
+				break;
+			}
+		}
+	}
+	input.close();
+	return(toReturn);
+}
+
+getObjectEndLine: startLine,endLine,objID,inputPath
+{
+	input = File(inputPath, "r");
+
+	if(startLine == 0 || startLine == nil)
+	{
+		startLine = 1;
+	}
+	if(endLine == 0)
+	{
+		endLine = input.linecount();
+	}
+	currentLine = 1;
+	toReturn = nil;
 	input.line(startLine);
 	while(currentLine != endLine)
 	{
@@ -139,26 +163,19 @@ getObjectEndLine: startLine,endLine,objID,inputPath
 		if(sizeof(currentLineArray[1]) >= 12)
 		{
 			currentLineString = strleft(line,12);
-			if(currentLineString == "LoadObjectLa" || currentLineString == "AddNullObjec")
+			if(currentLineString == "LoadObjectLa" || currentLineString == "AddNullObjec" || currentLineString == "AmbientColor")
 			{
-				return(currentLine);
-			}
-			else
-			{
-				if(currentLineString == "AmbientColor")
-				{
-					return(currentLine);
-				}
+				toReturn = currentLine;
+				break;
 			}
 		}
 	}
 	input.close();
+	return(toReturn);
 }
 
-getLightEndLine: startLine,endLine,objID,inputPath
+getCameraEndLine: startLine,endLine,objID,inputPath
 {
-	// Removed the a of ra, because the file is not being appended to in these functions, and it *seemed* to be causing a crash - Matt Gorner
-	// input = File(inputPath, "r");
 	input = File(inputPath, "r");
 
 	if(startLine == 0 || startLine == nil)
@@ -167,27 +184,64 @@ getLightEndLine: startLine,endLine,objID,inputPath
 	}
 	if(endLine == 0)
 	{
-		/* Changed to .linecount as .eof() only returns a bool value, if the purpose of this is to count the number of lines in the scene file Matt Gorner */
-		// endLine = input.eof();
 		endLine = input.linecount();
 	}
 	currentLine = 1;
+	toReturn = nil;
+	endMarkerString = "Plugin CameraHandler";
 	input.line(startLine);
 	while(currentLine != endLine)
 	{
 		line = input.read();
 		currentLine = input.line() - 1;
 		currentLineArray[1] = line;
-		if(sizeof(currentLineArray[1]) >= 8)
+		if(sizeof(currentLineArray[1]) >= size(endMarkerString))
 		{
-			currentLineString = strleft(line,8);
-			if(currentLineString == "AddLight" || currentLineString == "AddCamer")
+			currentLineString = strleft(line,size(endMarkerString));
+			if(currentLineString == endMarkerString)
 			{
-				return(currentLine);
+				toReturn = currentLine + 2; // offset to include the EndPlugin line, the whitespace afterwards and the subsequent line to match original code flow.
+				break;
 			}
 		}
 	}
 	input.close();
+	return(toReturn);
+}
+
+getLightEndLine: startLine,endLine,objID,inputPath
+{
+	input = File(inputPath, "r");
+
+	if(startLine == 0 || startLine == nil)
+	{
+		startLine = 1;
+	}
+	if(endLine == 0)
+	{
+		endLine = input.linecount();
+	}
+	currentLine = 1;
+	toReturn = nil;
+	endMarkerString = "Plugin LightHandler";
+	input.line(startLine);
+	while(currentLine != endLine)
+	{
+		line = input.read();
+		currentLine = input.line() - 1;
+		currentLineArray[1] = line;
+		if(sizeof(currentLineArray[1]) >= size(endMarkerString))
+		{
+			currentLineString = strleft(line,size(endMarkerString));
+			if(currentLineString == endMarkerString)
+			{
+				toReturn = currentLine + 2; // offset to include the EndPlugin line, the whitespace afterwards and the subsequent line to match original code flow.
+				break;
+			}
+		}
+	}
+	input.close();
+	return(toReturn);
 }
 
 getPartialLine: startLine, endLine, searchString, inputPath
@@ -205,6 +259,7 @@ getPartialLine: startLine, endLine, searchString, inputPath
 		endLine = input.linecount();
 	}
 	currentLine = 1;
+	toReturn = nil;
 	input.line(startLine);
 	while(currentLine != endLine)
 	{
@@ -237,7 +292,6 @@ getPartialLine: startLine, endLine, searchString, inputPath
 		}
 	}
 	input.close();
-	//info(toReturn);
 	return(toReturn);
 }
 

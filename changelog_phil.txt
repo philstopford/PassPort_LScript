@@ -1,3 +1,19 @@
+20130110
+========
+
+- Initial work on camera override implementation (type8).
+ - Highly experimental, minimal implementation.
+ - Cameras have to be assigned to passes, like other entities.
+- Scene parser code looks peculiar - reviewing.
+ - Need to investigate to see if it's still ~correct.
+ - It seemed to leave files hanging open, which is odd. Revised code to ensure input files are closed. Can revert if something breaks.
+ - Added functions for the camera handling.
+ - Adjusted end line function operation to be more generic.
+- Refined UI code for the renderer selection dialog for the scene master override (creation).
+- p0018 still lurking.
+- p0019 created
+- p0020 created.
+
 20130108
 ========
 
@@ -318,7 +334,8 @@ Brace yourself. Here's the big set of UI changes related to filtering the overri
 + In Progress +
 +++++++++++++++
 
-- Pending
+- Add Camera override, for camera settings.
+- Prototype w/ Kray support.
 
 ********
 * Bugs *
@@ -341,6 +358,8 @@ p0014 : Uncompiled version crashes out on Mac and fails to start-up roughly 70% 
 p0015 : Overrides with assigned items don't get bullet point until the lists are updated, or some major redraw occurs (also in original code)
 p0017 : Scene override fails during scene generation. Wrong line cited on OS X, but Win32 reports correct number. Invalid index to passName. Line 1744 of sceneGen code. (Fixed)
 p0018 : Light override causes no image to be saved. (In progress : The issue with this override is that placing VolumetricLighting in anything other than the correct location in the light setting's block causes the renderer to fail to save any image. Odd quirk in LW.)
+p0019 : Another prepareInputFiles() already called error for alternative object override.
+p0020 : Line 2162 and 2168 errors with light override.
 
 ###############
 # Limitations #
@@ -354,10 +373,8 @@ p0018 : Light override causes no image to be saved. (In progress : The issue wit
 
 - Lens flare toggle isn't working. (p0018)
 - SceneGen code could be optimised to walk the array and use loops to greatly simplify the code. (partially done with 20130101)
-- Add Camera override, for camera settings.
 - Autoscan plugin operation.
 - Need to check if growl interaction works with current growl versions.
-- Prototype w/ Kray support.
 
 -------------
 - Reference -
@@ -375,6 +392,7 @@ This tracks what is to be done. The 'type' of entity in the array is defined arb
 	case 5: "   (light properties)"
 	case 6: "   (scene properties)"
 	case 7: "   (light exclusion)"
+	case 8: "   (Camera)" - EXPERIMENTAL!!!
 
 B. How were override items handled originally?
 ----------------------------------------------

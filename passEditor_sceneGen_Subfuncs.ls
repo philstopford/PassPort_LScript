@@ -12,6 +12,9 @@ generatePassFile: mode, pass
     // initial stuff
     overriddenObjectID = nil;
     overriddenObjectName = nil;
+    lastObject = 0;
+    lastLight = 0;
+    lastCamera = 0;
     contentDirectory = getdir("Content");
     chdir(tempDirectory);
     SaveSceneCopy("passEditorTempSceneCopy.lws");
@@ -109,6 +112,9 @@ generatePassFile: mode, pass
                 srfInputTemp[passItem] = nil;
                 objPropOverrideSets[passItem] = nil;
                 objPropOverrideShadowOpts[passItem] = nil;
+                cameraSettingsPartOne[passItem] = nil;
+                cameraSettingsPartTwo[passItem] = nil;
+                cameraSettingsPartThree[passItem]= nil;
 
             }
 
@@ -124,6 +130,9 @@ generatePassFile: mode, pass
                 lightSettingsPartOne[passItem] = nil;
                 lightSettingsPartTwo[passItem] = nil;
                 lightSettingsPartThree[passItem] = nil;
+                cameraSettingsPartOne[passItem] = nil;
+                cameraSettingsPartTwo[passItem] = nil;
+                cameraSettingsPartThree[passItem]= nil;
 
             }   
 
@@ -139,6 +148,9 @@ generatePassFile: mode, pass
                 lightSettingsPartOne[passItem] = nil;
                 lightSettingsPartTwo[passItem] = nil;
                 lightSettingsPartThree[passItem] = nil;
+                cameraSettingsPartOne[passItem] = nil;
+                cameraSettingsPartTwo[passItem] = nil;
+                cameraSettingsPartThree[passItem]= nil;
             }   
 
             if(settingsArray[2] == "type3")
@@ -153,6 +165,9 @@ generatePassFile: mode, pass
                 lightSettingsPartOne[passItem] = nil;
                 lightSettingsPartTwo[passItem] = nil;
                 lightSettingsPartThree[passItem] = nil;
+                cameraSettingsPartOne[passItem] = nil;
+                cameraSettingsPartTwo[passItem] = nil;
+                cameraSettingsPartThree[passItem]= nil;
             }   
             if(settingsArray[2] == "type2")
             {
@@ -288,6 +303,9 @@ generatePassFile: mode, pass
                 lightSettingsPartOne[passItem] = nil;
                 lightSettingsPartTwo[passItem] = nil;
                 lightSettingsPartThree[passItem] = nil;
+                cameraSettingsPartOne[passItem] = nil;
+                cameraSettingsPartTwo[passItem] = nil;
+                cameraSettingsPartThree[passItem]= nil;
             }
             if(settingsArray[2] == "type7")
             {
@@ -363,7 +381,83 @@ generatePassFile: mode, pass
                 lightSettingsPartOne[passItem] = nil;
                 lightSettingsPartTwo[passItem] = nil;
                 lightSettingsPartThree[passItem] = nil;
+                cameraSettingsPartOne[passItem] = nil;
+                cameraSettingsPartTwo[passItem] = nil;
+                cameraSettingsPartThree[passItem]= nil;
             }
+
+            if(settingsArray[2] == "type8") // EXPERIMENTAL Camera override
+            {
+                zoomFactor 						= string(settingsArray[3]);
+                cameraSettingsPartOne[passItem] =	"ZoomFactor " + zoomFactor + "\n";
+				zoomType 						= string(settingsArray[4]);
+                cameraSettingsPartOne[passItem] +=	"ZoomType " + zoomType) + "\n";
+				resolutionMultiplier 			= string(settingsArray[5]);
+                cameraSettingsPartOne[passItem] +=	"ResolutionMultiplier " + resolutionMultiplier + "\n";
+				frameSizeH 						= string(settingsArray[6]);
+				frameSizeV 						= string(settingsArray[7]);
+                cameraSettingsPartOne[passItem] +=	"FrameSize " + frameSizeH + " " + frameSizeV + "\n";
+				pixelAspect 					= string(settingsArray[8]);
+                cameraSettingsPartOne[passItem] +=	"PixelAspect " + pixelAspect + "\n";
+				motionBlur 						= string(settingsArray[9]);
+                cameraSettingsPartOne[passItem] +=	"MotionBlur " + motionBlur + "\n";
+				motionBlurPasses 				= string(settingsArray[10]);
+                cameraSettingsPartOne[passItem] +=	"MotionBlurPasses " + motionBlurPasses + "\n";
+				shutterEfficiency 				= string(settingsArray[11]);
+                cameraSettingsPartOne[passItem] +=	"ShutterEfficiency " + shutterEfficiency + "\n";
+				rollingShutter 					= string(settingsArray[12]);
+                cameraSettingsPartOne[passItem] +=	"RollingShutter " + rollingShutter + "\n";
+				shutterOpen 					= string(settingsArray[13]);
+                cameraSettingsPartOne[passItem] +=	"ShutterOpen " + shutterOpen + "\n";
+				oversampling 					= string(settingsArray[14]);
+                cameraSettingsPartOne[passItem] +=	"Oversampling " + oversampling + "\n";
+				// UndockPreview 0
+				fieldRendering 					= string(settingsArray[15]);
+                cameraSettingsPartTwo[passItem] +=	"FieldRendering " + fieldRendering + "\n";
+				apertureHeight 					= string(settingsArray[16]);
+                cameraSettingsPartTwo[passItem] +=	"ApertureHeight " + apertureHeight + "\n";
+				eyeSeparation 					= string(settingsArray[17]);
+                cameraSettingsPartTwo[passItem] +=	"EyeSeparation " + eyeSeparation + "\n";
+				convergencePoint 				= string(settingsArray[18]);
+                cameraSettingsPartTwo[passItem] +=	"ConvergencePoint " + convergencePoint + "\n";
+				useConvergence 					= string(settingsArray[19]);
+                cameraSettingsPartTwo[passItem] +=	"UseConvergence " + useConvergence + "\n";
+				// AnaglyphOpenGL 1
+				convergenceToeIn 					= string(settingsArray[20]);
+                cameraSettingsPartThree[passItem] 	+=	"ConvergenceToeIn " + convergenceToeIn + "\n";
+				depthOfField 						= string(settingsArray[21]);
+                cameraSettingsPartThree[passItem] 	+=	"DepthOfField " + depthOfField + "\n";
+				focalDistance 						= string(settingsArray[22]);
+                cameraSettingsPartThree[passItem] 	+=	"FocalDistance " + focalDistance + "\n";
+				lensFStop 							= string(settingsArray[23]);
+                cameraSettingsPartThree[passItem] 	+=	"LensFStop " + lensFStop + "\n";
+				diaphragmSides 						= string(settingsArray[24]);
+                cameraSettingsPartThree[passItem] 	+=	"DiaphragmSides " + diaphragmSides + "\n";
+				diaphragmRotation 					= string(settingsArray[25]);
+                cameraSettingsPartThree[passItem] 	+=	"DiaphragmRotation " + diaphragmRotation + "\n";
+				aASamples 							= string(settingsArray[26]);
+                cameraSettingsPartThree[passItem] 	+=	"AASamples " + aASamples + "\n";
+				sampler 							= string(settingsArray[27]);
+                cameraSettingsPartThree[passItem] 	+=	"Sampler " + sampler + "\n";
+				adaptiveThreshold 					= string(settingsArray[28]);
+                cameraSettingsPartThree[passItem] 	+=	"AdaptiveThreshold " + adaptiveThreshold + "\n";
+				minimumSamples 						= string(settingsArray[29]);
+                cameraSettingsPartThree[passItem] 	+=	"MinimumSamples " + minimumSamples + "\n";
+				maximumSamples 						= string(settingsArray[30]);
+                cameraSettingsPartThree[passItem] 	+=	"MaximumSamples " + maximumSamples + "\n";
+
+                overrideType[passItem] = 8;
+                motInputTemp[passItem] = nil;
+                lwoInputTemp[passItem] = nil;
+                srfLWOInputID[passItem] = nil;
+                srfInputTemp[passItem] = nil;
+                objPropOverrideSets[passItem] = nil;
+                objPropOverrideShadowOpts[passItem] = nil;
+                lightSettingsPartOne[passItem] = nil;
+                lightSettingsPartTwo[passItem] = nil;
+                lightSettingsPartThree[passItem] = nil;
+            }
+
             if(assignmentsArray != nil && size(assignmentsArray) > 1)
             {
                 if(secondSettingsArray[2] == "type7")
@@ -461,7 +555,7 @@ generatePassFile: mode, pass
             overrideType[passItem] = 0;
         }
         
-        if(strleft(string(displayOldIDs[tempNumber]),1) == "1")
+        if(strleft(string(displayOldIDs[tempNumber]),1) == string(MESH)) // matches genus tag
         {
             objStart[passItem] = getObjectLines(passEditorEndLine + 1,0,displayOldIDs[tempNumber],currentScenePath);
             objStartTemp = number(objStart[passItem]);
@@ -477,7 +571,7 @@ generatePassFile: mode, pass
         }
 
         // then the light lines
-        if(strleft(string(displayOldIDs[tempNumber]),1) == "2")
+        if(strleft(string(displayOldIDs[tempNumber]),1) == string(LIGHT)) // matches genus tag
         {
             objStart[passItem] = getLightLines(passEditorEndLine + 1,0,displayOldIDs[tempNumber],currentScenePath);
             objStartTemp = number(objStart[passItem]);
@@ -501,7 +595,25 @@ generatePassFile: mode, pass
             objLightTypeLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"LightType ",currentScenePath);
             objLensFlareLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"LensFlare ",currentScenePath);
             objVolLightLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"VolumetricLighting ",currentScenePath);
+            lastLight++;
         }
+		
+        // then the camera lines
+        if(strleft(string(displayOldIDs[tempNumber]),1) == string(CAMERA)) // matches genus tag
+        {
+            objStart[passItem] = getCameraLines(passEditorEndLine + 1,0,displayOldIDs[tempNumber],currentScenePath);
+            objStartTemp = number(objStart[passItem]);
+            objStartPlusOne = objStartTemp + 1;
+            objEnd[passItem] = getCameraEndLine(objStartPlusOne,0,displayOldIDs[tempNumber],currentScenePath);
+            objMotStart[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"NumChannels",currentScenePath);
+            objMotEnd[passItem] = objMotStart[passItem];
+            for(b = 1; b <= 9; b++)
+            {
+                objMotEnd[passItem] = getPartialLine((objMotEnd[passItem] + 1),objEnd[passItem],"}",currentScenePath);
+            }
+            lastCamera++;
+		}
+
 	}
 
     // then the ambient color line
@@ -1029,6 +1141,9 @@ generatePassFile: mode, pass
                         }                   
                         outputFile.writeln("");
                         break;
+						
+					case 8: // EXPERIMENTAL Camera override
+						break;
                         
                     default:
                         inputFile.line(objStart[objectCounter]);
@@ -1090,7 +1205,7 @@ generatePassFile: mode, pass
     }
     
     // write out the lights
-    for(lightCounter = lastObject + 1; lightCounter <= size(objStart); lightCounter++)
+    for(lightCounter = lastObject + 1; lightCounter <= lastObject + lastLight; lightCounter++)
     {
         progressString = string(((lightCounter/size(objStart))/4) + 0.74);
         msgString = "{" + progressString + "}Generating Render Scene:  Writing Lights...";
@@ -1141,10 +1256,8 @@ generatePassFile: mode, pass
 								changeScnLine(lightSettingsPartTwo[lightCounter], fileToAdjust, objLensFlareLine[lightCounter]);
                                 inputFile.line(objLensFlareLine[lightCounter]);
                                 line = inputFile.read();
-//                                outputFile.writeln(line);
                             }
                         }
-//                        outputFile.write(lightSettingsPartTwo[lightCounter]);
 
                         // write out the volumetric line
                         if(objVolLightLine != nil)
@@ -1154,10 +1267,8 @@ generatePassFile: mode, pass
 								changeScnLine(lightSettingsPartThree[lightCounter], fileToAdjust, objVolLightLine[lightCounter]);
                                 inputFile.line(objVolLightLine[lightCounter]);
                                 line = inputFile.read();
-//                                outputFile.writeln(line);
                             }
                         }
-//                        outputFile.write(lightSettingsPartThree[lightCounter]);
                         
                         // write out the rest of the light
                         inputFile.line(objLightTypeLine[lightCounter]);
@@ -1281,7 +1392,94 @@ generatePassFile: mode, pass
             }
         }
     }
-    
+
+    // write out the cameras
+    for(cameraCounter = lastObject + lastLight + 1; lightCounter <= lastObject + lastLight + lastCamera; cameraCounter++)
+    {
+        if(doOverride[cameraCounter] == 1)
+        {
+            switch(overrideType[cameraCounter])
+            {
+                case 3:
+                    // begin case 3 here, which is the motion override type
+                    if(motInputTemp[cameraCounter] != nil)
+                    {
+                        inputFile.line(objStart[cameraCounter]);
+                        done = nil;
+                        while(!done)
+                        {
+                            line = inputFile.read();
+                            outputFile.writeln(line);
+                            if(inputFile.line() == (objMotStart[cameraCounter]))
+                            {
+                                done = true;
+                                break;
+                            }
+                        }
+                        motInputTemp[cameraCounter].line(4);
+                        while(!motInputTemp[cameraCounter].eof())
+                        {
+                            line = motInputTemp[cameraCounter].read();
+                            outputFile.writeln(line);
+                        }
+                        inputFile.line(objMotEnd[cameraCounter] + 1);
+                        done = nil;
+                        while(!done)
+                        {
+                            line = inputFile.read();
+                            outputFile.writeln(line);
+                            if(inputFile.line() == (objEnd[cameraCounter] - 2))
+                            {
+                                done = true;
+                                break;
+                            }
+                        }
+                        motInputTemp[cameraCounter].close();
+                        inputFile.line(objEnd[cameraCounter] - 2);
+                        line = inputFile.read();
+                        outputFile.writeln(line);
+                        outputFile.writeln("");
+                    }
+                    else
+                    {
+                        inputFile.line(objStart[cameraCounter]);
+                        done = nil;
+                        while(!done)
+                        {
+                            line = inputFile.read();
+                            outputFile.writeln(line);
+                            if(inputFile.line() == (objEnd[cameraCounter]))
+                            {
+                                done = true;
+                                break;
+                            }
+                        }
+                    }
+                    // end case 3 here, which is the motion override type
+                    break;
+
+                case 8:
+                	break;
+
+                default:
+                    inputFile.line(objStart[cameraCounter]);
+                    done = nil;
+                    while(!done)
+                    {
+                        line = inputFile.read();
+                        outputFile.writeln(line);
+                        if(inputFile.line() == (objEnd[cameraCounter]))
+                        {
+                            done = true;
+                            break;
+                        }
+                    }
+                    break;
+			}
+		}
+	}
+	
+	    
     if(hvDataLine == nil || includedHvObjects == nil)
     {
         if(hvDataLine != nil)

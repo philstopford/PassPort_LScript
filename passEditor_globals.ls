@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130108";
+var versionString = "20130110";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -41,7 +41,7 @@ var passNames;
 var overrideNames;
 var fileMenu_items;
 var passMenu_items = @"Full Scene Pass","Empty Pass","Pass From Layout Selection","Duplicate Selected Pass"@;
-var overrideMenu_items = @"Object Properties","Alternative Object...","Motion File...","Surface File...","Light Properties","Scene Master","==","Light Exclusions","Duplicate Selected Override"@;
+var overrideMenu_items = @"Object Properties","Alternative Object...","Motion File...","Surface File...","Light Properties","Scene Master","Camera Override","==","Light Exclusions","Duplicate Selected Override"@;
 var gad_PassesListview;
 var gad_OverridesListview;
 var gad_SceneItems_forPasses_Listview;
@@ -132,3 +132,6 @@ var usegrowl;
 var renderers = @"Native","Kray 2.5(ALPHA)"@;
 var overrideRenderer = 1; // default, native.
 var settingsArray;
+
+// EXPERIMENTAL features, enable
+var enableExperimental = 1;

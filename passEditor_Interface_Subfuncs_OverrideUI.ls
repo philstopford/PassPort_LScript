@@ -1,3 +1,115 @@
+cameraOverride_UI: action
+{
+	if(enableExperimental)
+	{
+		// sel only used in edit action.
+		// action should be either 'new' or 'edit'
+		if (action == "new" || action == "edit")
+		{
+			doUpdate;
+			if(action == "edit")
+			{
+				sel = getvalue(gad_OverridesListview).asInt();
+				settingsArray = parseOverrideSettings(overrideSettings[sel]);
+                zoomFactor 						= number(settingsArray[3]);
+				zoomType 						= integer(settingsArray[4]);
+				resolutionMultiplier 			= number(settingsArray[5]);
+				frameSizeH 						= integer(settingsArray[6]);
+				frameSizeV 						= integer(settingsArray[7]);
+				pixelAspect 					= integer(settingsArray[8]);
+				motionBlur 						= integer(settingsArray[9]);
+				motionBlurPasses 				= integer(settingsArray[10]);
+				shutterEfficiency 				= integer(settingsArray[11]);
+				rollingShutter 					= integer(settingsArray[12]);
+				shutterOpen 					= integer(settingsArray[13]);
+				oversampling 					= integer(settingsArray[14]);
+				fieldRendering 					= integer(settingsArray[15]);
+				apertureHeight 					= number(settingsArray[16]);
+				eyeSeparation 					= number(settingsArray[17]);
+				convergencePoint 				= integer(settingsArray[18]);
+				useConvergence 					= integer(settingsArray[19]);
+				convergenceToeIn 				= integer(settingsArray[20]);
+				depthOfField 					= integer(settingsArray[21]);
+				focalDistance 					= integer(settingsArray[22]);
+				lensFStop 						= integer(settingsArray[23]);
+				diaphragmSides 					= integer(settingsArray[24]);
+				diaphragmRotation 				= integer(settingsArray[25]);
+				aASamples 						= integer(settingsArray[26]);
+				sampler 						= integer(settingsArray[27]);
+				adaptiveThreshold 				= number(settingsArray[28]);
+				minimumSamples 					= integer(settingsArray[29]);
+				maximumSamples 					= integer(settingsArray[30]);
+			}
+			
+			doKeys = 0;
+	
+			reqbeginstr = "New Camera Override";
+			if(action == "edit")
+			{
+				reqbeginstr = "Edit Camera Override";
+			}
+			reqbegin(reqbeginstr);
+			
+			newName = "CameraOverride";
+			if(action == "edit")
+			{
+				newName = settingsArray[1];
+			}
+			if(reqpost())
+			{
+				newName = getvalue(c20);
+				newName = makeStringGood(newName);
+				doUpdate = 1;
+			}
+			else
+			{
+				doUpdate = 0;
+			}
+			reqend();
+			
+			if(doUpdate == 1)
+			{
+				newNumber = sel;
+				if(action == "new")
+				{
+					pass = currentChosenPass;
+					if(overrideNames[1] != "empty")
+					{
+						newNumber = size(overrideNames) + 1;
+					}
+					else
+					{
+						newNumber = 1;
+					}
+					passOverrideItems[pass][newNumber] = "";
+					for(y = 1; y <= size(passNames); y++)
+					{
+						passOverrideItems[y][newNumber] = "";
+					}
+				}
+				overrideNames[newNumber] = newName + "   (camera)";
+				overrideSettings[newNumber] = 	newName 				+ "||" + 	"type8" 			+ "||"
+											+ 	zoomFactor				+ "||" + 	zoomType 			+ "||"
+											+ 	resolutionMultiplier	+ "||" + 	frameSizeH 			+ "||"
+											+ 	frameSizeV				+ "||" + 	pixelAspect			+ "||"
+											+ 	motionBlur				+ "||" + 	motionBlurPasses	+ "||"
+											+ 	shutterEfficiency		+ "||" + 	rollingShutter		+ "||"
+											+ 	shutterOpen				+ "||" + 	oversampling		+ "||"
+											+ 	fieldRendering			+ "||" + 	apertureHeight		+ "||"
+											+ 	eyeSeparation			+ "||" + 	convergencePoint	+ "||"
+											+ 	useConvergence			+ "||" + 	convergenceToeIn	+ "||"
+											+ 	depthOfField			+ "||" + 	focalDistance		+ "||"
+											+ 	lensFStop				+ "||" + 	diaphragmSides		+ "||"
+											+ 	diaphragmRotation		+ "||" + 	aASamples			+ "||"
+											+ 	sampler					+ "||" + 	adaptiveThreshold	+ "||"
+											+ 	minimumSamples			+ "||" + 	maximumSamples;
+			}
+		} else {
+			error("cameraOverride_UI: incorrect, or no, action passed");
+		}
+	}
+}
+
 srfOverride_UI: action
 {
 	// sel only used in edit action.

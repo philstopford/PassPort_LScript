@@ -1,7 +1,3 @@
-// listbox functions (or UDFs, as we call them in the industry)
-
-// Passes and overrides via insert in master file.
-
 parseOverrideSettings: overrideSettingsString
 {
     settingsArray = parse("||",overrideSettingsString);
@@ -169,21 +165,28 @@ addSelButton
                 previousPassAssItems[newNumber] = passAssItems[newNumber];
                 switch(s[x].genus)
                 {
-                    case 1:
+                    case MESH: // was 1 - trying to avoid hard-coding.
                         tempMeshAgents[x] = Mesh(itemname);
                         tempMeshNames[x] = tempMeshAgents[x].name;
                         tempMeshIDs[x] = tempMeshAgents[x].id;
                         passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempMeshIDs[x];
                         break;
                     
-                    case 2:
+                    case LIGHT: // was 2 - trying to avoid hard-coding.
                         tempLightAgents[x] = Light(itemname);
                         tempLightNames[x] = tempLightAgents[x].name;
                         tempLightIDs[x] = tempLightAgents[x].id;
                         passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempLightIDs[x];
                         break;
                         
-                    default:
+                    case CAMERA: // was 2 - trying to avoid hard-coding.
+                        tempCameraAgents[x] = Camera(itemname);
+                        tempCameraNames[x] = tempCameraAgents[x].name;
+                        tempCameraIDs[x] = tempCameraAgents[x].id;
+                        passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempCameraIDs[x];
+                        break;
+
+					default:
                         break;
                 }
             }
@@ -219,14 +222,14 @@ o_addSelButton
             {
                 itemname = s[x].name;
                 previousPassOverrideItems[pass][sel] = passOverrideItems[pass][sel];
-                if((s[x].genus == 1) && (o_tempSettingsArray[2] == "type1" || o_tempSettingsArray[2] == "type2"  || o_tempSettingsArray[2] == "type3"  || o_tempSettingsArray[2] == "type4" || o_tempSettingsArray[2] == "type7"))
+                if((s[x].genus == MESH) && (o_tempSettingsArray[2] == "type1" || o_tempSettingsArray[2] == "type2"  || o_tempSettingsArray[2] == "type3"  || o_tempSettingsArray[2] == "type4" || o_tempSettingsArray[2] == "type7"))
                 {
                     tempMeshAgents[x] = Mesh(itemname);
                     tempMeshNames[x] = tempMeshAgents[x].name;
                     tempMeshIDs[x] = tempMeshAgents[x].id;
                     passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempMeshIDs[x];
                 }
-                if ((s[x].genus == 2) && (o_tempSettingsArray[2] == "type3" || o_tempSettingsArray[2] == "type5"))
+                if ((s[x].genus == LIGHT) && (o_tempSettingsArray[2] == "type3" || o_tempSettingsArray[2] == "type5"))
                 {
                     tempLightAgents[x] = Light(itemname);
                     tempLightNames[x] = tempLightAgents[x].name;
@@ -237,6 +240,14 @@ o_addSelButton
                 {
                      // since working from Layout select, no ability to assign scene master.
                 }
+                if ((s[x].genus == CAMERA) && (o_tempSettingsArray[2] == "type3" || o_tempSettingsArray[2] == "type8"))
+                {
+					// Camera override - prototype code.
+                    tempCameraAgents[x] = Camera(itemname);
+                    tempCameraNames[x] = tempCameraAgents[x].name;
+                    tempCameraIDs[x] = tempCameraAgents[x].id;
+                    passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempCameraIDs[x];
+				}
             }
             // Apply highlight to items assigned to override
             setvalue(gad_SceneItems_forOverrides_Listview,o_parseListItems(passOverrideItems[pass][sel]));
@@ -272,7 +283,7 @@ clearSelButton
                 previousPassAssItems[newNumber] = passAssItems[newNumber];
                 switch(s[x].genus)
                 {
-                    case 1:
+                    case MESH:
                         tempMeshAgents[x] = Mesh(itemname);
                         tempMeshNames[x] = tempMeshAgents[x].name;
                         removeMeIDs[x] = tempMeshAgents[x].id;
@@ -287,10 +298,25 @@ clearSelButton
                         }
                         break;
                     
-                    case 2:
+                    case LIGHT:
                         tempLightAgents[x] = Light(itemname);
                         tempLightNames[x] = tempLightAgents[x].name;
                         removeMeIDs[x] = tempLightAgents[x].id;
+                        tempParse = parse("||",passAssItems[newNumber]);
+                        passAssItems[newNumber] = "";
+                        for(y = 1; y <= size(tempParse); y++)
+                        {
+                            if(tempParse[y] != removeMeIDs[x])
+                            {
+                                passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempParse[y];
+                            }
+                        }
+                        break;
+
+                    case CAMERA:
+                        tempCameraAgents[x] = Camera(itemname);
+                        tempCameraNames[x] = tempCameraAgents[x].name;
+                        removeMeIDs[x] = tempCameraAgents[x].id;
                         tempParse = parse("||",passAssItems[newNumber]);
                         passAssItems[newNumber] = "";
                         for(y = 1; y <= size(tempParse); y++)
@@ -342,7 +368,7 @@ o_clearSelButton
                 previousPassOverrideItems[pass][sel] = passOverrideItems[pass][sel];
                 switch(s[x].genus)
                 {
-                    case 1:
+                    case MESH:
                         tempMeshAgents[x] = Mesh(itemname);
                         tempMeshNames[x] = tempMeshAgents[x].name;
                         removeMeIDs[x] = tempMeshAgents[x].id;
@@ -357,10 +383,25 @@ o_clearSelButton
                         }
                         break;
                     
-                    case 2:
+                    case LIGHT:
                         tempLightAgents[x] = Light(itemname);
                         tempLightNames[x] = tempLightAgents[x].name;
                         removeMeIDs[x] = tempLightAgents[x].id;
+                        tempParse = parse("||",passOverrideItems[pass][sel]);
+                        passOverrideItems[pass][sel] = "";
+                        for(y = 1; y <= size(tempParse); y++)
+                        {
+                            if(tempParse[y] != removeMeIDs[x])
+                            {
+                                passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempParse[y];
+                            }
+                        }
+                        break;
+
+                    case CAMERA:
+                        tempCameraAgents[x] = Camera(itemname);
+                        tempCameraNames[x] = tempCameraAgents[x].name;
+                        removeMeIDs[x] = tempCameraAgents[x].id;
                         tempParse = parse("||",passOverrideItems[pass][sel]);
                         passOverrideItems[pass][sel] = "";
                         for(y = 1; y <= size(tempParse); y++)
@@ -873,10 +914,6 @@ passMenu_select: passMenu_item
     {
         reProcess();
         createNewFullScenePass();
-        //setvalue(gad_SelectedPass,nil);
-        //setvalue(gad_SelectedPass,"Current Pass",passNames,"currentPassMenu_select");
-
-        //reProcess();
         req_update();
     }
    
@@ -884,27 +921,17 @@ passMenu_select: passMenu_item
     {
         justReopened = 1;
         createNewEmptyPass();
-        //setvalue(gad_SelectedPass,nil);
-        //setvalue(gad_SelectedPass,"Current Pass",passNames,"currentPassMenu_select");
-        //reProcess();
         req_update();
     }
     if(passMenu_item == 3)
     {
         reProcess();
         createNewPassFromLayoutSelection();
-        //setvalue(gad_SelectedPass,nil);
-        //setvalue(gad_SelectedPass,"Current Pass",passNames,"currentPassMenu_select");
-        //reProcess();
         req_update();
     }
     if(passMenu_item == 4)
     {
-        //reProcess();
         duplicateSelectedPass();
-        //setvalue(gad_SelectedPass,nil);
-        //setvalue(gad_SelectedPass,"Current Pass",passNames,"currentPassMenu_select");
-        //reProcess();
         req_update();
     }
     
@@ -916,7 +943,6 @@ currentPassMenu_refresh: value
     currentChosenPassString = passNames[currentChosenPass];
     setvalue(gad_OverridesListview,nil);
     setvalue(gad_SceneItems_forOverrides_Listview,nil);
-    //setvalue(gad_SelectedPass,currentChosenPass);
     reProcess();
     req_update();
 }
@@ -949,50 +975,42 @@ overrideMenu_select: overrideMenu_item
     {
         case 1:
             createObjPropOverride();
-            //reProcess();
             req_update();
             break;
         case 2:
             createAltObjOverride();
-            //reProcess();
             req_update();
             break;
         case 3:
             createMotOverride();
-            //reProcess();
             req_update();
             break;
         case 4:
             createSrfOverride();
-            //reProcess();
             req_update();
             break;
-            
         case 5:
             createLgtPropOverride();
-            //reProcess();
             req_update();
             break;
-            
         case 6:
             createSceneMasterOverride();
-            //reProcess();
             req_update();
             break;
-            
-        case 8:
-            createLightExclusionOverride();
-            //reProcess();
+        case 7:
+            createCameraOverride();
             req_update();
             break;
-            
         case 9:
+            createLightExclusionOverride();
+            req_update();
+            break;
+        case 10:
             duplicateSelectedOverride();
             req_update();
             break;
             
         default:
-            //reProcess();
             req_update();
             break;
     }
@@ -1036,9 +1054,6 @@ reqkeyboard: key
             {
 
                 duplicateSelectedPass();
-                //setvalue(gad_SelectedPass,nil);
-                //setvalue(gad_SelectedPass,"Current Pass",passNames,"currentPassMenu_select");
-                //reProcess();
                 req_update();
             }
             else if(overrideSel > 0)
@@ -1151,9 +1166,6 @@ reqkeyboard: key
             {
                 
                 duplicateSelectedPass();
-                //setvalue(gad_SelectedPass,nil);
-                //setvalue(gad_SelectedPass,"Current Pass",passNames,"currentPassMenu_select");
-                //reProcess();
                 req_update();
             }
             else if(overrideSel > 0)

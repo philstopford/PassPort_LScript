@@ -165,17 +165,24 @@ createNewPassFromLayoutSelection
 				//previousPassAssItems[newNumber] = passAssItems[newNumber];
 				switch(s[x].genus)
 				{
-					case 1:
+					case MESH:
 						tempMeshAgents[x] = Mesh(itemname);
 						tempMeshNames[x] = tempMeshAgents[x].name;
 						tempMeshIDs[x] = tempMeshAgents[x].id;
 						passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempMeshIDs[x];
 						break;
 					
-					case 2:
+					case LIGHT:
 						tempLightAgents[x] = Light(itemname);
 						tempLightNames[x] = tempLightAgents[x].name;
 						tempLightIDs[x] = tempLightAgents[x].id;
+						passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempLightIDs[x];
+						break;
+
+					case CAMERA:
+						tempCameraAgents[x] = Camera(itemname);
+						tempCameraNames[x] = tempCameraAgents[x].name;
+						tempCameraIDs[x] = tempCameraAgents[x].id;
 						passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempLightIDs[x];
 						break;
 						
@@ -183,23 +190,16 @@ createNewPassFromLayoutSelection
 						break;
 				}
 			}
-			
-			//setitems = parseListItems(passAssItems[newNumber]);
-			//setvalue(gad_SceneItems_forPasses_Listview,setitems);
-			
-					
+								
 			SelectItem(s[1].id);
 			for(x = 1; x <= size(s); x++)
 			{
 				AddToSelection(s[x].id);
 			}
-			
     	}
 		
 		setitems = parseListItems(passAssItems[newNumber]);
-		setvalue(gad_SceneItems_forPasses_Listview,setitems);
-		
-
+		setvalue(gad_SceneItems_forPasses_Listview,setitems);		
 }
 
 duplicateSelectedPass
@@ -273,7 +273,10 @@ duplicateSelectedOverride
 		    	case 7:
 		    		overrideNames[newNumber] = newName + "   (light exclusion)";
 		    		break;
-		    		
+		    	
+		    	case 8:
+		    		overrideNames[newNumber] = newName + "   (camera)";
+		    		break;
 		    		
 		    	default:
 		    		break;
@@ -329,11 +332,16 @@ editSelectedOverride
 					reProcess();
 					req_update();
 					break;
-
 					
 				case 6:
 					renderer = settingsArray[3];
 					scnmasterOverride_UI(renderer, "edit");
+					reProcess();
+					req_update();
+					break;
+
+				case 8:
+					cameraexclOverride_UI("edit");
 					reProcess();
 					req_update();
 					break;
@@ -407,21 +415,31 @@ createAltObjOverride
 	req_update();
 }
 
+createCameraOverride
+{
+	cameraOverride_UI("new");
+	reProcess();
+	req_update();
+}
+
+
 createSceneMasterOverride
 {
 	if(renderers.count() >= 2)
 	{
 		reqbeginstr = "Choose Renderer";
 		reqbegin(reqbeginstr);
-		reqsize(200, 200);
-		renderermenu = ctlpopup("Supported Renderers",1,renderers);
-		ctlposition(renderermenu, 25, (200 - ScnMst_gad_h) / 2, 150, ScnMst_gad_h, ScnMst_gad_text_offset);
+		smoWidth = 300;
+		smoHeight = 60;
+		reqsize(smoWidth, smoHeight);
+		renderermenu = ctlpopup("Renderer",1,renderers);
+		ctlposition(renderermenu, 25, 5, (smoWidth - (2 * 25)), ScnMst_gad_h, ScnMst_gad_text_offset);
 				
 		if(reqpost())
 		{
 			scnmasterOverride_UI(int(getvalue(renderermenu)), "new");
 		} else {
-			scnmasterOverride_UI(1, "new"); // native
+			// User cancelled out, so we do nothing.
 		}
 		reqend();
 	} else {
@@ -1101,9 +1119,7 @@ loadPassesSettings
 			editorResolution = io.read().asInt();
 			io.close();
 			
-			//panelWidth = 640;
 			panelWidth = integer(globalrecall("passEditorpanelWidth", 640));
-			//panelHeight = 540;
 			panelHeight = integer(globalrecall("passEditorpanelHeight", 540));
 			
 			reProcess();
