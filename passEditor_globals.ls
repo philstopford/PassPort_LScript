@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130102";
+var versionString = "20130104";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -110,12 +110,15 @@ var bottomPosition;
 var loadingInProgress;
 var justReopened;
 var beingEscaped;
+var pass;
 
 // motion mixer
 var overriddenObjectID;
 var overriddenObjectName;
 
 // file variables.
+var newScenePath;
+var currentScenePath;
 var newScenePath;
 var inputFileName;
 var filesPrepared = 0;

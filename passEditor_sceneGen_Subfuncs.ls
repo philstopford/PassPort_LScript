@@ -610,7 +610,6 @@ generatePassFile: mode, pass
         {
             if(chdir("temp"))
             {
-				info(pass.asStr());
                 if(chdir("tempScenes"))
                 {
                     newScenePath = outputFolder[1] + getsep() + "CG" + getsep() + "temp" + getsep() + "tempScenes" + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + ".lws";
@@ -692,7 +691,6 @@ generatePassFile: mode, pass
             msgString = "{" + progressString + "}Generating Render Scene:  Writing Objects...";
             StatusMsg(msgString);
             sleep(1);
-            
             
             if(doOverride[x] == 1)
             {
@@ -805,8 +803,6 @@ generatePassFile: mode, pass
                         }
                         // end case 1 here, which is the surface type
                         break;
-                    
-                    
                     
                     case 2:
                         // begin case 2 here, which is the object properties override type
@@ -1462,11 +1458,8 @@ generatePassFile: mode, pass
     inputFile.close();
     outputFile.close();
 
-    // new stuff to go back and overwrite the scene settings
-	
-	// since the currentScenePath is a temporary file, let's push back the changes to it for the next iteration of write activity.
-	// FIXME: Might be better to use a temporary file, but this works for now
-	filecopy(newScenePath, currentScenePath);
+    updatedCurrentScenePath = tempDirectory + getsep() + "passEditorTempSceneUpdated.lws";
+	filecopy(newScenePath, updatedCurrentScenePath);
 	
     // newScenePath
     if(overrideNames[1] != "empty")
@@ -1524,27 +1517,27 @@ generatePassFile: mode, pass
                     break;
             }
             
-			writeOverrideString(currentScenePath, newScenePath, "FrameSize ", resMult);
+			writeOverrideString(updatedCurrentScenePath, newScenePath, "FrameSize ", resMult);
 
-			writeOverrideString(currentScenePath, newScenePath, "GlobalFrameSize ", resMult);
+			writeOverrideString(updatedCurrentScenePath, newScenePath, "GlobalFrameSize ", resMult);
 						
 			renderModeSetts = integer(settingsArray[4]);
-			writeOverrideString(currentScenePath, newScenePath, "RenderMode ", renderModeSetts);
+			writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderMode ", renderModeSetts);
 
 			renderModeSetts = integer(settingsArray[4]);
-			writeOverrideString(currentScenePath, newScenePath, "RenderMode ", renderModeSetts);
+			writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderMode ", renderModeSetts);
             
 			depthBufferAASetts = integer(settingsArray[5]);
-			writeOverrideString(currentScenePath, newScenePath, "DepthBufferAA ", depthBufferAASetts);
+			writeOverrideString(updatedCurrentScenePath, newScenePath, "DepthBufferAA ", depthBufferAASetts);
             
 			renderLinesSetts = integer(settingsArray[6]);
-			writeOverrideString(currentScenePath, newScenePath, "RenderLines ", renderLinesSetts);
+			writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderLines ", renderLinesSetts);
 
 			rayRecursionLimitSetts = integer(settingsArray[7]);
-			writeOverrideString(currentScenePath, newScenePath, "RayRecursionLimit ", rayRecursionLimitSetts);
+			writeOverrideString(updatedCurrentScenePath, newScenePath, "RayRecursionLimit ", rayRecursionLimitSetts);
 
 			if(disableAASetts == 1) {
-				writeOverrideString(currentScenePath, newScenePath, "AASamples ", "1");
+				writeOverrideString(updatedCurrentScenePath, newScenePath, "AASamples ", "1");
 			}
 			
 			raytraceShadows				= integer(settingsArray[10]);
@@ -1567,132 +1560,132 @@ generatePassFile: mode, pass
 			raytraceOccl_Flag			= 16;
 			raytraceFlags				+= (raytraceOccl * raytraceOccl_Flag);
 			
-     		writeOverrideString(currentScenePath, newScenePath, "RayTraceEffects ", raytraceFlags);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RayTraceEffects ", raytraceFlags);
 
    			volumetricAA = integer(settingsArray[15]);
-     		writeOverrideString(currentScenePath, newScenePath, "VolumetricAA ", volumetricAA);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "VolumetricAA ", volumetricAA);
 
    			gLensFlares = integer(settingsArray[16]);
-     		writeOverrideString(currentScenePath, newScenePath, "EnableLensFlares ", gLensFlares);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableLensFlares ", gLensFlares);
 
    			shadowMaps = integer(settingsArray[17]);
-     		writeOverrideString(currentScenePath, newScenePath, "EnableShadowMaps ", shadowMaps);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableShadowMaps ", shadowMaps);
   
    			volLights = integer(settingsArray[18]);
-     		writeOverrideString(currentScenePath, newScenePath, "EnableVolumetricLights ", volLights);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableVolumetricLights ", volLights);
 
    			twoSidedALgts = integer(settingsArray[19]);
-     		writeOverrideString(currentScenePath, newScenePath, "DoubleSidedAreaLights ", twoSidedALgts);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "DoubleSidedAreaLights ", twoSidedALgts);
 
    			renderInstances = integer(settingsArray[20]);
-     		writeOverrideString(currentScenePath, newScenePath, "RenderInstances ", renderInstances);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderInstances ", renderInstances);
 
    			rayPrecision = number(settingsArray[21]);
-     		writeOverrideString(currentScenePath, newScenePath, "RayPrecision ", rayPrecision);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RayPrecision ", rayPrecision);
 
    			rayCutoff = number(settingsArray[22]);
-     		writeOverrideString(currentScenePath, newScenePath, "RayCutoff ", rayCutoff);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RayCutoff ", rayCutoff);
 
    			shadingSamples = integer(settingsArray[23]);
-     		writeOverrideString(currentScenePath, newScenePath, "ShadingSamples ", shadingSamples);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "ShadingSamples ", shadingSamples);
   
      		lightSamples = integer(settingsArray[24]);
-     		writeOverrideString(currentScenePath, newScenePath, "LightSamples ", lightSamples);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "LightSamples ", lightSamples);
 
      		gLightIntensity = number(settingsArray[25]);
-     		writeOverrideString(currentScenePath, newScenePath, "GlobalLightIntensity ", gLightIntensity);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "GlobalLightIntensity ", gLightIntensity);
 
      		gFlareIntensity = number(settingsArray[26]);
-     		writeOverrideString(currentScenePath, newScenePath, "GlobalFlareIntensity ", gFlareIntensity);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "GlobalFlareIntensity ", gFlareIntensity);
 
      		enableGI = number(settingsArray[27]);
-     		writeOverrideString(currentScenePath, newScenePath, "EnableRadiosity ", enableGI);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableRadiosity ", enableGI);
 
      		giMode = integer(settingsArray[28]);
      		giMode = giMode - 1; // decrement by one to match index in LW. Menus are 1-indexed.
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityType ", giMode);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityType ", giMode);
 
      		interpolateGI = integer(settingsArray[29]);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityInterpolated ", interpolateGI);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityInterpolated ", interpolateGI);
 
      		blurBGGI = integer(settingsArray[30]);
-     		writeOverrideString(currentScenePath, newScenePath, "BlurRadiosity ", blurBGGI);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "BlurRadiosity ", blurBGGI);
  
       		transparencyGI = integer(settingsArray[31]);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityTransparency ", transparencyGI);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityTransparency ", transparencyGI);
 
       		volumetricGI = integer(settingsArray[32]);
-     		writeOverrideString(currentScenePath, newScenePath, "VolumetricRadiosity ", volumetricGI);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "VolumetricRadiosity ", volumetricGI);
 
       		ambOcclGI = integer(settingsArray[33]);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityUseAmbient ", ambOcclGI);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityUseAmbient ", ambOcclGI);
 
       		directionalGI = integer(settingsArray[34]);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityDirectionalRays ", directionalGI);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityDirectionalRays ", directionalGI);
 
       		gradientsGI = integer(settingsArray[35]);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityUseGradients ", gradientsGI);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityUseGradients ", gradientsGI);
 
       		behindTestGI = integer(settingsArray[36]);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityUseBehindTest ", behindTestGI);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityUseBehindTest ", behindTestGI);
 
       		useBumpsGI = integer(settingsArray[37]);
       		useBumpsGI = useBumpsGI * (-2147483648);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityFlags ", useBumpsGI);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityFlags ", useBumpsGI);
 
       		giIntensity = integer(settingsArray[38]);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityIntensity ", giIntensity);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityIntensity ", giIntensity);
 
       		giAngTol = integer(settingsArray[39]);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityTolerance ", giAngTol);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityTolerance ", giAngTol);
 
       		giIndBounces = integer(settingsArray[40]);
-     		writeOverrideString(currentScenePath, newScenePath, "IndirectBounces ", giIndBounces);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "IndirectBounces ", giIndBounces);
             
             giMinSpacing = number(settingsArray[41]);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityMinPixelSpacing ", giMinSpacing);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityMinPixelSpacing ", giMinSpacing);
 
             giRPE = number(settingsArray[42]);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityRays ", giRPE);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityRays ", giRPE);
 
             giMaxSpacing = number(settingsArray[43]);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityMaxPixelSpacing ", giMaxSpacing);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityMaxPixelSpacing ", giMaxSpacing);
 
             gi2ndBounces = integer(settingsArray[44]);
-     		writeOverrideString(currentScenePath, newScenePath, "SecondaryBounceRays ", gi2ndBounces);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "SecondaryBounceRays ", gi2ndBounces);
 
             giMultiplier = number(settingsArray[45]);
-     		writeOverrideString(currentScenePath, newScenePath, "RadiosityMultiplier ", giMultiplier);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityMultiplier ", giMultiplier);
 
             enableCaustics = number(settingsArray[46]);
-     		writeOverrideString(currentScenePath, newScenePath, "EnableCaustics ", enableCaustics);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableCaustics ", enableCaustics);
 
             causticsAccuracy = integer(settingsArray[47]);
-     		writeOverrideString(currentScenePath, newScenePath, "CausticAccuracy ", causticsAccuracy);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "CausticAccuracy ", causticsAccuracy);
 
             causticsIntensity = number(settingsArray[48]);
-     		writeOverrideString(currentScenePath, newScenePath, "CausticIntensity ", causticsIntensity);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "CausticIntensity ", causticsIntensity);
 
             causticsSoftness = number(settingsArray[49]);
-     		writeOverrideString(currentScenePath, newScenePath, "CausticSoftness ", causticsSoftness);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "CausticSoftness ", causticsSoftness);
                                    
 			// FIXME : Move to camera override.
 			disableAASetts = integer(settingsArray[9]);
 			if(disableAASetts == 1)
 				disableAASetts = 0;
-     		writeOverrideString(currentScenePath, newScenePath, "Antialiasing ", disableAASetts);
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "Antialiasing ", disableAASetts);
 
-     		writeOverrideString(currentScenePath, newScenePath, "AntiAliasingLevel ", "-1");
+     		writeOverrideString(updatedCurrentScenePath, newScenePath, "AntiAliasingLevel ", "-1");
             
 			finishFiles();
 
 	        // deal with the buffer savers now.
-	        handleBuffers();
+	        handleBuffers(updatedCurrentScenePath);
         }
     }
     
 	// and as a tack-on fix, replace motion-mixer stuff for overridden objects
-	motionMixerStuff();
+	motionMixerStuff(updatedCurrentScenePath);
 
     // and the test frame resolution multiplier stuff
     switch(testResMultiplier)
@@ -1720,13 +1713,11 @@ generatePassFile: mode, pass
         default:
             break;
     }
-    
+	writeOverrideString(updatedCurrentScenePath, newScenePath, "FrameSize ", resMult);
+	finishFiles();
+	filedelete(updatedCurrentScenePath);
 
-	writeOverrideString(currentScenePath, newScenePath, "FrameSize ", resMult);
-	writeOverrideString(currentScenePath, newScenePath, "GlobalFrameSize ", resMult);
-	
     return(newScenePath);
-
 } // generatePass
 
 generatePath: mode, outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, baseName
@@ -1745,9 +1736,9 @@ generatePath: mode, outputFolder, outputStr, fileOutputPrefix, userOutputString,
     return genPath;
 }
 
-handleBuffers
+handleBuffers: hbFile
 {
-	inputFileName = prepareInputFile(currentScenePath);
+	inputFileName = prepareInputFile(hbFile);
 	inputFile = File(inputFileName, "r");
 	tempOutput = File(newScenePath,"w");
 	if(redirectBuffersSetts == 1)
@@ -1777,9 +1768,8 @@ handleBuffers
 									bufferBaseName = baseNameArray[size(baseNameArray)];
 									updatedBufferSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], bufferBaseName);
 
-									if(platformVar == WIN32 || platformVar == WIN64)
+									if(platform() == INTEL)
 									{
-										
 										tempFixedPath = fixPathForWin32(updatedBufferSaverPath);
 										newPathFixed = tempFixedPath;
 										toWrite = newPathFixed;
@@ -1816,7 +1806,7 @@ handleBuffers
 									psdBaseName = baseNameArray[size(baseNameArray)];
 									updatedPsdSaverPath = "Path \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], psdBaseName);
 
-									if(platformVar == WIN32 || platformVar == WIN64)
+									if(platform() == INTEL)
 									{
 										noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], psdBaseName);
 										tempFixedPath = fixPathForWin32(noIntroPath);
@@ -1987,7 +1977,7 @@ handleBuffers
 	}
 }
 
-motionMixerStuff
+motionMixerStuff: mmFile
 {
 	if(overriddenObjectID != nil)
 	{
@@ -2006,7 +1996,7 @@ motionMixerStuff
 		
 		for(x = 1; x <= size(overriddenObjectID); x++)
 		{
-			inputFileName = prepareInputFile(currentScenePath);
+			inputFileName = prepareInputFile(mmFile);
 			inputFile = File(inputFileName, "r");
 			tempOutput = File(newScenePath,"w");
 			
@@ -2084,7 +2074,7 @@ motionMixerStuff
 				tempOutput.close();
 				finishFiles();
 
-				inputFileName = prepareInputFile(currentScenePath);
+				inputFileName = prepareInputFile(mmFile);
 				inputFile = File(inputFileName, "r");
 				tempOutput = File(newScenePath,"w");
 				
@@ -2111,7 +2101,7 @@ motionMixerStuff
 				tempOutput.close();
 				finishFiles();
 
-				inputFileName = prepareInputFile(currentScenePath);
+				inputFileName = prepareInputFile(mmFile);
 				inputFile = File(inputFileName, "r");
 				tempOutput = File(newScenePath,"w");
 				
@@ -2135,7 +2125,7 @@ motionMixerStuff
 				tempOutput.close();
 				finishFiles();
 
-				inputFileName = prepareInputFile(currentScenePath);
+				inputFileName = prepareInputFile(mmFile);
 				inputFile = File(inputFileName, "r");
 				tempOutput = File(newScenePath,"w");
 				
@@ -2165,13 +2155,9 @@ motionMixerStuff
 				tempOutput.close();
 				finishFiles();
 			}
-			
 			// end of the mm if and else statement here
 			// write out the scene, replacing the motion mixer stuff with the object name with the overridden info
-			
-			
 		}
-		
 	//end of all the mm stuff
 	}
 }
@@ -2265,4 +2251,163 @@ finishFiles
 	tempFileName = tempDirectory + getsep() + "tempPassportInputFile.lws";
 	filedelete(tempFileName);
 	filesPrepared = 0;
+}
+
+generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStartLine
+{
+	// figure out which mesh object agent we're dealing with here so we can do the surfacing
+	for(x = 1; x <= size(meshIDs); x++)
+	{
+		if(meshIDs[x] == srfLWOInputID)
+		{
+			selectedMeshID = x;
+		}
+	}
+	
+	if(meshAgents[selectedMeshID].null == 1)
+	{
+		return(nil);
+	}
+	else
+	{
+		// get the surface base name
+		srfInputTempArray = split(srfInputTemp);
+
+		// get the directory and path set up for the temp LWO output
+		
+		outputFolder = parse("(",userOutputFolder);
+		if(outputFolder[1] == nil || outputFolder[1] == "leave empty)")
+		{
+			error("Please choose an output folder in the preferences.");
+		}
+		if(chdir(outputFolder[1]))
+		{
+			if(chdir("CG"))
+			{
+				if(chdir("temp"))
+				{
+					if(chdir("tempScenes"))
+					{
+						if(chdir("tempObjects"))
+						{
+						}
+						else
+						{
+							mkdir("tempObjects");
+							chdir("tempObjects");
+						}
+						
+					}
+					else
+					{
+						mkdir("tempScenes");
+						chdir("tempScenes");
+						mkdir("tempObjects");
+						chdir("tempObjects");
+					}
+				}
+				else
+				{
+					mkdir("temp");
+					chdir("temp");
+					mkdir("tempScenes");
+					chdir("tempScenes");
+					mkdir("tempObjects");
+					chdir("tempObjects");
+				}
+			}
+			else
+			{
+				mkdir("CG");
+				chdir("CG");
+				mkdir("temp");
+				chdir("temp");
+				mkdir("tempScenes");
+				chdir("tempScenes");
+				mkdir("tempObjects");
+				chdir("tempObjects");
+			}
+		}
+		else
+		{
+			mkdir(outputFolder[1]);
+			chdir(outputFolder[1]);
+			mkdir("CG");
+			chdir("CG");
+			mkdir("temp");
+			chdir("temp");
+			mkdir("tempScenes");
+			chdir("tempScenes");
+			mkdir("tempObjects");
+			chdir("tempObjects");
+		}
+		tempLWOPath = generatePath("LWO", outputFolder[1], string(srfLWOInputID), srfInputTempArray[3], userOutputString, passNames[pass], ".lwo");
+		
+		srf_file_path = split(srfInputTemp);
+		surfaceList = Surface(meshAgents[selectedMeshID]);
+		for(x = 1; x <= size(surfaceList); x++)
+		{
+			progressString = string((x/size(surfaceList))/2);
+			msgString = "{" + progressString + "}Overriding Surfaces on " + meshNames[selectedMeshID] + "...";
+			StatusMsg(msgString);
+			
+			// deal with both layer names and clones
+			meshBaseName = split(meshAgents[selectedMeshID].filename); 
+			if(meshBaseName[3] != nil)
+			{
+				nameOfObject = meshBaseName[3];
+			}
+			else
+			{
+				error("Unable to override surfaces on current object.");
+			}
+			
+			commandAdd = "Surf_SetSurf \"" + surfaceList[x] + "\" \"" + nameOfObject + "\"";
+			//info(commandAdd);
+
+			CommandInput(commandAdd);
+			commandAdd = "Surf_Save \"surfaceForReturning_" + x + "_.srf\"";
+			CommandInput(commandAdd);
+			commandAdd = "Surf_Load \"" + srfInputTemp + "\"";
+			CommandInput(commandAdd);
+			sleep(1);
+		}
+		
+		//SelectItem(srfLWOInputID);
+		SelectByName(meshNames[selectedMeshID]);
+		SaveObjectCopy(tempLWOPath);
+
+		for(x = 1; x <= size(surfaceList); x++)
+		{
+			if((((x/size(surfaceList))/2) + 0.5) < 1)
+			{
+				progressString = string(((x/size(surfaceList))/2) + 0.5);
+				msgString = "{" + progressString + "}Overriding Surfaces on " + meshNames[selectedMeshID] + "...";
+				StatusMsg(msgString);
+			}
+			else
+			{
+				StatusMsg("Completed Overriding Surfaces on " + meshNames[selectedMeshID] + ".");
+			}
+			
+			// deal with both layer names and clones
+			meshBaseName = split(meshAgents[selectedMeshID].filename); 
+			if(meshBaseName[3] != nil)
+			{
+				nameOfObject = meshBaseName[3];
+			}
+			else
+			{
+				error("Unable to override surfaces on current object.");
+			}
+			
+			commandAdd = "Surf_SetSurf \"" + surfaceList[x] + "\" \"" + nameOfObject + "\"";
+			CommandInput(commandAdd);
+			commandAdd = "Surf_Load \"surfaceForReturning_" + x + "_.srf\"";
+			CommandInput(commandAdd);
+			sleep(1);
+			filedelete("surfaceForReturning_" + x + "_.srf");
+		}
+		return(tempLWOPath);
+	}
 }

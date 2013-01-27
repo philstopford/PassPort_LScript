@@ -1,3 +1,19 @@
+20130104
+========
+
+- Found the render code wouldn't work at frame 0. The system would think it saved frame 1, but actually frame 0 should have been saved.
+ - Implemented a floor operator to force the frame to the lowest integer returned by the system.
+- Fixed some odd scene generation bug, but not exactly sure how. Oh well.
+
+20130103
+========
+
+- Moved generateSurfaceObjects() to the sceneGen file from the interface_subfuncs file.
+- p0017: On Win32, was able to get correct line in error message for 'surface override' bug p0017. Seems that line 1744 in the sceneGen generatePath code reports an invalid value of pass :
+ 	genPath = genPath + outputStr + "_" + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + baseName;
+ - Also triggered when .lwo needs to be written out for surface override, or similar. Origin is the call to generateSurfaceObjects() which expects to evaluate passNames[pass]. Since 'pass' is a local variable, it fails.
+ - Fixed by making 'pass' a global variable. Not particularly elegant.
+
 20130102
 ========
 
@@ -294,6 +310,7 @@ p0012 : Rebuilding lists causes script to explode. (Fixed)
 p0013 : Selecting second item in list causes highlight to be drawn (on repaint) for 1st item. (Fixed)
 p0014 : Uncompiled version crashes out on Mac and fails to start-up roughly 70% of the time on WinXP. (closed, LScript bug)
 p0015 : Overrides with assigned items don't get bullet point until the lists are updated, or some major redraw occurs (also in original code)
+p0017 : Scene override fails during scene generation. Wrong line cited on OS X, but Win32 reports correct number. Invalid index to passName. Line 1744 of sceneGen code. (Fixed)
 
 ###############
 # Limitations #
