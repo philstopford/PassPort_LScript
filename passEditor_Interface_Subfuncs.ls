@@ -1,86 +1,3 @@
-// globals
-var buildString = "(build 0001)";
-var versionString = " v1.1.2";
-var registeredToName;
-var scenesnames;
-var passSelected = false;
-var overridesSelected = false;
-var passAssItems;
-var previousPassAssItems;
-var passOverrideItems;
-var previousPassOverrideItems;
-var overrideSettings;
-var masterScene;
-var image_formats_array;
-var originalSelection;
-var meshAgents;
-var meshNames;
-var meshIDs;
-var meshOldIDs;
-var lightAgents;
-var lightNames;
-var lightIDs;
-var lightOldIDs;
-var displayNames;
-var o_displayNames;
-var displayIDs;
-var displayOldIDs;
-var passNames;
-var overrideNames;
-var fileMenu_items;
-var passMenu_items = @"Full Scene Pass","Empty Pass","Pass From Layout Selection","Duplicate Selected Pass"@;
-var overrideMenu_items = @"Object Properties","Alternative Object...","Motion File...","Surface File...","Light Properties","Scene Master","==","Light Exclusions","Duplicate Selected Override"@;
-var gad_PassesListview;
-var gad_OverridesListview;
-var c3;
-var c3_5;
-var gad_SelectedPass;
-var c7;
-var currentChosenPass;
-var currentChosenPassString;
-var interfaceRunYet;
-var userOutputFolder;
-var fileOutputPrefix;
-var userOutputString;
-var areYouSurePrompts;
-var doKeys;
-var platformVar;
-var useHackyUpdates;
-var rgbSaveType;
-var editorResolution;
-var testResMultiplier;
-var testRgbSaveType;
-var sceneJustLoaded = 0;
-var sceneJustSaved;
-var testOutputPath;
-var seqOutputPath;
-// hacky scene save vars
-var replaceMeVar;
-var replaceCount;
-var unsaved;
-var listOneWidth;
-var panelWidth;
-var panelWidthOnOpen;
-var listTwoWidth;
-var listTwoPosition;
-var panelWidth;
-var panelHeight;
-var listOneHeight;
-// exclusion attempt;
-var tempLightTransferring;
-var light21;
-var light23;
-var lightListArray;
-
-// registration variables
-var dongleCheckVar;
-var registeredDonglesVar;
-
-// need for hacky saving
-var needHackySaving;
-var justReopened;
-var beingEscaped;
-
 undoOverrideSelect
 {
 	pass = currentChosenPass;
@@ -1407,7 +1324,7 @@ aboutPassPortDialog
 
 	// Check if the script is compiled, if so, don't need to find the banner images on disk
 	compiled = 1;
-	s = strsub(this_script[4], size(this_script[4]), 1);
+	s = strsub(this_script[4], size(this_script[4]), 1);  // simply check the extension terminating character - c means compiled.
 	if(s =="s" || s =="S")
 	{
 		compiled = 0;
@@ -1415,7 +1332,7 @@ aboutPassPortDialog
 
 	doKeys = 0;
 	reqbegin("About PassPort");
-	reqsize(400,200);
+	reqsize(aboutsize_x,aboutsize_y);
 
 	// About Graphic
 	if(compiled)
@@ -1443,14 +1360,34 @@ aboutPassPortDialog_redraw
 {
 	if(reqisopen())
 	{
-		y = 135;
-		str = string(versionString + " " + buildString);
-		drawtext(str, <0,0,0>, 10, y);
-		str = string("Registered to: " + registeredToName);
-		drawtext(str, <0,0,0>, 10, y + drawtextheight(str) );
+		txt_y = 135;
+		drawline(<038,038,040>, 0, txt_y - 10, aboutsize_x, txt_y - 10);
+		lwversion = string(string(hostVersion()) + " (" + string(hostBuild()) + ")" );
+		str = string("Version: " + versionString + " on LW version: " + lwversion);
+		drawtext(str, <0,0,0>, 10, txt_y);
+		str = string("Platform: " + platformInformation(platform()));
+		drawtext(str, <0,0,0>, 10, txt_y + drawtextheight(str) );
 	}
 }
 
+platformInformation: platformVar
+{
+	switch(platformVar) {
+		case 1:
+			parch = "Win_x86";
+			break;
+		case 10:
+			parch = "Win_x86_64";
+			break;
+		case 9:
+			parch = "MacUB_x86";
+			break;
+		default:
+			parch = "unknown: " + string(platform());
+			break;
+	}
+	return parch;
+}
 
 preferencePanel
 {
@@ -1466,7 +1403,7 @@ preferencePanel
 
 	num_gads			= 10;																// Total number of gadgets vertically (for calculating the max window height)
 
-	if(platform() == 9)
+	if(platform() == 9) // MacUB
 	{
 		num_gads ++;
 	}
@@ -1737,23 +1674,6 @@ getImageFormats
 			// Future proofing, don't hard code the LightWave version number - Matt Gorner
 			tempString = config_dir + getsep() + "LightWave Extensions " + vers + " Prefs";
 			input = File(tempString);
-			/*
-			if(integer(hostVersion()) == 10)
-			{
-				tempString = config_dir + getsep() + "LightWave Extensions 10 Prefs";
-				input = File(tempString);
-			}
-			if(integer(hostVersion()) == 9)
-			{
-				tempString = config_dir + getsep() + "LightWave Extensions 9 Prefs";
-				input = File(tempString);
-			}
-			if(integer(hostVersion()) == 8)
-			{
-				tempString = config_dir + getsep() + "LightWave Extensions 8 Prefs";
-				input = File(tempString);
-			}
-			*/
 			break;
 
 		case 9:
@@ -1781,13 +1701,6 @@ getImageFormats
 				tempString = config_dir + getsep() + "Extensions " + vers;
 				input = File(tempString);
 			}
-			/*
-			if(integer(hostVersion()) == 9)
-			{
-				tempString = config_dir + getsep() + "Extensions 9";
-				input = File(tempString);
-			}
-			*/
 			break;
 
 		case 1:
@@ -1812,18 +1725,6 @@ getImageFormats
 				tempString = config_dir + getsep() + "LWEXT" + vers + ".CFG";
 				input = File(tempString);
 			}
-			/*
-			if(integer(hostVersion()) == 9)
-			{
-				tempString = config_dir + getsep() + "LWEXT9.CFG";
-				input = File(tempString);
-			}
-			if(integer(hostVersion()) == 8)
-			{
-				tempString = config_dir + getsep() + "LWEXT8.CFG";
-				input = File(tempString);
-			}
-			*/
 			break;
 
 		case 10:
@@ -1848,18 +1749,6 @@ getImageFormats
 				tempString = config_dir + getsep() + "LWEXT" + vers + "-64.CFG";
 				input = File(tempString);
 			}
-			/*
-			if(integer(hostVersion()) == 9)
-			{
-				tempString = config_dir + getsep() + "LWEXT9-64.CFG";
-				input = File(tempString);
-			}
-			if(integer(hostVersion()) == 8)
-			{
-				tempString = config_dir + getsep() + "LWEXT8.CFG";
-				input = File(tempString);
-			}
-			*/
 			break;
 
 		default:
@@ -3142,35 +3031,6 @@ fixPathForWin32: path
 	
 	return(newPathFixed);
 	
-}
-
-dongleCheckFunction: dongleIDsArray
-{
-	
-	registered = 0;
-	
-	for(x = 1; x <= size(dongleIDsArray); x++)
-	{
-		if(licenseId() == dongleIDsArray[x])
-		{
-			registered = 1;
-		}
-	}
-	
-	
-	//registered = 1;
-	
-	if(platformVar == 5)
-	{
-		registered = 2;
-	}
-	
-	if(needHackySaving == 1)
-	{
-		registered = 3;
-	}
-	
-	return(registered);
 }
 
 hackyCloseReopenToggle: value

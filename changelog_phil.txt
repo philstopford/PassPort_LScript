@@ -1,0 +1,42 @@
+PP-Phil_20121128
+================
+
+- Removed unused build variable. Switched version to a date build (experimental)
+- Added a dev toggle switch to handle @insert switching for source vs compiled.
+- Adjusting about screen to remove registration readout and to add LW version and platform information.
+- Removed dongle check code that was obsolete.
+- Removed Mac CFM code chunk - CFM was never supported, based on the code comments.
+- Optimised the @insert statements to make the code more readable and maintainable.
+- Discovered that @insert doesn't work with icon resources - you have to include them in the main script.
+- Moved variables out of code into a separate file to reduce clutter and needless duplication.
+- Removed dead code that was disabled by previous contributors for better alternatives.
+- Fixed indenting in original code.
+- Moved UDF code to a dedicated file.
+- Worked around About box corruption by disabling drawline calls in the req_redraw function. Added an explicit line drawing call in the about box function instead.
+
+Reference :
+-----------
+
+settingsarray tracks what is to be done. The 'type' of entity in the array is defined arbitrarily as :
+
+	case 1: "   (.srf file)"
+	case 2: "   (object properties)"
+	case 3: "   (.mot file)"
+	case 4: "   (.lwo file)"
+	case 5: "   (light properties)"
+	case 6: "   (scene properties)"
+	case 7: "   (light exclusion)"
+
+Issues to check :
+-----------------
+
+- do object properties overrides work?
+- do surface properties overrides work?
+- all features post-9.3.1 need to be reviewed and checked against the scene file.
+	- requires *heavy* research into the SceneGen code....
+	- radiosity example :
+	    new interface elements to allow access to the new features, probably revamping the scene master override type. Or maybe creating a new override type and method of assigning.
+		parse support for finding where in the scene the new radiosity information is stored. in other words, what's before it, and what's after it in the scene file?
+		parse support for writing that information, from the override properties, into the render scene. you'll have to set up and obey all the if/then switches of testing if the override is assigned, then testing if the information is already in the scene file, then if all the conditions are right, plugging in the override radiosity into the render scene instead of the live scene radiosity settings.
+
+
