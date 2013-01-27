@@ -1,8 +1,26 @@
+20130107
+========
+
+- Misc bug fixes.
+- tempDirectory now a global since it's used so much.
+- Light override was partially busted.
+ - Reworked to reliably change/handle lens flare and volumetric properties.
+
+20130106
+========
+
+- Updated graphics to match 'Renewed' differentiation.
+- Removed 'Affect OpenGL' light override setting - it has no bearing on the render.
+- Implemented FiberFX pass generation and overrides in Scene Master.
+ - Added safety check in scene generation code to query whether we're altering version 3 data.
+ - Changes are very specific in nature due to the unfortunately generic parameter names being used in this plugin's data.
+- Reworked scene generation code due to inconsistent GI parameter presence in LWS files. Extended the preparation code to review whether certain inconsistent settings are present. If they aren't, we insert them into the scene file in the correct location with the corresponding value to avoid changing behaviour. We then set the value accordingly later in the generation code.
+
 20130104
 ========
 
 - Found the render code wouldn't work at frame 0. The system would think it saved frame 1, but actually frame 0 should have been saved.
- - Implemented a floor operator to force the frame to the lowest integer returned by the system.
+ - Implemented int() cast to force the frame to the integer value returned by the system.
 - Fixed some odd scene generation bug, but not exactly sure how. Oh well.
 
 20130103
@@ -254,7 +272,6 @@ Brace yourself. Here's the big set of UI changes related to filtering the overri
 - Bug p0008 identified and preliminary triage added - if the overrideType is (nil), size() will choke badly in the 'failsafe' conditional in sceneGen. Trying to avoid this and more cleanly handle the situation.
 - Bug p0009 related to the above - it seems to be possible to add elements to overrides that are incompatible with that override (e.g. surfacing overrides to lights)
  - Fix will be to screen right hand column contents to avoid listing incompatible types for overrides. UDF code needs serious work to address this (also for add all, etc. buttons).
-
 - 30 KB less code right now compared to original source.
 
 20121129
@@ -283,7 +300,6 @@ Brace yourself. Here's the big set of UI changes related to filtering the overri
 - Fixed indenting in original code.
 - Moved UDF code to a dedicated file.
 - Worked around About box corruption (bug p0001) by disabling drawline calls in the req_redraw function. Added an explicit line drawing call in the about box function instead.
-
 
 +++++++++++++++
 + In Progress +
@@ -326,7 +342,6 @@ p0017 : Scene override fails during scene generation. Wrong line cited on OS X, 
 - SceneGen code could be optimised to walk the array and use loops to greatly simplify the code. (partially done with 20130101)
 - Add Camera override, for camera settings.
 - Autoscan plugin operation.
-- FiberFX pass generation integration possible?
 - Need to check if growl interaction works with current growl versions.
 
 -------------

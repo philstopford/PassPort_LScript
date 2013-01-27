@@ -13,7 +13,6 @@ generatePassFile: mode, pass
     overriddenObjectID = nil;
     overriddenObjectName = nil;
     contentDirectory = getdir("Content");
-    tempDirectory = getdir("Temp");
     chdir(tempDirectory);
     SaveSceneCopy("passEditorTempSceneCopy.lws");
     currentScenePath = tempDirectory + getsep() + "passEditorTempSceneCopy.lws";
@@ -85,21 +84,13 @@ generatePassFile: mode, pass
                 }
                 if(settingsArray[9] == "0")
                 {
-                    affectOpenglLine = "AffectOpenGL 0\n";
-                }
-                else
-                {
-                    affectOpenglLine = "";
-                }
-                if(settingsArray[10] == "0")
-                {
                     LensFlareLine = "LensFlare 0\n";
                 }
                 else
                 {
                     LensFlareLine = "LensFlare 1\n";
                 }
-                if(settingsArray[11] == "0")
+                if(settingsArray[10] == "0")
                 {
                     VolumetricsLine = "VolumetricLighting 0\n";
                 }
@@ -108,8 +99,9 @@ generatePassFile: mode, pass
                     VolumetricsLine = "VolumetricLighting 1\n";
                 }
                 
-                lightSettingsPartOne[x] = lightColorLine + lightIntensityLine + affectDiffuseLine + affectSpecularLine + LensFlareLine + VolumetricsLine;
-                lightSettingsPartTwo[x] = affectOpenglLine;
+                lightSettingsPartOne[x] = lightColorLine + lightIntensityLine + affectDiffuseLine + affectSpecularLine;
+                lightSettingsPartTwo[x] = LensFlareLine;
+                lightSettingsPartThree[x] = VolumetricsLine;
                 
                 motInputTemp[x] = nil;
                 lwoInputTemp[x] = nil;
@@ -131,6 +123,7 @@ generatePassFile: mode, pass
                 objPropOverrideShadowOpts[x] = nil;
                 lightSettingsPartOne[x] = nil;
                 lightSettingsPartTwo[x] = nil;
+                lightSettingsPartThree[x] = nil;
 
             }   
 
@@ -145,7 +138,7 @@ generatePassFile: mode, pass
                 objPropOverrideShadowOpts[x] = nil;
                 lightSettingsPartOne[x] = nil;
                 lightSettingsPartTwo[x] = nil;
-
+                lightSettingsPartThree[x] = nil;
             }   
             if(settingsArray[2] == "type3")
             {
@@ -158,7 +151,7 @@ generatePassFile: mode, pass
                 objPropOverrideShadowOpts[x] = nil;
                 lightSettingsPartOne[x] = nil;
                 lightSettingsPartTwo[x] = nil;
-
+                lightSettingsPartThree[x] = nil;
             }   
             if(settingsArray[2] == "type2")
             {
@@ -293,6 +286,7 @@ generatePassFile: mode, pass
                 objPropOverrideShadowOpts[x] = shadowOptionsLine;
                 lightSettingsPartOne[x] = nil;
                 lightSettingsPartTwo[x] = nil;
+                lightSettingsPartThree[x] = nil;
             }
             if(settingsArray[2] == "type7")
             {
@@ -368,6 +362,7 @@ generatePassFile: mode, pass
                 objPropOverrideShadowOpts[x] = nil;
                 lightSettingsPartOne[x] = nil;
                 lightSettingsPartTwo[x] = nil;
+                lightSettingsPartThree[x] = nil;
             }
             if(assignmentsArray != nil && size(assignmentsArray) > 1)
             {
@@ -505,6 +500,8 @@ generatePassFile: mode, pass
                 objAffectCausticsLine[x] = nil;
             }
             objLightTypeLine[x] = getPartialLine(objStart[x],objEnd[x],"LightType ",currentScenePath);
+            objLensFlareLine[x] = getPartialLine(objStart[x],objEnd[x],"LensFlare ",currentScenePath);
+            objVolLightLine[x] = getPartialLine(objStart[x],objEnd[x],"VolumetricLighting ",currentScenePath);
         }
 
 
@@ -1141,8 +1138,29 @@ generatePassFile: mode, pass
                             }
                         }
                         
-                        // write out the open gl line
+                        // write out the lens flare line
+                        if(objLensFlareLine != nil)
+                        {
+                            if(objLensFlareLine[x] != nil)
+                            {
+                                inputFile.line(objLensFlareLine[x]);
+                                line = inputFile.read();
+                                outputFile.writeln(line);
+                            }
+                        }
                         outputFile.write(lightSettingsPartTwo[x]);
+
+                        // write out the volumetric line
+                        if(objVolLightLine != nil)
+                        {
+                            if(objVolLightLine[x] != nil)
+                            {
+                                inputFile.line(objVolLightLine[x]);
+                                line = inputFile.read();
+                                outputFile.writeln(line);
+                            }
+                        }
+                        outputFile.write(lightSettingsPartThree[x]);
                         
                         // write out the rest of the light
                         inputFile.line(objLightTypeLine[x]);
@@ -1519,12 +1537,10 @@ generatePassFile: mode, pass
             
 			writeOverrideString(updatedCurrentScenePath, newScenePath, "FrameSize ", resMult);
 
-			writeOverrideString(updatedCurrentScenePath, newScenePath, "GlobalFrameSize ", resMult);
+// obsolete
+//			writeOverrideString(updatedCurrentScenePath, newScenePath, "GlobalFrameSize ", resMult);
 						
-			renderModeSetts = integer(settingsArray[4]);
-			writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderMode ", renderModeSetts);
-
-			renderModeSetts = integer(settingsArray[4]);
+			renderModeSetts = integer(settingsArray[4]) - 1;
 			writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderMode ", renderModeSetts);
             
 			depthBufferAASetts = integer(settingsArray[5]);
@@ -1676,8 +1692,15 @@ generatePassFile: mode, pass
      		writeOverrideString(updatedCurrentScenePath, newScenePath, "Antialiasing ", disableAASetts);
 
      		writeOverrideString(updatedCurrentScenePath, newScenePath, "AntiAliasingLevel ", "-1");
-            
+
 			finishFiles();
+
+			// FiberFX stuff. Due to poor parameter naming, we need to do this in a more specific manner.
+			if(fiberFX(newScenePath) == 1)
+			{
+				// We made some changes, so let's align the files again
+				filecopy(newScenePath, updatedCurrentScenePath);
+			}
 
 	        // deal with the buffer savers now.
 	        handleBuffers(updatedCurrentScenePath);
@@ -1734,6 +1757,56 @@ generatePath: mode, outputFolder, outputStr, fileOutputPrefix, userOutputString,
 
 	genPath = genPath + outputStr + "_" + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + baseName;
     return genPath;
+}
+
+fiberFX: ffFile
+{
+	// Let's check if FiberFX was even applied.
+	ffLine = getPartialLine(0,0,"Plugin PixelFilterHandler 1 FiberFilter",ffFile);
+	if(ffLine == nil)
+	{
+		return 0;
+	}
+	
+	// Let's check if it's version 3
+	checkFile = File(ffFile, "r");
+	checkFile.line(ffLine + 2);
+	line = checkFile.read();
+	if(line != "Version 3")
+	{
+		checkFile.close();
+		return 0;
+	}
+	
+	// If we got here, we're happy that everything is good to go.
+	checkFile.close();
+
+	// Hard-coded offsets from the detected pixel filter line, based on scene file inspection.
+	fiberFXSaveRGBA				= integer(settingsArray[50]);
+	ffString = "SaveRGBA " + string(fiberFXSaveRGBA);
+	changeScnLine(ffString, ffFile, ffLine + 8);
+
+	fiberFXSaveDepth			= integer(settingsArray[53]);
+	ffString = "SaveDepth " + string(fiberFXSaveDepth);
+	changeScnLine(ffString, ffFile, ffLine + 9);
+
+	fiberFXSaveRGBAType			= integer(settingsArray[51]);
+	ffString = "RGBType " + string(image_formats_array[fiberFXSaveRGBAType]);
+	changeScnLine(ffString, ffFile, ffLine + 10);
+
+	fiberFXSaveDepthType		= integer(settingsArray[54]);
+	ffString = "DepthType " + string(image_formats_array[fiberFXSaveDepthType]);
+	changeScnLine(ffString, ffFile, ffLine + 11);
+
+	fiberFXSaveRGBAName			= string(settingsArray[52]);
+	ffString = "RGBName " + string(fiberFXSaveRGBAName);
+	changeScnLine(ffString, ffFile, ffLine + 12);
+
+	fiberFXSaveDepthName		= string(settingsArray[55]);
+	ffString = "DepthName " + string(fiberFXSaveDepthName);
+	changeScnLine(ffString, ffFile, ffLine + 13);
+
+	return 1; // notify caller that we changed something.
 }
 
 handleBuffers: hbFile
@@ -2236,9 +2309,10 @@ prepareInputFile: inputFileName
 {
 	if(filesPrepared == 1)
 		error("Internal error - prepareInputFile() already called.");
-    tempDirectory = getdir("Temp");	
 	tempFileName = tempDirectory + getsep() + "tempPassportInputFile.lws";
 	filecopy(inputFileName, tempFileName);
+	prepareRadiosityLines(tempFileName);
+	filecopy(tempFileName, inputFileName);
 	filesPrepared = 1;
 	return tempFileName;
 }
@@ -2247,10 +2321,106 @@ finishFiles
 {
 	if(filesPrepared == 0)
 		error("Internal error - finishFiles() already called.");
-    tempDirectory = getdir("Temp");	
 	tempFileName = tempDirectory + getsep() + "tempPassportInputFile.lws";
 	filedelete(tempFileName);
 	filesPrepared = 0;
+}
+
+// Insert missing radiosity lines in the file passed in.
+// This is ~annoying. The setting locations in the scene file were determined by manual inspection.
+// I've version-controlled them in case they move/change in future.
+prepareRadiosityLines: radFileName
+{
+	switch (int(hostVersion()))
+	{
+		case 11:
+			prepareRadiosityLines_11(radFileName);
+			break;
+		
+		default:
+			break;
+    }
+}
+
+prepareRadiosityLines_11: radFileName
+{
+	if (getPartialLine(0,0,"EnableRadiosity",radFileName) == nil)
+	{
+		insertScnLine("EnableRadiosity 0",radFileName,(getPartialLine(0,0,"DoubleSidedAreaLights",radFileName)));
+	}
+	if(getPartialLine(0,0,"IndirectBounces",radFileName) == nil)
+	{
+		insertScnLine("IndirectBounces 1",radFileName,(getPartialLine(0,0,"RadiosityMultiplier",radFileName)));
+	}
+	if(getPartialLine(0,0,"VolumetricRadiosity",radFileName) == nil)
+	{
+		insertScnLine("VolumetricRadiosity 0",radFileName,(getPartialLine(0,0,"IndirectBounces",radFileName)));
+	}
+	if(getPartialLine(0,0,"RadiosityUseAmbient",radFileName) == nil)
+	{
+		insertScnLine("RadiosityUseAmbient 0",radFileName,(getPartialLine(0,0,"VolumetricRadiosity",radFileName)));
+	}
+	if(getPartialLine(0,0,"EnableCaustics",radFileName) == nil)
+	{
+		insertScnLine("EnableCaustics 0",radFileName,(getPartialLine(0,0,"PixelFilterForceMT",radFileName)));
+	}
+	if(getPartialLine(0,0,"CausticIntensity",radFileName) == nil)
+	{
+		insertScnLine("CausticIntensity 0",radFileName,(getPartialLine(0,0,"EnableCaustics",radFileName)));
+	}
+	if(getPartialLine(0,0,"CausticAccuracy",radFileName) == nil)
+	{
+		insertScnLine("CausticAccuracy 100",radFileName,(getPartialLine(0,0,"CausticIntensity",radFileName)));
+	}
+	if(getPartialLine(0,0,"CausticSoftness",radFileName) == nil)
+	{
+		insertScnLine("CausticSoftness 20",radFileName,(getPartialLine(0,0,"CausticAccuracy",radFileName)));
+	}
+}
+
+changeScnLine: stringToWrite, fileToAdjust, lineToChange
+{
+	fileAdjust = File(fileToAdjust, "r");
+	tempFileToAdjust = tempDirectory + getsep() + "tempPassportInputFileAdjust.lws";
+	tempFileAdjust = File(tempFileToAdjust, "w");
+
+	for(i = 1; i < lineToChange; i++)
+	{
+		tempFileAdjust.writeln(fileAdjust.read());
+	}
+	tempFileAdjust.writeln(stringToWrite);
+	fileAdjust.read(); // move on the read file by that line.
+	tempFileAdjust.reopen("a"); // append mode
+	while(!fileAdjust.eof())
+	{
+		tempFileAdjust.writeln(fileAdjust.read());
+	}
+	fileAdjust.close();
+	tempFileAdjust.close();
+	filecopy(tempFileToAdjust, fileToAdjust);
+	filedelete(tempFileToAdjust);
+}
+
+insertScnLine: stringToInsert, fileToAdjust, lineToInsertAfter
+{
+	fileAdjust = File(fileToAdjust, "r");
+	tempFileToAdjust = tempDirectory + getsep() + "tempPassportInputFileAdjust.lws";
+	tempFileAdjust = File(tempFileToAdjust, "w");
+
+	for(i = 1; i <= lineToInsertAfter; i++)
+	{
+		tempFileAdjust.writeln(fileAdjust.read());
+	}
+	tempFileAdjust.writeln(stringToInsert);
+	tempFileAdjust.reopen("a"); // append mode
+	while(!fileAdjust.eof())
+	{
+		tempFileAdjust.writeln(fileAdjust.read());
+	}
+	fileAdjust.close();
+	tempFileAdjust.close();
+	filecopy(tempFileToAdjust, fileToAdjust);
+	filedelete(tempFileToAdjust);
 }
 
 generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStartLine

@@ -92,9 +92,8 @@ lightOverride_UI: action
 			lightIntensitySetts = number(settingsArray[6]);
 			affectDiffuseSetts = integer(settingsArray[7]);
 			affectSpecularSetts = integer(settingsArray[8]);
-			affectOpenGLSetts = integer(settingsArray[9]);
-			lensFlareSetts = integer(settingsArray[10]);
-			volumetricLightingSetts = integer(settingsArray[11]);
+			lensFlareSetts = integer(settingsArray[9]);
+			volumetricLightingSetts = integer(settingsArray[10]);
 			lightColorSettsArray = <lightColorSettsArrays[1], lightColorSettsArrays[2], lightColorSettsArrays[3]>;
 		}
 		
@@ -161,16 +160,6 @@ lightOverride_UI: action
 
 		ui_offset_y += LgtProp_ui_row_offset;
 
-		c26val = 1;
-		if(action == "edit")
-		{
-			c26val = affectOpenGLSetts;
-		}
-		c26 = ctlcheckbox("Affect OpenGL          ",c26val);
-		ctlposition(c26, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
-
-		ui_offset_y += LgtProp_ui_row_offset;
-
 		c27val = 0;
 		if(action == "edit")
 		{
@@ -197,7 +186,6 @@ lightOverride_UI: action
 			lightIntensitySetts = getvalue(c23);
 			affectDiffuseSetts = getvalue(c24);
 			affectSpecularSetts = getvalue(c25);
-			affectOpenGLSetts = getvalue(c26);
 			lensFlareSetts = getvalue(c27);
 			volumetricLightingSetts = getvalue(c28);
 			doUpdate = 1;
@@ -230,7 +218,7 @@ lightOverride_UI: action
 				}
 			}
 			overrideNames[newNumber] = newName + "   (light properties)";
-			overrideSettings[newNumber] = newName + "||" + "type5" + "||" +	string(lightColorSettsArray.x) +  "||" + string(lightColorSettsArray.y) + "||" + string(lightColorSettsArray.z) + "||" + string(lightIntensitySetts) + "||" + string(affectDiffuseSetts) + "||" + string(affectSpecularSetts) + "||" + string(affectOpenGLSetts)  + "||" + string(lensFlareSetts)  + "||" + string(volumetricLightingSetts);
+			overrideSettings[newNumber] = newName + "||" + "type5" + "||" +	string(lightColorSettsArray.x) +  "||" + string(lightColorSettsArray.y) + "||" + string(lightColorSettsArray.z) + "||" + string(lightIntensitySetts) + "||" + string(affectDiffuseSetts) + "||" + string(affectSpecularSetts) + "||" + string(lensFlareSetts)  + "||" + string(volumetricLightingSetts);
 		}
 	} else {
 		error("lightOverride_UI: incorrect, or no, action passed");
@@ -770,6 +758,12 @@ scnmasterOverride_UI: action
 			causticsAccuracy			= integer(settingsArray[47]);
 			causticsIntensity			= number(settingsArray[48]);
 			causticsSoftness			= integer(settingsArray[49]);
+			fiberFXSaveRGBA				= integer(settingsArray[50]);
+			fiberFXSaveRGBAType			= integer(settingsArray[51]);
+			fiberFXSaveRGBAName			= string(settingsArray[52]);
+			fiberFXSaveDepth			= integer(settingsArray[53]);
+			fiberFXSaveDepthType		= integer(settingsArray[54]);
+			fiberFXSaveDepthName		= string(settingsArray[55]);
 		}
 	
 		doKeys = 0;
@@ -780,7 +774,7 @@ scnmasterOverride_UI: action
 			reqbeginstr = "Edit Scene Master Override";
 		}
 		reqbegin(reqbeginstr);
-		reqsize(ScnMst_ui_window_w, 650);
+		reqsize(ScnMst_ui_window_w, 725);
 
 		newName = "SceneMasterOverride";
 		if(action == "edit")
@@ -1244,6 +1238,68 @@ scnmasterOverride_UI: action
 		c66 = ctlinteger("Caustics Softness",c66val);
 		ctlposition(c66, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
+		ui_offset_y += ScnMst_ui_row_offset + 2;
+		sep6 = ctlsep(0, ScnMst_ui_seperator_w + 4);
+		ctlposition(sep6, -2, ScnMst_gad_y + ui_offset_y);
+		ui_offset_y += ScnMst_ui_spacing_y + 4;
+
+		ffxLabel = ctltext("", "FiberFX");
+		ctlposition(ffxLabel, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		ui_offset_y -= 2;
+
+		c67val = 0;
+		if(action == "edit")
+		{
+			c67val = fiberFXSaveRGBA;
+		}
+		c67 = ctlcheckbox("FFx Save RGBA",c67val);
+		ctlposition(c67, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		c70val = 0;
+		if(action == "edit")
+		{
+			c70val = fiberFXSaveDepth;
+		}
+		c70 = ctlcheckbox("FFx Save Depth",c70val);
+		ctlposition(c70, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		ui_offset_y += ScnMst_ui_row_offset;
+
+		c68val = 0;
+		if(action == "edit")
+		{
+			c68val = fiberFXSaveRGBAType;
+		}
+		c68 = ctlpopup("RGBA Type",c68val,image_formats_array);
+		ctlposition(c68, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		c71val = 0;
+		if(action == "edit")
+		{
+			c71val = fiberFXSaveDepthType;
+		}
+		c71 = ctlpopup("Depth Type",c71val,image_formats_array);
+		ctlposition(c71, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		ui_offset_y += ScnMst_ui_row_offset;
+
+		c69val = "*.*";
+		if(action == "edit")
+		{
+			c69val = fiberFXSaveRGBAName;
+		}
+		c69 = ctlfilename("Save ...", c69val,30,1);
+		ctlposition(c69, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w - 22, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		c72val = "*.*";
+		if(action == "edit")
+		{
+			c72val = fiberFXSaveDepthName;
+		}
+		c72 = ctlfilename("Save ...", c72val,30,1);
+		ctlposition(c72, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w - 22, ScnMst_gad_h, ScnMst_gad_text_offset);
+
 		if(reqpost())
 		{
 			newName 						= getvalue(c20);
@@ -1295,6 +1351,12 @@ scnmasterOverride_UI: action
 			causticsAccuracy 				= getvalue(c64);
 			causticsIntensity				= getvalue(c65);
 			causticsSoftness				= getvalue(c66);
+			fiberFXSaveRGBA					= getvalue(c67);
+			fiberFXSaveRGBAType				= getvalue(c68);
+			fiberFXSaveRGBAName				= getvalue(c69);
+			fiberFXSaveDepth				= getvalue(c70);
+			fiberFXSaveDepthType			= getvalue(c71);
+			fiberFXSaveDepthName			= getvalue(c72);
 			doUpdate = 1;	
 		}
 		else
@@ -1347,7 +1409,10 @@ scnmasterOverride_UI: action
 										+ string(giMaxSpacing)					+	"||"	+ string(gi2ndBounces)			+	"||"
 										+ string(giMultiplier)					+	"||"	+ string(enableCaustics)		+	"||"
 										+ string(causticsAccuracy)				+	"||"	+ string(causticsIntensity)		+	"||"
-										+ string(causticsSoftness);
+										+ string(causticsSoftness)				+	"||"	+ string(fiberFXSaveRGBA)		+	"||"
+										+ string(fiberFXSaveRGBAType)			+	"||"	+ string(fiberFXSaveRGBAName)	+	"||"
+										+ string(fiberFXSaveDepth)				+	"||"	+ string(fiberFXSaveDepthType)	+	"||"
+										+ string(fiberFXSaveDepthName);
 		}
 	} else {
 		error("scnmasterOverride_UI: incorrect, or no, action passed");

@@ -206,7 +206,7 @@ create
 		icon[LETTERO] = Icon(lettero_icon);
 		icon[CTRLR] = Icon(ctrlR_icon);
 		icon[BULLET] = Icon(bullet_icon);
-		setdesc("PassPort " + versionString);
+		setdesc("PassPort Renewed " + versionString);
 		sceneJustLoaded = 0;
 		
 		fileMenu_items = @"Save Pass as Scene...","Save All Passes As Scenes...","Render Pass Frame","Render Pass Scene","Render All Passes","==","Update Lists Now      "+ icon[CTRLR],"Preferences...          " + icon[LETTERO],"Render Globals...","==","Save Current Settings...","Load Settings...","About PassPort..."@;

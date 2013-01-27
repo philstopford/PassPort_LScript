@@ -6,7 +6,7 @@ win_bg_frameRender: sceneFile, frameOutputPath
     currentscene_patharray = split(currentscene_path);
     currentscene_filename = currentscene_patharray[3] + currentscene_patharray[4];
     currenttime = Scene().currenttime;
-    currentframe = floor(Scene().currenttime*Scene().fps);
+    currentframe = int(Scene().currenttime*Scene().fps);
     extensionArray = parse("(",image_formats_array[testRgbSaveType]);
     extension = strleft(extensionArray[2],4);
     if(currentframe < 10)
@@ -103,7 +103,7 @@ win_bg_sceneRender: sceneFile, frameOutputPath
     currentscene_patharray = split(currentscene_path);
     currentscene_filename = currentscene_patharray[3] + currentscene_patharray[4];
     currenttime = Scene().currenttime;
-    currentframe = floor(Scene().currenttime*Scene().fps);
+    currentframe = int(Scene().currenttime*Scene().fps);
     extensionArray = parse("(",image_formats_array[rgbSaveType]);
     extension = strleft(extensionArray[2],4);
     renderStart = Scene().renderstart;
@@ -150,7 +150,7 @@ win_bg_allSceneRender: sceneFile, frameOutputPath
     currentscene_patharray = split(currentscene_path);
     currentscene_filename = currentscene_patharray[3] + currentscene_patharray[4];
     currenttime = Scene().currenttime;
-    currentframe = floor(Scene().currenttime*Scene().fps);
+    currentframe = int(Scene().currenttime*Scene().fps);
     extensionArray = parse("(",image_formats_array[rgbSaveType]);
     extension = strleft(extensionArray[2],4);
     renderStart = Scene().renderstart;
@@ -203,7 +203,7 @@ UB_bg_frameRender: sceneFile, frameOutputPath
     currentscene_patharray = split(currentscene_path);
     currentscene_filename = currentscene_patharray[3] + currentscene_patharray[4];
     currenttime = Scene().currenttime;
-    currentframe = floor(Scene().currenttime*Scene().fps);
+    currentframe = int(Scene().currenttime*Scene().fps);
     extensionArray = parse("(",image_formats_array[testRgbSaveType]);
     extension = strleft(extensionArray[2],4);
     if(currentframe < 10)
@@ -297,7 +297,7 @@ UB_bg_sceneRender: sceneFile, frameOutputPath
     currentscene_patharray = split(currentscene_path);
     currentscene_filename = currentscene_patharray[3] + currentscene_patharray[4];
     currenttime = Scene().currenttime;
-    currentframe = floor(Scene().currenttime*Scene().fps);
+    currentframe = int(Scene().currenttime*Scene().fps);
     renderStart = Scene().renderstart;
     renderEnd = Scene().renderend;
     renderStep = Scene().renderstep;
@@ -368,7 +368,7 @@ UB_bg_allSceneRender: sceneFile, frameOutputPath
 {
 	temp_dir = getdir("Temp");
 	currenttime = Scene().currenttime;
-    currentframe = floor(Scene().currenttime*Scene().fps);
+    currentframe = int(Scene().currenttime*Scene().fps);
     renderStart = Scene().renderstart;
     renderEnd = Scene().renderend;
     renderStep = Scene().renderstep;

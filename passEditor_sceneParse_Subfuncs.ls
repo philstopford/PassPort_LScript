@@ -192,8 +192,6 @@ getLightEndLine: startLine,endLine,objID,inputPath
 
 getPartialLine: startLine, endLine, searchString, inputPath
 {
-	// Removed the a of ra, because the file is not being appended to in these functions, and it *seemed* to be causing a crash - Matt Gorner
-	// input = File(inputPath, "r");
 	input = File(inputPath, "r");
 
 	searchLine[1] = searchString;
@@ -204,8 +202,6 @@ getPartialLine: startLine, endLine, searchString, inputPath
 	}
 	if(endLine == 0)
 	{
-		/* Changed to .linecount as .eof() only returns a bool value, if the purpose of this is to count the number of lines in the scene file Matt Gorner */
-		// endLine = input.eof();
 		endLine = input.linecount();
 	}
 	currentLine = 1;
