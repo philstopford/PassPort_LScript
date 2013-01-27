@@ -1026,7 +1026,7 @@ overrideMenu_active: overrideMenu_item
 reqkeyboard: key
 {
     // win hotkeys
-    if(platformVar == WIN32 || platformVar == WIN64)
+    if(platform() == WIN32 || platform() == WIN64)
     {
         
         // undo selections
@@ -1139,7 +1139,7 @@ reqkeyboard: key
     }
     
     // mac UB hotkeys
-    if(platformVar == MACUB || platformVar == MAC64)
+    if(platform() == MACUB || platform() == MAC64)
     {
         // undo selections
         if(key == 26 && doKeys == 1)

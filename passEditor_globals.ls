@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130112";
+var versionString = "20130115";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -60,14 +60,11 @@ var fileOutputPrefix;
 var	userOutputString;
 var areYouSurePrompts;
 var doKeys;
-var platformVar;
 var rgbSaveType;
 var editorResolution;
 var testResMultiplier;
 var testRgbSaveType;
 var sceneJustLoaded = 0;
-var testOutputPath;
-var seqOutputPath;
 var unsaved;
 var listOneWidth;
 var panelWidth;
@@ -82,7 +79,7 @@ var tempLightTransferring;
 var light21;
 var light23;
 var lightListArray;
-
+var saveRGBImagesPrefix;
 var newPassButtonString;
 var newPassButtonXposition;
 var newPassButtonWidth;
@@ -115,6 +112,11 @@ var loadingInProgress;
 var justReopened;
 var beingEscaped;
 var pass;
+var passItem;
+var noOfStages;
+var lastObject = 0;
+var lastLight = 0;
+var lastCamera = 0;
 
 // motion mixer
 var overriddenObjectID;
@@ -140,4 +142,26 @@ var renderers = @"Native"@;
 @end
 var overrideRenderer = 1; // default, native.
 
+var lastObject;
+var lastLight;
+var lastCamera;
+var objStart;
+var objEnd;
+var doOverride;
+
+// Global override variables settings.
 var settingsArray;
+var overrideType;
+var motInputTemp;
+var lwoInputTemp;
+var srfLWOInputID;
+var srfInputTemp;
+var objPropOverrideSets;
+var objPropOverrideShadowOpts;
+var lightSettingsPartOne;
+var lightSettingsPartTwo;
+var lightSettingsPartThree;
+var cameraSettingsPartOne;
+var cameraSettingsPartTwo;
+var cameraSettingsPartThree;
+

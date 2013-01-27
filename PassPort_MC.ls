@@ -71,6 +71,7 @@ var supportedplatform = 1;
 
 @insert "@passEditor_globals.ls"
 @insert "@passEditor_UIglobals.ls"
+@insert "@passEditor_Utilityfuncs.ls"
 @insert "@passEditor_Interface_Subfuncs.ls"
 @insert "@passEditor_Interface_Subfuncs_OverrideUI.ls"
 @insert "@passEditor_render_Subfuncs.ls"
@@ -196,7 +197,6 @@ create
 	// Attempt to avoid failures under LWSN.
 	if(runningUnder() == LAYOUT)
 	{
-    debug();
 		platformcheck();
 	
 		loadingInProgress = 0;
@@ -632,7 +632,6 @@ process: event, command
         originalSelection = masterScene.getSelect();
         
         EditObjects();
-        platformVar = platform();
         image_formats_array = getImageFormats();
         
         // Set 'userOutputFolder' to "Content/Passport_Passes" by default - Matt Gorner
@@ -1100,7 +1099,6 @@ reProcess
         // and this bit just recatalogs the items so assignments are up to date
         if(sceneJustLoaded == 1)
         {
-            platformVar = platform();
             doKeys = 1;
             masterScene = Scene();
             originalSelection = masterScene.getSelect();

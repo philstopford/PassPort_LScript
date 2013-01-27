@@ -37,19 +37,11 @@ getPassEditorStartLine: inputPath
 	return(toReturn);
 }
 
-getObjectLines: startLine,endLine,objID,inputPath
+getObjectLines: objID,inputPath
 {
 	input = File(inputPath, "r");
-
-	if(startLine == 0 || startLine == nil)
-	{
-		startLine = 1;
-	}
-	if(endLine == 0)
-	{
-		endLine = input.linecount();
-	}
-
+	startLine = 1;
+	endLine = input.linecount();
 	currentLine = 1;
 	toReturn = nil;
 	input.line(startLine);
@@ -74,18 +66,11 @@ getObjectLines: startLine,endLine,objID,inputPath
 	return(toReturn);
 }
 
-getLightLines: startLine,endLine,objID,inputPath
+getLightLines: objID,inputPath
 {
 	input = File(inputPath, "r");
-
-	if(startLine == 0 || startLine == nil)
-	{
-		startLine = 1;
-	}
-	if(endLine == 0)
-	{
-		endLine = input.linecount();
-	}
+	startLine = 1;
+	endLine = input.linecount();
 	currentLine = 1;
 	toReturn = nil;
 	input.line(startLine);
@@ -106,18 +91,11 @@ getLightLines: startLine,endLine,objID,inputPath
 	return(toReturn);
 }
 
-getCameraLines: startLine,endLine,objID,inputPath
+getCameraLines: objID,inputPath
 {
 	input = File(inputPath, "r");
-
-	if(startLine == 0 || startLine == nil)
-	{
-		startLine = 1;
-	}
-	if(endLine == 0)
-	{
-		endLine = input.linecount();
-	}
+	startLine = 1;
+	endLine = input.linecount();
 	currentLine = 1;
 	toReturn = nil;
 	input.line(startLine);
@@ -138,7 +116,7 @@ getCameraLines: startLine,endLine,objID,inputPath
 	return(toReturn);
 }
 
-getObjectEndLine: startLine,endLine,objID,inputPath
+getObjectEndLine: startLine,objID,inputPath
 {
 	input = File(inputPath, "r");
 
@@ -146,10 +124,7 @@ getObjectEndLine: startLine,endLine,objID,inputPath
 	{
 		startLine = 1;
 	}
-	if(endLine == 0)
-	{
-		endLine = input.linecount();
-	}
+	endLine = input.linecount();
 	currentLine = 1;
 	toReturn = nil;
 	input.line(startLine);
@@ -172,7 +147,7 @@ getObjectEndLine: startLine,endLine,objID,inputPath
 	return(toReturn);
 }
 
-getCameraEndLine: startLine,endLine,objID,inputPath
+getCameraEndLine: startLine,objID,inputPath
 {
 	input = File(inputPath, "r");
 
@@ -180,10 +155,7 @@ getCameraEndLine: startLine,endLine,objID,inputPath
 	{
 		startLine = 1;
 	}
-	if(endLine == 0)
-	{
-		endLine = input.linecount();
-	}
+	endLine = input.linecount();
 	currentLine = 1;
 	toReturn = nil;
 	endMarkerString = "Plugin CameraHandler";
@@ -207,7 +179,7 @@ getCameraEndLine: startLine,endLine,objID,inputPath
 	return(toReturn);
 }
 
-getLightEndLine: startLine,endLine,objID,inputPath
+getLightEndLine: startLine,objID,inputPath
 {
 	input = File(inputPath, "r");
 
@@ -215,10 +187,7 @@ getLightEndLine: startLine,endLine,objID,inputPath
 	{
 		startLine = 1;
 	}
-	if(endLine == 0)
-	{
-		endLine = input.linecount();
-	}
+	endLine = input.linecount();
 	currentLine = 1;
 	toReturn = nil;
 	endMarkerString = "Plugin LightHandler";

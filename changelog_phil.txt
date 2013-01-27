@@ -1,3 +1,27 @@
+20130115
+========
+
+- Restored missing definition of hvStartLine.
+- Working on the final state of the scene generator code, to better handle the HV stuff and to avoid losing lines in the process.
+- p0018 was pretty stubborn, but should be close to resolution.
+
+20130114
+========
+
+- Adjusted code to derive number of channels - now uses parse() to split the line and directly retrieve the number of channels.
+- Generic header function added to future-proof header handling.
+- Reworked the approach from the original plugin to stripping the PassEditor reference.
+ - No longer breaks line number references, so look-ups of the line numbers are correct.
+ - Color correction settings and related lines are no longer dropped from the scene. We only strip the PassEditor lines, nothing more, nothing less.
+- Utility functions file added and code moved in to reduce clutter elsewhere.
+- Removed platformVar - replaced with platform()
+- Simplifying main scene generation function:
+ - Created new function to generate new scene path.
+ - Created new functions to hold code to write object, light and camera data.
+ - Created new function to generate SaveRGB path.
+- Moved radiosity insertion code to early in the scene generation code to avoid line reference breakage.
+- Optimised some aspects of the scene generation code.
+
 20130112
 ========
 
@@ -397,6 +421,7 @@ p0020 : Line 2162 and 2168 errors with light override. (Fixed)
 - Autoscan plugin operation.
 - Need to check if growl interaction works with current growl versions.
 - Check if motion override breaks cameras (9 channels vs 6 for cameras)
+- Versioning of overrides for host application version and Passport version.
 
 -------------
 - Reference -
