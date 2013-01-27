@@ -18,7 +18,6 @@ generatePassFile: mode, pass
     SaveSceneCopy("passEditorTempSceneCopy.lws");
     currentScenePath = tempDirectory + getsep() + "passEditorTempSceneCopy.lws";
     chdir(contentDirectory);
-
     // get the plugin lines so we don't copy those into the render scenes
     passEditorStartLine = getPassEditorStartLine(currentScenePath);
 

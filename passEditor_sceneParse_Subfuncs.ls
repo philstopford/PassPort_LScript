@@ -1,8 +1,6 @@
 //scene parsing functions
 getPassEditorStartLine: inputPath
 {
-	// Removed the a of ra, because the file is not being appended to in these functions, and it *seemed* to be causing a crash - Matt Gorner
-	// input = File(inputPath, "r");
 	input = File(inputPath, "r");
 
 	if(startLine == 0 || startLine == nil)
@@ -25,7 +23,6 @@ getPassEditorStartLine: inputPath
 	currentLine = 1;
 	input.line(startLine);
 
-	while(currentLine != endLine)
 	{
 		line = input.read();
 		lineArray = parse(" ", line);
@@ -38,6 +35,7 @@ getPassEditorStartLine: inputPath
 			}
 		}
 	}
+
 	input.close();
 }
 
@@ -45,8 +43,6 @@ getPassEditorStartLine: inputPath
 
 getObjectLines: startLine,endLine,objID,inputPath
 {
-	// Removed the a of ra, because the file is not being appended to in these functions, and it *seemed* to be causing a crash - Matt Gorner
-	// input = File(inputPath, "r");
 	input = File(inputPath, "r");
 
 	if(startLine == 0 || startLine == nil)

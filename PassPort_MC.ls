@@ -265,7 +265,7 @@ options
         compiled = 0;
     }
 
-    reqbegin("PassPort Editor " + versionString);
+    reqbegin("PassPort Editor " + versionString.asStr());
     reqsize(Main_panelWidth,Main_panelHeight);
 
     // Banner Graphic
