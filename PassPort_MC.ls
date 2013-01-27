@@ -189,12 +189,9 @@ create
 {
 	loadingInProgress = 0;
 	justReopened = 0;
-
 	// 22 = List gadget scrollbar
 	listOneWidth = listTwoWidth = integer( ( (Main_panelWidth - (3 * Main_ui_gap) ) - 44) / 2);
 	listTwoPosition = listTwoWidth + 22 + (2 * Main_ui_gap);
-
-	// New UI layout code - Matt Gorner
 	listOneHeight = Main_panelHeight - ( 3 * Main_button_height) - Main_banner_height - Main_spacer_height - ( 5 * Main_ui_y_spacer);
 
 	icon[BLANK] = Icon(blank_icon);
@@ -321,7 +318,7 @@ options
 	ctlposition(file_popup_menu, Main_ui_gap, Main_banner_height + 5);
 	
 	c0_5 = ctltab("Passes","Overrides");
-	ctlposition(c0_5, 0, banner_height + 35);
+	ctlposition(c0_5, 0, Main_banner_height + 35);
 
 	gad_PassesListview = ctllistbox("Render Passes",listOneWidth,listOneHeight,"passeslb_count","passeslb_name","passeslb_event");
 	ctlposition(gad_PassesListview, Main_ui_gap, Main_banner_height + 55);
@@ -382,7 +379,7 @@ options
 	ctlrefresh(gad_SelectedPass, "currentPassMenu_refresh");
 
 	//c7 = ctltext(currentChosenPassString,"");
-	//ctlposition(c7, 208, banner_height + 8);
+	//ctlposition(c7, 208, Main_banner_height + 8);
 
 	ctlpage(1,gad_PassesListview,c3,c4,c5_01,c5_02,c5_10,c5_15,c5_20,c5_25);
 	ctlpage(2,gad_OverridesListview,c3_5,c5,c5_05,c5_06,c5_30,c5_35,c5_40,c5_45);
@@ -909,11 +906,11 @@ process: event, command
 
 				newPassButtonString = "New Pass...      " + icon[DOWNARROW];
 				newPassButtonWidth = w;
-				newPassButtonXposition = ui_gap;
+				newPassButtonXposition = Main_ui_gap;
 
 				newOverrideButtonString = "New Override... " + icon[DOWNARROW];
 				newOverrideButtonWidth = w;
-				newOverrideButtonXposition = ui_gap;
+				newOverrideButtonXposition = Main_ui_gap;
 
 				editSelectedButtonString = "Edit Selected  " + icon[ENTERKEY];
 				editSelectedButtonWidth = w;
@@ -1417,7 +1414,7 @@ reProcess
 
 				newPassButtonString = "+Pass...   " + icon[DOWNARROW];
 				newPassButtonWidth = w;
-				newPassButtonXposition = ui_gap;
+				newPassButtonXposition = Main_ui_gap;
 
 				newOverrideButtonString = "+Override" + icon[DOWNARROW];
 				newOverrideButtonWidth = w;
@@ -1599,7 +1596,7 @@ req_redraw
 	if(reqisopen())
 	{
 		// Draw divider line (ctlsep kept getting drawn over)
-//		drawline(<038,038,040>, 0, banner_height + 29, panelWidth, banner_height + 29);
-//		drawline(<081,081,083>, 0, banner_height + 31, panelWidth, banner_height + 31);
+//		drawline(<038,038,040>, 0, Main_banner_height + 29, panelWidth, Main_banner_height + 29);
+//		drawline(<081,081,083>, 0, Main_banner_height + 31, panelWidth, Main_banner_height + 31);
 	}
 }

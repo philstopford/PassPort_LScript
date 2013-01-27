@@ -1375,6 +1375,12 @@ platformInformation: platformVar
 
 preferencePanel
 {
+
+	if(platform() == 9) // MacUB
+	{
+		Pref_num_gads ++;
+	}
+
 	resolutionsArray[1] = "640 x 540";
 	resolutionsArray[2] = "640 x 385";
 	resolutionsArray[3] = "457 x 540";
@@ -2099,14 +2105,13 @@ generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStar
 					{
 						if(chdir("tempObjects"))
 						{
-							tempLWOPath = outputFolder[1] + "CG" + getsep() + "temp" + getsep() + "tempScenes" + getsep() + "tempObjects" + getsep() + string(srfLWOInputID) + "_" + srfInputTempArray[3] + "_" + userOutputString + "_" + passNames[pass] + ".lwo";
 						}
 						else
 						{
 							mkdir("tempObjects");
 							chdir("tempObjects");
-							tempLWOPath = outputFolder[1] + "CG" + getsep() + "temp" + getsep() + "tempScenes" + getsep() + "tempObjects" + getsep() + string(srfLWOInputID) + "_" + srfInputTempArray[3] + "_" + userOutputString + "_" + passNames[pass] + ".lwo";
 						}
+						
 					}
 					else
 					{
@@ -2114,7 +2119,6 @@ generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStar
 						chdir("tempScenes");
 						mkdir("tempObjects");
 						chdir("tempObjects");
-						tempLWOPath = outputFolder[1] + "CG" + getsep() + "temp" + getsep() + "tempScenes" + getsep() + "tempObjects" + getsep() + string(srfLWOInputID) + "_" + srfInputTempArray[3] + "_" + userOutputString + "_" + passNames[pass] + ".lwo";
 					}
 				}
 				else
@@ -2125,7 +2129,6 @@ generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStar
 					chdir("tempScenes");
 					mkdir("tempObjects");
 					chdir("tempObjects");
-					tempLWOPath = outputFolder[1] + "CG" + getsep() + "temp" + getsep() + "tempScenes" + getsep() + "tempObjects" + getsep() + string(srfLWOInputID) + "_" + srfInputTempArray[3] + "_" + userOutputString + "_" + passNames[pass] + ".lwo";
 				}
 			}
 			else
@@ -2138,7 +2141,6 @@ generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStar
 				chdir("tempScenes");
 				mkdir("tempObjects");
 				chdir("tempObjects");
-				tempLWOPath = outputFolder[1] + "CG" + getsep() + "temp" + getsep() + "tempScenes" + getsep() + "tempObjects" + getsep() + string(srfLWOInputID) + "_" + srfInputTempArray[3] + "_" + userOutputString + "_" + passNames[pass] + ".lwo";
 			}
 		}
 		else
@@ -2153,8 +2155,8 @@ generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStar
 			chdir("tempScenes");
 			mkdir("tempObjects");
 			chdir("tempObjects");
-			tempLWOPath = outputFolder[1] + "CG" + getsep() + "temp" + getsep() + "tempScenes" + getsep() + "tempObjects" + getsep() + string(srfLWOInputID) + "_" + srfInputTempArray[3] + "_" + userOutputString + "_" + passNames[pass] + ".lwo";
 		}
+		tempLWOPath = generatePath("LWO", outputFolder[1], string(srfLWOInputID), srfInputTempArray[3], userOutputString, passNames[pass], ".lwo");
 		
 		srf_file_path = split(srfInputTemp);
 		surfaceList = Surface(meshAgents[selectedMeshID]);

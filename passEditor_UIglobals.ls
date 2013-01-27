@@ -4,9 +4,9 @@ Main_button_height			= 19;
 Main_spacer_height			= 3;
 Main_ui_y_spacer			= 4;
 Main_ui_gap					= 5;
-Main_panelWidth = integer(globalrecall("passEditorpanelWidth", 640));
-Main_panelHeight = integer(globalrecall("passEditorpanelHeight", 540));
-Main_panelWidthOnOpen 		= Main_panelWidth;
+Main_panelWidth 			= integer(globalrecall("passEditorpanelWidth", 640));
+Main_panelHeight 			= integer(globalrecall("passEditorpanelHeight", 540));
+// Main_panelWidthOnOpen 		= Main_panelWidth;
 Main_res1_panelWidth 		= 640;
 Main_res1_panelHeight 		= 540;
 Main_res2_panelWidth 		= 640;
@@ -15,7 +15,7 @@ Main_res3_panelWidth 		= 457;
 Main_res3_panelHeight 		= 540;
 Main_res4_panelWidth 		= 457;
 Main_res4_panelHeight 		= 385;
-				
+
 // Light Properties dialog UI
 LgtProp_gad_x				= 6;													// Gadget X coord
 LgtProp_gad_y				= 6;													// Gadget Y coord
@@ -127,16 +127,11 @@ Pref_gad_text_offset		= 150;													// Gadget text offset
 Pref_gad_prev_w				= 0;													// Previous gadget width temp variable
 Pref_num_gads				= 10;													// Total number of gadgets vertically (for calculating the max window height)
 
-if(platform() == 9) // MacUB
-{
-	Pref_num_gads ++;
-}
-
 Pref_ui_banner_height		= 0;																						// Height of banner graphic
 Pref_ui_spacing				= 3;																						// Spacing gap size
 Pref_ui_offset_x 			= 0;																						// Main X offset from 0
 Pref_ui_offset_y 			= 3 * Pref_ui_spacing;																		// Main Y offset from 0
-Pref_Pref_ui_row			= 0;																						// Row number
+Pref_ui_row					= 0;																						// Row number
 Pref_ui_column				= 0;																						// Column number
 Pref_ui_tab_offset			= Pref_ui_offset_y + 23;																	// Offset for tab height
 Pref_ui_row_offset			= Pref_gad_h + Pref_ui_spacing;																// Row offset

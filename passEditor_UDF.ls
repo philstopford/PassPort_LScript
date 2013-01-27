@@ -21,19 +21,23 @@ o_itemslb_name: index
 
 itemslb_event: items
 {
-	
+	info("itemslb_event: items");
 	items_array = nil;
 	sel = getvalue(gad_PassesListview).asInt();
 	if(passSelected == true && sel != 0)
 	{
 		previousPassAssItems[sel] = passAssItems[sel];
 		passAssItems[sel] = "";
-		if(items != nil)  {
-		items_size = sizeof(items);
-		for(x = 1;x <= items_size;x++)  {
-			items_array[x] = items[x];
-			tempNumber = items[x];
-			passAssItems[sel] = passAssItems[sel] + "||" + displayIDs[tempNumber]; }  }
+		if(items != nil)
+		{
+			items_size = sizeof(items);
+			for(x = 1;x <= items_size;x++)
+			{
+				items_array[x] = items[x];
+				tempNumber = items[x];
+				passAssItems[sel] = passAssItems[sel] + "||" + displayIDs[tempNumber];
+			}
+		}
 		else
 		{
 			setvalue(c3,nil);
@@ -49,6 +53,7 @@ itemslb_event: items
 
 o_itemslb_event: o_items
 {
+	info("o_itemslb_event: o_items");
 	o_items_array = nil;
 	pass = currentChosenPass;
 	sel = getvalue(gad_OverridesListview).asInt();
@@ -104,35 +109,40 @@ passeslb_name: index
 }
 passeslb_event: passes_items
 {
+	info("passeslb_event: passes_items");
 	passes_array = nil;
-	if(passes_items != nil)  {
-	passes_size = sizeof(passes_items);
-	for(x = 1;x <= passes_size;x++)  {
-		passes_array[x] = passes_items[x];
-		passes_sel = passes_items[x];  }
-	if(passes_size != 1)
+	if(passes_items != nil)
 	{
-		passSelected = false;
-		setvalue(gad_OverridesListview,nil);
-		setvalue(c3,nil);
-		requpdate();
+		passes_size = sizeof(passes_items);
+		for(x = 1;x <= passes_size;x++)
+		{
+			passes_array[x] = passes_items[x];
+			passes_sel = passes_items[x];
+		}
+		if(passes_size != 1)
+		{
+			passSelected = false;
+			setvalue(gad_OverridesListview,nil);
+			setvalue(c3,nil);
+			requpdate();
+		}
+		if(passes_size > 1)
+		{
+			setvalue(gad_PassesListview,nil);
+			setvalue(gad_OverridesListview,nil);
+			setvalue(c3,nil);
+			requpdate();
+		}
+		if(passes_size == 1)
+		{
+			passes_sel = passes_array[1];
+			setitems = parseListItems(passAssItems[passes_sel]);
+			setvalue(c3,setitems);
+			setvalue(gad_OverridesListview,nil);
+			requpdate();
+			passSelected = true;
+		} 
 	}
-	if(passes_size > 1)
-	{
-		setvalue(gad_PassesListview,nil);
-		setvalue(gad_OverridesListview,nil);
-		setvalue(c3,nil);
-		requpdate();
-	}
-	if(passes_size == 1)
-	{
-		passes_sel = passes_array[1];
-		setitems = parseListItems(passAssItems[passes_sel]);
-		setvalue(c3,setitems);
-		setvalue(gad_OverridesListview,nil);
-		requpdate();
-		passSelected = true;
-	}  }
 	else
 	{
 		passSelected = false;
@@ -141,7 +151,6 @@ passeslb_event: passes_items
 		setvalue(c3,nil);
 		requpdate();
 	}
-	
 }
 
 parseListItems: passItemsString
@@ -230,36 +239,41 @@ overrideslb_name: index
 }
 overrideslb_event: overrides_items
 {	
+	info("overrideslb_event: overrides_items");
 	pass = currentChosenPass;
 	overrides_array = nil;
-	if(overrides_items != nil)  {
-	overrides_size = sizeof(overrides_items);
-	for(x = 1;x <= overrides_size;x++)  {
-		overrides_array[x] = overrides_items[x];
-		overrides_sel = overrides_items[x];  }
-	if(overrides_size != 1)
+	if(overrides_items != nil)
 	{
-		overridesSelected = false;
-		setvalue(c3_5,nil);
-		setvalue(gad_PassesListview,nil);
-		requpdate();
+		overrides_size = sizeof(overrides_items);
+		for(x = 1;x <= overrides_size;x++)
+		{
+			overrides_array[x] = overrides_items[x];
+			overrides_sel = overrides_items[x];
+		}
+		if(overrides_size != 1)
+		{
+			overridesSelected = false;
+			setvalue(c3_5,nil);
+			setvalue(gad_PassesListview,nil);
+			requpdate();
+		}
+		if(overrides_size > 1)
+		{
+			setvalue(gad_OverridesListview,nil);
+			setvalue(c3_5,nil);
+			setvalue(gad_PassesListview,nil);
+			requpdate();
+		}
+		if(overrides_size == 1)
+		{
+			overrides_sel = overrides_array[1];
+			set_o_items = o_parseListItems(passOverrideItems[currentChosenPass][overrides_sel]);
+			setvalue(c3_5,set_o_items);
+			setvalue(gad_PassesListview,nil);
+			requpdate();
+			overridesSelected = true;
+		}
 	}
-	if(overrides_size > 1)
-	{
-		setvalue(gad_OverridesListview,nil);
-		setvalue(c3_5,nil);
-		setvalue(gad_PassesListview,nil);
-		requpdate();
-	}
-	if(overrides_size == 1)
-	{
-		overrides_sel = overrides_array[1];
-		set_o_items = o_parseListItems(passOverrideItems[currentChosenPass][overrides_sel]);
-		setvalue(c3_5,set_o_items);
-		setvalue(gad_PassesListview,nil);
-		requpdate();
-		overridesSelected = true;
-	}  }
 	else
 	{
 		overridesSelected = false;
@@ -280,10 +294,12 @@ addAllButton
 		previousPassAssItems[sel] = passAssItems[sel];
 		passAssItems[sel] = "";
 		items_size = sizeof(displayNames);
-		for(x = 1;x <= items_size;x++)  {
+		for(x = 1;x <= items_size;x++)
+		{
 			items_array[x] = x;
 			tempNumber = x;
-			passAssItems[sel] = passAssItems[sel] + "||" + displayIDs[tempNumber]; }
+			passAssItems[sel] = passAssItems[sel] + "||" + displayIDs[tempNumber];
+		}
 		setitems = parseListItems(passAssItems[sel]);
 		setvalue(c3,setitems);
 		requpdate();
@@ -293,7 +309,6 @@ addAllButton
 		setvalue(c3,nil);
 		requpdate();
 	}
-	
 }
 
 o_addAllButton
@@ -309,10 +324,12 @@ o_addAllButton
 		o_items_array[1] = 1;
 		tempNumber = 1;
 		passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + "(Scene Master)";
-		for(x = 2;x <= o_items_size;x++)  {
+		for(x = 2;x <= o_items_size;x++)
+		{
 			o_items_array[x] = x;
 			tempNumber = x;
-			passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + displayIDs[tempNumber - 1]; }
+			passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + displayIDs[tempNumber - 1];
+		}
 		passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + displayIDs[1]; 
 		set_o_items = o_parseListItems(passOverrideItems[pass][sel]);
 		setvalue(c3_5,set_o_items);
@@ -357,7 +374,6 @@ clearAllButton
 		sel = getvalue(gad_PassesListview).asInt();
 		if(passSelected == true && sel != 0)
 		{
-			
 			passAssItems[sel] = "";
 			setvalue(c3,nil);
 			requpdate();
@@ -384,7 +400,6 @@ o_clearAllButton
 				setvalue(c3_5,nil);
 				requpdate();
 			}
-
 		}
 		else
 		{
@@ -437,9 +452,10 @@ editSelectedPass
 			if(useHackyUpdates == 1)
 			{
 				justReopened = 1;
-				if(reqisopen())  {
-					reqend();  }
-				
+				if(reqisopen())
+				{
+					reqend();
+				}
 				options();
 			}
 		}
@@ -462,7 +478,6 @@ deleteSelectedPass
 				c20 = ctltext("","Are you sure you want to delete selected pass?");
 				if(reqpost())
 				{
-					
 					sel = getvalue(gad_PassesListview).asInt();
 					if(passSelected == true && sel != 0)
 					{
@@ -534,9 +549,10 @@ deleteSelectedPass
 					if(useHackyUpdates == 1)
 					{
 						justReopened = 1;
-						if(reqisopen())  {
-							reqend();  }
-						
+						if(reqisopen())
+						{
+							reqend();
+						}
 						options();
 					}
 				}
@@ -607,15 +623,16 @@ deleteSelectedPass
 				if(useHackyUpdates == 1)
 				{
 					justReopened = 1;
-					if(reqisopen())  {
-						reqend();  }
+					if(reqisopen())
+					{
+						reqend();
+					}
 					
 					options();
 				}
 				//reProcess();
 				requpdate();
 			}
-
 		}
 		else
 		{
@@ -675,7 +692,6 @@ deleteSelectedOverride
 						overrideNames[topNumber] = nil;
 						passOverrideItems[currentChosenPass][topNumber] = nil;
 						overrideSettings[topNumber] = nil;
-						
 					}
 				}
 				reProcess();
@@ -736,7 +752,6 @@ deleteSelectedOverride
 					overrideNames[topNumber] = nil;
 					passOverrideItems[currentChosenPass][topNumber] = nil;
 					overrideSettings[topNumber] = nil;
-					
 				}
 			}
 			reProcess();

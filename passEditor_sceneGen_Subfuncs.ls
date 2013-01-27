@@ -1,4 +1,4 @@
-generatePassFile: pass, mode
+generatePassFile: mode, pass
 {
     if (mode == "frame")
     {
@@ -31,7 +31,7 @@ generatePassFile: pass, mode
 
     // get the item start and stop lines for copying
     setItems = parseListItems(passAssItems[pass]);
-
+	
     for(x = 1; x <= size(setItems); x++)
     {
         progressString = string((x / size(setItems)) / 2);
@@ -46,6 +46,7 @@ generatePassFile: pass, mode
     
         if(assignmentsArray != nil)
         {
+			info("assignmentsArray != nil");
             doOverride[x] = 1;
             a = assignmentsArray[1];
             settingsArray = parse("||", overrideSettings[a]);
@@ -55,6 +56,14 @@ generatePassFile: pass, mode
                 secondSettingsArray = parse("||",overrideSettings[b]);
             }
 
+			// Scene Master override is incompatible with an assignment array, so empty it in this case :			
+			if(settingsArray[2] == "type6")
+			{
+				assignmentsArray = nil;
+				doOverride[x] = 0;
+				overrideType[x] = 0;
+			}
+			
             if(settingsArray[2] == "type5")
             {
                 overrideType[x] = 5;
@@ -362,7 +371,7 @@ generatePassFile: pass, mode
                 lightSettingsPartOne[x] = nil;
                 lightSettingsPartTwo[x] = nil;
             }
-            if(size(assignmentsArray) > 1)
+            if(assignmentsArray != nil && size(assignmentsArray) > 1)
             {
                 if(secondSettingsArray[2] == "type7")
                 {
@@ -425,13 +434,6 @@ generatePassFile: pass, mode
                     {
                         lightExclusion[x] = nil;
                     }
-
-
-                    
-                    
-                    
-                    
-                    
                     
                     //tempIDArray = parse("x",hex(number(secondSettingsArray[4])));
                     //lightExclusion[x] = "ExcludeLight " + tempIDArray[2] + "\n";
@@ -449,6 +451,7 @@ generatePassFile: pass, mode
         }
         else
         {
+			info("assignmentsArray was nil");
             doOverride[x] = 0;
             overrideType[x] = 0;
         }
@@ -456,8 +459,13 @@ generatePassFile: pass, mode
         {
             doOverride[x] = 0;
         }
-        if(size(overrideType) < x)
+        if(overrideType == nil || size(overrideType) < x)
         {
+			errorString = "An internal error has been detected: overrideType is: " + overrideType;
+			info(errorString);
+			errorString = "Will render a full pass of type '" + mode + "' instead. Sorry.";
+			info(errorString);
+			doOverride[x] = 0;
             overrideType[x] = 0;
         }
         
@@ -1484,6 +1492,7 @@ generatePassFile: pass, mode
         settingsArray = parse("||",overrideSettings[a]);
         if(settingsArray[2] == "type6")
         {
+			overrideType[x] = 6;
             resolutionMultiplierSetts   = integer(settingsArray[3]);
             renderModeSetts             = integer(settingsArray[4]);
             depthBufferAASetts          = integer(settingsArray[5]);
@@ -1819,17 +1828,8 @@ generatePassFile: pass, mode
                                         if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
                                         {
                                             bufferBaseName = baseNameArray[size(baseNameArray)];
-
-                                            // Experimental simplification
                                             updatedBufferSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], bufferBaseName);
 
-/*                                          updatedBufferSaverPath = "\"" + outputFolder[1] + "CG" + getsep();
-                                            if (mode == "frame")
-                                            {
-                                                updatedBufferSaverPath = updatedBufferSaverPath + "temp" + getsep();
-                                            }
-                                            updatedBufferSaverPath = updatedBufferSaverPath + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + passNames[pass] + "_" + bufferBaseName;
-*/
                                             if(platformVar == 1 || platformVar == 10)
                                             {
                                                 
@@ -1867,24 +1867,12 @@ generatePassFile: pass, mode
                                         if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
                                         {
                                             psdBaseName = baseNameArray[size(baseNameArray)];
-                                            // Experimental simplification
                                             updatedPsdSaverPath = "Path \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], psdBaseName);
 
-/*                                          updatedPsdSaverPath = "Path \"" + outputFolder[1] + "CG" + getsep();
-                                            if( mode == "frame" )
-                                            {
-                                                updatedPsdSaverPath = updatedPsdSaverPath + "temp" + getsep();
-                                            }
-                                            updatedPsdSaverPath = updatedPsdSaverPath + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + passNames[pass] + "_" + psdBaseName;
-*/
                                             if(platformVar == 1 || platformVar == 10)
                                             {
-                                                noIntroPath = "\"" + outputFolder[1] + "CG" + getsep();
-                                                if (mode == "frame") {
-                                                    noIntroPath = noIntroPath +"temp" + getsep();
-                                                }
-                                                noIntroPath = noIntroPath + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + passNames[pass] + "_" + psdBaseName;
-                                                tempFixedPath = fixPathForWin32(noIntroPath);
+												noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], psdBaseName);
+												tempFixedPath = fixPathForWin32(noIntroPath);
                                                 noIntroPath = tempFixedPath;
                                                 newPathFixed = "Path " + noIntroPath;
                 
@@ -1920,10 +1908,7 @@ generatePassFile: pass, mode
                                         if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
                                         {
                                             rlaBaseName = baseNameArray[size(baseNameArray)];
-                                            // Experimental simplification
                                             updatedRlaSaverPath = generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], rlaBaseName);
-
-//                                          updatedRlaSaverPath = outputFolder[1] + "CG" + getsep() +"temp" + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + passNames[pass] + "_" + rlaBaseName;
                                             toWrite = updatedRlaSaverPath;
                                         }
                                         else
@@ -1952,10 +1937,7 @@ generatePassFile: pass, mode
                                         if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
                                         {
                                             rpfBaseName = baseNameArray[size(baseNameArray)];
-                                            // Experimental simplification
                                             updatedRpfSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], rpfBaseName);
-
-//                                          updatedRpfSaverPath = outputFolder[1] + "CG" + getsep() +"temp" + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + passNames[pass] + "_" + rpfBaseName;
                                             toWrite = updatedRpfSaverPath;
                                         }
                                         else
@@ -1983,10 +1965,7 @@ generatePassFile: pass, mode
                                         if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
                                         {
                                             auraBaseName = baseNameArray[size(baseNameArray)];
-                                            // Experimental simplification
                                             updatedAuraSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], auraBaseName);
-
-//                                          updatedAuraSaverPath = "\"" + outputFolder[1] + "CG" + getsep() +"temp" + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + passNames[pass] + "_" + auraBaseName;
                                             toWrite = updatedAuraSaverPath;
                                         }
                                         else
@@ -2028,10 +2007,7 @@ generatePassFile: pass, mode
                                         if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
                                         {
                                             idofBaseName = baseNameArray[size(baseNameArray)];
-                                            // Experimental simplification
                                             updatedIdofSaverPath = generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], idofBaseName);
-
-//                                          updatedIdofSaverPath = outputFolder[1] + "CG" + getsep() +"temp" + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + passNames[pass] + "_" + idofBaseName;
                                             toWrite = updatedIdofSaverPath;
                                         }
                                         else
@@ -2373,12 +2349,16 @@ generatePassFile: pass, mode
 
 generatePath: mode, outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, baseName
 {
-    genPath = outputFolder + getsep() + "CG" + getsep();
-    if (mode == "frame")
-    {
-        genPath = genPath + "temp" + getsep();
-    }
-    genPath = genPath + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + baseName;
+	genPath = outputFolder + getsep() + "CG" + getsep();
+	if (mode == "LWO" || "frame")
+	{
+		genPath = genPath + "temp" + getsep();
+	}
+	if (mode == "LWO")
+	{
+		genPath = genPath + getsep() + "tempScenes" + getsep() + "tempObjects" + getsep();
+	}
+
+	genPath = genPath + outputStr + "_" + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + baseName;
     return genPath;
 }
-
