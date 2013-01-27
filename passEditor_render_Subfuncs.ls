@@ -67,8 +67,6 @@ win_bg_frameRender: sceneFile, frameOutputPath
 
     //chdir(currentscene_patharray[2] + getsep());
 	
-    info(bashFilePath);
-
 	result = spawn(bashFilePath);
 
     /*
@@ -130,8 +128,6 @@ win_bg_sceneRender: sceneFile, frameOutputPath
 
     bashOutput.writeln("pause");
     bashOutput.close();
-
-    info(bashFilePath);
 
 	if(debugmode == 0)
 	{
@@ -274,6 +270,7 @@ UB_bg_frameRender: sceneFile, frameOutputPath
 		bashOutput.writeln("rm " + growlAppleScriptPath);
     }
 	bashOutput.writeln("echo \"Displaying Completed Frame.\"");
+    bashOutput.writeln("exit");
     bashOutput.close();
     
     scriptOutput = File(scriptFilePath,"w");
@@ -348,6 +345,7 @@ UB_bg_sceneRender: sceneFile, frameOutputPath
 		bashOutput.writeln("rm " + growlAppleScriptPath);
     }
 	bashOutput.writeln("echo \"Sequence Render Complete.\"");
+    bashOutput.writeln("exit");
     bashOutput.close();
     
     scriptOutput = File(scriptFilePath,"w");
@@ -429,7 +427,7 @@ UB_bg_allSceneRender: sceneFile, frameOutputPath
 		growlScriptOutput.writeln("end tell");
 		growlScriptOutput.close();
 	}
-	
+
     bashOutput.writeln("rm " + bashFilePath);
 	if(useGrowl == 1)
 	{
@@ -437,6 +435,7 @@ UB_bg_allSceneRender: sceneFile, frameOutputPath
 		bashOutput.writeln("rm " + growlAppleScriptPath);
     }
 	bashOutput.writeln("echo \"Passes Render Complete.\"");
+    bashOutput.writeln("exit"); 
     bashOutput.close();
     
     scriptOutput = File(scriptFilePath,"w");

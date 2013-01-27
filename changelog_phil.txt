@@ -1,3 +1,11 @@
+20130121 (beta 7 - no override changes since beta 6)
+========
+
+- Internal tweaks to motion override code in scene generation, nothing user-relevant.
+- Camera override no longer has trouble with .mot files.
+- Added error handling for invalid filenames in overrides. Avoids an ugly error message from LScript that scares the user.
+- Fixed p0031 - object override led to 0 KB scene file! Misfire in MotionMixer function. Also affected surface overrides.
+
 20130120 (beta 6 - scene master changed since beta 5)
 ========
 
@@ -497,6 +505,7 @@ p0027 : Backdrop color not saved by Scene Master override. (Fixed, beta4)
 p0028 : Wireframe mode change reported for Scene Master override. (Fixed, beta4)
 p0029 : More than 3 lights causes 'exceeds file size' error. (Fixed, beta6)
 p0030 : Resolution Multiplier not sticking in camera override. (Fixed, beta6)
+p0031 : object replacement override broken in beta 6. Issue was in MotionMixer code. (Fixed, beta7)
 
 ###############
 # Limitations #
@@ -508,9 +517,7 @@ p0030 : Resolution Multiplier not sticking in camera override. (Fixed, beta6)
 : Issues to check :
 :::::::::::::::::::
 
-- SceneGen code could be optimised to walk the array and use loops to greatly simplify the code. (partially done with 20130101)
 - Need to check if growl interaction works with current growl versions.
-- Check if motion override breaks cameras (9 channels vs 6 for cameras)
 - 3rd party lights/cameras end of block detection.
 - Active camera override in Scene Override.
 - Extend light override (caustics).

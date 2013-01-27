@@ -496,7 +496,6 @@ load: what,io
           areYouSurePrompts = io.read().asInt();
           rgbSaveType = io.read().asInt();
           editorResolution = io.read().asInt();
-          testResMultiplier = io.read().asInt();
           testRgbSaveType = io.read().asInt();
           
           setdesc("PassPort Renewed " + versionString);
@@ -609,7 +608,6 @@ save: what,io
               io.writeln(areYouSurePrompts);
               io.writeln(rgbSaveType);
               io.writeln(editorResolution);
-              io.writeln(testResMultiplier);
               io.writeln(testRgbSaveType);
               
               unsaved = 0;
@@ -620,7 +618,6 @@ save: what,io
               globalstore("passEditorareYouSurePrompts",areYouSurePrompts);
               globalstore("passEditorrgbSaveType",rgbSaveType);
               globalstore("passEditoreditorResolution",editorResolution);
-              globalstore("passEditortestResMultiplier",testResMultiplier);
               globalstore("passEditortestRgbSaveType",testRgbSaveType);
           }
 
@@ -659,7 +656,6 @@ process: event, command
         areYouSurePrompts = integer(globalrecall("passEditorareYouSurePrompts", 1));
         rgbSaveType = integer(globalrecall("passEditorrgbSaveType", 1));
         editorResolution = integer(globalrecall("passEditoreditorResolution", 1));
-        testResMultiplier = integer(globalrecall("passEditortestResMultiplier", 3));
         testRgbSaveType = integer(globalrecall("passEditortestRgbSaveType", 1));
         
         interfaceRunYet = 0;

@@ -74,7 +74,7 @@ scnmasterOverride_UI_native: action
 			backgroundColorArray		= <integer(settingsArray[62]), integer(settingsArray[63]), integer(settingsArray[64])>;
 			// backdrop
 			backdropColorArray			= <integer(settingsArray[65]), integer(settingsArray[66]), integer(settingsArray[67])>;
-			adaptiveSampline			= integer(settingsArray[68]);
+			adaptiveSampling			= integer(settingsArray[68]);
 		}
 	
 		doKeys = 0;

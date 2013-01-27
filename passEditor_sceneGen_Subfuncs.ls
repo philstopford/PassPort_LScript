@@ -139,7 +139,7 @@ generatePassFile: mode, pass
             if(settingsArray[2] == "type3")
             {
                 overrideType[passItem] = 3;
-                motInputTemp[passItem] = File(settingsArray[3],"r");
+                motInputTemp[passItem] = settingsArray[3];
             }
 
             if(settingsArray[2] == "type2")
@@ -871,34 +871,6 @@ generatePassFile: mode, pass
 	// and as a tack-on fix, replace motion-mixer stuff for overridden objects. Calls finishFiles() for us.
 	motionMixerStuff(updatedCurrentScenePath);
 
-    /*    // and the test frame resolution multiplier stuff
-    switch(testResMultiplier)
-    {
-        case 1:
-            resMult = 0.25;
-            break;
-        
-        case 2:
-            resMult = 0.5;
-            break;
-            
-        case 3:
-            resMult = 1.0;
-            break;
-            
-        case 4:
-            resMult = 2.0;
-            break;
-            
-        case 5:
-            resMult = 4.0;
-            break;
-            
-        default:
-            break;
-    }
-	writeOverrideString(updatedCurrentScenePath, newScenePath, "FrameSize ", resMult);
-    */
 	filedelete(updatedCurrentScenePath);
 
     return(newScenePath);
@@ -951,6 +923,8 @@ writeCameras: inputFile, outputFile, lastObject, lastLight, lastCamera
                     // begin case 3 here, which is the motion override type
                     if(motInputTemp[cameraCounter] != nil)
                     {
+                        fileCheck(motInputTemp[cameraCounter]);
+                        motFile = File(motInputTemp[cameraCounter], "r");
                         inputFile.line(objStart[cameraCounter]);
                         done = nil;
                         while(!done)
@@ -963,11 +937,14 @@ writeCameras: inputFile, outputFile, lastObject, lastLight, lastCamera
                                 break;
                             }
                         }
-                        motInputTemp[cameraCounter].line(4);
-                        while(!motInputTemp[cameraCounter].eof())
+                        lineNumber = 4;
+                        motFile.line(lineNumber);
+                        endLine = getPartialLine(0,0,"Channel 6",motInputTemp[cameraCounter]); // cameras don't support scale channels (the last 3 in a traditional LW .mot file).
+                        while(lineNumber < endLine)
                         {
-                            line = motInputTemp[cameraCounter].read();
+                            line = motFile.read();
                             outputFile.writeln(line);
+                            lineNumber = motFile.line();
                         }
                         inputFile.line(objMotEnd[cameraCounter] + 1);
                         done = nil;
@@ -975,17 +952,13 @@ writeCameras: inputFile, outputFile, lastObject, lastLight, lastCamera
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[cameraCounter] - 2))
+                            if(inputFile.line() == (objEnd[cameraCounter]))
                             {
                                 done = true;
                                 break;
                             }
                         }
-                        motInputTemp[cameraCounter].close();
-                        inputFile.line(objEnd[cameraCounter] - 2);
-                        line = inputFile.read();
-                        outputFile.writeln(line);
-                        outputFile.writeln("");
+                        motFile.close();
                     }
                     else
                     {
@@ -1139,7 +1112,7 @@ writeObjects: inputFile, outputFile, lastObject
                         // begin case 1 here, which is the surface type
                         if(srfInputTemp[objectCounter] != nil && srfLWOInputID[objectCounter] != nil)
                         {
-                            surfacedLWO = generateSurfaceObjects(pass,srfLWOInputID[objectCounter],srfInputTemp[objectCounter],currentScenePath,objStart[objectCounter], passNames, pass);
+                            surfacedLWO = generateSurfaceObjects(srfLWOInputID[objectCounter],srfInputTemp[objectCounter],currentScenePath,objStart[objectCounter], passNames, pass);
                             if(surfacedLWO != nil)
                             {
                                 inputFile.line(objStart[objectCounter]);
@@ -1304,6 +1277,9 @@ writeObjects: inputFile, outputFile, lastObject
                         // begin case 3 here, which is the motion override type
                         if(motInputTemp[objectCounter] != nil)
                         {
+                            // Check that we can find the motion file.
+                            fileCheck(motInputTemp[objectCounter]);
+                            motFile = File(motInputTemp[objectCounter], "r");
                             inputFile.line(objStart[objectCounter]);
                             done = nil;
                             while(!done)
@@ -1316,10 +1292,10 @@ writeObjects: inputFile, outputFile, lastObject
                                     break;
                                 }
                             }
-                            motInputTemp[objectCounter].line(4);
-                            while(!motInputTemp[objectCounter].eof())
+                            motFile.line(4);
+                            while(!motFile.eof())
                             {
-                                line = motInputTemp[objectCounter].read();
+                                line = motFile.read();
                                 outputFile.writeln(line);
                             }
                             inputFile.line(objMotEnd[objectCounter] + 1);
@@ -1334,7 +1310,7 @@ writeObjects: inputFile, outputFile, lastObject
                                     break;
                                 }
                             }
-                            motInputTemp[objectCounter].close();
+                            motFile.close();
                             inputFile.line(objEnd[objectCounter] - 2);
                             line = inputFile.read();
                             outputFile.writeln(line);
@@ -1380,6 +1356,8 @@ writeObjects: inputFile, outputFile, lastObject
                         // begin case 4 here, which is the alternate object type
                         if(lwoInputTemp[objectCounter] != nil)
                         {
+                            // Check that we can find the file.
+                            fileCheck(lwoInputTemp[objectCounter]);
                             inputFile.line(objStart[objectCounter]);
                             line = inputFile.read();
                             if(line != nil && line != "")
@@ -1627,6 +1605,9 @@ writeLights: inputFile, outputFile, lastObject, lastLight, IKInitialState, objLi
                     // begin case 3 here, which is the motion override type
                     if(motInputTemp[lightCounter] != nil)
                     {
+                        // Check file is valid.
+                        fileCheck(motInputTemp[lightCounter]);
+                        motFile = File(motInputTemp[lightCounter],"r");
                         inputFile.line(objStart[lightCounter]);
                         done = nil;
                         while(!done)
@@ -1639,10 +1620,10 @@ writeLights: inputFile, outputFile, lastObject, lastLight, IKInitialState, objLi
                                 break;
                             }
                         }
-                        motInputTemp[lightCounter].line(4);
-                        while(!motInputTemp[lightCounter].eof())
+                        motFile.line(4);
+                        while(!motFile.eof())
                         {
-                            line = motInputTemp[lightCounter].read();
+                            line = motFile.read();
                             outputFile.writeln(line);
                         }
                         inputFile.line(objMotEnd[lightCounter] + 1);
@@ -1651,17 +1632,13 @@ writeLights: inputFile, outputFile, lastObject, lastLight, IKInitialState, objLi
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[lightCounter] - 2))
+                            if(inputFile.line() == (objEnd[lightCounter]))
                             {
                                 done = true;
                                 break;
                             }
                         }
-                        motInputTemp[lightCounter].close();
-                        inputFile.line(objEnd[lightCounter] - 2);
-                        line = inputFile.read();
-                        outputFile.writeln(line);
-                        outputFile.writeln("");
+                        motFile.close();
                     }
                     else
                     {
@@ -2025,10 +2002,7 @@ motionMixerStuff: mmFile
 		
 		for(x = 1; x <= size(overriddenObjectID); x++)
 		{
-			inputFileName = prepareInputFile(mmFile);
-			inputFile = File(inputFileName, "r");
-			tempOutput = File(newScenePath,"w");
-			
+			inputFile = File(mmFile, "r");
 			inputFile.line(1);
 			
 			mmItemIDLine = nil;
@@ -2046,10 +2020,15 @@ motionMixerStuff: mmFile
 					}
 				}
 			}
+            inputFile.close();
 
 			// if the item line exists in the motion mixer stuff, read the line before it to get the object name
 			if(mmItemIDLine != nil)
 			{
+                inputFileName = prepareInputFile(mmFile);
+                inputFile = File(inputFileName, "r");
+                tempOutput = File(newScenePath,"w");
+
 				if(clonedMMItems == true)
 				{
 					error("PassPort has found clones being overridden in a scene with Motion Mixer.  Please resolve clone naming.");
@@ -2174,12 +2153,6 @@ motionMixerStuff: mmFile
 					}
 					tempOutput.writeln(line);
 				}
-				inputFile.close();
-				tempOutput.close();
-				finishFiles();
-			}
-			else
-			{
 				inputFile.close();
 				tempOutput.close();
 				finishFiles();

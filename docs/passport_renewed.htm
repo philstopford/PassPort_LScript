@@ -69,6 +69,7 @@
 	<li>The item list for overrides is now filtered to only show scene items compatible with the selected override type (e.g. lights for light-specific overrides, objects for object-specific overrides)</li>
 	<li>The Scene Master override has been massively overhauled and is now aligned with the LightWave 11.0 feature set:</li>
 	<ul>
+		<li>Render instance setting under LightWave 3D 11.5</li>
 		<li>All raytrace flags can be overridden</li>
 		<li>Universal sampling parameters can be overridden</li>
 		<li>The increased upper value for recursion depth (64) is now supported by the interface</li>
@@ -88,7 +89,7 @@
 <p><a name="beforeinstalling"></a><strong>Before Installing</strong></p>
 <ul>
 <li> This version has no compatibility with previous PassPort scenes. The overrides and code have been radically overhauled. There is no migration path.</li>
-<li> This version is locked to a minimum of LightWave 3D 11.0.</li>
+<li> This version is locked to a minimum of LightWave 3D 11.0. Operation under OS X requires LightWave 3D 11.5 due to unavoidable issues in LScript for prior versions.</li>
 <li>This revision of PassPort has been tested on Windows XP (32-bit), Windows 7 (32-bit and 64-bit LightWave) and OS X Mountain Lion. The previous version of PassPort was restricted to LightWave 3D 9.3.1 on Windows and 32-bit LightWave 9.3.1 on Mac.</li>
 <li>Please note, at the time of writing, PassPort Renewed is a work-in-progress. It's currently implemented in LScript and will eventually be migrated to Python.</li>
 <li>3rd party lights and camera features are not available in overrides due to the complexities of supporting them. Only shared properties with the basic light and cameras will be modified.</li>
@@ -154,8 +155,11 @@
 	<p align="center"><img src="images/override_light.png" height="262" width="275" alt="Light Properties"></p>
 	<p>Please note that, due to the way that LightWave 11 currently generates its scene files, the volumetric toggle will only work if the light being overridden had its volumetric properties set up through the main LW interface. The volumetrics can be deactivated within LW afterwards for that light - this override will then work fine. This is because LightWave will not write out the volumetric settings properly unless you have set them. There's also an element of common sense here - unless you've configured the volumetric light behaviour ahead of time on the light, how will the renderer know what to do. Note that the Scene Master override provides support for globally enabling/disabling volumetric lights (corresponding to the setting in LW's own render control panel).</p>
 	<p>In this version, the lens flare override is limited to a toggle. This may be supplemented by other options in a future revision. Note that the Scene Master override provides support for globally enabling/disabling lens flare (corresponding to the setting in LW's own render control panel).</p>
-	<p><a name="overrides_scene"></a><strong>Scene Master File</strong></p>
-	<p align="center"><img src="images/override_scene.png" height="747" width="590" alt="Scene Master Override"></p>
+	<p><a name="overrides_scene"></a><strong>Camera Properties</strong></p>
+	<p align="center"><img src="images/override_camera.png" height="347" width="590" alt="Camera Override"></p>
+	<p><a name="overrides_scene"></a><strong>Scene Master</strong></p>
+	<p align="center"><img src="images/override_scene.png" height="747" width="885" alt="Scene Master Override"></p>
+	<p>'Render Instances' is only supported under LightWave 3D 11.5</p>
 	<p><a name="overrides_lightexcl"></a><strong>Light Exclusion</strong></p>
 	<p align="center"><img src="images/override_lightexcl.png" height="158" width="306" alt="Light Exclusion"></p>
 	<p>The Light Exclusions override allows you to specify per-pass light exclusions. Assigning it to an object will exclude that object from any lights in the override settings in that pass. The Light Exclusions override is unique in that it can be assigned in addition to another override. So if you want to use a surface override AND a light exclusion override, you’d simply have the surface override higher in the overrides listbox and assign both to an object. If you ever find that the light exclusion is higher in the listbox than another override (and therefore preventing its stack-ability), simply hit Page Down on your keyboard to move the selected override to the bottom of the listbox.</p>

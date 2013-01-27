@@ -533,12 +533,6 @@ preferencePanel
 	resolutionsArray[3] = "457 x 540";
 	resolutionsArray[4] = "457 x 385";
 	
-	tempMultiplierArray[1] = "25 %";
-	tempMultiplierArray[2] = "50 %";
-	tempMultiplierArray[3] = "100 %";
-	tempMultiplierArray[4] = "200 %";
-	tempMultiplierArray[5] = "400 %";
-
 	rgbSaveType = integer(rgbSaveType);
 	doKeys = 0;
 
@@ -606,11 +600,6 @@ preferencePanel
 
 	ui_offset_y += Pref_ui_spacing + 5;
 
-	c28 = ctlpopup("Test Resolution Multiplier",testResMultiplier,tempMultiplierArray);
-	ctlposition(c28, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
-
-	ui_offset_y += Pref_ui_row_offset;
-
 	c29 = ctlpopup("Test Render RGB Type", testRgbSaveType, image_formats_array);
 	ctlposition(c29, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
 
@@ -626,7 +615,6 @@ preferencePanel
 		areYouSurePrompts = getvalue(c23);
 		rgbSaveType = getvalue(c25);
 		editorResolution = getvalue(c26);
-		testResMultiplier = getvalue(c28);
 		testRgbSaveType = getvalue(c29);
 	}
 	reqend();

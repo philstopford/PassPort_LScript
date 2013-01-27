@@ -257,8 +257,11 @@ insertScnLine: stringToInsert, fileToAdjust, lineToInsertAfter
 	filedelete(tempFileToAdjust);
 }
 
-generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStartLine, passNames, pass
+generateSurfaceObjects: srfLWOInputID,srfInputTemp,currentScenePath,objStartLine, passNames, pass
 {
+	// File test, just in case.
+	fileCheck(srfInputTemp);
+
 	// figure out which mesh object agent we're dealing with here so we can do the surfacing
 	for(x = 1; x <= size(meshIDs); x++)
 	{
@@ -1223,4 +1226,12 @@ stripPassEditor: sceneFile
     filecopy(tempFileName, sceneFile);
     filedelete(tempFileName);
     return ((passEditorEndLine + 1) - passEditorStartLine);
+}
+
+fileCheck: fileToCheck
+{
+	test = File(fileToCheck, "r");
+	if(!test)
+		error("Invalid file specified: " + fileToCheck);
+	test.close();
 }

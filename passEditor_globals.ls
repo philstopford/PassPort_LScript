@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130120_b6";
+var versionString = "20130121_b7";
 var parch = "Unknown";
 var icon;
 var scenesnames;
