@@ -223,7 +223,7 @@ changeScnLine: stringToWrite, fileToAdjust, lineToChange
 		tempFileAdjust.writeln(fileAdjust.read());
 	}
 	tempFileAdjust.writeln(stringToWrite);
-	fileAdjust.read(); // move on the read file by that line.
+	fileAdjust.line(lineToChange + 1);
 	tempFileAdjust.reopen("a"); // append mode
 	while(!fileAdjust.eof())
 	{
@@ -231,6 +231,7 @@ changeScnLine: stringToWrite, fileToAdjust, lineToChange
 	}
 	fileAdjust.close();
 	tempFileAdjust.close();
+	info("boo2");
 	filecopy(tempFileToAdjust, fileToAdjust);
 	filedelete(tempFileToAdjust);
 }

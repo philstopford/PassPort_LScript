@@ -26,8 +26,6 @@ generatePassFile: mode, pass
     radLines_native(currentScenePath);
 
     chdir(contentDirectory);
-    numberofLinesRemoved = stripPassEditor(currentScenePath);
-    info(currentScenePath);
 
     // get the item start and stop lines for copying
     setItems = parseListItems(passAssItems[pass]);
@@ -78,6 +76,7 @@ generatePassFile: mode, pass
 				overrideType[passItem] = 0;
 			}
 			
+            lightSettingOffset = 0;
             if(settingsArray[2] == "type5")
             {
                 overrideType[passItem] = 5;
@@ -86,6 +85,7 @@ generatePassFile: mode, pass
                 if(settingsArray[7] == "0")
                 {
                     affectDiffuseLine = "AffectDiffuse 0\n";
+                    lightSettingOffset++;
                 }
                 else
                 {
@@ -94,26 +94,27 @@ generatePassFile: mode, pass
                 if(settingsArray[8] == "0")
                 {
                     affectSpecularLine = "AffectSpecular 0\n";
+                    lightSettingOffset++;
                 }
                 else
                 {
                     affectSpecularLine = "";
                 }
-                if(settingsArray[9] == "0")
+                if(settingsArray[9] == "0") // deliberately omit carriage returns.
                 {
-                    LensFlareLine = "LensFlare 0\n";
+                    LensFlareLine = "LensFlare 0";
                 }
                 else
                 {
-                    LensFlareLine = "LensFlare 1\n";
+                    LensFlareLine = "LensFlare 1";
                 }
-                if(settingsArray[10] == "0")
+                if(settingsArray[10] == "0") // deliberately omit carriage returns.
                 {
-                    VolumetricsLine = "VolumetricLighting 0\n";
+                    VolumetricsLine = "VolumetricLighting 0";
                 }
                 else
                 {
-                    VolumetricsLine = "VolumetricLighting 1\n";
+                    VolumetricsLine = "VolumetricLighting 1";
                 }
                 
                 lightSettingsPartOne[passItem] = lightColorLine + lightIntensityLine + affectDiffuseLine + affectSpecularLine;
@@ -529,19 +530,15 @@ generatePassFile: mode, pass
             {
                 objMotEnd[passItem] = getPartialLine((objMotEnd[passItem] + 1),objEnd[passItem],"}",currentScenePath);
             }
-            objPathAlignReliableDistLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"PathAlignReliableDist",currentScenePath);
-            if(getPartialLine(objStart[passItem],objEnd[passItem],"AffectCaustics",currentScenePath) > 0)
-            {
-                objAffectCausticsLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"AffectCaustics",currentScenePath);
-            }
-            else
-            {
-                objAffectCausticsLine[passItem] = nil;
-            }
+            IKInitialState[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"IKInitialState",currentScenePath);
+            objAffectCausticsLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"AffectCaustics",currentScenePath);
             objLightTypeLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"LightType ",currentScenePath);
-            objLensFlareLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"LensFlare ",currentScenePath) + 1;
-            info(objLensFlareLine[passItem].asStr());
+            objLensFlareLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"LensFlare ",currentScenePath);
+            if(objLensFlareLine[passItem])
+                objLensFlareLine[passItem] += lightSettingOffset;
             objVolLightLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"VolumetricLighting ",currentScenePath);
+            if(objVolLightLine[passItem])
+                objVolLightLine[passItem] += lightSettingOffset;
             lastLight++;
         }
 		
@@ -690,12 +687,12 @@ generatePassFile: mode, pass
     }
     
     // write out the lights
-    writeLights(inputFile, outputFile, lastObject, lastLight, objPathAlignReliableDistLine, objLightTypeLine, objLensFlareLine, objVolLightLine, lightSettingsPartOne, lightSettingsPartTwo, lightSettingsPartThree);
+    writeLights(inputFile, outputFile, lastObject, lastLight, IKInitialState, objLightTypeLine, objAffectCausticsLine, objLensFlareLine, objVolLightLine, lightSettingsPartOne, lightSettingsPartTwo, lightSettingsPartThree);
 
     // write out the cameras
     writeCameras(inputFile, outputFile, lastObject, lastLight, lastCamera);
 
-    lineNumber = objEnd[lastLight + lastObject + lastCamera] + 2; // 2 == 1 blank line and then the next line to read.
+    lineNumber = objEnd[lastLight + lastObject + lastCamera];
     inputFile.line(lineNumber);
     while(lineNumber <= dataOverlayLabelLine)
     {
@@ -1436,7 +1433,7 @@ writeObjects: inputFile, outputFile, lastObject
     }
 }
 
-writeLights: inputFile, outputFile, lastObject, lastLight, objPathAlignReliableDistLine, objLightTypeLine, objLensFlareLine, objVolLightLine, lightSettingsPartOne, lightSettingsPartTwo, lightSettingsPartThree
+writeLights: inputFile, outputFile, lastObject, lastLight, IKInitialState, objLightTypeLine, objAffectCausticsLine, objLensFlareLine, objVolLightLine, lightSettingsPartOne, lightSettingsPartTwo, lightSettingsPartThree
 {
     for(lightCounter = lastObject + 1; lightCounter <= lastObject + lastLight; lightCounter++)
     {
@@ -1460,7 +1457,7 @@ writeLights: inputFile, outputFile, lastObject, lastLight, objPathAlignReliableD
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objPathAlignReliableDistLine[lightCounter]) + 1)
+                            if(inputFile.line() == (IKInitialState[lightCounter]) + 1)
                             {
                                 done = true;
                                 break;
@@ -1469,15 +1466,18 @@ writeLights: inputFile, outputFile, lastObject, lastLight, objPathAlignReliableD
                         
                         // write out the custom parameters
                         outputFile.write(lightSettingsPartOne[lightCounter]);
-                        
-                        // write out the affect caustics line
-                        if(objAffectCausticsLine != nil)
+
+                        // write out the rest of the light
+                        inputFile.line(objAffectCausticsLine[lightCounter]);
+                        done = nil;
+                        while(!done)
                         {
-                            if(objAffectCausticsLine[lightCounter] != nil)
+                            line = inputFile.read();
+                            outputFile.writeln(line);
+                            if(inputFile.line() == (objEnd[lightCounter]))
                             {
-                                inputFile.line(objAffectCausticsLine[lightCounter]);
-                                line = inputFile.read();
-                                outputFile.writeln(line);
+                                done = true;
+                                break;
                             }
                         }
                         
@@ -1503,19 +1503,6 @@ writeLights: inputFile, outputFile, lastObject, lastLight, objPathAlignReliableD
                             }
                         }
                         
-                        // write out the rest of the light
-                        inputFile.line(objLightTypeLine[lightCounter]);
-                        done = nil;
-                        while(!done)
-                        {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[lightCounter]))
-                            {
-                                done = true;
-                                break;
-                            }
-                        }
                     }
                     else
                     {

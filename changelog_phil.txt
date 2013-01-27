@@ -1,9 +1,18 @@
+20130116
+========
+
+- p0016 *finally* fixed. This revealed a lot of faulty assumptions in the original code that needed to be adjusted, as well as various issues in the reworked scene gen system. It's a great relief to have this fixed, but it made the whole system far more robust in the process.
+- Fixed caustics line handling in the scene gen code.
+- Removed \n from the volumetric and lens flare settings that are written out - we only replace lines, not add them in these situations. We use a different mechanism to make the changes, so \n adds needless carriage returns.
+- Fix to use 'IKInitialState' instead of 'objPathAlignReliableDistLine' to track end of the standard initial chunk of settings for each block.
+- Minor fix to final stage scene gen code.
+
 20130115
 ========
 
 - Restored missing definition of hvStartLine.
 - Working on the final state of the scene generator code, to better handle the HV stuff and to avoid losing lines in the process.
-- p0018 was pretty stubborn, but should be close to resolution.
+- p0016 was pretty stubborn, but should be close to resolution.
 
 20130114
 ========
@@ -55,7 +64,7 @@
  - Added functions for the camera handling.
  - Adjusted end line function operation to be more generic. May need more careful thought - haven't investigated third party light/camera handling yet. Anticipating that this change might need to be reverted.
 - Refined UI code for the renderer selection dialog for the scene master override (creation).
-- p0018 still lurking.
+- p0016 still lurking.
 - p0019 created
 - p0020 created.
 
@@ -70,14 +79,14 @@
  - Major change to refactor code and introduce early value into settings array for the type6 override to track renderer in use.
  - Will need a partial line read to ensure that Kray is applied before manipulating. Should warn the user if the data is not found.
 - Minor refactoring of sceneGen code to clarify array indexer usage.
-- More work on the light override issue (p0018).
+- More work on the light override issue (p0016).
 
 20130107
 ========
 
 - Misc bug fixes.
 - tempDirectory now a global since it's used so much.
-- Light override was partially busted (p0018).
+- Light override was partially busted (p0016, p0018).
  - Reworked to reliably change/handle lens flare and volumetric properties.
 
 20130106
@@ -401,8 +410,9 @@ p0012 : Rebuilding lists causes script to explode. (Fixed)
 p0013 : Selecting second item in list causes highlight to be drawn (on repaint) for 1st item. (Fixed)
 p0014 : Uncompiled version crashes out on Mac and fails to start-up roughly 70% of the time on WinXP. (closed, LScript bug)
 p0015 : Overrides with assigned items don't get bullet point until the lists are updated, or some major redraw occurs (also in original code)
+p0016 : Lens flare override not functional. (Fixed)
 p0017 : Scene override fails during scene generation. Wrong line cited on OS X, but Win32 reports correct number. Invalid index to passName. Line 1744 of sceneGen code. (Fixed)
-p0018 : Light override causes no image to be saved. (In progress : The issue with this override is that placing VolumetricLighting in anything other than the correct location in the light setting's block causes the renderer to fail to save any image. Odd quirk in LW.)
+p0018 : Light override causes no image to be saved. (Fixed)
 p0019 : Another prepareInputFiles() already called error for alternative object override. (Fixed)
 p0020 : Line 2162 and 2168 errors with light override. (Fixed)
 
@@ -416,7 +426,6 @@ p0020 : Line 2162 and 2168 errors with light override. (Fixed)
 : Issues to check :
 :::::::::::::::::::
 
-- Lens flare toggle isn't working. (p0018)
 - SceneGen code could be optimised to walk the array and use loops to greatly simplify the code. (partially done with 20130101)
 - Autoscan plugin operation.
 - Need to check if growl interaction works with current growl versions.
