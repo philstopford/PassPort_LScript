@@ -887,6 +887,8 @@ writeHeader: inputFileName, inputFile, outputFile
             endLine = getPartialLine(0, 0, "NavigationDesiredDevice", inputFileName);
             break;
         default:
+            inputFile.close();
+            outputFile.close();
             error("Unsupported version of LW!");
             break;
     }
@@ -895,7 +897,11 @@ writeHeader: inputFileName, inputFile, outputFile
         endLine = getPartialLine(0, 0, "FirstBackgroundImageSyncFrame", inputFileName);
     }
     if(!endLine || endLine == nil || endLine == 0)
+    {
+        inputFile.close();
+        outputFile.close();
         error("writeHeader: couldn't find endLine");
+    }
 
     while(lineNumber <= endLine)
     {
@@ -1003,7 +1009,11 @@ writeCameras: inputFile, outputFile, lastObject, lastLight, lastCamera
                         lineNumber = getPartialLine(objStart[cameraCounter],0,"Oversampling",currentScenePath) + 1;
                         tempEndNumber = getPartialLine(lineNumber,0,"FieldRendering",currentScenePath);
                         if(!tempEndNumber)
+                        {
+                            inputFile.close();
+                            outputFile.close();
                             error("writeCameras: Failed to find FieldRendering!");
+                        }
                         for(i = lineNumber; i < tempEndNumber; i++)
                         {
                            inputFile.line(i);
@@ -1017,7 +1027,11 @@ writeCameras: inputFile, outputFile, lastObject, lastLight, lastCamera
                         lineNumber = tempEndNumber + cameraSettingsPartTwoCount[cameraCounter] + 1;
                         tempEndNumber = getPartialLine(lineNumber,0,"DepthOfField",currentScenePath);
                         if(!tempEndNumber)
+                        {
+                            inputFile.close();
+                            outputFile.close();
                             error("writeCameras: Failed to find DepthOfField!");
+                        }
                         for(i = lineNumber; i < tempEndNumber; i++)
                         {
                            inputFile.line(i);
@@ -1031,7 +1045,11 @@ writeCameras: inputFile, outputFile, lastObject, lastLight, lastCamera
                         lineNumber = tempEndNumber + cameraSettingsPartThreeCount[cameraCounter] + 1;
                         tempEndNumber = getPartialLine(lineNumber,0,"Sampler",currentScenePath);
                         if(!tempEndNumber)
+                        {
+                            inputFile.close();
+                            outputFile.close();
                             error("writeCameras: Failed to find Sampler!");
+                        }
                         for(i = lineNumber; i < tempEndNumber; i++)
                         {
                            inputFile.line(i);
@@ -1743,7 +1761,7 @@ fiberFX: ffFile
 	return 1; // notify caller that we changed something.
 }
 
-handleBuffers: hbFile
+handleBuffers: hbFile // if you edit this, don't forget to extend defaultBufferExporters as well and the new/edit pass dialog to set the values accordingly. You'll also need to bump the version due to mismatches.
 {
 	if(redirectBuffersSetts == 1)
 	{
@@ -1757,38 +1775,102 @@ handleBuffers: hbFile
 			{
 				if(strleft(line,26) == "Plugin ImageFilterHandler ")
 				{
+                    bufferTestLineParse = parse(" ",line);
+                    // compositing buffer exporter - experimental with beta 8
+                    if(bufferTestLineParse[4] == "LW_CompositeBuffer")
+                    {
+                        for(i = 1; i <= 3; i++)
+                        {
+                            tempOutput.writeln(line);
+                            line = inputFile.read();
+                        }
+                        baseNameArray = parse(getsep(),line);
+                        if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+                        {
+                            compositeBaseName = baseNameArray[size(baseNameArray)];
+                            updatedCompositeSaverPath = "   \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
+
+                            if(platform() == INTEL)
+                            {
+                                noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
+                                tempFixedPath = fixPathForWin32(noIntroPath);
+                                noIntroPath = tempFixedPath;
+                                newPathFixed = "    " + noIntroPath;
+
+                                toWrite = newPathFixed;
+                            }
+                            else
+                            {
+                                toWrite = updatedCompositeSaverPath;
+                            }
+                        }
+                        else
+                        {
+                            toWrite = line;
+                        }
+                    }
+
+                    // exrTrader - experimental with beta 8
+                    if(bufferTestLineParse[4] == "exrTrader")
+                    {
+                        for(i = 1; i <= 3; i++)
+                        {
+                            tempOutput.writeln(line);
+                            line = inputFile.read();
+                        }
+                        baseNameArray = parse(getsep(),line);
+                        if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+                        {
+                            compositeBaseName = baseNameArray[size(baseNameArray)];
+                            updatedCompositeSaverPath = "    \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
+
+                            if(platform() == INTEL)
+                            {
+                                noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
+                                tempFixedPath = fixPathForWin32(noIntroPath);
+                                noIntroPath = tempFixedPath;
+                                newPathFixed = "    " + noIntroPath;
+
+                                toWrite = newPathFixed;
+                            }
+                            else
+                            {
+                                toWrite = updatedCompositeSaverPath;
+                            }
+                        }
+                        else
+                        {
+                            toWrite = line;
+                        }
+                    }
+
 					// the stock render buffer exporter
-						bufferTestLineParse = parse(" ",line);
-						if(bufferTestLineParse[4] == "LW_SpecialBuffers")
+					if(bufferTestLineParse[4] == "LW_SpecialBuffers")
+					{
+                        for(i = 1; i <= 2; i++)
+                        {
+                            tempOutput.writeln(line);
+                            line = inputFile.read();
+                        }
+						if(line == "0")
 						{
 							tempOutput.writeln(line);
 							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							if(line == "0")
+							baseNameArray = parse(getsep(),line);
+							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
 							{
-								tempOutput.writeln(line);
-								line = inputFile.read();
-								baseNameArray = parse(getsep(),line);
-								if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-								{
-									bufferBaseName = baseNameArray[size(baseNameArray)];
-									updatedBufferSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, bufferBaseName);
+								bufferBaseName = baseNameArray[size(baseNameArray)];
+								updatedBufferSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, bufferBaseName);
 
-									if(platform() == INTEL)
-									{
-										tempFixedPath = fixPathForWin32(updatedBufferSaverPath);
-										newPathFixed = tempFixedPath;
-										toWrite = newPathFixed;
-									}
-									else
-									{
-										toWrite = updatedBufferSaverPath;
-									}
+								if(platform() == INTEL)
+								{
+									tempFixedPath = fixPathForWin32(updatedBufferSaverPath);
+									newPathFixed = tempFixedPath;
+									toWrite = newPathFixed;
 								}
 								else
 								{
-									toWrite = line;
+									toWrite = updatedBufferSaverPath;
 								}
 							}
 							else
@@ -1796,40 +1878,41 @@ handleBuffers: hbFile
 								toWrite = line;
 							}
 						}
+						else
+						{
+							toWrite = line;
+						}
+					}
 					// end of the stock render buffer exporter
 					
 					// the psd exporter
-						if(bufferTestLineParse[4] == "LW_PSDExport")
+					if(bufferTestLineParse[4] == "LW_PSDExport")
+					{
+                        for(i = 1; i <= 2; i++)
+                        {
+                            tempOutput.writeln(line);
+                            line = inputFile.read();
+                        }
+						if(strleft(line,5) == "Path ")
 						{
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							if(strleft(line,5) == "Path ")
+							baseNameArray = parse(getsep(),line);
+							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
 							{
-								baseNameArray = parse(getsep(),line);
-								if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-								{
-									psdBaseName = baseNameArray[size(baseNameArray)];
-									updatedPsdSaverPath = "Path \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, psdBaseName);
+								psdBaseName = baseNameArray[size(baseNameArray)];
+								updatedPsdSaverPath = "Path \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, psdBaseName);
 
-									if(platform() == INTEL)
-									{
-										noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, psdBaseName);
-										tempFixedPath = fixPathForWin32(noIntroPath);
-										noIntroPath = tempFixedPath;
-										newPathFixed = "Path " + noIntroPath;
-		
-										toWrite = newPathFixed;
-									}
-									else
-									{
-										toWrite = updatedPsdSaverPath;
-									}
+								if(platform() == INTEL)
+								{
+									noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, psdBaseName);
+									tempFixedPath = fixPathForWin32(noIntroPath);
+									noIntroPath = tempFixedPath;
+									newPathFixed = "Path " + noIntroPath;
+	
+									toWrite = newPathFixed;
 								}
 								else
 								{
-									toWrite = line;
+									toWrite = updatedPsdSaverPath;
 								}
 							}
 							else
@@ -1837,133 +1920,128 @@ handleBuffers: hbFile
 								toWrite = line;
 							}
 						}
+						else
+						{
+							toWrite = line;
+						}
+					}
 					// end of the psd exporter
 					
 					// the rla exporter
 						if(bufferTestLineParse[4] == "LW_ExtendedRLAExport")
+					{
+                        for(i = 1; i <= 2; i++)
+                        {
+                            tempOutput.writeln(line);
+                            line = inputFile.read();
+                        }
+						if(strleft(line,1) != "")
 						{
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							if(strleft(line,1) != "")
+							baseNameArray = parse(getsep(),line);
+							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
 							{
-								baseNameArray = parse(getsep(),line);
-								if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-								{
-									rlaBaseName = baseNameArray[size(baseNameArray)];
-									updatedRlaSaverPath = generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, rlaBaseName);
-									toWrite = updatedRlaSaverPath;
-								}
-								else
-								{
-									toWrite = line;
-								}
-
+								rlaBaseName = baseNameArray[size(baseNameArray)];
+								updatedRlaSaverPath = generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, rlaBaseName);
+								toWrite = updatedRlaSaverPath;
 							}
 							else
 							{
 								toWrite = line;
-							}   
+							}
+
 						}
+						else
+						{
+							toWrite = line;
+						}   
+					}
 					// end of the rla exporter
 					
 					// the rpf exporter
-						if(bufferTestLineParse[4] == "LW_ExtendedRPFExport")
+					if(bufferTestLineParse[4] == "LW_ExtendedRPFExport")
+					{
+                        for(i = 1; i <= 2; i++)
+                        {
+                            tempOutput.writeln(line);
+                            line = inputFile.read();
+                        }
+						if(strleft(line,1) != "")
 						{
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							if(strleft(line,1) != "")
+							baseNameArray = parse(getsep(),line);
+							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
 							{
-								baseNameArray = parse(getsep(),line);
-								if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-								{
-									rpfBaseName = baseNameArray[size(baseNameArray)];
-									updatedRpfSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, rpfBaseName);
-									toWrite = updatedRpfSaverPath;
-								}
-								else
-								{
-									toWrite = line;
-								}
+								rpfBaseName = baseNameArray[size(baseNameArray)];
+								updatedRpfSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, rpfBaseName);
+								toWrite = updatedRpfSaverPath;
 							}
 							else
 							{
 								toWrite = line;
-							}   
+							}
 						}
+						else
+						{
+							toWrite = line;
+						}   
+					}
 					// end of the rpf exporter
 					
 					// the aura exporter
-						if(bufferTestLineParse[4] == "Aura25Export")
+					if(bufferTestLineParse[4] == "Aura25Export")
+					{
+                        for(i = 1; i <= 2; i++)
+                        {
+                            tempOutput.writeln(line);
+                            line = inputFile.read();
+                        }
+						if(strleft(line,1) == "\"")
 						{
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							if(strleft(line,1) == "\"")
+							baseNameArray = parse(getsep(),line);
+							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
 							{
-								baseNameArray = parse(getsep(),line);
-								if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-								{
-									auraBaseName = baseNameArray[size(baseNameArray)];
-									updatedAuraSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, auraBaseName);
-									toWrite = updatedAuraSaverPath;
-								}
-								else
-								{
-									toWrite = line;
-								}
+								auraBaseName = baseNameArray[size(baseNameArray)];
+								updatedAuraSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, auraBaseName);
+								toWrite = updatedAuraSaverPath;
 							}
 							else
 							{
 								toWrite = line;
-							}   
+							}
 						}
+						else
+						{
+							toWrite = line;
+						}   
+					}
 					// end of the aura exporter
 					
 					// idof channels
-						if(bufferTestLineParse[4] == "iDof_channels_IF")
+					if(bufferTestLineParse[4] == "iDof_channels_IF")
+					{
+                        for(i = 1; i <= 9; i++)
+                        {
+    						tempOutput.writeln(line);
+    						line = inputFile.read();
+                        }
+						if(strleft(line,1) != "")
 						{
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							if(strleft(line,1) != "")
+							baseNameArray = parse(getsep(),line);
+							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
 							{
-								baseNameArray = parse(getsep(),line);
-								if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-								{
-									idofBaseName = baseNameArray[size(baseNameArray)];
-									updatedIdofSaverPath = generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, idofBaseName);
-									toWrite = updatedIdofSaverPath;
-								}
-								else
-								{
-									toWrite = line;
-								}
+								idofBaseName = baseNameArray[size(baseNameArray)];
+								updatedIdofSaverPath = generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, idofBaseName);
+								toWrite = updatedIdofSaverPath;
 							}
 							else
 							{
 								toWrite = line;
 							}
-						}                               
+						}
+						else
+						{
+							toWrite = line;
+						}
+					}       
 					// end of idof channels
 				}
 				else
@@ -1981,7 +2059,112 @@ handleBuffers: hbFile
         tempOutput.close();
         finishFiles();
 	}
+
+@if enablePBS == 1
+    passBufferSetup(hbFile);
+@end
 }
+
+@if enablePBS == 1
+// This function is called from handleBuffers and it works to (de)activate buffer exporters (image filters) for the current pass. It's highly experimental and not scheduled for the 1.0 release.
+passBufferSetup: pbsFile
+{
+    pbsSettings = parse("||",passBufferExporters[pass]);
+
+    if(int(pbsSettings[1]) == 0)
+    {
+        return; // user didn't opt to have us change their exporter settings, so we won't do it. We're good like that.
+    } else {
+
+        // Setting order defined in the global definitions.
+        compBuffSetting         = int(pbsSettings[2]);
+        exrTraderSetting        = int(pbsSettings[3]);
+        specBuffersSetting      = int(pbsSettings[4]);
+        psdBuffersSetting       = int(pbsSettings[5]);
+        extRLABuffersSetting    = int(pbsSettings[6]);
+        extRPFBuffersSetting    = int(pbsSettings[7]);
+        auraBuffersSetting      = int(pbsSettings[8]);
+        iDOFBuffersSetting      = int(pbsSettings[9]);
+
+        passBufferSetup_processBufferSetting(pbsFile, "LW_CompositeBuffer", compBuffSetting);
+        passBufferSetup_processBufferSetting(pbsFile, "exrTrader", exrTraderSetting);
+        passBufferSetup_processBufferSetting(pbsFile, "LW_SpecialBuffers", specBuffersSetting);
+        passBufferSetup_processBufferSetting(pbsFile, "LW_PSDExport", psdBuffersSetting);
+        passBufferSetup_processBufferSetting(pbsFile, "LW_ExtendedRLAExport", extRLABuffersSetting);
+        passBufferSetup_processBufferSetting(pbsFile, "LW_ExtendedRPFExport", extRPFBuffersSetting);
+        passBufferSetup_processBufferSetting(pbsFile, "Aura25Export", auraBuffersSetting);
+        passBufferSetup_processBufferSetting(pbsFile, "iDof_channels_IF", iDOFBuffersSetting);
+    }
+}
+
+passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSetting
+{
+    scanFile = File(pbsFile, "r"); // We know this file exists - we got here from our caller function that validated its existence.
+
+    imageFilterLinesIndex = 0;
+    while(!scanFile.eof())
+    {
+        line = scanFile.read();
+        searchString = "Plugin ImageFilterHandler ";
+        if(size(line) > size(searchString))
+        {
+            if(strleft(line,size(searchString)) == searchString)
+            {
+                pbsTestLineParse = parse(" ",line);
+                // Here we check for a match to the image filter string fed in..
+                // If found, we store the line we need to change to activate or deactivate the buffer exporter in the scene file (an offset from the detected line containing the exporter itself).
+                // LW has a plugin activated by default. If the plugin is deactivated, it adds 'PluginEnabled 0' in a new line after the EndPlugin line. *sigh*
+                // For now, we retrieve the end plugin line. We'll have to check for the existence of a 'PluginEnabled' line when activating/deactivating the plugins.
+
+                if(pbsTestLineParse[4] == imageFilterString)
+                {
+                    imageFilterLinesIndex++;
+                    endPluginLine = getPartialLine(line,0,"EndPlugin", pbsFile);
+                    imageFilterLines[imageFilterLinesIndex] = endPluginLine;
+                }
+            }
+        }
+    }
+    
+    if(imageFilterLinesIndex >= 1) // We detected at least one buffer exporter of this type.
+    {
+        lineOffset = 0; // We'll need to modify this as we go to ensure we target the correct lines.
+                        // Needs to be incremented when we insert 'PluginEnabled 0' lines for active plugins. We change 'PluginEnabled 0' to 'PluginEnabled 1' rather than removing lines,for simplicity.
+
+        tempFilePBS = tempDirectory + getsep() + "tempPassportFilePBS.lws";
+        filecopy(pbsFile, tempFilePBS);
+        for(i = 1; i <= imageFilterLinesIndex; i++)
+        {
+            // Assume plugin is currently enabled.
+            state = 1;
+            // Let's figure out what state this plugin is in.
+            scanFile.line(imageFilterLines[i] + 1);
+            line = scanFile.read();
+            if(strleft(line,14) == "PluginEnabled ")
+            {
+                state = int(parse(" ", line));
+            }
+
+            // Now we know what state the plugin is in. Let's find out if we need to do something.
+            if(imageFilterSetting != state)
+            {
+                if(state == 0)
+                {
+                    changeScnLine("PluginEnabled 1", tempFilePBS, imageFilterLines[i] + 1 + lineOffset);
+                } else {
+                    insertScnLine("PluginEnabled 0", tempFilePBS, imageFilterLines[i] + lineOffset);
+                    lineOffset++;
+                }
+            }
+        }
+        filecopy(tempFilePBS, pbsFile);
+        filedelete(tempFilePBS);
+    }
+
+    // Tidy up after outselves.
+    scanFile.close();
+}
+@end // PBS
 
 motionMixerStuff: mmFile
 {
@@ -2025,14 +2208,14 @@ motionMixerStuff: mmFile
 			// if the item line exists in the motion mixer stuff, read the line before it to get the object name
 			if(mmItemIDLine != nil)
 			{
-                inputFileName = prepareInputFile(mmFile);
-                inputFile = File(inputFileName, "r");
-                tempOutput = File(newScenePath,"w");
-
 				if(clonedMMItems == true)
 				{
 					error("PassPort has found clones being overridden in a scene with Motion Mixer.  Please resolve clone naming.");
 				}
+
+                inputFileName = prepareInputFile(mmFile);
+                inputFile = File(inputFileName, "r");
+                tempOutput = File(newScenePath,"w");
 				
 				inputFile.line(mmItemIDLine - 2);
 				mmItemToReplace = inputFile.read();
@@ -2103,10 +2286,7 @@ motionMixerStuff: mmFile
 					tempOutput.writeln(line);
 				}
 				inputFile.close();
-				tempOutput.close();
-				
-				inputFile.close();
-				tempOutput.close();
+				tempOutput.close();				
 				finishFiles();
 
 				inputFileName = prepareInputFile(mmFile);

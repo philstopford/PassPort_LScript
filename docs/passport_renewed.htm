@@ -54,6 +54,7 @@
 </ul>
 </ul>
 <li><strong><a href="#troubleshooting">Troubleshooting.</a></strong></li>
+<li><strong><a href="#credits">Credits.</a></strong></li>
 
 <hr>
 <div class="c1">
@@ -61,11 +62,12 @@
 </div>
 <p>PassPort Renewed is an ongoing rework of the LScript-based PassPort code. That code, designed for LightWave 3D 9.3.1, was open-sourced (GPL) by Jeremy Hardin in 2010. It was modified by Matt Gorner in 2010 to improve operation with autoscan plugins and to revise the code to work with LW10. The author of PassPort Renewed is Phil Stopford. Compared to the original PassPort plugin, the code has been substantially revised. These changes were made for this release:</p>
 <ul>
+	<li>Re-designed for LightWave 3D 11.x</li>
 	<li>Extensive internal refactoring. The plugin code is now smaller, more efficient and more cleanly structured.</li>
 	<li>Internal support for custom overrides for alternative renderers has been prepared, but implementation is not exposed in the public release at this time.</li>
 	<li>Operation on Mac is now possible without crashing.</li>
 	<li>Growl support on Mac is optional, and disabled by default</li>
-	<li>Operation with the renamed 'lwsn' binary (previously called ScreamerNet)</li>
+	<li>Operation with the renamed and relocated 'lwsn' binary (previously called ScreamerNet on Mac)</li>
 	<li>The item list for overrides is now filtered to only show scene items compatible with the selected override type (e.g. lights for light-specific overrides, objects for object-specific overrides)</li>
 	<li>The Scene Master override has been massively overhauled and is now aligned with the LightWave 11.0 feature set:</li>
 	<ul>
@@ -84,11 +86,15 @@
 	<li>PassPort has been made LWSN-safe as well. Previously, it used to crash the process.</li>
 	<li>Rendering at frame 0 is now supported. Previously, it used to fail to save an image for review.</li>
 	<li>Autoscan plugin operation is much improved.</li>
+	<li>Buffer Redirect Export extended to work with exrTrader and LightWave's Compositing Buffer Export image filters (experimental, beta 8)</li>
+	<li>(Experimental build of beta 8) Passes can now be configured to activate/deactivate supported image filters.</li>
+	<li>RPE files now contain version information (the RPE version, the PassPort version, the LightWave version).</li>
 </ul>
+<p></p>
 <hr>
-<p><a name="beforeinstalling"></a><strong>Before Installing</strong></p>
+<h3><a name="beforeinstalling"></a>Before Installing</h3>
 <ul>
-<li> This version has no compatibility with previous PassPort scenes. The overrides and code have been radically overhauled. There is no migration path.</li>
+<li> This version has no compatibility with previous PassPort scenes or RPE files. The overrides and code have been radically overhauled. There is no migration path.</li>
 <li> This version is locked to a minimum of LightWave 3D 11.0. Operation under OS X requires LightWave 3D 11.5 due to unavoidable issues in LScript for prior versions.</li>
 <li>This revision of PassPort has been tested on Windows XP (32-bit), Windows 7 (32-bit and 64-bit LightWave) and OS X Mountain Lion. The previous version of PassPort was restricted to LightWave 3D 9.3.1 on Windows and 32-bit LightWave 9.3.1 on Mac.</li>
 <li>Please note, at the time of writing, PassPort Renewed is a work-in-progress. It's currently implemented in LScript and will eventually be migrated to Python.</li>
@@ -97,20 +103,22 @@
 <li>As of beta 3, operation with autoscan plugins is now supported. There are some things to be aware of :</li>
 <ul>
 	<li>Autoscan plugins stores its data in a different file to the classical mode of operation for LW. In manual mode, the typical configuration file is named LWEXT.CFG (or some variation thereof). In autoscan mode, the plugin data is stored in some variation of 'Extensions Cache' in the same location. PassPort will read both of these files to obtain image saver data. If there is duplicate data in each file (e.g. two instances of JPEG savers) because you switched off autoscan plugins, but the cache file exists, PassPort will find and display both instances. LightWave doesn't offer a mechanism to avoid this. So, please review your configuration folder in cases like this to ensure nothing strange happens.</li>
-</ul></ul>
-<p><a name="compatibility"><strong>Compatibility Notes</strong></p>
-<p>There is no plan, right now, to migrate settings between PassPort versions (where major changes are made) and LW versions. Settings *may* be fine (changes will be noted in the release notes), but for safety, PassPort will show a dialog for each of</p>
-<ul>
-<li>A different version of PassPort than was in-use when the scene was saved.</li>
-<li>A different version of LW than was in-use when the scene was saved.</li>
 </ul>
-<p>The expected versions of each are shown to guide the user in case they want to adopt a matching configuration. In each case, the plugin will load its settings from the scene file, but the results cannot be guaranteed. Some override options may not apply/may be incorrect/may results in crashes during PassPort or render operations. Some changes may even cause PassPort to fail to open its interface. No data loss will occur - PassPort itself never writes to the master scene except when the user explicitly saves the scene through LightWave.</p>
-<p><strong>If a scene is saved in this state, the version strings currently in use will be written out to PassPort data block within that scene file. This will silence any future warnings for this scene, but the PassPort data block may still be problematic. It is strongly recommended that the user either adopt a compatible configuration or re-create the pass and overrides they need prior to saving.</strong></p>
+</ul>
+<h3><a name="compatibility">Compatibility Notes</h3>
+<p><strong>Scenes and RPE files created with the original version of PassPort are *not* compatible with PassPort Renewed. Too much has changed. Any existing scenes should be loaded into Layout *without* PassPort added to the plugin configuration and then saved out to a new file in order to strip the PassPort section. You can then re-add PassPort to Layout and re-create your passes and overrides in PassPort Renewed.</strong></p>
+<p>There is no plan, right now, to migrate settings in RPE files or scene between PassPort versions (where major changes are made) and LW versions. Settings *may* be fine (changes will be noted in the release notes), but for safety, PassPort will show a dialog for each of</p>
+<ul>
+<li>A different version of PassPort than was in-use when the scene or RPE file was saved.</li>
+<li>A different version of LW than was in-use when the scene or RPE file was saved.</li>
+</ul>
+<p>The expected versions of each are shown to guide the user in case they want to adopt a matching configuration. In each case, the plugin will load its settings from the scene or RPE file, but the results cannot be guaranteed. Some override options may not apply/may be incorrect/may results in crashes during PassPort or render operations. Some changes may even cause PassPort to fail to open its interface. No data loss will occur - PassPort itself never writes to the master scene except when the user explicitly saves the scene through LightWave.</p>
+<p><strong>If a scene or RPE file is saved in this state, the version strings currently in use will be written out to PassPort data block within that file. This will silence any future warnings for this file, but the PassPort data block may still be problematic. It is strongly recommended that the user either adopt a compatible configuration or re-create the pass and overrides they need prior to saving the scene or RPE file.</strong></p>
 <hr>
-<p><a name="installation"></a><strong>Installation</strong></p>
+<h3><a name="installation"></a>Installation</h3>
 <p>The package consists of PassPort_MC.lsc. This has to be added to the plugin system and used directly from the Master Plugins drop-down list. The plugin will *not* function correctly if operated through the LScript/RT Master Plugin system.</p>
 <hr>
-<p><a name="usage"></a><strong>Usage</strong></p>
+<h3><a name="usage"></a>Usage</h3>
 <ul>
 <p><a name="usage"></a><strong>Preferences Panel</strong></p>
 <p>PassPort needs some basic necessary information to be input via its preference panel. This panel can be brought up by highlighting the PassPort Editor and hitting the lowercase o key, or by choosing File... &gt;&gt; Preferences.</p>
@@ -160,15 +168,40 @@
 	<p><a name="overrides_scene"></a><strong>Scene Master</strong></p>
 	<p align="center"><img src="images/override_scene.png" height="747" width="885" alt="Scene Master Override"></p>
 	<p>'Render Instances' is only supported under LightWave 3D 11.5</p>
+	<p>'Redirect Buffer Export Paths' works with a number of image filters to redirect their output into pass-specific named files. The filters have to be configured with a valid save path (only the filenames will be changed!) and to save all information that you are interested in for all passes that you will be rendering. Passport does not attempt to adjust other settings - the range of settings and options would greatly complicate this plugin and lead to compatibility issues very quickly.</p>
+	<ul>
+		<li>LightWave's Compositing Buffer Export (experimental in beta 8)</li>
+		<li>exrTrader (experimental in beta 8)</li>
+		<li>LightWave's RLA Export</li>
+		<li>LightWave's Extended RLA Export</li>
+		<li>LightWave's PSD Export</li>
+		<li>LightWave's Extended RPF Export</li>
+		<li>LightWave's Aura 2.5 Export</li>
+		<li>iDOF Channel Export</li>
+	</ul>
+	<p>This panel offers a toggle for LightWave's Adaptive Sampling. In LightWave, this is a global setting, affecting all cameras. The threshold value is camera-specific and can be overridden using a camera override.</p>
 	<p><a name="overrides_lightexcl"></a><strong>Light Exclusion</strong></p>
 	<p align="center"><img src="images/override_lightexcl.png" height="158" width="306" alt="Light Exclusion"></p>
 	<p>The Light Exclusions override allows you to specify per-pass light exclusions. Assigning it to an object will exclude that object from any lights in the override settings in that pass. The Light Exclusions override is unique in that it can be assigned in addition to another override. So if you want to use a surface override AND a light exclusion override, you’d simply have the surface override higher in the overrides listbox and assign both to an object. If you ever find that the light exclusion is higher in the listbox than another override (and therefore preventing its stack-ability), simply hit Page Down on your keyboard to move the selected override to the bottom of the listbox.</p>
 </ul>
 </ul>
-<p><a name="troubleshooting"></a><strong>Troubleshooting</strong></p>
-<p>Overrides cannot be stacked on an object in a pass (with the exception of the Light Exclusions override).  For example, you cannot apply both a motion override and a surface override to the same object in the same pass.</p>
+<h3><a name="troubleshooting"></a>Troubleshooting</h3>
+<p>Overrides cannot be stacked on an object in a pass (with the exception of the Light Exclusions override).  For example, you cannot apply both a motion override and a surface override to the same object in the same pass. Note that this will cause a failure even if the issue is located in a pass other than the one you are rendering. The error message will also be very ugly and scary. You'll have to manually figure out what you did wrong, fix it up and try again.</p>
 <p>Bullet points may not be drawn even when items have been assigned to an override. The items have been assigned, but the LScript system, on which PassPort Renewed is currently based, occasionally seems to struggle to repaint the UI correctly. You can force an update using the Rebuild command in the File menu.</p>
 <p>Also, the quick-keys very rarely get confused after pass creation or editing and then they think you’ve hit the delete key (and therefore try to delete a pass/override). As of now, the only way to prevent this it to keep the confirmation prompts enabled in the preferences and cancel the pass deletion when it asks.</p>
+<p>3rd party lights and cameras will probably have trouble with the overrides.</p>
 
+<h3><a name="credits"></a>Credits</h3>
+</div>
+<p>PassPort Renewed would not exist without the original PassPort code that was so generously open-sourced by its creator, Jeremy Hardin</p>
+<p>Matt Gorner's work to make the original PassPort compatible with LightWave through 10.0 is much appreciated, as well as his effort to get the source uploaded to SourceForge. I'm also very grateful for his help in showing me some of the UI tricks that could be performed in LScript.</p>
+<p>I also have to thank James Willmott and Lernie Ang for their help as I fought my way to understanding (somewhat) LScript and its quirks. Jeremy gets another nod here for sending me his notes and insight.</p>
+<p>Deuce Bennett , patient master bug wrangler at NT - thanks ever so much for fielding various bug reports along the way.</p>
+<p>Thanks to Bob Hood for the LScript fixes for Mac in LightWave 11.5!</p>
+<p>This plugin's failings and bugs are mine alone. Its robustness and ability are in large part due to the enthusiasm and diligence of the testing crew :</p>
+<ul>
+<li>Luis Lopes (zardoz) : bug reporter in chief, I'm in your debt.</li>
+<li>Javier Meroño (Netvudu) : the man who requested, quite robustly, the image filter export handling for passes. It's thanks to Javier's bug report that autoscan operation is properly handled now.</li>
+</ul>
 </body>
 </html>

@@ -6,13 +6,18 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130121_b7";
+var versionString = "20130123_b8";
+var rpeVersion = "1.0";
 var parch = "Unknown";
 var icon;
 var scenesnames;
 var passSelected = false;
 var overridesSelected = false;
 var passAssItems;
+@if enablePBS == 1
+var defaultBufferExporters = @0,0,0,0,0,0,0,0,0@; // user setting to make changes, compositing buffer, exrTrader, special buffers, PSD export, extended RLA, extended RPF, Aura 2.5, iDof
+var passBufferExporters;
+@end // PBS
 var previousPassAssItems;
 var passOverrideItems;
 var previousPassOverrideItems;
@@ -57,7 +62,7 @@ var currentChosenPassString;
 var interfaceRunYet;
 var userOutputFolder;
 var fileOutputPrefix;
-var	userOutputString;
+var userOutputString;
 var areYouSurePrompts;
 var doKeys;
 var rgbSaveType;
@@ -181,3 +186,4 @@ var samplerArray = @"Low-discrepancy","Fixed","Classic"@;
 var reconFilterArray = @"Classic","Box","Box (Soft)","Box (Sharp)","Gaussian","Gaussian (Soft)","Gaussian (Sharp)","Mitchell","Mitchell (Soft)","Mitchell (Sharp)","Lanczos","Lanczos (Soft)","Lanczos (Sharp)"@;
 var fieldRenderArray = @"Off","Even/Upper First","Odd/Lower First"@;
 var fogTypeArray = @"Off","Linear","Nonlinear 1","Nonlinear 2","Realistic"@;
+

@@ -1,71 +1,12 @@
-//--------------------------------------
-// PassPort
-// by Jeremy Hardin
-// LightWave 9.6 fix - Matt Gorner
-// Major revision and Mac64 compatibility - Phil Stopford.
-
-/*
-    About:
-        This is a master script that uses a catalog of scene items and
-        allows assignment of those scene items to new groups, called
-        Passes.  Each pass has its own rendered output, so an object
-        can be included/excluded according to need with each pass.
-        Also, each pass has an Override system, which gives the user
-        the opportunity to alter properties on a per-pass basis.
-        Things like surfaces, motions, object properties, etc. can
-        be overridden on a per-object, per-pass basis.
-
-    Script Logic:
-        The logic is this.  There are 4 listboxes for the interface.  One
-        holds a list of passes (user created).  This list grows and shrinks
-        based on user input, but one pass will always exist.
-        An acompanying scene items listbox holds all non-camera scene items
-        for assignment in passes.  Selecting a pass in the first listbox will
-        allow the user to select any combination of scene items in the second
-        listbox.  Clicking on each pass will auto-select assigned scene items
-        in the second listbox.
-        The second tab is for overrides, and contains 2 more listboxes.  These
-        listboxes reflect the overrides, and do so based on which pass is
-        selected in a pass menu above the listboxes.  The selection system is
-        the same as the pass system, but this one changes based on what pass
-        is selected, and there don't have to be overrides.
-        
-    Render Logic:
-        On render, the script takes the pass selected in the pulldown menu,
-        gets the item assignments, and writes out a new scene file to a
-        location specified in the preferences.  This is a render only scene
-        and is never to be loaded by the user.  I will likely have it deleted
-        when I'm finished.  No filenames are specified directly.  The names of
-        the render come from the pass name, the user specified prefix, and the
-        user field.  Appropriate directories are created using this information.
-        
-    Files in this setup:
-        I've tried to name the files appropriate to the functions located in them.
-        A fair bit of scene parsing happens, so I've put that in the scene parse
-        subfunctions script.  Additional sub-interfaces have been put in the interface
-        subfunction, and so on.
-        
-        
-    Multi-dimensional array hack:
-        This is my way of allowing 3 dimensional arrays in lscript, and it's specific to
-        the override assignments.  I use 2 dimensional arrays, with strings in each element.
-        Each string is parseable to reveal a third dimension of elements (separated by the
-        double pipe symbol "||").
-        
-    Hacky Saving:
-        Builds of LW earlier than 1281 had problems with arrays of more than 99 items. The original Passport offered
-        a hacky saving mode. I've now removed it and blocked operation on LW prior to 9.3.
-*/
-//
-//--------------------------------------
 @asyncspawn
 @warnings
 @script master
 @name "PassPort_MC"
 // @define dev 1
 
-// EXPERIMENTAL features, enable
+// EXPERIMENTAL features
 // @define enableKray 1;
+// @define enablePBS 1; // only for post-1.0.
 
 var supportedplatform = 1;
 
@@ -73,7 +14,9 @@ var supportedplatform = 1;
 @insert "@passEditor_UIglobals.ls"
 @insert "@passEditor_Utilityfuncs.ls"
 @insert "@passEditor_Interface_Subfuncs.ls"
-@insert "@passEditor_Interface_Subfuncs_OverrideUI.ls"
+@insert "@passEditor_Interface_Subfuncs_Passes.ls"
+@insert "@passEditor_Interface_Subfuncs_Overrides.ls"
+@insert "@passEditor_Interface_Subfuncs_OverrideUI.ls" // override UIs are complicated so they got broken out into a separate file.
 @insert "@passEditor_render_Subfuncs.ls"
 @insert "@passEditor_sceneGen_Subfuncs.ls"
 @insert "@passEditor_sceneParse_Subfuncs.ls"
@@ -394,9 +337,6 @@ options
     ctlposition(gad_SelectedPass, 100, Main_banner_height + 5, 300, Main_button_height);
     ctlrefresh(gad_SelectedPass, "currentPassMenu_refresh");
 
-    //c7 = ctltext(currentChosenPassString,"");
-    //ctlposition(c7, 208, Main_banner_height + 8);
-
     ctlpage(1,gad_PassesListview,gad_SceneItems_forPasses_Listview,gad_New_Pass,gad_EditSel_Passes,gad_DelSel_Passes,gad_AddAll_Passes,gad_AddSelected_Passes,gad_ClearAll_Passes,gad_ClearSel_Passes);
     ctlpage(2,gad_OverridesListview,gad_SceneItems_forOverrides_Listview,gad_New_Override,gad_EditSel_Override,gad_DelSel_Override,gad_AddAll_Override,gad_AddSelected_Override,gad_ClearAll_Override,gad_ClearSel_Override);
 
@@ -437,6 +377,10 @@ load: what,io
               {
                   passAssItems[x] = "";
               }
+
+@if enablePBS == 1
+              passBufferExporters[x] = io.read();
+@end
           }
           overrideNamesSize = io.read().asInt();
           overrideNames[1] = io.read();
@@ -520,6 +464,10 @@ save: what,io
               {
                   io.writeln(passNames[x]);
                   io.writeln(passAssItems[x]);
+
+@if enablePBS == 1
+                  io.writeln(passBufferExporters[x]);
+@end
               }
               
                for(x = 1; x <= size(overrideNames); x++)
@@ -785,6 +733,21 @@ process: event, command
         }
 
         passNames[1] = "Default";
+
+@if enablePBS == 1
+        changeImageFilterState = "0";
+        compBufferToggle = "0";
+        exrTraderToggle = "0";
+        specBuffToggle = "0";
+        psdToggle = "0";
+        rlaToggle = "0";
+        rpfToggle = "0";
+        auraToggle = "0";
+        iDOFToggle = "0";
+        passBufferExporters[1] = changeImageFilterState + "||" + compBufferToggle + "||" + exrTraderToggle + "||" + specBuffToggle + "||" + psdToggle
+                                                        + "||" + rlaToggle + "||" + rpfToggle + "||" + auraToggle + "||" + iDOFToggle;
+@end
+
         overrideNames[1] = "empty";
         for(x = 1; x <= size(passNames); x++)
         {
@@ -1681,6 +1644,11 @@ unProcess
     passSelected = nil;
     overridesSelected = nil;
     passAssItems = nil;
+
+@if enablePBS == 1
+    passBufferExporters = nil;
+@end
+
     passOverrideItems = nil;
     masterScene = nil;
     originalSelection = nil;

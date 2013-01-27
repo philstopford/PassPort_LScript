@@ -946,7 +946,6 @@ getCommand: event,data
 										}
 									}
 									io.close();
-						
 								}
 							}
 							

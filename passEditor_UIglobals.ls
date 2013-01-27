@@ -176,3 +176,20 @@ Pref_ui_window_h			= Pref_ui_offset_y + (Pref_gad_h*Pref_num_gads)
 							+ (Pref_ui_spacing*(Pref_num_gads+1)) + 24;				// Window height
 Pref_ui_seperator_w			= Pref_ui_window_w + 2;									// Width of seperators
 
+// Passes UI
+
+Passes_gad_x				= 6;													// Gadget X coord
+Passes_gad_y				= 24;													// Gadget Y coord
+Passes_gad_w				= 400;													// Gadget width
+Passes_gad_h				= 19;													// Gadget height
+Passes_gad_text_offset		= 150;													// Gadget text offset
+
+Passes_ui_spacing			= 3;													// Spacing gap size
+Passes_ui_offset_x 			= 0;													// Main X offset from 0
+Passes_ui_offset_y 			= 3 * Passes_ui_spacing;								// Main Y offset from 0
+Passes_ui_row				= 0;													// Row number
+Passes_ui_column			= 0;													// Column number
+Passes_ui_row_offset		= Passes_gad_h + Passes_ui_spacing;						// Row offset
+Passes_ui_window_w			= 436;													// Window width
+Passes_ui_seperator_w		= Passes_ui_window_w + 2;								// Width of seperators
+

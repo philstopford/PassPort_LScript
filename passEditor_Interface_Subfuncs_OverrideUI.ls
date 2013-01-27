@@ -333,6 +333,7 @@ cameraOverride_UI: action
 	} else {
 		error("cameraOverride_UI: incorrect, or no, action passed");
 	}
+    req_update();
 }
 
 srfOverride_UI: action
@@ -410,6 +411,7 @@ srfOverride_UI: action
 	} else {
 		error("srfOverride_UI: incorrect, or no, action passed");
 	}
+    req_update();
 }
 
 lightOverride_UI: action
@@ -560,6 +562,7 @@ lightOverride_UI: action
 	} else {
 		error("lightOverride_UI: incorrect, or no, action passed");
 	}
+    req_update();
 }
 
 objpropsOverride_UI: action
@@ -778,6 +781,7 @@ objpropsOverride_UI: action
 	} else {
 		error("objpropsOverride_UI: incorrect, or no, action passed");
 	}
+    req_update();
 }
 
 motOverride_UI: action
@@ -853,6 +857,7 @@ motOverride_UI: action
 	} else {
 		error("motOverride_UI: incorrect, or no, action passed");
 	}
+    req_update();
 }
 
 lwoOverride_UI: action
@@ -929,6 +934,7 @@ lwoOverride_UI: action
 	} else {
 		error("lwoOverride_UI: incorrect, or no, action passed");
 	}
+    req_update();
 }
 
 lightexclOverride_UI: action
@@ -1034,6 +1040,7 @@ lightexclOverride_UI: action
 	} else {
 		error("lightexclOverride_UI: incorrect, or no, action passed");
 	}
+    req_update();
 }
 
 scnmasterOverride_UI: rendererindex, action
@@ -1050,4 +1057,5 @@ scnmasterOverride_UI: rendererindex, action
 			scnmasterOverride_UI_native(action);
 			break;
 	}
+    req_update();
 }

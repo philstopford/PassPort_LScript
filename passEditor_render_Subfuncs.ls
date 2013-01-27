@@ -44,9 +44,6 @@ win_bg_frameRender: sceneFile, frameOutputPath
     	bashFilePath = currentscene_patharray[2] + "frameRender_bat.bat";
     }
 
-
-    // currentscene_patharray[2] = fixPathForWin32(currentscene_patharray[2]);
-
     bashOutput = File(bashFilePath,"w");
     if(!bashOutput)
         error("Can't create the batch file");
@@ -65,13 +62,7 @@ win_bg_frameRender: sceneFile, frameOutputPath
 
     bashOutput.close();
 
-    //chdir(currentscene_patharray[2] + getsep());
-	
 	result = spawn(bashFilePath);
-
-    /*
-    commandadd =  "\"" + install_dir + getsep() + lwsn.exe\" -3 -c\"" + config_dir + "\" -d\"" + content_dir + "\" \"" + scenespaths[items_array[x]] + scenesnames[items_array[x]] + "\" " + scenesstart[items_array[1]] + " " + scenesend[items_array[1]] + " " + scenesstep[items_array[1]];
-    */
 }
 
 /* Matt Gorner - get rid of extra slashes that stops the del command in the Batch file */
@@ -176,7 +167,6 @@ win_bg_allSceneRender: sceneFile, frameOutputPath
 
 	/* Matt Gorner - get rid of extra slashes that stops the del command in the Batch file */
     t = currentscene_patharray[1] + getsep() + strip_slashes(currentscene_patharray[2]) + "frameRender_bat.bat";
-    // bashOutput.writeln("@del \"" + bashFilePath + "\"\n");
     bashOutput.writeln("@del \"" + t + "\"\n");
     
     bashOutput.writeln("pause");
@@ -278,12 +268,12 @@ UB_bg_frameRender: sceneFile, frameOutputPath
     scriptOutput.writeln("	activate");
     scriptOutput.writeln("	do script \"bash " + bashFilePath + "\"");
     scriptOutput.writeln("end tell");
+    scriptOutput.close();
     chdir(currentscene_patharray[2] + getsep());
     systemCommand = "osascript \"temp.scpt\"";
        
     result = system(systemCommand); 
-    filedelete(scriptFilePath);
-        
+    filedelete(scriptFilePath);        
 }
 
 UB_bg_sceneRender: sceneFile, frameOutputPath
@@ -353,6 +343,7 @@ UB_bg_sceneRender: sceneFile, frameOutputPath
     scriptOutput.writeln("	activate");
     scriptOutput.writeln("	do script \"bash " + bashFilePath + "\"");
     scriptOutput.writeln("end tell");
+    scriptOutput.close();
     chdir(currentscene_patharray[2] + getsep());
     systemCommand = "osascript \"temp.scpt\"";
        
@@ -443,12 +434,12 @@ UB_bg_allSceneRender: sceneFile, frameOutputPath
     scriptOutput.writeln("	activate");
     scriptOutput.writeln("	do script \"bash " + bashFilePath + "\"");
     scriptOutput.writeln("end tell");
+    scriptOutput.close();
     chdir(currentscene_patharray[2] + getsep());
     systemCommand = "osascript \"temp.scpt\"";
        
     result = system(systemCommand); 
     filedelete(scriptFilePath);
-    
 }
 
 

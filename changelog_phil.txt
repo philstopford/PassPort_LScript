@@ -1,3 +1,36 @@
+20130123 (beta 8 - no override changes since beta 7; major change in the experimental build)
+========
+
+(Garbage collector should clean up file handles, but this is a path to ensuring a clean implementation from which to base the Python port)
+
+- p0034 also fixed.
+- Fixed p0032 and p0033 in a beta 8 respin.
+- Fixed bug in 'create pass from selection' code for cameras, where an incorrect reference to tempLightAgents[] was lurking.
+- Optimization and unification of pass creation/editing dialog code into passHandler(). Need to use intermediary functions due to callback limitations. Reduced binary size by 7 KB and source by 10 KB.
+- Tweaked MotionMixer code to avoid creating file handles when we might fall into an error condition immediately afterwards due to cloned MotionMixer items check. Move the file handle activity after that check.
+- Revised RPE handling.
+ - Store RPE file version (in case of changes). Mismatch or absence will cause Passport to fail the load and display a nice error message to the user.
+ - Store Passport version (in case of changes). We'll try and load, but display a warning, just like the scene load. Same caveat as for scene save in this state applies. Note added to documentation.
+ - Store LW version as well. We'll try and load, but display a warning, just like the scene load. Same caveat as for scene save in this state applies. Note added to documentation.
+- Audited file handling code
+ - Fixed file handle leaks in the render script functions (scriptOutput was left open).
+ - Removed accidental duplicate file close calls in the MotionMixer function.
+ - Error paths now have close() calls.
+- Reorganising source in some places. No functional change other than additional inserts in the main file to pull in the new ones.
+ - Broke apart interface subfuncs file to separate out pass and override interface functions. Neutral functions are retained in the original file.
+ - Finished breaking out UDFs to separate, UI-feature-specific files. Reduces clutter.
+- Scattered some req_update() calls around to try and improve repaint issues.
+- Experimental code for user feature request (Javier Meroño). This is currently for post-1.0 (not compiled-in in the 1.0 betas) : Implement a passBuffers[pass] array to flag whether supported image filter exporters should be utilised for a pass. If no image filter is configured in the scene file, don't bother to (de)activate them. This is fairly disruptive and hence experimental. Depending on QA tests, it might be pulled into 1.0.
+ - Initial functions added. Activated globally with internal flag that can be removed once stable.
+ - Works with all supported image filter exporters handled by handleBuffers().
+  - Works as a subsequent, and iterative, stage. Will handle multiple instances of the image filters and with any buffer redirection option.
+ - Implemented across pass creation/duplication/editing/deletion.
+ - Implemented in save/load passes files (rpe).
+ - Auto-assigned with zero values for all options to Default pass.
+ - Breaks compatibility with scene data blocks and rpe files when active.
+ - Initial UI implementation for all actions.
+- handleBuffers experimental handling of the compositing buffers export and also exrTrader. Users must set up the filters; we just redirect the image data.
+
 20130121 (beta 7 - no override changes since beta 6)
 ========
 
@@ -506,6 +539,9 @@ p0028 : Wireframe mode change reported for Scene Master override. (Fixed, beta4)
 p0029 : More than 3 lights causes 'exceeds file size' error. (Fixed, beta6)
 p0030 : Resolution Multiplier not sticking in camera override. (Fixed, beta6)
 p0031 : object replacement override broken in beta 6. Issue was in MotionMixer code. (Fixed, beta7)
+p0032 : missed code meant that pass renaming wasn't working. (Fixed, beta8 respin)
+p0033 : code regression in override listbox handling. (Fixed, beta8 respin)
+p0034 : LScript bug needed working around. (Fixed, beta8 respin)
 
 ###############
 # Limitations #
@@ -519,7 +555,6 @@ p0031 : object replacement override broken in beta 6. Issue was in MotionMixer c
 
 - Need to check if growl interaction works with current growl versions.
 - 3rd party lights/cameras end of block detection.
-- Active camera override in Scene Override.
 - Extend light override (caustics).
 - Overriding multiple surfaces on an object. Doable?
 - Save/load override configuration files.
