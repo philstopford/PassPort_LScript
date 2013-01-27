@@ -1356,14 +1356,18 @@ aboutPassPortDialog_redraw
 platformInformation: platformVar
 {
 	switch(platformVar) {
-		case 1:
+		case WIN32:
+		case INTEL:
 			parch = "Win_x86";
 			break;
-		case 10:
+		case WIN64:
 			parch = "Win_x86_64";
 			break;
-		case 9:
+		case MACUB:
 			parch = "MacUB_x86";
+			break;
+		case MAC64:
+			parch = "MacUB_x86_64";
 			break;
 		default:
 			parch = "unknown: " + string(platform());
@@ -1375,7 +1379,7 @@ platformInformation: platformVar
 preferencePanel
 {
 
-	if(platform() == 9) // MacUB
+	if(platform() == MACUB || platform() == MAC64) // Mac
 	{
 		Pref_num_gads ++;
 	}
@@ -1423,7 +1427,7 @@ preferencePanel
 
 	ui_offset_y += Pref_ui_row_offset;
 
-	if(platform() == 9 || platform() == 11) // FIXME : Might not be needed any more. Mac-specific hack.
+	if(platform() == MACUB || platform() == MAC64) // FIXME : Might not be needed any more. Mac-specific hack.
 	{
 		c24 = ctlcheckbox("Enable auto close/reopen updates of Editor", useHackyUpdates);
 		ctlposition(c24, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
@@ -1467,7 +1471,7 @@ preferencePanel
 		userOutputString = getvalue(c22);
 		userOutputString = makeStringGood(userOutputString);
 		areYouSurePrompts = getvalue(c23);
-		if(platform() == 9)
+		if(platform() == MACUB || platform() == MAC64)
 		{
 			useHackyUpdates = getvalue(c24);
 		}
@@ -1561,13 +1565,13 @@ renderPassFrame
 
 
 	// windows frame rendering
-  	if(platformVar == 1 || platformVar == 10)
+  	if(platformVar == INTEL || platformVar == WIN32 || platformVar == WIN64)
 	{
 		win_bg_frameRender(frameRenderScene,testOutputPath);
 	}
 
 	// mac UB frame rendering
- 	if(platformVar == 9 || platformVar == 11)
+ 	if(platformVar == MACUB || platformVar == MAC64)
 	{
 		UB_bg_frameRender(frameRenderScene,testOutputPath);
 	}
@@ -1578,13 +1582,13 @@ renderPassScene
 	seqRenderScene = generatePassFile("seq", currentChosenPass);
 	
 	// windows scene rendering
-	if(platformVar == 1 || platformVar == 10)
+	if(platformVar == INTEL || platformVar == WIN32 || platformVar == WIN64)
 	{
 		win_bg_sceneRender(seqRenderScene,seqOutputPath);
 	}
 	
 	// mac UB scene rendering
-	if(platformVar == 9 || platformVar == 11)
+	if(platformVar == MACUB || platformVar == MAC64)
 	{
 		UB_bg_sceneRender(seqRenderScene,seqOutputPath);
 	}
@@ -1598,13 +1602,13 @@ renderAllScene
 	}
 	
 	// windows all scene rendering
-	if(platformVar == 1 || platformVar == 10)
+	if(platformVar == INTEL || platformVar == WIN32 || platformVar == WIN64)
 	{
 		win_bg_allSceneRender(seqRenderScene,seqOutputPath);
 	}
 	
 	// mac UB all scene rendering
-	if(platformVar == 9 || platformVar == 11)
+	if(platformVar == MACUB || platformVar == MAC64)
 	{
 		UB_bg_allSceneRender(seqRenderScene,seqOutputPath);
 	}
@@ -1619,13 +1623,8 @@ getImageFormats
 
 	switch(platformVar)
 	{
-		case 5:
-			tempString = config_dir + getsep() + "LightWave Extensions " + vers + " Prefs";
-			input = File(tempString);
-			break;
-
-		case 9:
-		case 11:
+		case MACUB:
+		case MAC64:
 			// Special case check for LW Extensions due to the "extension cache" file
 			if(integer(hostVersion()) >= 10)
 			{
@@ -1649,7 +1648,8 @@ getImageFormats
 			}
 			break;
 
-		case 1:
+		case WIN32:
+		case INTEL:
 			if(integer(hostVersion()) >= 10)
 			{
 				tempString = config_dir + getsep() + "LWEXT" + vers + ".CFG";
@@ -1672,7 +1672,7 @@ getImageFormats
 			}
 			break;
 
-		case 10:
+		case WIN64:
 			if(integer(hostVersion()) >= 10)
 			{
 				tempString = config_dir + getsep() + "LWEXT" + vers + "-64.CFG";

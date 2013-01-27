@@ -63,32 +63,57 @@ o_parseListItems: overrideItemsString
 {
 	if (overrideItemsString != nil)
 	{
-		idsArray = parse("||",overrideItemsString);
-	/*	if(string(idsArray[1]) == "(Scene Master)")
+		sel = getvalue(gad_OverridesListview).asInt();
+		o_tempSettingsArray = parse("||",overrideSettings[sel]);
+		tempOverrideType = o_tempSettingsArray[2];
+
+		if(tempOverrideType == "type6") // special case for the scene master override
+										// might need to be tweaked in case of multiple scene overrides; assumes SM always assigned.
 		{
 			itemsParsedArray[1] = 1;
 			z = 2;
 		}
 		else
 		{
+			idsArray = parse("||",overrideItemsString);
+//			info("idsArray: " + idsArray);
+//			info("overrideItemsString: " + overrideItemsString);
+//			info("o_displayIDsFiltered: " + o_displayIDsFiltered);
 			z = 1;
-		}
-	*/
-		z = 1; // still need to special case scene override.
-		
-		for(x = 1; x <= size(o_displayIDsFiltered); x++)
-		{
-			for(y = 1; y <= size(idsArray); y++)
+			
+/*			tempString = "";
+			for (ab = 1; ab <= size(o_displayIDsFiltered); ab++)
 			{
-				if(string(o_displayIDsFiltered[x]) == string(idsArray[y]))
+				tempString += o_displayIDsFiltered[ab].asStr();
+				tempString += " ";
+			}
+			
+			info(tempString);
+			
+			tempString = "";
+
+			for (ab = 1; ab <= size(idsArray); ab++)
+			{
+				tempString += idsArray[ab].asStr();
+				tempString += " ";
+			}
+			
+			tempString = "";
+*/			
+			for(x = 1; x <= size(o_displayIDsFiltered); x++)
+			{
+				for(y = 1; y <= size(idsArray); y++)
 				{
-					itemsParsedArray[z] = x;
-					z++;
+					if(o_displayIDsFiltered[x].asStr() == idsArray[y].asStr())
+					{
+						itemsParsedArray[z] = x;
+						z++;
+					}
 				}
 			}
 		}
 
-		if(z > 1) {
+		if(z > 1) { // we found at least one match, so the index value was bumped to at least 2 in the process.
 			return(itemsParsedArray);
 		} else {
 			return nil;

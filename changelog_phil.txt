@@ -1,3 +1,12 @@
+20121212
+========
+
+- Found various gaps in platform support for Win64. Closed.
+- Still fighting p0013....
+ - Very odd. The arrays seem to be intact and valid. There's something odd going on in the look-up. A multiple selection, even with a gap between, always returns sequential numbers (1 2) rather than (3 5). Puzzling. Values coming into the parse function are correct.
+- Replaced hard-coded platform IDs with official variable names.
+- Deuce reported that the compiled version doesn't have the start-up issues of the uncompiled version (p0014), on both Windows and Mac. Odd. (NT : known issue with images loading into uncompiled LScripts - nothing to do except compile the script)
+
 20121211b
 =========
 
@@ -159,7 +168,8 @@ p0010 : listbox selections are misfiring. (notabug? related to p0011 - user expe
 p0011 : AddSel seems to replace existing assignments of overrides, rather than adding to the existing selection. Odd and probably the cause for report p0010. (deferred)
 p0012 : Rebuilding lists causes script to explode. (Fixed)
 p0013 : Selecting second item in list causes highlight to be drawn (on repaint) for 1st item. (20121211 - new)
-
+p0014 : Uncompiled version crashes out on Mac and fails to start-up roughly 70% of the time on WinXP. (closed, LScript bug)
+p0015 : Overrides with assigned items don't get bullet point until the lists are updated, or some major redraw occurs (also in original code)
 
 :::::::::::::::::::
 : Issues to check :

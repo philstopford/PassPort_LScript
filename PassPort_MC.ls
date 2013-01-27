@@ -63,11 +63,11 @@
 @warnings
 @script master
 @name "PassPort_MC"
-@define dev 1
+@define dev 0
 
 // Inserts other functions ...
 @if dev == 1
-@if platform == 11 || platform == MACUB
+@if platform == MAC64 || platform == MACUB
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_globals.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UIglobals.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_Interface_Subfuncs.ls"
@@ -78,7 +78,7 @@
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UDF_Passes.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UDF_Overrides.ls"
 @end
-@if platform == INTEL
+@if platform == INTEL || platform == WIN32 || platform == WIN64
 @insert "E:/PassPort/Source/passEditor_globals.ls"
 @insert "E:/PassPort/Source/passEditor_UIglobals.ls"
 @insert "E:/PassPort/Source/passEditor_Interface_Subfuncs.ls"
@@ -229,7 +229,6 @@ create
     fileMenu_items = @"Save Pass as Scene...","Save All Passes As Scenes...","Render Pass Frame","Render Pass Scene","Render All Passes","==","Update Lists Now      "+ icon[CTRLR],"Preferences...          " + icon[LETTERO],"Render Globals...","==","Save Current Settings...","Load Settings...","About PassPort..."@;
 
     //preProcess();
-    
     comringattach("LW_PassPort","getCommand");
 }
 
@@ -339,7 +338,8 @@ options
     ctlposition(gad_OverridesListview, Main_ui_gap, Main_banner_height + 55);
 
 @if dev == 1
-    gad_Debug = ctlstate("DEBUG",debugmode,debugButtonWidth,"debugMe"); // use globalstore (defined in globals), defaults to 0 if not retrieved.
+//    gad_Debug = ctlstate("DEBUG",debugmode,debugButtonWidth,"debugMe"); // use globalstore (defined in globals), defaults to 0 if not retrieved.
+    gad_Debug = ctlbutton("DEBUG",debugButtonWidth,"debugMe");
     ctlposition(gad_Debug,debugButtonXposition, Main_banner_height+5);
 @end
     

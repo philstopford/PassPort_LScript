@@ -660,7 +660,7 @@ generatePassFile: mode, pass
         newScenePath = outputFolder[1] + getsep() + "CG" + getsep() + "temp" + getsep() + "tempScenes" + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + ".lws";
     }
 
-    if(platformVar == 1 || platformVar == 10)
+    if(platformVar == INTEL || platformVar == WIN32 || platformVar == WIN64)
     {
         
         tempFixedPath = fixPathForWin32(newScenePath);
@@ -1830,7 +1830,7 @@ generatePassFile: mode, pass
                                             bufferBaseName = baseNameArray[size(baseNameArray)];
                                             updatedBufferSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], bufferBaseName);
 
-                                            if(platformVar == 1 || platformVar == 10)
+                                            if(platformVar == INTEL || platformVar == WIN32 || platformVar == WIN64)
                                             {
                                                 
                                                 tempFixedPath = fixPathForWin32(updatedBufferSaverPath);
@@ -1869,7 +1869,7 @@ generatePassFile: mode, pass
                                             psdBaseName = baseNameArray[size(baseNameArray)];
                                             updatedPsdSaverPath = "Path \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], psdBaseName);
 
-                                            if(platformVar == 1 || platformVar == 10)
+                                            if(platformVar == INTEL || platformVar == WIN32 || platformVar == WIN64)
                                             {
 												noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames[pass], psdBaseName);
 												tempFixedPath = fixPathForWin32(noIntroPath);

@@ -1082,7 +1082,7 @@ overrideMenu_active: overrideMenu_item
 reqkeyboard: key
 {
     // win hotkeys
-    if(platformVar == 1 || platformVar == 10)
+    if(platformVar == INTEL || platformVar == WIN32 || platformVar == WIN64)
     {
         
         // undo selections
@@ -1218,7 +1218,7 @@ reqkeyboard: key
     }
     
     // mac UB hotkeys
-    if(platformVar == 9 || platformVar == 11)
+    if(platformVar == MACUB || platformVar == MAC64)
     {
         // undo selections
         if(key == 26 && doKeys == 1)
@@ -1362,10 +1362,11 @@ reqkeyboard: key
 }
 
 @if dev == 1
-debugMe: val
+debugMe //: val
 {
-    debug = val;
-    globalstore("passEditorDebugMode", debug);
+//    debug = val;
+//    globalstore("passEditorDebugMode", debug);
+    debug();
 }
 @end
 
