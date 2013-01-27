@@ -51,11 +51,10 @@
         the override assignments.  I use 2 dimensional arrays, with strings in each element.
         Each string is parseable to reveal a third dimension of elements (separated by the
         double pipe symbol "||").
-		
-	Hacky Saving:
-		Builds of LW earlier than 1281 had problems with arrays of more than 99 items. To workaround this,
-		Passport enters a 'hacky saving' mode. In this revision, I'm minded to nuke this to simplify the code.
-		
+        
+    Hacky Saving:
+        Builds of LW earlier than 1281 had problems with arrays of more than 99 items. The original Passport offered
+        a hacky saving mode. I've now removed it and blocked operation on LW prior to 9.3.
 */
 //
 //--------------------------------------
@@ -64,10 +63,8 @@
 @script master
 @name "PassPort_MC"
 @define dev 1
-@define compiledform 1
 
-// Inserts other functions ...
-@if compiledform == 1
+var supportedplatform = 0;
 
 @insert "@passEditor_globals.ls"
 @insert "@passEditor_UIglobals.ls"
@@ -78,49 +75,6 @@
 @insert "@passEditor_UDF.ls"
 @insert "@passEditor_UDF_Passes.ls"
 @insert "@passEditor_UDF_Overrides.ls"
-
-@else
-
-@if dev == 1
-@if platform == MAC64 || platform == MACUB
-@insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_globals.ls"
-@insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UIglobals.ls"
-@insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_Interface_Subfuncs.ls"
-@insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_render_Subfuncs.ls"
-@insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_sceneGen_Subfuncs.ls"
-@insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_sceneParse_Subfuncs.ls"
-@insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UDF.ls"
-@insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UDF_Passes.ls"
-@insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UDF_Overrides.ls"
-@end
-
-@if platform == INTEL || platform == WIN32 || platform == WIN64
-@insert "E:/PassPort/Source/passEditor_globals.ls"
-@insert "E:/PassPort/Source/passEditor_UIglobals.ls"
-@insert "E:/PassPort/Source/passEditor_Interface_Subfuncs.ls"
-@insert "E:/PassPort/Source/passEditor_render_Subfuncs.ls"
-@insert "E:/PassPort/Source/passEditor_sceneGen_Subfuncs.ls"
-@insert "E:/PassPort/Source/passEditor_sceneParse_Subfuncs.ls"
-@insert "E:/PassPort/Source/passEditor_UDF.ls"
-@insert "E:/PassPort/Source/passEditor_UDF_Passes.ls"
-@insert "E:/PassPort/Source/passEditor_UDF_Overrides.ls"
-@end
-
-@else
-
-@insert "@passEditor_globals.ls"
-@insert "@passEditor_UIglobals.ls"
-@insert "@passEditor_Interface_Subfuncs.ls"
-@insert "@passEditor_render_Subfuncs.ls"
-@insert "@passEditor_sceneGen_Subfuncs.ls"
-@insert "@passEditor_sceneParse_Subfuncs.ls"
-@insert "@passEditor_UDF.ls"
-@insert "@passEditor_UDF_Passes.ls"
-@insert "@passEditor_UDF_Overrides.ls"
-
-@end
-
-@end
 
 // icons
 blank_icon = @ "................",
@@ -217,9 +171,37 @@ bullet_icon = @ "................",
 @define CTRLR 7
 @define BULLET 8
 
+platformcheck
+{
+	switch(platform())
+	{
+		case MACUB:
+		case MAC64:
+		case WIN32:
+		case WIN64:
+		case INTEL:
+			supportedplatform = 1;
+			break;
+		default:
+			supportedplatform = 0;
+			break;
+	}
+	if (supportedplatform != 1)
+		error("Unsupported platform: " + platform().asStr());
+
+    // Check to block operation on old LW versions - permitted removal of needHackySaving!
+    if (hostBuild() < 1281) {
+        error("PassPort requires at least LightWave 3D 9.3.");
+    }
+
+	return;
+}
+
 // typical interface functions for master script here
 create
 {
+	platformcheck();
+
     loadingInProgress = 0;
     justReopened = 0;
     // 22 = List gadget scrollbar
@@ -236,16 +218,7 @@ create
     icon[CTRLR] = Icon(ctrlR_icon);
     icon[BULLET] = Icon(bullet_icon);
     setdesc("PassPort " + versionString);
-    sceneJustSaved = 0;
     sceneJustLoaded = 0;
-    if(hostBuild() >= 1281)
-    {
-        needHackySaving = 0;
-    }
-    else
-    {
-        needHackySaving = 1;
-    }
     
     fileMenu_items = @"Save Pass as Scene...","Save All Passes As Scenes...","Render Pass Frame","Render Pass Scene","Render All Passes","==","Update Lists Now      "+ icon[CTRLR],"Preferences...          " + icon[LETTERO],"Render Globals...","==","Save Current Settings...","Load Settings...","About PassPort..."@;
 
@@ -255,12 +228,14 @@ create
 
 destroy
 {
-    unProcess();
+	if(supportedplatform != 1)
+		return;
+	unProcess();
 }
 
 options
 {
-    debug();
+	platformcheck();
 
     if(interfaceRunYet == 1)
     {
@@ -362,7 +337,7 @@ options
 @if dev == 1
     gad_Debug = ctlstate("DEBUG",debugmode,debugButtonWidth,"debugMe"); // use globalstore (defined in globals), defaults to 0 if not retrieved.
     ctlposition(gad_Debug,debugButtonXposition, Main_banner_height+5);
-@end
+@end // end of dev == 1 check
     
     gad_SceneItems_forPasses_Listview = ctllistbox("Scene Items",listTwoWidth,listOneHeight,"itemslb_count","itemslb_name","itemslb_event");
     ctlposition(gad_SceneItems_forPasses_Listview,listTwoPosition, Main_banner_height + 55);
@@ -424,11 +399,12 @@ options
     
     reqredraw("req_redraw");
     reqopen();
-
 } // end options
 
 load: what,io
     {
+		platformcheck();
+
         loadingInProgress = 1;
         if(what == SCENEMODE)
         {
@@ -506,42 +482,23 @@ load: what,io
             setdesc("PassPort " + versionString);
             sceneJustLoaded = 1;
             interfaceRunYet = 1;
-            sceneJustSaved = 0;
         }
     }
     
     save: what,io
     {
+		if(supportedplatform != 1)
+			return;
         if(what == SCENEMODE)
         {   
             if(sceneJustLoaded == 1 || interfaceRunYet == 1)
             {
-
-                // set up my hacky replacement system
-                replaceCount = 0;
-                
                 passNamesSize = size(passNames);
                 io.writeln(passNamesSize);
                 for(x = 1; x <= passNamesSize; x++)
                 {
                     io.writeln(passNames[x]);
-                    if(needHackySaving == 1)
-                    {
-                        if(size(passAssItems[x]) <= 99)
-                        {
-                            io.writeln(passAssItems[x]);
-                        }
-                        else
-                        {
-                            replaceCount++;
-                            io.writeln("REPLACEME " + string(replaceCount));
-                            replaceMeVar[replaceCount] = passAssItems[x];
-                        }
-                    }
-                    else
-                    {
-                            io.writeln(passAssItems[x]);
-                    }
+                    io.writeln(passAssItems[x]);
                 }
                 
                  for(x = 1; x <= size(overrideNames); x++)
@@ -595,23 +552,7 @@ load: what,io
                 
                 if(overrideNames[1] != "empty")
                 {
-                    if(needHackySaving == 1)
-                    {
-                        if(size(overrideSettings[1]) <= 99)
-                        {
-                            io.writeln(overrideSettings[1]);
-                        }
-                        else
-                        {
-                            replaceCount++;
-                            io.writeln("REPLACEME " + string(replaceCount));
-                            replaceMeVar[replaceCount] = overrideSettings[1];
-                        }
-                    }
-                    else
-                    {
-                            io.writeln(overrideSettings[1]);
-                    }
+                    io.writeln(overrideSettings[1]);
                 }
                 if(overrideNamesSize > 1)
                 {
@@ -620,24 +561,7 @@ load: what,io
                         io.writeln(overrideNames[x]);
                         if(overrideNames[1] != "empty")
                         {
-                            if(needHackySaving == 1)
-                            {
-                                if(size(overrideSettings[x]) <= 99)
-                                {
-                                    io.writeln(overrideSettings[x]);
-                                }
-                                else
-                                {
-                                    replaceCount++;
-                                    io.writeln("REPLACEME " + string(replaceCount));
-                                    replaceMeVar[replaceCount] = overrideSettings[x];
-                                }
-                            }
-                            else
-                            {
-                                    io.writeln(overrideSettings[x]);
-                            }
-                            
+                            io.writeln(overrideSettings[x]);
                         }
                     }
                 }
@@ -648,24 +572,7 @@ load: what,io
                     {
                         if(overrideNames[1] != "empty")
                         {
-                            if(needHackySaving == 1)
-                            {
-                                if(size(passOverrideItems[x][y]) <= 99)
-                                {
-                                    io.writeln(passOverrideItems[x][y]);
-                                }
-                                else
-                                {
-                                    replaceCount++;
-                                    io.writeln("REPLACEME " + string(replaceCount));
-                                    replaceMeVar[replaceCount] = passOverrideItems[x][y];
-                                }
-                            }
-                            else
-                            {
-                                    io.writeln(passOverrideItems[x][y]);
-                            }
-                            
+                            io.writeln(passOverrideItems[x][y]);
                         }
                     }
                 }
@@ -679,12 +586,7 @@ load: what,io
                 io.writeln(testResMultiplier);
                 io.writeln(testRgbSaveType);
                 
-                sceneJustSaved = 1;
                 unsaved = 0;
-                if(replaceCount > 0)
-                {
-                    //warn("Hacky scene-saving hasn't completed.  Please don't close or clear Layout yet!");
-                }
                 
                 globalstore("passEditoruserOutputString",userOutputString);
                 globalstore("passEditorareYouSurePrompts",areYouSurePrompts);
@@ -696,50 +598,25 @@ load: what,io
             }
 
         }
-
     }
     
     flags
     {
-      return(SCENE,LWMASTF_RECEIVE_NOTIFICATIONS);
+		if(!supportedplatform)
+			return;
+		return(SCENE,LWMASTF_RECEIVE_NOTIFICATIONS);
     }
     
 process: event, command
 {
-
-    // Was getting an error when a scene was reloaded, but only happened once, so this might not be needed
-    /* if (event == LWEVNT_NOTIFY_SCENE_CLEAR_STARTING)
-    {
-        unProcess();
-    } */
-
-    if(command)
-    {
-        if(size(command) >= 10)
-        {
-            if(strleft(command,10) == "SaveScene ")
-            {
-                if(replaceCount > 0)
-                {
-                    if(unsaved == 0)
-                    {
-                        if(needHackySaving == 1)
-                        {
-                            doHackyReplacing();
-                        }
-                        //info("Hacky scene-saving complete.  It's safe to close or clear now.");
-                    }
-                }
-                sceneJustSaved = 0;
-            }
-        }
-    }
 }
-
 
 // custom interface functions below here
     preProcess
     {
+		if (supportedplatform != 1)
+			return;
+			
         // this bit is basically just cataloging scene items and setting up initial values for variables
         masterScene = Scene();
         originalSelection = masterScene.getSelect();
@@ -806,11 +683,11 @@ process: event, command
         // do the experimental scene master override setup
         o_displayNames = nil; // clear it out
         o_displayGenus = nil; // clear it out
-		o_displayIDs = nil;
+        o_displayIDs = nil;
         o_displayNames[1] = "(Scene Master)";
         o_displayGenus[1] = 0;
-		o_displayIDs[1] = "SM";
-				
+        o_displayIDs[1] = "SM";
+                
         if(s != nil)
         {
             arraySize = size(s);
@@ -831,12 +708,12 @@ process: event, command
         {
             if(meshAgents[1] != "none")
             {
-				displayNames[x] = meshNames[y];
+                displayNames[x] = meshNames[y];
                 o_displayNames[x+1] = meshNames[y];
                 displayGenus[x] = 1;
                 o_displayGenus[x+1] = 1;
                 displayIDs[x] = meshIDs[y];
-				o_displayIDs[x+1] = meshIDs[y];
+                o_displayIDs[x+1] = meshIDs[y];
                 displayOldIDs[x] = meshOldIDs[y];
                 x++;
             }
@@ -848,7 +725,7 @@ process: event, command
             displayGenus[x] = 2;
             o_displayGenus[x+1] = 2;
             displayIDs[x] = lightIDs[y];
-			o_displayIDs[x+1] = lightIDs[y];
+            o_displayIDs[x+1] = lightIDs[y];
             displayOldIDs[x] = lightOldIDs[y];
             x++;
         }
@@ -1174,6 +1051,8 @@ process: event, command
 
 reProcess
 {
+	if(supportedplatform != 1)
+		return;
     if(justReopened != 1)
     {
         // and this bit just recatalogs the items so assignments are up to date
@@ -1287,10 +1166,10 @@ reProcess
         // Scene Master override setup
         o_displayNames = nil; // clear it out
         o_displayGenus = nil; // clear it out
-		o_displayIDs = nil;
+        o_displayIDs = nil;
         o_displayNames[1] = "(Scene Master)";
         o_displayGenus[1] = 0;
-		o_displayIDs[1] = "SM";
+        o_displayIDs[1] = "SM";
         
         for(y = 1; y <= size(meshAgents); y++)
         {
@@ -1301,7 +1180,7 @@ reProcess
                 displayGenus[x] = 1;
                 o_displayGenus[x+1] = displayGenus[x];
                 displayIDs[x] = meshIDs[y];
-				o_displayIDs[x+1] = meshIDs[y];
+                o_displayIDs[x+1] = meshIDs[y];
                 displayOldIDs[x] = meshOldIDs[y];
                 x++;
             }
@@ -1313,7 +1192,7 @@ reProcess
             displayGenus[x] = 2;
             o_displayGenus[x+1] = displayGenus[x];
             displayIDs[x] = lightIDs[y];
-			o_displayIDs[x+1] = lightIDs[y];
+            o_displayIDs[x+1] = lightIDs[y];
             displayOldIDs[x] = lightOldIDs[y];
             x++;
         }
@@ -1695,6 +1574,9 @@ reProcess
 
 unProcess
 {
+	if(supportedplatform != 1)
+		return;
+		
     // clears out all the variables
     
     if(reqisopen())  {
@@ -1730,6 +1612,8 @@ unProcess
 // Redraw custom drawing on requester
 req_redraw
 {
+	if(supportedplatform != 1)
+		return;
     if(reqisopen())
     {
         // Draw divider line (ctlsep kept getting drawn over)
@@ -1740,8 +1624,11 @@ req_redraw
 
 req_update
 {
+	if(supportedplatform != 1)
+		return;
     refreshing = true;
     requpdate();
     refreshing = false;
 }
+
 

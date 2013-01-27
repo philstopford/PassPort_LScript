@@ -1735,69 +1735,6 @@ getImageFormats
 	}
 }
 
-doHackyReplacing
-{
-	currentscene_path = Scene().filename;
-	currentscene_patharray = split(currentscene_path);
-	if(currentscene_patharray[1] != nil)
-	{
-		tempFilePath = currentscene_patharray[1] + currentscene_patharray[2] + getsep() + "passEditor_tempReplace.lws";
-	}
-	else
-	{
-		tempFilePath = currentscene_patharray[2] + getsep() + "passEditor_tempReplace.lws";
-	}
-	
-	inputFile = File(currentscene_path,"r");
-	outputFile = File(tempFilePath,"w");
-	
-	replaceCount = 1;
-	while(!inputFile.eof())
-	{
-		line = inputFile.read();
-		if(line != nil && line != "")
-		{
-			if(size(line) >= 10)
-			{
-				if(strleft(line,10) != "REPLACEME ")
-				{
-					outputFile.writeln(line);
-				}
-				else
-				{
-					outputFile.writeln(replaceMeVar[replaceCount]);
-					replaceCount++;
-				}
-			}
-			else
-			{
-				outputFile.writeln(line);
-			}
-		}
-		else
-		{
-			outputFile.writeln(line);
-		}
-	}
-	
-	inputFile.close();
-	outputFile.close();
-	
-	inputFile = File(tempFilePath,"r");
-	outputFile = File(currentscene_path,"w");
-	
-	while(!inputFile.eof())
-	{
-		line = inputFile.read();
-		outputFile.writeln(line);
-	}
-	
-	inputFile.close();
-	outputFile.close();
-	filedelete(tempFilePath);
-}
-
-
 // override subfunctions
 checkForOverrideAssignments: currentID, pass
 {

@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20121214";
+var versionString = "20121220";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -63,12 +63,8 @@ var editorResolution;
 var testResMultiplier;
 var testRgbSaveType;
 var sceneJustLoaded = 0;
-var sceneJustSaved;
 var testOutputPath;
 var seqOutputPath;
-// hacky scene save vars
-var replaceMeVar;
-var replaceCount;
 var unsaved;
 var listOneWidth;
 var panelWidth;
@@ -115,9 +111,6 @@ var bottomPosition;
 var loadingInProgress;
 var justReopened;
 var beingEscaped;
-
-// need for hacky saving
-var needHackySaving;
 
 // motion mixer
 var overriddenObjectID;

@@ -1,3 +1,18 @@
+20121220
+=========
+
+- Preprocessor full of flaky, so went for a different approach to track supported platforms.
+- Dropped absolute paths for the @insert statements, gone for all-relative. Seems to no longer blow up.
+
+20121214b
+=========
+
+- First pass at system to failsafe operation on unsupported (e.g. CFM Mac) LW. Need to also add build check in this to block running when the hacky modes are stripped out.
+ - Needs QA.
+- HackySaving removed (was required for versions prior to 9.3 - very old now).
+ - Build check added to entry points; script will error() out on builds prior to 1281.
+ - Significant code reduction. Needs limited QA.
+
 20121214
 ========
 
@@ -154,8 +169,6 @@ Brace yourself. Here's the big set of UI changes related to filtering the overri
 
 UI layout code optimisation.
 HackyUpdates review
-HackySaving deprecation
-Block operation on CFM LW.
 
 ********
 * Bugs *
