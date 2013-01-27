@@ -1,9 +1,7 @@
 
 PassPort
-by Jeremy Hardin
-
-Version 1.1.3
-Build 0001
+originally by Jeremy Hardin
+modifications by Matt Gorner (2010) and Phil Stopford (2012)
 
 ---------------------------------------------------------
 
@@ -17,7 +15,6 @@ LightWave 9.6 fix and UI update - Matt Gorner (28 June 2010)
 LightWave 10 fix and UI update - Matt Gorner (27 December 2010)
 
 Installing: Just drag the entire 'PassPort' folder into your Plugins folder.
-
 
 --
 

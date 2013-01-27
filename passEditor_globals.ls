@@ -1,8 +1,13 @@
 // globals
-var versionString = "20121203";
+@if dev == 1
+var debugButtonXposition;
+var debugButtonWidth;
+var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to off if not found.
+@else
+var debugmode = 0;
+@end
+var versionString = "20121207";
 var parch = "Unknown";
-var aboutsize_x = 400;
-var aboutsize_y = 200;
 var icon;
 var scenesnames;
 var passSelected = false;
@@ -25,10 +30,9 @@ var lightIDs;
 var lightOldIDs;
 var displayNames;
 var displayGenus;
-var o_displayNames;
-var o_displayGenus;
-var o_displayNamesObject;
-var o_displayNamesLight;
+var o_displayNames; // holds all items for the override item listbox
+var o_displayNamesFiltered; // populates the listbox with compatible items for selected override type.
+var o_displayGenus; // used to filter the displayNames by type for compatibility.
 var displayIDs;
 var displayOldIDs;
 var passNames;
@@ -38,10 +42,10 @@ var passMenu_items = @"Full Scene Pass","Empty Pass","Pass From Layout Selection
 var overrideMenu_items = @"Object Properties","Alternative Object...","Motion File...","Surface File...","Light Properties","Scene Master","==","Light Exclusions","Duplicate Selected Override"@;
 var gad_PassesListview;
 var gad_OverridesListview;
-var c3;
-var c3_5;
+var gad_SceneItems_forPasses_Listview;
+var gad_SceneItems_forOverrides_Listview;
 var gad_SelectedPass;
-var c7;
+// var c7; // unused.
 var currentChosenPass;
 var currentChosenPassString;
 var interfaceRunYet;

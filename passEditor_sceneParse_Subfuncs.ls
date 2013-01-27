@@ -22,10 +22,10 @@ getPassEditorStartLine: inputPath
 	endLine = input.linecount();
 
 
-	tempNumber = 1;
+	currentLine = 1;
 	input.line(startLine);
 
-	while(tempNumber != endLine)
+	while(currentLine != endLine)
 	{
 		line = input.read();
 		lineArray = parse(" ", line);
@@ -33,8 +33,8 @@ getPassEditorStartLine: inputPath
 		{
 			if(lineArray[2] == "MasterHandler" && lineArray[4] == "PassPort_MC")
 			{
-				tempNumber = input.line() - 1;
-				return(tempNumber);
+				currentLine = input.line() - 1;
+				return(currentLine);
 			}
 		}
 	}
@@ -60,10 +60,10 @@ getObjectLines: startLine,endLine,objID,inputPath
 		endLine = input.linecount();
 	}
 
-	tempNumber = 1;
+	currentLine = 1;
 	input.line(startLine);
 
-	while(tempNumber != endLine)
+	while(currentLine != endLine)
 	{
 		line = input.read();
 		lineArray = parse(" ",line);
@@ -73,8 +73,8 @@ getObjectLines: startLine,endLine,objID,inputPath
 			{
 				if(lineArray[3] == string(objID) || lineArray[2] == string(objID))
 				{
-					tempNumber = input.line() - 1;
-					return(tempNumber);
+					currentLine = input.line() - 1;
+					return(currentLine);
 				}
 			}
 		}
@@ -98,9 +98,9 @@ getLightLines: startLine,endLine,objID,inputPath
 		// endLine = input.eof();
 		endLine = input.linecount();
 	}
-	tempNumber = 1;
+	currentLine = 1;
 	input.line(startLine);
-	while(tempNumber != endLine)
+	while(currentLine != endLine)
 	{
 		line = input.read();
 		lineArray = parse(" ",line);
@@ -108,8 +108,8 @@ getLightLines: startLine,endLine,objID,inputPath
 		{
 			if(lineArray[1] == "AddLight" && lineArray[2] == string(objID))
 			{
-				tempNumber = input.line() - 1;
-				return(tempNumber);
+				currentLine = input.line() - 1;
+				return(currentLine);
 			}
 		}
 	}
@@ -132,25 +132,25 @@ getObjectEndLine: startLine,endLine,objID,inputPath
 		// endLine = input.eof();
 		endLine = input.linecount();
 	}
-	tempNumber = 1;
+	currentLine = 1;
 	input.line(startLine);
-	while(tempNumber != endLine)
+	while(currentLine != endLine)
 	{
 		line = input.read();
-		tempNumber = input.line() - 1;
-		tempLineArray[1] = line;
-		if(sizeof(tempLineArray[1]) >= 12)
+		currentLine = input.line() - 1;
+		currentLineArray[1] = line;
+		if(sizeof(currentLineArray[1]) >= 12)
 		{
-			tempString = strleft(line,12);
-			if(tempString == "LoadObjectLa" || tempString == "AddNullObjec")
+			currentLineString = strleft(line,12);
+			if(currentLineString == "LoadObjectLa" || currentLineString == "AddNullObjec")
 			{
-				return(tempNumber);
+				return(currentLine);
 			}
 			else
 			{
-				if(tempString == "AmbientColor")
+				if(currentLineString == "AmbientColor")
 				{
-					return(tempNumber);
+					return(currentLine);
 				}
 			}
 		}
@@ -174,19 +174,19 @@ getLightEndLine: startLine,endLine,objID,inputPath
 		// endLine = input.eof();
 		endLine = input.linecount();
 	}
-	tempNumber = 1;
+	currentLine = 1;
 	input.line(startLine);
-	while(tempNumber != endLine)
+	while(currentLine != endLine)
 	{
 		line = input.read();
-		tempNumber = input.line() - 1;
-		tempLineArray[1] = line;
-		if(sizeof(tempLineArray[1]) >= 8)
+		currentLine = input.line() - 1;
+		currentLineArray[1] = line;
+		if(sizeof(currentLineArray[1]) >= 8)
 		{
-			tempString = strleft(line,8);
-			if(tempString == "AddLight" || tempString == "AddCamer")
+			currentLineString = strleft(line,8);
+			if(currentLineString == "AddLight" || currentLineString == "AddCamer")
 			{
-				return(tempNumber);
+				return(currentLine);
 			}
 		}
 	}
@@ -211,28 +211,27 @@ getPartialLine: startLine, endLine, searchString, inputPath
 		// endLine = input.eof();
 		endLine = input.linecount();
 	}
-	tempNumber = 1;
+	currentLine = 1;
 	input.line(startLine);
-	while(tempNumber != endLine)
+	while(currentLine != endLine)
 	{
 		line = input.read();
-		tempNumber = input.line() - 1;
+		currentLine = input.line() - 1;
 		if(line)
 		{
-			tempSize = size(line);
-			if(tempSize >= searchStringSize)
+			if(size(line) >= searchStringSize)
 			{
 				linePart = strleft(line,searchStringSize);
 				if(linePart == searchString)
 				{
-					if(tempNumber == 0)
+					if(currentLine == 0)
 					{
 						toReturn = nil;
 						break;
 					}
 					else
 					{
-						toReturn = tempNumber;
+						toReturn = currentLine;
 						break;
 					}
 				}

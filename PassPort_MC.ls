@@ -57,10 +57,10 @@
 @warnings
 @script master
 @name "PassPort_MC"
-@define dev "TRUE"
+@define dev 1
 
 // Inserts other functions ...
-@if dev == TRUE
+@if dev == 1
 @if platform == 11
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_globals.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UIglobals.ls"
@@ -69,6 +69,8 @@
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_sceneGen_Subfuncs.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_sceneParse_Subfuncs.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UDF.ls"
+@insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UDF_Passes.ls"
+@insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UDF_Overrides.ls"
 @end
 @if platform == INTEL
 @insert "E:/PassPort/Source/passEditor_globals.ls"
@@ -78,6 +80,8 @@
 @insert "E:/PassPort/Source/passEditor_sceneGen_Subfuncs.ls"
 @insert "E:/PassPort/Source/passEditor_sceneParse_Subfuncs.ls"
 @insert "E:/PassPort/Source/passEditor_UDF.ls"
+@insert "E:/PassPort/Source/passEditor_UDF_Passes.ls"
+@insert "E:/PassPort/Source/passEditor_UDF_Overrides.ls"
 @end
 @else
 @insert "@passEditor_globals.ls"
@@ -87,6 +91,8 @@
 @insert "@passEditor_sceneGen_Subfuncs.ls"
 @insert "@passEditor_sceneParse_Subfuncs.ls"
 @insert "@passEditor_UDF.ls"
+@insert "@passEditor_UDF_Passes.ls"
+@insert "@passEditor_UDF_Overrides.ls"
 @end
 
 // icons
@@ -317,8 +323,8 @@ options
     file_popup_menu = ctlmenu("File...           " + icon[DOWNARROW],fileMenu_items,"fileMenu_select","fileMenu_active");
     ctlposition(file_popup_menu, Main_ui_gap, Main_banner_height + 5);
     
-    c0_5 = ctltab("Passes","Overrides");
-    ctlposition(c0_5, 0, Main_banner_height + 35);
+    gad_PassesOverridesTab = ctltab("Passes","Overrides");
+    ctlposition(gad_PassesOverridesTab, 0, Main_banner_height + 35);
 
     gad_PassesListview = ctllistbox("Render Passes",listOneWidth,listOneHeight,"passeslb_count","passeslb_name","passeslb_event");
     ctlposition(gad_PassesListview, Main_ui_gap, Main_banner_height + 55);
@@ -326,53 +332,58 @@ options
     gad_OverridesListview = ctllistbox("Item Overrides",listOneWidth,listOneHeight,"overrideslb_count","overrideslb_name","overrideslb_event");
     ctlposition(gad_OverridesListview, Main_ui_gap, Main_banner_height + 55);
 
-    c3 = ctllistbox("Scene Items",listTwoWidth,listOneHeight,"itemslb_count","itemslb_name","itemslb_event");
-    ctlposition(c3,listTwoPosition, Main_banner_height + 55);
+@if dev == 1
+    gad_Debug = ctlstate("DEBUG",debugmode,debugButtonWidth,"debugMe"); // use globalstore (defined in globals), defaults to 0 if not retrieved.
+    ctlposition(gad_Debug,debugButtonXposition, Main_banner_height+5);
+@end
+    
+    gad_SceneItems_forPasses_Listview = ctllistbox("Scene Items",listTwoWidth,listOneHeight,"itemslb_count","itemslb_name","itemslb_event");
+    ctlposition(gad_SceneItems_forPasses_Listview,listTwoPosition, Main_banner_height + 55);
 
-    c3_5 = ctllistbox("Scene Items",listTwoWidth,listOneHeight,"o_itemslb_count","o_itemslb_name","o_itemslb_event");
-    ctlposition(c3_5,listTwoPosition, Main_banner_height + 55);
+    gad_SceneItems_forOverrides_Listview = ctllistbox("Scene Items",listTwoWidth,listOneHeight,"o_itemslb_count","o_itemslb_name","o_itemslb_event");
+    ctlposition(gad_SceneItems_forOverrides_Listview,listTwoPosition, Main_banner_height + 55);
 
-    c4 = ctlmenu(newPassButtonString,passMenu_items,"passMenu_select","passMenu_active");
-    ctlposition(c4,newPassButtonXposition,bottomPosition,newPassButtonWidth,Main_button_height);
+    gad_New_Pass = ctlmenu(newPassButtonString,passMenu_items,"passMenu_select","passMenu_active");
+    ctlposition(gad_New_Pass,newPassButtonXposition,bottomPosition,newPassButtonWidth,Main_button_height);
 
-    c5 = ctlmenu(newOverrideButtonString,overrideMenu_items,"overrideMenu_select","overrideMenu_active");
-    ctlposition(c5,newOverrideButtonXposition,bottomPosition,newOverrideButtonWidth,Main_button_height);
+    gad_New_Override = ctlmenu(newOverrideButtonString,overrideMenu_items,"overrideMenu_select","overrideMenu_active");
+    ctlposition(gad_New_Override,newOverrideButtonXposition,bottomPosition,newOverrideButtonWidth,Main_button_height);
 
-    c5_01 = ctlbutton(editSelectedButtonString,editSelectedButtonWidth,"editSelectedPass");
-    ctlposition(c5_01,editSelectedButtonXposition,bottomPosition);
+    gad_EditSel_Passes = ctlbutton(editSelectedButtonString,editSelectedButtonWidth,"editSelectedPass");
+    ctlposition(gad_EditSel_Passes,editSelectedButtonXposition,bottomPosition);
 
-    c5_02 = ctlbutton(deleteSelectedButtonString,deleteSelectedButtonWidth,"deleteSelectedPass");
-    ctlposition(c5_02,deleteSelectedButtonXposition,bottomPosition);
+    gad_DelSel_Passes = ctlbutton(deleteSelectedButtonString,deleteSelectedButtonWidth,"deleteSelectedPass");
+    ctlposition(gad_DelSel_Passes,deleteSelectedButtonXposition,bottomPosition);
 
-    c5_05 = ctlbutton(editSelectedButtonString,editSelectedButtonWidth,"editSelectedOverride");
-    ctlposition(c5_05,editSelectedButtonXposition,bottomPosition);
+    gad_EditSel_Override = ctlbutton(editSelectedButtonString,editSelectedButtonWidth,"editSelectedOverride");
+    ctlposition(gad_EditSel_Override,editSelectedButtonXposition,bottomPosition);
 
-    c5_06 = ctlbutton(deleteSelectedButtonString, deleteSelectedButtonWidth, "deleteSelectedOverride");
-    ctlposition(c5_06,deleteSelectedButtonXposition,bottomPosition);
+    gad_DelSel_Override = ctlbutton(deleteSelectedButtonString, deleteSelectedButtonWidth, "deleteSelectedOverride");
+    ctlposition(gad_DelSel_Override,deleteSelectedButtonXposition,bottomPosition);
 
-    c5_10 = ctlbutton(addAllButtonString,addAllButtonWidth,"addAllButton");
-    ctlposition(c5_10,addAllButtonXposition,bottomPosition);
+    gad_AddAll_Passes = ctlbutton(addAllButtonString,addAllButtonWidth,"addAllButton");
+    ctlposition(gad_AddAll_Passes,addAllButtonXposition,bottomPosition);
 
-    c5_15 = ctlbutton(addSelButtonString,addSelButtonWidth,"addSelButton");
-    ctlposition(c5_15,addSelButtonXposition,bottomPosition);
+    gad_AddSelected_Passes = ctlbutton(addSelButtonString,addSelButtonWidth,"addSelButton");
+    ctlposition(gad_AddSelected_Passes,addSelButtonXposition,bottomPosition);
 
-    c5_20 = ctlbutton(clearAllButtonString,clearAllButtonWidth,"clearAllButton");
-    ctlposition(c5_20,clearAllButtonXposition,bottomPosition);
+    gad_ClearAll_Passes = ctlbutton(clearAllButtonString,clearAllButtonWidth,"clearAllButton");
+    ctlposition(gad_ClearAll_Passes,clearAllButtonXposition,bottomPosition);
 
-    c5_25 = ctlbutton(clearSelButtonString,clearSelButtonWidth,"clearSelButton");
-    ctlposition(c5_25,clearSelButtonXposition,bottomPosition);
+    gad_ClearSel_Passes = ctlbutton(clearSelButtonString,clearSelButtonWidth,"clearSelButton");
+    ctlposition(gad_ClearSel_Passes,clearSelButtonXposition,bottomPosition);
 
-    c5_30 = ctlbutton(addAllButtonString,addAllButtonWidth,"o_addAllButton");
-    ctlposition(c5_30,addAllButtonXposition,bottomPosition);
+    gad_AddAll_Override = ctlbutton(addAllButtonString,addAllButtonWidth,"o_addAllButton");
+    ctlposition(gad_AddAll_Override,addAllButtonXposition,bottomPosition);
 
-    c5_35 = ctlbutton(addSelButtonString,addSelButtonWidth,"o_addSelButton");
-    ctlposition(c5_35,addSelButtonXposition,bottomPosition);
+    gad_AddSelected_Override = ctlbutton(addSelButtonString,addSelButtonWidth,"o_addSelButton");
+    ctlposition(gad_AddSelected_Override,addSelButtonXposition,bottomPosition);
 
-    c5_40 = ctlbutton(clearAllButtonString,clearAllButtonWidth,"o_clearAllButton");
-    ctlposition(c5_40,clearAllButtonXposition,bottomPosition);
+    gad_ClearAll_Override = ctlbutton(clearAllButtonString,clearAllButtonWidth,"o_clearAllButton");
+    ctlposition(gad_ClearAll_Override,clearAllButtonXposition,bottomPosition);
 
-    c5_45 = ctlbutton(clearSelButtonString,clearSelButtonWidth,"o_clearSelButton");
-    ctlposition(c5_45,clearSelButtonXposition,bottomPosition);
+    gad_ClearSel_Override = ctlbutton(clearSelButtonString,clearSelButtonWidth,"o_clearSelButton");
+    ctlposition(gad_ClearSel_Override,clearSelButtonXposition,bottomPosition);
 
     gad_SelectedPass = ctlpopup("Current Pass :",currentChosenPass,"currentPassMenu_update");
     ctlposition(gad_SelectedPass, 100, Main_banner_height + 5, 300, Main_button_height);
@@ -381,9 +392,9 @@ options
     //c7 = ctltext(currentChosenPassString,"");
     //ctlposition(c7, 208, Main_banner_height + 8);
 
-    ctlpage(1,gad_PassesListview,c3,c4,c5_01,c5_02,c5_10,c5_15,c5_20,c5_25);
-    ctlpage(2,gad_OverridesListview,c3_5,c5,c5_05,c5_06,c5_30,c5_35,c5_40,c5_45);
-
+    ctlpage(1,gad_PassesListview,gad_SceneItems_forPasses_Listview,gad_New_Pass,gad_EditSel_Passes,gad_DelSel_Passes,gad_AddAll_Passes,gad_AddSelected_Passes,gad_ClearAll_Passes,gad_ClearSel_Passes);
+    ctlpage(2,gad_OverridesListview,gad_SceneItems_forOverrides_Listview,gad_New_Override,gad_EditSel_Override,gad_DelSel_Override,gad_AddAll_Override,gad_AddSelected_Override,gad_ClearAll_Override,gad_ClearSel_Override);
+    
     reqredraw("req_redraw");
     reqopen();
 
@@ -764,6 +775,12 @@ process: event, command
             unsaved = 0;
         }
         s = masterScene.getSelect();
+
+        // do the experimental scene master override setup
+        o_displayNames = nil; // clear it out
+        o_displayGenus = nil; // clear it out
+        o_displayNames[1] = "(Scene Master)";
+        o_displayGenus[1] = 0;
         
         if(s != nil)
         {
@@ -785,8 +802,11 @@ process: event, command
         {
             if(meshAgents[1] != "none")
             {
-                displayNames[x] = meshNames[y];
+				info("Found mesh: " + meshNames[y] + " x=" + x);
+				displayNames[x] = meshNames[y];
+                o_displayNames[x+1] = displayNames[x];
                 displayGenus[x] = 1;
+                o_displayGenus[x+1] = 1;
                 displayIDs[x] = meshIDs[y];
                 displayOldIDs[x] = meshOldIDs[y];
                 x++;
@@ -794,12 +814,23 @@ process: event, command
         }
         for(y = 1; y <= size(lightAgents); y++)
         {
+			info("Found light: " + lightNames[y] + " x=" + x);
             displayNames[x] = lightNames[y];
+            o_displayNames[x+1] = displayNames[x];
             displayGenus[x] = 2;
+  			info("displayGenus[" + x + "]: " + displayGenus[x]);
+            o_displayGenus[x+1] = 2;
+			info("o_displayGenus[" + (x+1) + "]: " + o_displayGenus[x+1]);
             displayIDs[x] = lightIDs[y];
             displayOldIDs[x] = lightOldIDs[y];
             x++;
         }
+
+		// check override array
+		for (j = 1; j < o_displayNames.size(); j++) {
+			info(j.asStr() + ": item: " + o_displayNames[j] + " of type: " + o_displayGenus[j]);
+		}
+
         passNames[1] = "Default";
         overrideNames[1] = "empty";
         for(x = 1; x <= size(passNames); x++)
@@ -832,25 +863,7 @@ process: event, command
         {
             EditObjects();  
         }
-        
-        // do the experimental scene master override setup
-        o_displayNames[1] = "(Scene Master)";
-		o_displayNamesObjectIndex = 1;
-		o_displayNamesLightIndex = 1;
-        for(w = 1; w <= size(displayNames); w++)
-        {
-            o_displayNames[w + 1] = displayNames[w];
-			 // Populating filtered lists - will be used in UDF functions.
-			if (displayGenus[w] == 1) {
-				o_displayNamesObject[o_displayNamesObjectIndex] = displayNames[w];
-				o_displayNamesObjectIndex++;
-			}
-			if (displayGenus[w] == 2) {
-				o_displayNamesLight[o_displayNamesLightIndex] = displayNames[w];
-				o_displayNamesLightIndex++;
-			}
-        }
-        
+                
         if(loadingInProgress != 1)
         {
         }
@@ -905,6 +918,12 @@ process: event, command
                 clearSelButtonWidth = w;
                 clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
+@if dev == 1
+                // debug button is masked in release builds. X position to match the clear selected button. Y position matched from current pass gadget (hard-coded)
+                debugButtonXposition = clearSelButtonXposition;
+                debugButtonWidth = clearSelButtonWidth;
+@end
+
                 break;
                 
             case 2:
@@ -950,6 +969,12 @@ process: event, command
                 clearSelButtonString = "Clear Sel";
                 clearSelButtonWidth = w;
                 clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
+
+@if dev == 1
+                // debug button is masked in release builds. X position to match the clear selected button. Y position matched from current pass gadget (hard-coded)
+                debugButtonXposition = clearSelButtonXposition;
+                debugButtonWidth = clearSelButtonWidth;
+@end
 
                 break;
 
@@ -997,6 +1022,12 @@ process: event, command
                 clearSelButtonWidth = w;
                 clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
+@if dev == 1
+                // debug button is masked in release builds. X position to match the clear selected button. Y position matched from current pass gadget (hard-coded)
+                debugButtonXposition = clearSelButtonXposition;
+                debugButtonWidth = clearSelButtonWidth;
+@end
+
                 break;
                 
             case 4:
@@ -1042,6 +1073,12 @@ process: event, command
                 clearSelButtonString = "-Sel";
                 clearSelButtonWidth = w;
                 clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
+                
+@if dev == 1
+                // debug button is masked in release builds. X position to match the clear selected button. Y position matched from current pass gadget (hard-coded)
+                debugButtonXposition = clearSelButtonXposition;
+                debugButtonWidth = clearSelButtonWidth;
+@end
 
                 break;
                 
@@ -1088,6 +1125,12 @@ process: event, command
                 clearSelButtonString = "Clear Sel";
                 clearSelButtonWidth = w;
                 clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
+
+@if dev == 1
+                // debug button is masked in release builds. X position to match the clear selected button. Y position matched from current pass gadget (hard-coded)
+                debugButtonXposition = clearSelButtonXposition;
+                debugButtonWidth = clearSelButtonWidth;
+@end
 
                 break;
         }
@@ -1218,11 +1261,22 @@ reProcess
         displayIDs = nil;
         displayOldIDs = nil;
         x = 1;
+
+        // Scene Master override setup
+        o_displayNames = nil; // clear it out
+        o_displayGenus = nil; // clear it out
+        o_displayNames[1] = "(Scene Master)";
+        o_displayGenus[1] = 0;
+        
         for(y = 1; y <= size(meshAgents); y++)
         {
             if(meshAgents[1] != "none")
             {
+				info("Found mesh: " + meshNames[y] + " x=" + x);
                 displayNames[x] = meshNames[y];
+                o_displayNames[x+1] = displayNames[x];
+                displayGenus[x] = 1;
+                o_displayGenus[x+1] = displayGenus[x];
                 displayIDs[x] = meshIDs[y];
                 displayOldIDs[x] = meshOldIDs[y];
                 x++;
@@ -1230,7 +1284,13 @@ reProcess
         }
         for(y = 1; y <= size(lightAgents); y++)
         {
+			info("Found light: " + lightNames[y] + " x=" + x);
             displayNames[x] = lightNames[y];
+            o_displayNames[x+1] = displayNames[x];
+            displayGenus[x] = 2;
+			info("displayGenus[" + x + "]: " + displayGenus[x]);
+            o_displayGenus[x+1] = displayGenus[x];
+			info("o_displayGenus[" + (x+1) + "]: " + o_displayGenus[x+1]);
             displayIDs[x] = lightIDs[y];
             displayOldIDs[x] = lightOldIDs[y];
             x++;
@@ -1309,23 +1369,23 @@ reProcess
             }
         }
         
-		
-		// do the experimental scene master override setup
+        
+        // do the experimental scene master override setup
         o_displayNames[1] = "(Scene Master)";
-		o_displayNamesObjectIndex = 1;
-		o_displayNamesLightIndex = 1;
+        o_displayNamesObjectIndex = 1;
+        o_displayNamesLightIndex = 1;
         for(w = 1; w <= size(displayNames); w++)
         {
             o_displayNames[w + 1] = displayNames[w];
-			 // Populating filtered lists - will be used in UDF functions.
-			if (displayGenus[w] == 1) {
-				o_displayNamesObject[o_displayNamesObjectIndex] = displayNames[w];
-				o_displayNamesObjectIndex++;
-			}
-			if (displayGenus[w] == 2) {
-				o_displayNamesLight[o_displayNamesLightIndex] = displayNames[w];
-				o_displayNamesLightIndex++;
-			}
+             // Populating filtered lists - will be used in UDF functions.
+            if (displayGenus[w] == 1) {
+                o_displayNamesObject[o_displayNamesObjectIndex] = displayNames[w];
+                o_displayNamesObjectIndex++;
+            }
+            if (displayGenus[w] == 2) {
+                o_displayNamesLight[o_displayNamesLightIndex] = displayNames[w];
+                o_displayNamesLightIndex++;
+            }
         }
 
     }
@@ -1380,6 +1440,12 @@ reProcess
                 clearSelButtonWidth = w;
                 clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
+@if dev == 1
+                // debug button is masked in release builds. X position to match the clear selected button. Y position matched from current pass gadget (hard-coded)
+                debugButtonXposition = clearSelButtonXposition;
+                debugButtonWidth = clearSelButtonWidth;
+@end
+
                 break;
                 
             case 2:
@@ -1425,6 +1491,12 @@ reProcess
                 clearSelButtonString = "Clear Sel";
                 clearSelButtonWidth = w;
                 clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
+
+@if dev == 1
+                // debug button is masked in release builds. X position to match the clear selected button. Y position matched from current pass gadget (hard-coded)
+                debugButtonXposition = clearSelButtonXposition;
+                debugButtonWidth = clearSelButtonWidth;
+@end
 
                 break;
 
@@ -1472,6 +1544,12 @@ reProcess
                 clearSelButtonWidth = w;
                 clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
+@if dev == 1
+                    // debug button is masked in release builds. X position to match the clear selected button. Y position matched from current pass gadget (hard-coded)
+                debugButtonXposition = clearSelButtonXposition;
+                debugButtonWidth = clearSelButtonWidth;
+@end
+
                 break;
                 
             case 4:
@@ -1517,6 +1595,12 @@ reProcess
                 clearSelButtonString = "-Sel";
                 clearSelButtonWidth = w;
                 clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
+
+@if dev == 1
+                // debug button is masked in release builds. X position to match the clear selected button. Y position matched from current pass gadget (hard-coded)
+                debugButtonXposition = clearSelButtonXposition;
+                debugButtonWidth = clearSelButtonWidth;
+@end
 
                 break;
                 
@@ -1564,6 +1648,12 @@ reProcess
                 clearSelButtonWidth = w;
                 clearSelButtonXposition = listTwoPosition + 3 * (w + (Main_ui_gap / 2));
 
+@if dev == 1
+                // debug button is masked in release builds. X position to match the clear selected button. Y position matched from current pass gadget (hard-coded)
+                debugButtonXposition = clearSelButtonXposition;
+                debugButtonWidth = clearSelButtonWidth;
+@end
+
                 break;
         }
 
@@ -1606,10 +1696,9 @@ unProcess
     overrideNames = nil;
     gad_PassesListview = nil;
     gad_OverridesListview = nil;
-    c3 = nil;
-    c3_5 = nil;
+    gad_SceneItems_forPasses_Listview = nil;
+    gad_SceneItems_forOverrides_Listview = nil;
     gad_SelectedPass = nil;
-    c7 = nil;
     currentChosenPass = nil;
     currentChosenPassString = nil;
     interfaceRunYet = nil;
@@ -1625,5 +1714,12 @@ req_redraw
 //      drawline(<038,038,040>, 0, Main_banner_height + 29, panelWidth, Main_banner_height + 29);
 //      drawline(<081,081,083>, 0, Main_banner_height + 31, panelWidth, Main_banner_height + 31);
     }
+}
+
+req_update
+{
+    refreshing = true;
+    requpdate();
+    refreshing = false;
 }
 

@@ -1,5 +1,4 @@
 // scene rendering functions
-var noRender = "true";
 
 win_bg_frameRender: sceneFile, frameOutputPath
 {
@@ -69,7 +68,7 @@ win_bg_frameRender: sceneFile, frameOutputPath
 
     //chdir(currentscene_patharray[2] + getsep());
 	
-	if(noRender == "true")
+	if(debugmode == 0)
 	{
 		result = spawn(bashFilePath);
 	} else {
@@ -137,7 +136,7 @@ win_bg_sceneRender: sceneFile, frameOutputPath
 
     bashOutput.writeln("pause");
     bashOutput.close();
-	if(noRender == "true")
+	if(debugmode == 0)
 	{
 		result = spawn(bashFilePath);
 	} else {
@@ -191,7 +190,7 @@ win_bg_allSceneRender: sceneFile, frameOutputPath
     
     bashOutput.writeln("pause");
     bashOutput.close();
-	if(noRender == "true")
+	if(debugmode == 0)
 	{
 		result = spawn(bashFilePath);
 	} else {

@@ -14,30 +14,30 @@ undoOverrideSelect
 					passOverrideItems[pass][sel] = previousPassOverrideItems[pass][sel];
 					previousPassOverrideItems[pass][sel] = temp;
 					set_o_items = o_parseListItems(passOverrideItems[pass][sel]);
-					setvalue(c3_5,set_o_items);
+					setvalue(gad_SceneItems_forOverrides_Listview,set_o_items);
 					setvalue(gad_PassesListview,nil);
-					requpdate();
+					req_update();
 				}
 				else
 		    	{
-		    		requpdate();
+		    		req_update();
 		    	}
 			}
 			else
 	    	{
-	    		requpdate();
+	    		req_update();
 	    	}
 	    }
 		else
     	{
-    		setvalue(c3_5,nil);
-    		requpdate();
+    		setvalue(gad_SceneItems_forOverrides_Listview,nil);
+    		req_update();
     	}
 	}
 	else
    	{
-   		setvalue(c3_5,nil);
-   		requpdate();
+   		setvalue(gad_SceneItems_forOverrides_Listview,nil);
+   		req_update();
    	}
 }
 
@@ -55,23 +55,23 @@ undoItemSelect
 	    		passAssItems[sel] = previousPassAssItems[sel];
 	    		previousPassAssItems[sel] = temp;
 	    		setitems = parseListItems(passAssItems[sel]);
-				setvalue(c3,setitems);
+				setvalue(gad_SceneItems_forPasses_Listview,setitems);
 				setvalue(gad_OverridesListview,nil);
 	    	}
 	        else
 	    	{
-	    		requpdate();
+	    		req_update();
 	    	}
     	}
     	 else
     	{
-    		requpdate();
+    		req_update();
     	}
     }
     else
     {
-		setvalue(c3,nil);
-    	requpdate();
+		setvalue(gad_SceneItems_forPasses_Listview,nil);
+    	req_update();
 	}
 }
 
@@ -100,10 +100,9 @@ createNewFullScenePass
 	items_size = sizeof(displayNames);
 	for(x = 1;x <= items_size;x++)  {
 		items_array[x] = x;
-		tempNumber = x;
-		passAssItems[newNumber] = passAssItems[newNumber] + "||" + displayIDs[tempNumber]; }
+		passAssItems[newNumber] = passAssItems[newNumber] + "||" + displayIDs[x]; }
 	setitems = parseListItems(passAssItems[newNumber]);
-	setvalue(c3,setitems);
+	setvalue(gad_SceneItems_forPasses_Listview,setitems);
 }
 
 createNewEmptyPass
@@ -184,7 +183,7 @@ createNewPassFromLayoutSelection
 			}
 			
 			//setitems = parseListItems(passAssItems[newNumber]);
-			//setvalue(c3,setitems);
+			//setvalue(gad_SceneItems_forPasses_Listview,setitems);
 			
 					
 			SelectItem(s[1].id);
@@ -196,7 +195,7 @@ createNewPassFromLayoutSelection
     	}
 		
 		setitems = parseListItems(passAssItems[newNumber]);
-		setvalue(c3,setitems);
+		setvalue(gad_SceneItems_forPasses_Listview,setitems);
 		
 
 }
@@ -277,7 +276,7 @@ duplicateSelectedOverride
 		    	default:
 		    		break;
 		    }
-		    //requpdate();
+		    //req_update();
 		}
     }
 }
@@ -323,7 +322,7 @@ editSelectedOverride
 					    overrideSettings[newNumber] = newName + "||" + "type1" + "||" + string(srfFile);
 					}
 				    reProcess();
-					requpdate();
+					req_update();
 					break;
 						
 				case 5:
@@ -411,7 +410,7 @@ editSelectedOverride
 				
 					}
 					reProcess();
-					requpdate();
+					req_update();
 					break;
 
 
@@ -529,7 +528,7 @@ editSelectedOverride
 						overrideSettings[newNumber] = newName + "||" + "type2" + "||" + string(matteObjectSetts) + "||" + string(alphaChannelSetts) + "||" + string(unseenByRaysSetts) + "||" + string(unseenByCameraSetts) + "||" + string(unseenByRadiositySetts) + "||" + string(unseenByFogSetts) + "||" + string(selfShadowSetts) + "||" + string(castShadowSetts) + "||" + string(receiveShadowSetts) + "||" + string(matteColorSettsArray.x) + "||" + string(matteColorSettsArray.y) + "||" + string(matteColorSettsArray.z);
 					}
 				   reProcess();
-					requpdate();
+					req_update();
 					break;
 					
 				case 3:
@@ -560,7 +559,7 @@ editSelectedOverride
 					    overrideSettings[newNumber] = newName + "||" + "type3" + "||" + string(motFile);
 					}
 					reProcess();
-					requpdate();
+					req_update();
 					break;
 					
 				case 4:
@@ -591,7 +590,7 @@ editSelectedOverride
 					    overrideSettings[newNumber] = newName + "||" + "type4" + "||" + string(lwoFile);
 					}
 					reProcess();
-					requpdate();
+					req_update();
 					break;
 					
 				case 7:
@@ -663,7 +662,7 @@ editSelectedOverride
 					    overrideSettings[newNumber] = newName + "||" + "type7" + "||" + string(excludedLightsSetts);
 					}
 					reProcess();
-					requpdate();
+					req_update();
 					break;
 
 					
@@ -758,7 +757,7 @@ editSelectedOverride
 					    overrideSettings[newNumber] = newName + "||" + "type6" + "||" + string(resolutionMultiplierSetts) + "||" + string(renderModeSetts) + "||" + string(depthBufferAASetts) + "||" + string(renderLinesSetts) + "||" + string(rayRecursionLimitSetts) + "||" + string(redirectBuffersSetts) + "||" + string(disableAASetts);
 					}
 					reProcess();
-					requpdate();
+					req_update();
 					break;
 					
 				default:
@@ -784,7 +783,7 @@ lightExclusionAddLight
 		tempLightTransferring = tempLightTransferring + ";" + lightListArray[lightInteger];
 	}
 	setvalue(light23,tempLightTransferring);
-	requpdate();
+	req_update();
 }
 
 
@@ -1118,7 +1117,7 @@ createSrfOverride
 
 	}
 	reProcess();
-	requpdate();
+	req_update();
 }
 
 createMotOverride
@@ -2275,7 +2274,7 @@ loadPassesSettings
 			else
 			{
 				reProcess();
-				requpdate();
+				req_update();
 			}
 		}
 		else
@@ -2421,7 +2420,7 @@ loadPassesSettings
 			else
 			{
 				reProcess();
-				requpdate();
+				req_update();
 			}
 		}
 	}
@@ -2532,7 +2531,7 @@ moveOverrideToBottom
 			if(doRefresh == 1)
 			{
 				reProcess();
-				requpdate();
+				req_update();
 			}
 			doKeys = 1;
 		}
@@ -2621,7 +2620,7 @@ moveOverrideToBottom
 		    	}
 		    }
 		    reProcess();
-		    requpdate();
+		    req_update();
 		}
 	}
 }
@@ -2917,7 +2916,7 @@ getCommand: event,data
 					else
 					{
 						reProcess();
-						requpdate();
+						req_update();
 					}
 				}
 				if(comRingCommand == "renderPassFrame")
@@ -3267,9 +3266,9 @@ getCommand: event,data
 						passes_sel = sel;
 						setitems = parseListItems(passAssItems[passes_sel]);
 						setvalue(gad_PassesListview,passes_sel);
-						setvalue(c3,setitems);
+						setvalue(gad_SceneItems_forPasses_Listview,setitems);
 						setvalue(gad_OverridesListview,nil);
-						requpdate();
+						req_update();
 						passSelected = true;
 					}
 				}
@@ -3287,11 +3286,11 @@ getCommand: event,data
 						currentChosenPass = changeTo;
 						currentChosenPassString = passNames[currentChosenPass];
 						setvalue(gad_OverridesListview,nil);
-						setvalue(c3_5,nil);
+						setvalue(gad_SceneItems_forOverrides_Listview,nil);
 						setvalue(gad_SelectedPass,currentChosenPass);
 						setvalue(c7,currentChosenPassString,"");
 						reProcess();
-						requpdate();
+						req_update();
 					}
 				}
 				break;

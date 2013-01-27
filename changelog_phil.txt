@@ -75,8 +75,31 @@ PP-Phil_20121128
 20121206
 ========
 
-- Brace yourself. Here's the big UI change. Many thanks to both Lernie and Matt for their help in showing me where I was going wrong in the original attempt to implement this. I wasn't far off, but overlooked the multi-selection aware nature of the listboxes and a couple of other issues.
+Brace yourself. Here's the big set of UI changes related to filtering the override items listbox based on selected override type, and to making the code less aggravating to read. Many thanks to both Lernie and Matt for their help in showing me where I was going wrong in the original attempt to implement the listbox filtering based on a selection elsewhere in the UI. I wasn't far off, but overlooked the multi-selection aware nature of the listboxes and a couple of other issues.
 
+- Changed the obscure c3 listbox references to 'gad_SceneItems_forPasses_Listview'
+- Changed the obscure c3_5 listbox references to 'gad_SceneItems_forOverrides_Listview'
+- Changed all other obscure UI references to explicit labels; more readable/understandable than 'c0_5'
+- Removing lots of tempNumber usage that confuses intent of code.
+- Added debug state button to UI. Intent is to enable developer to block rendering and to have scene files open for inspection during development of new support in PP. Only shown in dev mode.
+ - Render functions now respect this setting.
+ - Setting retained across sessions. Default is off.
+- Switched dev and debug handling to integers to make handling easier. 0 is off, 1 is on.
+- Split Passes and Overrides UDFs out of main file to two separate ones.
+- Reworked the override item list generation code - much simpler.
+- Fixed bug p0012 - hadn't yet hooked up the override lists in the reprocess UI code.
+- Initial migration of override items listbox code to new filtered list. This will be bringing breakage aplenty.... There's some additional subtlety in tracking selected items, it seems.
+- Scene Master special item gets an internal genus type of 0 to filter against the type6 override.
+
+20121207
+========
+
+Work continues on the UI systems :
+
+- Migrated requpdate() calls to req_update().
+- Various fixes and implementation tweaks to filter override items. Some remaining bugs to be ironed out.
+- Disabling direct calls to set the override item list to nil or set_o_items. The associated array ought to deal with this.
+- More code clean-up to simplify overrides list handling in case of multi-selection, etc.
 
 Bugs :
 ------
@@ -89,9 +112,10 @@ p0005 : path incorrect. (Fixed)
 p0006 : LWO saver blowing up. (Fixed)
 p0007 : Master scene override failure if anything other than, or in addition to, (Scene Master) is assigned to it. (Fixed, better fix needed - see p0009)
 p0008 : Failsafe code for overrideType needs to be made more robust. (Fixed)
-p0009 : Possible to add (Scene Master) item to overrides that are not related. Need to engineer a fix (skip first item in list, or create a genus for this item)
+p0009 : Possible to add (Scene Master) item to overrides that are not related. Need to engineer a fix (skip first item in list, or create a genus for this item). (In progress with 20121206)
 p0010 : listbox selections are misfiring. (related to p0011 - user expectation was different to UI functionality)
 p0011 : AddSel seems to replace existing assignments of overrides, rather than adding to the existing selection. Odd and probably the cause for report p0010.
+p0012 : Rebuilding lists causes script to explode. (Fixed)
  
 Reference :
 -----------

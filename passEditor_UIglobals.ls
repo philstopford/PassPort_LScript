@@ -1,3 +1,6 @@
+var aboutsize_x = 400;
+var aboutsize_y = 200;
+
 // Main UI
 Main_banner_height			= 64;
 Main_button_height			= 19;
