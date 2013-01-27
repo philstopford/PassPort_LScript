@@ -1568,7 +1568,7 @@ renderPassFrame
 	}
 
 	// mac UB frame rendering
- 	if(platformVar == 9)
+ 	if(platformVar == 9 || platformVar == 11)
 	{
 		UB_bg_frameRender(frameRenderScene,testOutputPath);
 	}
@@ -1585,7 +1585,7 @@ renderPassScene
 	}
 	
 	// mac UB scene rendering
-	if(platformVar == 9)
+	if(platformVar == 9 || platformVar == 11)
 	{
 		UB_bg_sceneRender(seqRenderScene,seqOutputPath);
 	}
@@ -1605,7 +1605,7 @@ renderAllScene
 	}
 	
 	// mac UB all scene rendering
-	if(platformVar == 9)
+	if(platformVar == 9 || platformVar == 11)
 	{
 		UB_bg_allSceneRender(seqRenderScene,seqOutputPath);
 	}
@@ -1626,6 +1626,7 @@ getImageFormats
 			break;
 
 		case 9:
+		case 11:
 			// Special case check for LW Extensions due to the "extension cache" file
 			if(integer(hostVersion()) >= 10)
 			{
@@ -1844,6 +1845,7 @@ addSelButton
 				switch(s[x].genus)
 				{
 					case 1:
+//						info("AddSel: genus 1, mesh: " + itemname);
 						tempMeshAgents[x] = Mesh(itemname);
 						tempMeshNames[x] = tempMeshAgents[x].name;
 						tempMeshIDs[x] = tempMeshAgents[x].id;
@@ -1851,6 +1853,7 @@ addSelButton
 						break;
 					
 					case 2:
+//						info("AddSel: genus 2, light: " + itemname);
 						tempLightAgents[x] = Light(itemname);
 						tempLightNames[x] = tempLightAgents[x].name;
 						tempLightIDs[x] = tempLightAgents[x].id;
@@ -1858,6 +1861,7 @@ addSelButton
 						break;
 						
 					default:
+//						info("AddSel: Unrecognised, not adding " + itemname);
 						break;
 				}
 			}
@@ -1949,9 +1953,10 @@ o_addSelButton
 	o_items_array = nil;
     pass = currentChosenPass;
     sel = getvalue(gad_OverridesListview).asInt();
+	o_tempSettingsArray = parse("||",overrideSettings[sel]);
     if(overridesSelected == true && sel != 0)
     {
-    	s = masterScene.getSelect();
+    	s = masterScene.getSelect(); // picks up selected items in Layout, matching documentation.
     	if(s != nil)
     	{
 			arraySize = sizeof(s);
@@ -1959,24 +1964,25 @@ o_addSelButton
 			{
 				itemname = s[x].name;
 				previousPassOverrideItems[pass][sel] = passOverrideItems[pass][sel];
-				switch(s[x].genus)
+				if((s[x].genus == 1) && (o_tempSettingsArray[2] == "type1" || o_tempSettingsArray[2] == "type2"  || o_tempSettingsArray[2] == "type3"  || o_tempSettingsArray[2] == "type4" || o_tempSettingsArray[2] == "type7"))
 				{
-					case 1:
-						tempMeshAgents[x] = Mesh(itemname);
-						tempMeshNames[x] = tempMeshAgents[x].name;
-						tempMeshIDs[x] = tempMeshAgents[x].id;
-						passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempMeshIDs[x];
-						break;
-					
-					case 2:
-						tempLightAgents[x] = Light(itemname);
-						tempLightNames[x] = tempLightAgents[x].name;
-						tempLightIDs[x] = tempLightAgents[x].id;
-						passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempLightIDs[x];
-						break;
-						
-					default:
-						break;
+//					info("o_AddSel: genus 1, mesh: " + itemname);
+					tempMeshAgents[x] = Mesh(itemname);
+					tempMeshNames[x] = tempMeshAgents[x].name;
+					tempMeshIDs[x] = tempMeshAgents[x].id;
+					passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempMeshIDs[x];
+				}
+				if ((s[x].genus == 2) && (o_tempSettingsArray[2] == "type3" || o_tempSettingsArray[2] == "type5"))
+				{
+//					info("o_AddSel: genus 2, light: " + itemname);
+					tempLightAgents[x] = Light(itemname);
+					tempLightNames[x] = tempLightAgents[x].name;
+					tempLightIDs[x] = tempLightAgents[x].id;
+					passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempLightIDs[x];
+				}
+				if(o_tempSettingsArray[2] == "type6")
+				{
+					 // since working from Layout select, no ability to assign scene master.
 				}
 			}
 			set_o_items = o_parseListItems(passOverrideItems[pass][sel]);

@@ -1,4 +1,6 @@
 // scene rendering functions
+var noRender = "true";
+
 win_bg_frameRender: sceneFile, frameOutputPath
 {
 	
@@ -66,8 +68,13 @@ win_bg_frameRender: sceneFile, frameOutputPath
     bashOutput.close();
 
     //chdir(currentscene_patharray[2] + getsep());
-
-    result = spawn(bashFilePath);
+	
+	if(noRender == "true")
+	{
+		result = spawn(bashFilePath);
+	} else {
+		info(bashFilePath);
+	}
     //filedelete(scriptFilePath);
 
     /*
@@ -130,7 +137,12 @@ win_bg_sceneRender: sceneFile, frameOutputPath
 
     bashOutput.writeln("pause");
     bashOutput.close();
-    result = spawn(bashFilePath);
+	if(noRender == "true")
+	{
+		result = spawn(bashFilePath);
+	} else {
+		info(bashFilePath);
+	}
 }
 
 
@@ -179,7 +191,12 @@ win_bg_allSceneRender: sceneFile, frameOutputPath
     
     bashOutput.writeln("pause");
     bashOutput.close();
-    result = spawn(bashFilePath);
+	if(noRender == "true")
+	{
+		result = spawn(bashFilePath);
+	} else {
+		info(bashFilePath);
+	}
 }
 
 

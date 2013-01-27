@@ -1,5 +1,5 @@
 // globals
-var versionString = "20121201";
+var versionString = "20121203";
 var parch = "Unknown";
 var aboutsize_x = 400;
 var aboutsize_y = 200;
@@ -24,7 +24,11 @@ var lightNames;
 var lightIDs;
 var lightOldIDs;
 var displayNames;
+var displayGenus;
 var o_displayNames;
+var o_displayGenus;
+var o_displayNamesObject;
+var o_displayNamesLight;
 var displayIDs;
 var displayOldIDs;
 var passNames;

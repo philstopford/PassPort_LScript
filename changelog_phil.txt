@@ -53,6 +53,20 @@ PP-Phil_20121128
 - Added platform ID of 11 to correspond to Mac64.
 - Listbox selections are misbehaving… p0010
 
+20121203
+========
+
+- Added info() calls to try and understand why genus checks are failing, allowing incompatible types to be assigned to overrides.
+ - Found that code only uses genus to know how to reference the itemname in terms of an agent. There is no check for compatibility with the selected override.
+- Rewrote interface code to check override type and genus, rejecting incompatible assignment attempts.
+ - Works just fine.
+ > Fix to be rolled into other functions in the system. FIXME added to o_addAll - this will need to be re-worked in the same kind of way.
+- AddSel button tries to add selected Layout item, not the elements in the righthand listbox. Documented, but odd, possibly not expected, behaviour that caused p0010. Opened p0011 for more explicit tracking of issue and whether this needs to be re-worked.
+- Added platform '11' corresponding to Mac64 platform to various platform checks in the code.
+- Added dev flag in the render code to block rendering and instead permit inspection of the generated scene file and batch file combination.
+- Re-jigged some changes related to override item assignment filtering, to make them more understandable.
+- Minor typo fixes.
+
 Bugs :
 ------
 
@@ -65,7 +79,8 @@ p0006 : LWO saver blowing up. (Fixed)
 p0007 : Master scene override failure if anything other than, or in addition to, (Scene Master) is assigned to it. (Fixed, better fix needed - see p0009)
 p0008 : Failsafe code for overrideType needs to be made more robust. (Fixed)
 p0009 : Possible to add (Scene Master) item to overrides that are not related. Need to engineer a fix (skip first item in list, or create a genus for this item)
-p0010 : listbox selections are misfiring.
+p0010 : listbox selections are misfiring. (related to p0011 - user expectation was different to UI functionality)
+p0011 : AddSel seems to replace existing assignments of overrides, rather than adding to the existing selection. Odd and probably the cause for report p0010.
  
 Reference :
 -----------
