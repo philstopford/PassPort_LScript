@@ -9,6 +9,8 @@ generatePassFile: mode, pass
         outputStr = "seq_";
     }
 
+    noOfStages = 4; // drives progress value - currently parse, object, light and render stages.
+
     // initial stuff
     overriddenObjectID = nil;
     overriddenObjectName = nil;
@@ -35,7 +37,7 @@ generatePassFile: mode, pass
 	
     for(passItem = 1; passItem <= size(setItems); passItem++)
     {
-        progressString = string((passItem / size(setItems)) / 2);
+        progressString = string((passItem / size(setItems)) / noOfStages);
         msgString = "{" + progressString + "}Generating Render Scene:  Cataloging Items and Overrides...";
         StatusMsg(msgString);
         sleep(1);
@@ -168,7 +170,8 @@ generatePassFile: mode, pass
                 cameraSettingsPartOne[passItem] = nil;
                 cameraSettingsPartTwo[passItem] = nil;
                 cameraSettingsPartThree[passItem]= nil;
-            }   
+            }
+
             if(settingsArray[2] == "type2")
             {
                 overrideType[passItem] = 2;
@@ -307,6 +310,7 @@ generatePassFile: mode, pass
                 cameraSettingsPartTwo[passItem] = nil;
                 cameraSettingsPartThree[passItem]= nil;
             }
+
             if(settingsArray[2] == "type7")
             {
                 overrideType[passItem] = 7;
@@ -369,9 +373,6 @@ generatePassFile: mode, pass
                     lightExclusion[passItem] = nil;
                 }
                 
-                //tempIDArray = parse("x",hex(number(settingsArray[4])));
-                //lightExclusion[passItem] = "ExcludeLight " + tempIDArray[2] + "\n";
-                
                 motInputTemp[passItem] = nil;
                 lwoInputTemp[passItem] = nil;
                 srfLWOInputID[passItem] = nil;
@@ -391,7 +392,7 @@ generatePassFile: mode, pass
                 zoomFactor 						= string(settingsArray[3]);
                 cameraSettingsPartOne[passItem] =	"ZoomFactor " + zoomFactor + "\n";
 				zoomType 						= string(settingsArray[4]);
-                cameraSettingsPartOne[passItem] +=	"ZoomType " + zoomType) + "\n";
+                cameraSettingsPartOne[passItem] +=	"ZoomType " + zoomType + "\n";
 				resolutionMultiplier 			= string(settingsArray[5]);
                 cameraSettingsPartOne[passItem] +=	"ResolutionMultiplier " + resolutionMultiplier + "\n";
 				frameSizeH 						= string(settingsArray[6]);
@@ -555,15 +556,16 @@ generatePassFile: mode, pass
             overrideType[passItem] = 0;
         }
         
-        if(strleft(string(displayOldIDs[tempNumber]),1) == string(MESH)) // matches genus tag
+        if(strleft(string(displayOldIDs[tempNumber]),1) == string(MESH))
         {
             objStart[passItem] = getObjectLines(passEditorEndLine + 1,0,displayOldIDs[tempNumber],currentScenePath);
             objStartTemp = number(objStart[passItem]);
             objStartPlusOne = objStartTemp + 1;
             objEnd[passItem] = getObjectEndLine(objStartPlusOne,0,displayOldIDs[tempNumber],currentScenePath);
             objMotStart[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"NumChannels",currentScenePath);
+            numberOfChannels = integer(strright(readSpecificLine(objMotStart[passItem],currentScenePath),1));
             objMotEnd[passItem] = objMotStart[passItem];
-            for(b = 1; b <= 9; b++)
+            for(b = 1; b <= numberOfChannels; b++)
             {
                 objMotEnd[passItem] = getPartialLine((objMotEnd[passItem] + 1),objEnd[passItem],"}",currentScenePath);
             }
@@ -571,15 +573,16 @@ generatePassFile: mode, pass
         }
 
         // then the light lines
-        if(strleft(string(displayOldIDs[tempNumber]),1) == string(LIGHT)) // matches genus tag
+        if(strleft(string(displayOldIDs[tempNumber]),1) == string(LIGHT))
         {
             objStart[passItem] = getLightLines(passEditorEndLine + 1,0,displayOldIDs[tempNumber],currentScenePath);
             objStartTemp = number(objStart[passItem]);
             objStartPlusOne = objStartTemp + 1;
             objEnd[passItem] = getLightEndLine(objStartPlusOne,0,displayOldIDs[tempNumber],currentScenePath);
             objMotStart[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"NumChannels",currentScenePath);
+            numberOfChannels = integer(strright(readSpecificLine(objMotStart[passItem],currentScenePath),1));
             objMotEnd[passItem] = objMotStart[passItem];
-            for(b = 1; b <= 9; b++)
+            for(b = 1; b <= numberOfChannels; b++)
             {
                 objMotEnd[passItem] = getPartialLine((objMotEnd[passItem] + 1),objEnd[passItem],"}",currentScenePath);
             }
@@ -599,15 +602,16 @@ generatePassFile: mode, pass
         }
 		
         // then the camera lines
-        if(strleft(string(displayOldIDs[tempNumber]),1) == string(CAMERA)) // matches genus tag
+        if(strleft(string(displayOldIDs[tempNumber]),1) == string(CAMERA))
         {
             objStart[passItem] = getCameraLines(passEditorEndLine + 1,0,displayOldIDs[tempNumber],currentScenePath);
             objStartTemp = number(objStart[passItem]);
             objStartPlusOne = objStartTemp + 1;
             objEnd[passItem] = getCameraEndLine(objStartPlusOne,0,displayOldIDs[tempNumber],currentScenePath);
             objMotStart[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"NumChannels",currentScenePath);
+            numberOfChannels = integer(strright(readSpecificLine(objMotStart[passItem],currentScenePath),1));
             objMotEnd[passItem] = objMotStart[passItem];
-            for(b = 1; b <= 9; b++)
+            for(b = 1; b <= numberOfChannels; b++)
             {
                 objMotEnd[passItem] = getPartialLine((objMotEnd[passItem] + 1),objEnd[passItem],"}",currentScenePath);
             }
@@ -793,7 +797,7 @@ generatePassFile: mode, pass
         mmInt = 1;
         for(objectCounter = 1; objectCounter <= lastObject; objectCounter++)
         {
-            progressString = string(((objectCounter/size(lastObject))/4) + 0.5);
+            progressString = string(((objectCounter/size(lastObject))/4) + (1 / noOfStages));
             msgString = "{" + progressString + "}Generating Render Scene:  Writing Objects...";
             StatusMsg(msgString);
             sleep(1);
@@ -1142,9 +1146,6 @@ generatePassFile: mode, pass
                         outputFile.writeln("");
                         break;
 						
-					case 8: // EXPERIMENTAL Camera override
-						break;
-                        
                     default:
                         inputFile.line(objStart[objectCounter]);
                         done = nil;
@@ -1207,7 +1208,7 @@ generatePassFile: mode, pass
     // write out the lights
     for(lightCounter = lastObject + 1; lightCounter <= lastObject + lastLight; lightCounter++)
     {
-        progressString = string(((lightCounter/size(objStart))/4) + 0.74);
+        progressString = string(((lightCounter/(lastObject + lastLight))/4) + (2 / noOfStages));
         msgString = "{" + progressString + "}Generating Render Scene:  Writing Lights...";
         StatusMsg(msgString);
         sleep(1);
@@ -1253,7 +1254,7 @@ generatePassFile: mode, pass
                         {
                             if(objLensFlareLine[lightCounter] != nil)
                             {
-								changeScnLine(lightSettingsPartTwo[lightCounter], fileToAdjust, objLensFlareLine[lightCounter]);
+								changeScnLine(lightSettingsPartTwo[lightCounter], newScenePath, objLensFlareLine[lightCounter]);
                                 inputFile.line(objLensFlareLine[lightCounter]);
                                 line = inputFile.read();
                             }
@@ -1264,7 +1265,7 @@ generatePassFile: mode, pass
                         {
                             if(objVolLightLine[lightCounter] != nil)
                             {
-								changeScnLine(lightSettingsPartThree[lightCounter], fileToAdjust, objVolLightLine[lightCounter]);
+								changeScnLine(lightSettingsPartThree[lightCounter], newScenePath, objVolLightLine[lightCounter]);
                                 inputFile.line(objVolLightLine[lightCounter]);
                                 line = inputFile.read();
                             }
@@ -1394,8 +1395,16 @@ generatePassFile: mode, pass
     }
 
     // write out the cameras
-    for(cameraCounter = lastObject + lastLight + 1; lightCounter <= lastObject + lastLight + lastCamera; cameraCounter++)
+    info("lastObject: " + lastObject.asStr());
+    info("lastLight: " + lastLight.asStr());
+    info("lastCamera: " + lastCamera.asStr());
+    for(cameraCounter = lastObject + lastLight; cameraCounter <= lastObject + lastLight + lastCamera; cameraCounter++)
     {
+        progressString = string(((cameraCounter/(lastObject + lastLight + lastCamera))/4) + (3 / noOfStages));
+        msgString = "{" + progressString + "}Generating Render Scene:  Writing Cameras...";
+        StatusMsg(msgString);
+        sleep(1);
+
         if(doOverride[cameraCounter] == 1)
         {
             switch(overrideType[cameraCounter])
@@ -1477,63 +1486,26 @@ generatePassFile: mode, pass
                     break;
 			}
 		}
+        else
+        {
+            inputFile.line(objStart[cameraCounter]);
+            done = nil;
+            while(!done)
+            {
+                line = inputFile.read();
+                outputFile.writeln(line);
+                if(inputFile.line() == (objEnd[cameraCounter]))
+                {
+                    done = true;
+                    break;
+                }
+            }
+        }
 	}
 	
 	    
-    if(hvDataLine == nil || includedHvObjects == nil)
-    {
-        if(hvDataLine != nil)
-        {
-            // write out the camera lines
-            hvStartLine = hvDataLine - 1;
-            lineNumber = cameraStartLine - 1;
-            inputFile.line(lineNumber);
-            while(lineNumber <= hvStartLine)
-            {
-                line = inputFile.read();
-                outputFile.writeln(line);
-                lineNumber = inputFile.line();
-            }
-            
-            // write out more of the scene, skipping the HV data
-            tempSizeNumber = size(hvObjectEndLine);
-            lineNumber = hvObjectEndLine[tempSizeNumber];
-            inputFile.line(lineNumber);
-            while(lineNumber <= dataOverlayLabelLine)
-            {
-                line = inputFile.read();
-                outputFile.writeln(line);
-                lineNumber = inputFile.line();
-            }
-        }
-        else
-        {
-            // write out the camera lines
-            lineNumber = cameraStartLine - 1;
-            inputFile.line(lineNumber);
-            while(lineNumber <= dataOverlayLabelLine)
-            {
-                line = inputFile.read();
-                outputFile.writeln(line);
-                lineNumber = inputFile.line();
-            }
-
-        }
-            
-    }
-    else
-    {
-        // write out the camera lines
-        hvStartLine = hvDataLine - 1;
-        lineNumber = cameraStartLine - 1;
-        inputFile.line(lineNumber);
-        while(lineNumber <= hvStartLine)
-        {
-            line = inputFile.read();
-            outputFile.writeln(line);
-            lineNumber = inputFile.line();
-        }
-        
+    if(hvDataLine != nil || includedHvObjects != nil)
+    {        
         //write out the HV data
         lineNumber = hvStartLine + 1;
         inputFile.line(lineNumber);
@@ -1563,8 +1535,7 @@ generatePassFile: mode, pass
             line = inputFile.read();
             outputFile.writeln(line);
             lineNumber = inputFile.line();
-        }
-        
+        }        
     }
     
     progressString = string(0.995);
@@ -1829,8 +1800,6 @@ fiberFX: ffFile
 
 handleBuffers: hbFile
 {
-	if(hbFile == nil)
-		error("hbFile MIA");
 	inputFileName = prepareInputFile(hbFile);
 	inputFile = File(inputFileName, "r");
 	tempOutput = File(newScenePath,"w");
@@ -2064,10 +2033,10 @@ handleBuffers: hbFile
 			tempOutput.writeln(toWrite);
 		}
 		
-		inputFile.close();
-		tempOutput.close();
-		finishFiles();
 	}
+    inputFile.close();
+    tempOutput.close();
+    finishFiles();
 }
 
 motionMixerStuff: mmFile
@@ -2089,8 +2058,6 @@ motionMixerStuff: mmFile
 		
 		for(x = 1; x <= size(overriddenObjectID); x++)
 		{
-			if(mmFile == nil)
-				error("mmFile1 MIA");
 			inputFileName = prepareInputFile(mmFile);
 			inputFile = File(inputFileName, "r");
 			tempOutput = File(newScenePath,"w");
@@ -2169,8 +2136,6 @@ motionMixerStuff: mmFile
 				tempOutput.close();
 				finishFiles();
 
-				if(mmFile == nil)
-					error("mmFile2 MIA");
 				inputFileName = prepareInputFile(mmFile);
 				inputFile = File(inputFileName, "r");
 				tempOutput = File(newScenePath,"w");
@@ -2198,8 +2163,6 @@ motionMixerStuff: mmFile
 				tempOutput.close();
 				finishFiles();
 
-				if(mmFile == nil)
-					error("mmFile3 MIA");
 				inputFileName = prepareInputFile(mmFile);
 				inputFile = File(inputFileName, "r");
 				tempOutput = File(newScenePath,"w");
@@ -2224,8 +2187,6 @@ motionMixerStuff: mmFile
 				tempOutput.close();
 				finishFiles();
 
-				if(mmFile == nil)
-					error("mmFile4 MIA");
 				inputFileName = prepareInputFile(mmFile);
 				inputFile = File(inputFileName, "r");
 				tempOutput = File(newScenePath,"w");

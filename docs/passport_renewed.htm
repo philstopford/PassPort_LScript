@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="GENERATOR" content="Mozilla/4.5 [en] (Win95; I) [Netscape]">
+<meta name="Author" content="Jeremy Hardin, Phil Stopford">
+<title>PassPort Renewed</title>
+
+<style type="text/css">
+ body {
+  background-color: #FFFFFF;
+  color: #000000;
+ }
+ :link { color: #0000BB }
+ :visited { color: #000055 }
+ :active { color: #FF0000 }
+ span.c6 {font-size: 120%}
+ td.c5 {background-color: #FF99FF}
+ span.c4 {text-decoration: underline}
+ li.c3 {list-style: none; display: inline}
+ li.c2 {list-style: none}
+ div.c1 {text-align: center}
+</style>
+</head>
+<body>
+<a name="top"></a>
+<div class="c1"><h2>PassPort Renewed</h2></div>
+<p align="center"><img src="images/passport_header.png" height="128" width="300" alt="PassPort Logo"></p>
+<ul>
+<hr>
+</ul>
+<div class="c1"><a name="toc"></a>
+<h2>Table of Contents:</h2>
+</div>
+<ul>
+<li><strong><a href="#whatispassport">What is PassPort Renewed</a></strong></li>
+<li><strong><a href="#beforeinstalling">Before Installing</a></strong></li>
+<li><strong><a href="#installation">Installation</a></strong></li>
+<li><strong><a href="#usage">Usage</a></strong></li>
+<ul>
+<li><a href="#preferences">Preferences Panel</a></li>
+<li><a href="#maininterface">Main Interface</a></li>
+<li><a href="#workingwithpasses">Working with Passes</a></li>
+<li><a href="#workingwithoverrides">Working with Overrides</a></li>
+<ul>
+<li><a href="#overrides_objprops">Object Properties</a></li>
+<li><a href="#overrides_altobj">Alternative Object</a></li>
+<li><a href="#overrides_motion">Motion File</a></li>
+<li><a href="#overrides_surface">Surface File</a></li>
+<li><a href="#overrides_light">Light Properties</a></li>
+<li><a href="#overrides_scene">Scene Master</a></li>
+<li><a href="#overrides_lightexcl">Light Exclusion</a></li>
+</ul>
+</ul>
+<li><strong><a href="#troubleshooting">Troubleshooting.</a></strong></li>
+
+<hr>
+<div class="c1">
+<h3><a name="whatispassport"></a>What is PassPort Renewed?</h3>
+</div>
+<p>PassPort Renewed is an ongoing rework of the LScript-based PassPort code. That code, designed for LightWave 3D 9.3.1, was open-sourced (GPL) by Jeremy Hardin in 2010. It was modified by Matt Gorner in 2010 to improve certain aspects. The author of PassPort Renewed is Phil Stopford. Compared to the original PassPort plugin, the code has been substantially revised. These changes were made for this release:</p>
+<ul>
+	<li>Extensive internal refactoring. The plugin code is now smaller, more efficient and more cleanly structured.</li>
+	<li>Internal support for custom overrides for alternative renderers has been prepared, but implementation is not exposed in the public release at this time.</li>
+	<li>Operation on Mac is now possible without crashing.</li>
+	<li>Growl support on Mac is optional, and disabled by default</li>
+	<li>Operation with the renamed 'lwsn' binary (previously called ScreamerNet)</li>
+	<li>The item list for overrides is now filtered to only show scene items compatible with the selected override type (e.g. lights for light-specific overrides, objects for object-specific overrides)</li>
+	<li>The Scene Master override has been massively overhauled and is now aligned with the LightWave 11.0 feature set:</li>
+	<ul>
+		<li>All raytrace flags can be overridden</li>
+		<li>Universal sampling parameters can be overridden</li>
+		<li>The increased upper value for recursion depth (64) is now supported by the interface</li>
+		<li>Volumetric AA can be overridden</li>
+		<li>Render mode can be overridden</li>
+		<li>Caustics and radiosity values can all be overridden</li>
+	</ul>
+	<li>The light override now permits disabling of lens flares and volumetrics. Creation is not enabled due to complexities in supporting these. Lens flare creation support may appear in a future revision, though.</li>
+	<li>Camera overrides are now available, for the first time. Limited settings are available in this initial public release, and no specialised propeties for 3rd party cameras are available at this time.</li>
+	<li>Pass generation for FiberFX has been enabled. Overrides are not available for FiberFX at this time.</li>
+	<li>PassPort has been made LWSN-safe as well. Previously, it used to crash the process.</li>
+	<li>Rendering at frame 0 is now supported. Previously, it used to fail to save an image for review.</li>
+</ul>
+<hr>
+<p><a name="beforeinstalling"></a><strong>Before Installing</strong></p>
+<ul>
+<li> This version has no compatibility with previous PassPort scenes. The overrides and code have been radically overhauled. There is no migration path.</li>
+<li> This version is locked to a minimum of LightWave 3D 11.0. The Scene Master is only compatible with LightWave 3D 11.5 due to the support for the render instances toggle.</li>
+<li>This revision of PassPort has been tested on Windows XP (32-bit), Windows 7 (32-bit and 64-bit LightWave) and OS X Mountain Lion. The previous version of PassPort was restricted to LightWave 3D 9.3.1 on Windows and 32-bit LightWave 9.3.1 on Mac.</li>
+<li>Please note, at the time of writing, PassPort Renewed is a work-in-progress. It's currently implemented in LScript and will eventually be migrated to Python.</li>
+<li>3rd party lights and camera features are not available in overrides due to the complexities of supporting them. Only shared properties with the basic light and cameras will be modified.</li>
+<li>It is also extremely important that the LightWave 3D content folder is set according to the LightWave 3D documentation.</li>
+</ul>
+<hr>
+<p><a name="installation"></a><strong>Installation</strong></p>
+<p>The package consists of PassPort_MC.lsc. This has to be added to the plugin system and used directly from the Master Plugins drop-down list. The plugin will *not* function correctly if operated through the LScript/RT Master Plugin system.</p>
+<hr>
+<p><a name="usage"></a><strong>Usage</strong></p>
+<ul>
+<p><a name="usage"></a><strong>Preferences Panel</strong></p>
+<p>PassPort needs some basic necessary information to be input via its preference panel. This panel can be brought up by highlighting the PassPort Editor and hitting the lowercase o key, or by choosing File... &gt;&gt; Preferences.</p>
+<p align="center"><img src="images/preferences.png" height="522" width="436" alt="Preferences Panel"></p>
+<p>For the output folder, use the browse button to choose a folder where the frames will be written on render. This serves the same function as LightWave’s render output location, but the name is derived from the Render file prefix and the User field. Be sure to leave the parentheses and the words (leave empty) in the output folder field.</p>
+<p>On Mac, the preference dialog provides an option whether or not to use growl for notification. Note that the Notification Center in Mountain Lion is not usable because this is only available to App Store applications. There are 3rd party re-routing systems to pass growl messages to the Notification Center, if that is desired.</p>
+<p>Enable confirmation dialogs lets you get the usual “Are you sure...” prompt before doing anything drastic. Uncheck to remove these for faster operation.</p>
+<p>Editor resolution is the size of the PassPort Editor window. You can also quickly scroll through these sizes after the Editor is open by using the plus (+) and minus(-) keys.</p>
+<p>The next several options are render settings.  When you render a whole sequence, the first RGB type you choose will be used for the sequence render.  For rendering single frames though, you may want to render at half size, and with a jpeg or tga format instead.  So you can choose to use the Test Resolution Multiplier and Test Render RGB Type for this. You can choose from any available image format in LW - including any formats supported by 3rd party addons such as exrTrader. Please note, though, that there is no ability to configure options related to these formats.</p>
+
+<p><a name="maininterface"></a><strong>Main Interface</strong></p>
+<p>On run, the main interface pops up. It is non-modal, so you can close and reopen at will. The main interface consist of top items, 2 listboxes, and bottom items.</p>
+<p align="center"><img src="images/passport_passes.png" height="562" width="640" alt="Main Interface"></p>
+<p>The File... pulldown is how preferences are changed, passes are exported as scenes, and renders are accomplished. You’ll use this to render test frames, render full individual passes, and render all the passes in one go.  Items that have quick-keys have the correct quick-key combination on the right. This is true throughout the interface.
+</p>
+<p align="center"><img src="images/file_menu.png" height="238" width="183" alt="File Menu"></p>
+<p>Beside this is the pulldown for active pass selection. The pass selected here will be the one that renders. Also, override assignments (in the overrides tab) are applied to the selected pass. So assignments for one pass will be different with a different pass chosen in the Current Pass... pulldown.</p>
+<p>Bottom items correspond to the listbox above them. Those on the left are for the left listbox (either passes or overrides, depending on which tab is selected), and those on the right are for the right listbox.  Under the right listbox, you’ll find quick methods of adding and removing multiple items to each pass or override assignment. Add All is self explanatory. Add Sel gets the item(s) selected in Layout and adds only those items to the existing, compatible, assignments. The Clear All and Clear Sel functions are obviously the inverse of the add buttons.</p>
+
+<p><a name="workingwithpasses"></a><strong>Working With Passes</strong></p>
+<p align="center"><img src="images/passes_menu.png" height="80" width="175" alt="Passes Menu"></p>
+<p>If you’ve ever had to create an object copy just for a data pass and then had to create a copy of the scene for all your object copies, you know how difficult a multi-pass workflow is in LightWave. With PassPort Renewed, these problems are greatly reduced. There's no need to have ten copies of your object for your passes (even if they have different surfaces - including nodal systems), nor is there a need for scenes with various lights or objects omitted. PassPort Renewed massively extends this to most common camera setting variations and to the vast majority of rendering settings, as well as FiberFX pass generation.</p>
+<p>When it comes time to render, just use the PassPort Editor to render the sequence. If you’ve got access to a render farm, choose Save Pass as Scene... and that pass will be used to create a standard LightWave scene file that you can submit to your render farm at will.</p>
+<p>The method is simple. Select a pass, then select an object or light on the right listbox. That newly highlighted object is now a part of the selected pass.  CTRL click the item again to remove it from the pass.</p>
+
+<p><a name="workingwithoverrides"></a><strong>Working With Overrides</strong></p>
+<p align="center"><img src="images/passport_overrides.png" height="562" width="640" alt="Overrides Interface"></p>
+<p>Here’s where the real power of the PassPort Editor comes in. In each pass, you can specify a combination of Overrides that change an item’s properties or appearance, but just for that pass. So if you’re doing a shadow pass, you can have the shadow casting objects Unseen By Camera, even though that is not the case in the LightWave scene.</p>
+<p>There are eight types of overrides.</p>
+<p align="center"><img src="images/override_menu.png" height="178" width="177" alt="Overrides Menu"></p>
+<p>When applied, these will override any parameter they cover. In other words, if the parameter exists in any state in the overrides, the override parameter will be used instead of the native LightWave parameter (please refer to the light override note for the volumetric setting). Also, there’s a bit of common sense in working with these. The PassPort Editor won’t allow you to assign an Alternative Object... override to a light, or light overrides to non-lights, etc. The Motion File... override will work on all items except the Scene Master.</p>
+<ul>
+	<p><a name="overrides_objprops"></a><strong>Object Properties</strong></p>
+	<p align="center"><img src="images/override_objprops.png" height="342" width="275" alt="Object Properties Override"></p>
+	<p><a name="overrides_altobj"></a><strong>Alternative Object</strong></p>
+	<p align="center"><img src="images/override_altobj.png" height="108" width="284" alt="Alternative Object Override"></p>
+	<p><a name="overrides_motion"></a><strong>Motion File</strong></p>
+	<p align="center"><img src="images/override_motion.png" height="108" width="285" alt="Motion Override"></p>
+	<p><a name="overrides_surface"></a><strong>Surface File</strong></p>
+	<p align="center"><img src="images/override_surface.png" height="108" width="284" alt="Surface Override"></p>
+	<p><a name="overrides_light"></a><strong>Light Properties</strong></p>
+	<p align="center"><img src="images/override_light.png" height="262" width="275" alt="Light Properties"></p>
+	<p>Please note that, due to the way that LightWave 11 currently generates its scene files, the volumetric toggle will only work if the light being overridden had its volumetric properties set up through the main LW interface. The volumetrics can be deactivated within LW afterwards for that light - this override will then work fine. This is because LightWave will not write out the volumetric settings properly unless you have set them. There's also an element of common sense here - unless you've configured the volumetric light behaviour ahead of time on the light, how will the renderer know what to do. Note that the Scene Master override provides support for globally enabling/disabling volumetric lights (corresponding to the setting in LW's own render control panel).</p>
+	<p>In this version, the lens flare override is limited to a toggle. This may be supplemented by other options in a future revision. Note that the Scene Master override provides support for globally enabling/disabling lens flare (corresponding to the setting in LW's own render control panel).</p>
+	<p><a name="overrides_scene"></a><strong>Scene Master File</strong></p>
+	<p align="center"><img src="images/override_scene.png" height="747" width="590" alt="Scene Master Override"></p>
+	<p><a name="overrides_lightexcl"></a><strong>Light Exclusion</strong></p>
+	<p align="center"><img src="images/override_lightexcl.png" height="158" width="306" alt="Light Exclusion"></p>
+	<p>The Light Exclusions override allows you to specify per-pass light exclusions. Assigning it to an object will exclude that object from any lights in the override settings in that pass. The Light Exclusions override is unique in that it can be assigned in addition to another override. So if you want to use a surface override AND a light exclusion override, you’d simply have the surface override higher in the overrides listbox and assign both to an object. If you ever find that the light exclusion is higher in the listbox than another override (and therefore preventing its stack-ability), simply hit Page Down on your keyboard to move the selected override to the bottom of the listbox.</p>
+</ul>
+</ul>
+<p><a name="troubleshooting"></a><strong>Troubleshooting</strong></p>
+<p>Overrides cannot be stacked on an object in a pass (with the exception of the Light Exclusions override).  For example, you cannot apply both a motion override and a surface override to the same object in the same pass.</p>
+<p>Bullet points may not be drawn even when items have been assigned to an override. The items have been assigned, but the LScript system, on which PassPort Renewed is currently based, occasionally seems to struggle to repaint the UI correctly. You can force an update using the Rebuild command in the File menu.</p>
+<p>Also, the quick-keys very rarely get confused after pass creation or editing and then they think you’ve hit the delete key (and therefore try to delete a pass/override). As of now, the only way to prevent this it to keep the confirmation prompts enabled in the preferences and cancel the pass deletion when it asks.</p>
+
+</body>
+</html>

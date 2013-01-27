@@ -64,6 +64,9 @@
 @name "PassPort_MC"
 @define dev 1
 
+// EXPERIMENTAL features, enable
+@define enableKray 1;
+
 var supportedplatform = 1;
 
 @insert "@passEditor_globals.ls"
@@ -77,6 +80,9 @@ var supportedplatform = 1;
 @insert "@passEditor_UDF_Passes.ls"
 @insert "@passEditor_UDF_Overrides.ls"
 @insert "@passEditor_NativeRenderer_Support.ls"
+@if enableKray
+@insert "@passEditor_Kray25Renderer_Support.ls"
+@end
 
 // icons
 blank_icon = @ "................",
@@ -190,6 +196,7 @@ create
 	// Attempt to avoid failures under LWSN.
 	if(runningUnder() == LAYOUT)
 	{
+    debug();
 		platformcheck();
 	
 		loadingInProgress = 0;
@@ -536,6 +543,10 @@ load: what,io
                                 overrideNames[x] = settingsArray[1] + "   (light exclusion)";
                                 break;
 
+                            case 8:
+                                overrideNames[x] = settingsArray[1] + "   (camera)";
+                                break;
+
                             default:
                                 overrideNames[x] = settingsArray[1];
                                 break;
@@ -638,6 +649,23 @@ process: event, command
         interfaceRunYet = 0;
         doKeys = 1;
         idMapping = 1;
+
+        fileOutputPrefix = masterScene.name;
+        if(strright(fileOutputPrefix,4) == ".lws")
+        {
+            n = size(fileOutputPrefix) - 4;
+            fileOutputPrefix = (strleft(fileOutputPrefix,n));
+        }
+        if(fileOutputPrefix == "(unnamed)")
+        {
+            fileOutputPrefix = "unnamed";
+            unsaved = 1;
+        }
+        else
+        {
+            unsaved = 0;
+        }
+
         if(Mesh(0))
         {
             SelectAllObjects();
@@ -663,31 +691,7 @@ process: event, command
         EditObjects();
         EditLights();
         SelectAllLights();
-        fileOutputPrefix = masterScene.name;
-        if(strright(fileOutputPrefix,4) == ".lws")
-        {
-            n = size(fileOutputPrefix) - 4;
-            fileOutputPrefix = (strleft(fileOutputPrefix,n));
-        }
-        if(fileOutputPrefix == "(unnamed)")
-        {
-            fileOutputPrefix = "unnamed";
-            unsaved = 1;
-        }
-        else
-        {
-            unsaved = 0;
-        }
         s = masterScene.getSelect();
-
-        // do the experimental scene master override setup
-        o_displayNames = nil; // clear it out
-        o_displayGenus = nil; // clear it out
-        o_displayIDs = nil;
-        o_displayNames[1] = "(Scene Master)";
-        o_displayGenus[1] = 0;
-        o_displayIDs[1] = "SM";
-                
         if(s != nil)
         {
             arraySize = size(s);
@@ -702,6 +706,32 @@ process: event, command
             }
         }
 
+        EditCameras();
+        SelectAllCameras();
+        s = masterScene.getSelect();
+        if(s != nil)
+        {
+            arraySize = size(s);
+            for(x = 1; x <= arraySize; x++)
+            {
+                itemname = s[x].name;
+                cameraAgents[x] = Camera(itemname);
+                cameraNames[x] = cameraAgents[x].name;
+                cameraIDs[x] = cameraAgents[x].id;
+                tempIDArray = parse("x",hex(cameraIDs[x]));
+                cameraOldIDs[x] = tempIDArray[2];
+            }
+        }
+
+        // do the experimental scene master override setup
+        o_displayNames = nil; // clear it out
+        o_displayGenus = nil; // clear it out
+        o_displayIDs = nil;
+        o_displayNames[1] = "(Scene Master)";
+        o_displayGenus[1] = 0;
+        o_displayIDs[1] = "SM";
+                
+
         idMapping = 0;
         x = 1;
         for(y = 1; y <= size(meshAgents); y++)
@@ -710,8 +740,8 @@ process: event, command
             {
                 displayNames[x] = meshNames[y];
                 o_displayNames[x+1] = meshNames[y];
-                displayGenus[x] = 1;
-                o_displayGenus[x+1] = 1;
+                displayGenus[x] = MESH;
+                o_displayGenus[x+1] = MESH;
                 displayIDs[x] = meshIDs[y];
                 o_displayIDs[x+1] = meshIDs[y];
                 displayOldIDs[x] = meshOldIDs[y];
@@ -722,11 +752,23 @@ process: event, command
         {
             displayNames[x] = lightNames[y];
             o_displayNames[x+1] = lightNames[y];
-            displayGenus[x] = 2;
-            o_displayGenus[x+1] = 2;
+            displayGenus[x] = LIGHT;
+            o_displayGenus[x+1] = LIGHT;
             displayIDs[x] = lightIDs[y];
             o_displayIDs[x+1] = lightIDs[y];
             displayOldIDs[x] = lightOldIDs[y];
+            x++;
+        }
+
+        for(y = 1; y <= size(cameraAgents); y++)
+        {
+            displayNames[x] = cameraNames[y];
+            o_displayNames[x+1] = cameraNames[y];
+            displayGenus[x] = CAMERA;
+            o_displayGenus[x+1] = CAMERA;
+            displayIDs[x] = cameraIDs[y];
+            o_displayIDs[x+1] = cameraIDs[y];
+            displayOldIDs[x] = cameraOldIDs[y];
             x++;
         }
 
@@ -1156,7 +1198,27 @@ reProcess
             tempIDArray = parse("x",hex(lightIDs[x]));
             lightOldIDs[x] = tempIDArray[2];
         }
-            
+
+        itemname = nil;
+        cameraAgents = nil;
+        cameraNames = nil;
+        cameraIDs = nil;
+        cameraOldIDs = nil;
+        EditCameras();
+        SelectAllCameras();
+
+        s = masterScene.getSelect();
+        arraySize = size(s);
+        for(x = 1; x <= arraySize; x++)
+        {
+            itemname = s[x].name;
+            cameraAgents[x] = Camera(itemname);
+            cameraNames[x] = cameraAgents[x].name;
+            cameraIDs[x] = cameraAgents[x].id;
+            tempIDArray = parse("x",hex(cameraIDs[x]));
+            cameraOldIDs[x] = tempIDArray[2];
+        }
+
         idMapping = 0;
         displayNames = nil;
         displayIDs = nil;
@@ -1177,8 +1239,8 @@ reProcess
             {
                 displayNames[x] = meshNames[y];
                 o_displayNames[x+1] = meshNames[y];
-                displayGenus[x] = 1;
-                o_displayGenus[x+1] = displayGenus[x];
+                displayGenus[x] = MESH;
+                o_displayGenus[x+1] = MESH;
                 displayIDs[x] = meshIDs[y];
                 o_displayIDs[x+1] = meshIDs[y];
                 displayOldIDs[x] = meshOldIDs[y];
@@ -1189,14 +1251,26 @@ reProcess
         {
             displayNames[x] = lightNames[y];
             o_displayNames[x+1] = lightNames[y];
-            displayGenus[x] = 2;
-            o_displayGenus[x+1] = displayGenus[x];
+            displayGenus[x] = LIGHT;
+            o_displayGenus[x+1] = LIGHT;
             displayIDs[x] = lightIDs[y];
             o_displayIDs[x+1] = lightIDs[y];
             displayOldIDs[x] = lightOldIDs[y];
             x++;
         }
-        
+
+        for(y = 1; y <= size(cameraAgents); y++)
+        {
+            displayNames[x] = cameraNames[y];
+            o_displayNames[x+1] = cameraNames[y];
+            displayGenus[x] = CAMERA;
+            o_displayGenus[x+1] = CAMERA;
+            displayIDs[x] = cameraIDs[y];
+            o_displayIDs[x+1] = cameraIDs[y];
+            displayOldIDs[x] = cameraOldIDs[y];
+            x++;
+        }
+
         if(originalSelection != nil)
         {
             //info(originalSelection);
@@ -1260,7 +1334,11 @@ reProcess
                             case 7:
                                 overrideNames[x] = settingsArray[1] + "   (light exclusion)";
                                 break;
-                                
+
+                            case 8:
+                                overrideNames[x] = settingsArray[1] + "   (camera)";
+                                break;
+
                             default:
                                 overrideNames[x] = settingsArray[1];
                                 break;
@@ -1275,17 +1353,24 @@ reProcess
         o_displayNames[1] = "(Scene Master)";
         o_displayNamesObjectIndex = 1;
         o_displayNamesLightIndex = 1;
+        o_displayNamesCameraIndex = 1;
+
         for(w = 1; w <= size(displayNames); w++)
         {
             o_displayNames[w + 1] = displayNames[w];
              // Populating filtered lists - will be used in UDF functions.
-            if (displayGenus[w] == 1) {
+            if (displayGenus[w] == MESH) {
                 o_displayNamesObject[o_displayNamesObjectIndex] = displayNames[w];
                 o_displayNamesObjectIndex++;
             }
-            if (displayGenus[w] == 2) {
+            if (displayGenus[w] == LIGHT) {
                 o_displayNamesLight[o_displayNamesLightIndex] = displayNames[w];
                 o_displayNamesLightIndex++;
+            }
+
+            if (displayGenus[w] == CAMERA) {
+                o_displayNamesCamera[o_displayNamesCameraIndex] = displayNames[w];
+                o_displayNamesCameraIndex++;
             }
         }
 
@@ -1594,6 +1679,9 @@ unProcess
     lightAgents = nil;
     lightNames = nil;
     lightIDs = nil;
+    cameraAgents = nil;
+    cameraNames = nil;
+    cameraIDs = nil;
     displayNames = nil;
     displayIDs = nil;
     passNames = nil;

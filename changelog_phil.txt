@@ -1,3 +1,24 @@
+20130112
+========
+
+- Stupid error in handleBuffers file handling resolved, fixing bug p0019.
+
+20130111
+========
+
+- Plan to fork code for release vs ongoing development.
+- Will work to fix open issues before continuing with camera override implementation (UI and sceneGen case8).
+ - p0020 fixed. Stupid error in filenames being passed to function to change the scene lines.
+- HTML documentation to replace the original PDF files.	
+- Moved large comment block in main file out to notes.txt to reduce clutter.
+- Original code had hard-coded the number of channels. Now we retrieve this information directly from the scene file (cameras only have six channels (3*trans, 3*rot), for example - objects and lights have 9 (3*trans, 3*rot, 3*scale))
+- Added another utility function readSpecificLine(line,file) to retrieve the requested line. Get nil back if the line requested is beyond the end of the file.
+- More implementation work for camera override.
+- Tweaked progress readout code - now uses a defined number of stages to handle offsets. Added to camera chunk of code.
+- Removed harmless, but misplaced case 8 handler in object section of scene gen code. Copy/paste error.
+- Basic QA following heavy disruption yesterday. Nothing seems to be broken beyond the existing open issues.
+- Eliminating additional hard-coding of genus types in various places. Replacing with the SDK values (MESH, LIGHT, CAMERA)
+
 20130110
 ========
 
@@ -8,7 +29,7 @@
  - Need to investigate to see if it's still ~correct.
  - It seemed to leave files hanging open, which is odd. Revised code to ensure input files are closed. Can revert if something breaks.
  - Added functions for the camera handling.
- - Adjusted end line function operation to be more generic.
+ - Adjusted end line function operation to be more generic. May need more careful thought - haven't investigated third party light/camera handling yet. Anticipating that this change might need to be reverted.
 - Refined UI code for the renderer selection dialog for the scene master override (creation).
 - p0018 still lurking.
 - p0019 created
@@ -358,8 +379,8 @@ p0014 : Uncompiled version crashes out on Mac and fails to start-up roughly 70% 
 p0015 : Overrides with assigned items don't get bullet point until the lists are updated, or some major redraw occurs (also in original code)
 p0017 : Scene override fails during scene generation. Wrong line cited on OS X, but Win32 reports correct number. Invalid index to passName. Line 1744 of sceneGen code. (Fixed)
 p0018 : Light override causes no image to be saved. (In progress : The issue with this override is that placing VolumetricLighting in anything other than the correct location in the light setting's block causes the renderer to fail to save any image. Odd quirk in LW.)
-p0019 : Another prepareInputFiles() already called error for alternative object override.
-p0020 : Line 2162 and 2168 errors with light override.
+p0019 : Another prepareInputFiles() already called error for alternative object override. (Fixed)
+p0020 : Line 2162 and 2168 errors with light override. (Fixed)
 
 ###############
 # Limitations #
@@ -375,6 +396,7 @@ p0020 : Line 2162 and 2168 errors with light override.
 - SceneGen code could be optimised to walk the array and use loops to greatly simplify the code. (partially done with 20130101)
 - Autoscan plugin operation.
 - Need to check if growl interaction works with current growl versions.
+- Check if motion override breaks cameras (9 channels vs 6 for cameras)
 
 -------------
 - Reference -

@@ -341,7 +341,7 @@ editSelectedOverride
 					break;
 
 				case 8:
-					cameraexclOverride_UI("edit");
+					cameraOverride_UI("edit");
 					reProcess();
 					req_update();
 					break;

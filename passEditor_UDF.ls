@@ -179,7 +179,7 @@ addSelButton
                         passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempLightIDs[x];
                         break;
                         
-                    case CAMERA: // was 2 - trying to avoid hard-coding.
+                    case CAMERA: // was 3 - trying to avoid hard-coding.
                         tempCameraAgents[x] = Camera(itemname);
                         tempCameraNames[x] = tempCameraAgents[x].name;
                         tempCameraIDs[x] = tempCameraAgents[x].id;

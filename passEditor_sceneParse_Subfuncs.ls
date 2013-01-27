@@ -1,4 +1,3 @@
-//scene parsing functions
 getPassEditorStartLine: inputPath
 {
 	input = File(inputPath, "r");
@@ -15,7 +14,6 @@ getPassEditorStartLine: inputPath
 	
 	startLine = 1;
 	endLine = input.linecount();
-
 
 	currentLine = 1;
 	toReturn = nil;
@@ -290,6 +288,20 @@ getPartialLine: startLine, endLine, searchString, inputPath
 			toReturn = nil;
 			break;
 		}
+	}
+	input.close();
+	return(toReturn);
+}
+
+readSpecificLine: lineToRead, inputPath
+{
+	input = File(inputPath, "r");
+	endLine = input.linecount();
+	toReturn = "";
+	if(lineToRead <= endLine)
+	{
+		input.line(lineToRead);
+		toReturn = input.read();
 	}
 	input.close();
 	return(toReturn);

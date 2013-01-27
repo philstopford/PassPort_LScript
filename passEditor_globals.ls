@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130110";
+var versionString = "20130112";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -28,6 +28,10 @@ var lightAgents;
 var lightNames;
 var lightIDs;
 var lightOldIDs;
+var cameraAgents;
+var cameraNames;
+var cameraIDs;
+var cameraOldIDs;
 var displayNames;
 var displayGenus;
 var o_displayNames; // holds all items for the override item listbox
@@ -129,9 +133,11 @@ var useGrowl = 0; // shut off Growl by default.
 var usegrowl;
 
 // Renderer support extension - prototype!
+@if enableKray
 var renderers = @"Native","Kray 2.5(ALPHA)"@;
+@else
+var renderers = @"Native"@;
+@end
 var overrideRenderer = 1; // default, native.
-var settingsArray;
 
-// EXPERIMENTAL features, enable
-var enableExperimental = 1;
+var settingsArray;
