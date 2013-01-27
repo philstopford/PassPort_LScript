@@ -490,12 +490,6 @@ platformInformation: platformVar
 
 preferencePanel
 {
-
-	if(platform() == MACUB || platform() == MAC64) // Mac
-	{
-		Pref_num_gads ++;
-	}
-
 	resolutionsArray[1] = "640 x 540";
 	resolutionsArray[2] = "640 x 385";
 	resolutionsArray[3] = "457 x 540";
@@ -539,14 +533,6 @@ preferencePanel
 
 	ui_offset_y += Pref_ui_row_offset;
 
-	if(platform() == MACUB || platform() == MAC64) // FIXME : Might not be needed any more. Mac-specific hack.
-	{
-		c24 = ctlcheckbox("Enable auto close/reopen updates of Editor", useHackyUpdates);
-		ctlposition(c24, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
-
-		ui_offset_y += Pref_ui_row_offset;
-	}
-
 	c26 = ctlpopup("Editor UI Size (On Reopen)",editorResolution,resolutionsArray);
 	ctlposition(c26, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
 
@@ -583,10 +569,6 @@ preferencePanel
 		userOutputString = getvalue(c22);
 		userOutputString = makeStringGood(userOutputString);
 		areYouSurePrompts = getvalue(c23);
-		if(platform() == MACUB || platform() == MAC64)
-		{
-			useHackyUpdates = getvalue(c24);
-		}
 		rgbSaveType = getvalue(c25);
 		editorResolution = getvalue(c26);
 		testResMultiplier = getvalue(c28);
@@ -1081,38 +1063,6 @@ resizePanel: w, h
 
 }
 
-quickDownSize
-{
-	if(editorResolution != 4)
-	{
-		editorResolution = editorResolution + 1;
-		if(useHackyUpdates == 1)
-		{
-			justReopened = 1;
-			if(reqisopen())  {
-       			reqend();  }
-       		
-			options();
-		}
-	}
-}
-
-quickUpSize
-{
-	if(editorResolution != 1)
-	{
-		editorResolution = editorResolution - 1;
-		if(useHackyUpdates == 1)
-		{
-			justReopened = 1;
-			if(reqisopen())  {
-       			reqend();  }
-       		
-			options();
-		}
-	}
-}
-
 saveCurrentPassesSettings
 {
 	doKeys = 0;
@@ -1190,14 +1140,12 @@ saveCurrentPassesSettings
 		io.writeln(fileOutputPrefix);
 		io.writeln(userOutputString);
 		io.writeln(areYouSurePrompts);
-		io.writeln(useHackyUpdates);
 		io.writeln(rgbSaveType);
 		io.writeln(editorResolution);
 		io.close();
 		
 		globalstore("passEditoruserOutputString",userOutputString);
 		globalstore("passEditorareYouSurePrompts",areYouSurePrompts);
-		globalstore("passEditoruseHackyUpdates",useHackyUpdates);
 		globalstore("passEditorrgbSaveType",rgbSaveType);
 		globalstore("passEditoreditorResolution",editorResolution);
 		
@@ -1301,7 +1249,6 @@ loadPassesSettings
 				userOutputString = "";
 			}
 			areYouSurePrompts = io.read().asInt();
-			useHackyUpdates = io.read().asInt();
 			rgbSaveType = io.read().asInt();
 			editorResolution = io.read().asInt();
 			io.close();
@@ -1311,19 +1258,8 @@ loadPassesSettings
 			//panelHeight = 540;
 			panelHeight = integer(globalrecall("passEditorpanelHeight", 540));
 			
-			if(useHackyUpdates == 1)
-			{
-				justReopened = 1;
-				if(reqisopen())  {
-	        		reqend();  }
-	        	
-				options();
-			}
-			else
-			{
-				reProcess();
-				req_update();
-			}
+			reProcess();
+			req_update();
 		}
 		else
 		{
@@ -1457,19 +1393,8 @@ loadPassesSettings
 				}
 			}
 			io.close();
-			if(useHackyUpdates == 1)
-			{
-				justReopened = 1;
-				if(reqisopen())  {
-	        		reqend();  }
-	        	
-				options();
-			}
-			else
-			{
-				reProcess();
-				req_update();
-			}
+			reProcess();
+			req_update();
 		}
 	}
 }
@@ -1719,11 +1644,6 @@ fixPathForWin32: path
 	return(newPathFixed);
 }
 
-hackyCloseReopenToggle: value
-{
-	return(value == 0);
-}
-
 getCommand: event,data
 {
 	if(event != nil)
@@ -1953,19 +1873,8 @@ getCommand: event,data
 				comRingCommand = comringdecode(@"s:200"@,data);
 				if(comRingCommand == "updateListsNow")
 				{
-					if(useHackyUpdates == 1)
-					{
-						justReopened = 1;
-						if(reqisopen())  {
-			        		reqend();  }
-			        	
-						options();
-					}
-					else
-					{
-						reProcess();
-						req_update();
-					}
+					reProcess();
+					req_update();
 				}
 				if(comRingCommand == "renderPassFrame")
 				{
@@ -2071,7 +1980,6 @@ getCommand: event,data
 						io.writeln(fileOutputPrefix);
 						io.writeln(userOutputString);
 						io.writeln(areYouSurePrompts);
-						io.writeln(useHackyUpdates);
 						io.writeln(rgbSaveType);
 						io.writeln(editorResolution);
 						io.close();
@@ -2152,7 +2060,6 @@ getCommand: event,data
 									userOutputString = "";
 								}
 								areYouSurePrompts = io.read().asInt();
-								useHackyUpdates = io.read().asInt();
 								rgbSaveType = io.read().asInt();
 								editorResolution = io.read().asInt();
 								io.close();

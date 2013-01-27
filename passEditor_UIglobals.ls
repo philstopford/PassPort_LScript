@@ -116,9 +116,11 @@ ScnMst_ui_column			= 0;													// Column number
 ScnMst_ui_tab_offset		= ScnMst_ui_offset_y + 23;								// Offset for tab height
 ScnMst_ui_row_offset		= ScnMst_gad_h + ScnMst_ui_spacing_y;					// Row offset
 
-ScnMst_ui_window_w			= 295;													// Window width
+ScnMst_ui_window_w			= 295 * 2;												// Window width
 ScnMst_ui_window_h			= (ScnMst_ui_row_offset*ScnMst_num_gads) + 11;			// Window height
 ScnMst_ui_seperator_w		= ScnMst_ui_window_w + 2;								// Width of seperators
+
+ScnMst_gad_x2				= (ScnMst_ui_window_w / 2) + ScnMst_gad_x;				// Gadget X coord2
 
 // Preferences UI
 

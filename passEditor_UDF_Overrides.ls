@@ -117,7 +117,7 @@ overrideslb_count
 
 overrideslb_name: index
 {
-    if(overrideNames[1] != "empty")
+/*    if(overrideNames[1] != "empty")
     {
 		if(getvalue(gad_OverridesListview).asInt() >= 1)
 		{
@@ -125,13 +125,13 @@ overrideslb_name: index
 			{
 				return(" " + icon[BULLET] + " " + overrideNames[index]);
 			}
-		}
+		}*/
 		return(overrideNames[index]);
-    }
+/*    }
     else
     {
         return(nil);
-    }
+    }*/
 }
 
 overrideslb_event: overrides_list

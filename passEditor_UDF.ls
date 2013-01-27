@@ -417,15 +417,6 @@ editSelectedPass
             passNames[newNumber] = newName;
             //setvalue(gad_SelectedPass,nil);
             //setvalue(gad_SelectedPass,"Current Pass", passNames, "currentPassMenu_select");
-            if(useHackyUpdates == 1)
-            {
-                justReopened = 1;
-                if(reqisopen())
-                {
-                    reqend();
-                }
-                options();
-            }
         }
         //reProcess();
         req_update();
@@ -514,15 +505,6 @@ deleteSelectedPass
                         currentChosenPassString = passNames[currentChosenPass];
                     }
                     //setvalue(c7,currentChosenPassString,"");
-                    if(useHackyUpdates == 1)
-                    {
-                        justReopened = 1;
-                        if(reqisopen())
-                        {
-                            reqend();
-                        }
-                        options();
-                    }
                 }
                 //reProcess();
                 req_update();
@@ -588,16 +570,6 @@ deleteSelectedPass
                     currentChosenPassString = passNames[currentChosenPass];
                 }
                 //setvalue(c7,currentChosenPassString,"");
-                if(useHackyUpdates == 1)
-                {
-                    justReopened = 1;
-                    if(reqisopen())
-                    {
-                        reqend();
-                    }
-                    
-                    options();
-                }
                 //reProcess();
                 req_update();
             }
@@ -904,22 +876,8 @@ passMenu_select: passMenu_item
         //setvalue(gad_SelectedPass,nil);
         //setvalue(gad_SelectedPass,"Current Pass",passNames,"currentPassMenu_select");
 
-        if(useHackyUpdates == 1)
-        {
-            justReopened = 1;
-            if(reqisopen())
-            {
-                reqend();
-            }
-            options();
-        }
-        
-        else
-        {
-            //reProcess();
-            req_update();
-        }
-        
+        //reProcess();
+        req_update();
     }
    
    if(passMenu_item == 2)
@@ -928,19 +886,8 @@ passMenu_select: passMenu_item
         createNewEmptyPass();
         //setvalue(gad_SelectedPass,nil);
         //setvalue(gad_SelectedPass,"Current Pass",passNames,"currentPassMenu_select");
-        if(useHackyUpdates == 1)
-        {
-            justReopened = 1;
-            if(reqisopen())  {
-                reqend();  }
-            
-            options();
-        }
-        else
-        {
-            //reProcess();
-            req_update();
-        }
+        //reProcess();
+        req_update();
     }
     if(passMenu_item == 3)
     {
@@ -948,19 +895,8 @@ passMenu_select: passMenu_item
         createNewPassFromLayoutSelection();
         //setvalue(gad_SelectedPass,nil);
         //setvalue(gad_SelectedPass,"Current Pass",passNames,"currentPassMenu_select");
-        if(useHackyUpdates == 1)
-        {
-            justReopened = 1;
-            if(reqisopen())  {
-                reqend();  }
-            
-            options();
-        }
-        else
-        {
-            //reProcess();
-            req_update();
-        }
+        //reProcess();
+        req_update();
     }
     if(passMenu_item == 4)
     {
@@ -968,19 +904,8 @@ passMenu_select: passMenu_item
         duplicateSelectedPass();
         //setvalue(gad_SelectedPass,nil);
         //setvalue(gad_SelectedPass,"Current Pass",passNames,"currentPassMenu_select");
-        if(useHackyUpdates == 1)
-        {
-            justReopened = 1;
-            if(reqisopen())  {
-                reqend();  }
-            
-            options();
-        }
-        else
-        {
-            //reProcess();
-            req_update();
-        }
+        //reProcess();
+        req_update();
     }
     
 }
@@ -1113,19 +1038,8 @@ reqkeyboard: key
                 duplicateSelectedPass();
                 //setvalue(gad_SelectedPass,nil);
                 //setvalue(gad_SelectedPass,"Current Pass",passNames,"currentPassMenu_select");
-                if(useHackyUpdates == 1)
-                {
-                    justReopened = 1;
-                    if(reqisopen())  {
-                        reqend();  }
-                    
-                    options();
-                }
-                else
-                {
-                    //reProcess();
-                    req_update();
-                }
+                //reProcess();
+                req_update();
             }
             else if(overrideSel > 0)
             {
@@ -1203,15 +1117,6 @@ reqkeyboard: key
         //o is 111
         
         
-        if(key == 45 && doKeys == 1)
-        {
-                quickDownSize();
-        }
-        if(key == 61 && doKeys == 1)
-        {
-                quickUpSize();
-        }
-        
         if(key == REQKB_PAGEDOWN && doKeys == 1)
         {
             moveOverrideToBottom();
@@ -1248,19 +1153,8 @@ reqkeyboard: key
                 duplicateSelectedPass();
                 //setvalue(gad_SelectedPass,nil);
                 //setvalue(gad_SelectedPass,"Current Pass",passNames,"currentPassMenu_select");
-                if(useHackyUpdates == 1)
-                {
-                    justReopened = 1;
-                    if(reqisopen())  {
-                        reqend();  }
-                    
-                    options();
-                }
-                else
-                {
-                    //reProcess();
-                    req_update();
-                }
+                //reProcess();
+                req_update();
             }
             else if(overrideSel > 0)
             {
@@ -1268,18 +1162,6 @@ reqkeyboard: key
                 req_update();
             }
             doKeys = 1;
-        }
-
-
-
-        
-        if(key == 45 && doKeys == 1)
-        {
-                quickDownSize();
-        }
-        if(key == 61 && doKeys == 1)
-        {
-                quickUpSize();
         }
         
         if(key == REQKB_PAGEDOWN && doKeys == 1)

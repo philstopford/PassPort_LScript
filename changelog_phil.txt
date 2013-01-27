@@ -1,7 +1,56 @@
+20121229
+========
+
+- Removed HackyUpdates and related code.
+- Scene Master Override extended to support GI adjustment :
+ - Toggle radiosity
+ - Change mode :
+		mode		type value
+		backdrop	0
+		monte		1
+		final		2
+ - Toggle interpolation.
+ - Toggle blur.
+ - Transparency
+ - Volumetric radiosity
+ - Directional rays
+ - Gradients
+ - Behind Test
+ - Use Bumps (uses RadiosityFlags, and uses binary which is written out as decimal. LScript doesn't appear to permit conversion).
+ - Numeric values for GI. Angular tolerance is currently broken due to some odd conversion behavior in LW.
+ - Caustics.
+- Scene Master override interface overhauled.
+- Scene Master override support added for :
+ - Ray precision
+ - Ray Cutoff
+ - Shading samples
+ - Light samples
+ - Global light intensity
+ - Global flare intensity
+- Scene Master Override extended to add toggles for :
+ - Lens Flares
+ - Shadow Maps
+ - Volumetric Lights
+ - Two-sided area lights
+ - Render instances
+ - Scene Master Override extended to support overriding raytrace flags :
+ - sum of (ctlstate * flag value) for each of:	
+		raytrace	flag value
+		shad		1
+		refl		2
+		refr		4
+		tran		8
+		occl		16
+- Tuned scene generation code to work more flexibly and in a more robust manner.
+ - Previous approach, from original code, was to use hard-coded lengths from the strings being sought and had multiple occurrences of the string.
+ - Previous approach also didn't seem to handle variant settings (those that disappear when unset and reappear when set, in the scene file).
+ - New approach appends these settings to the end of the scene file.
+
 20121228c
 =========
 
 - Removed some binary character corruption from the scenegen file.
+- Bumped recursion maximum value to 64, to match LW 11.x.
 
 20121228b
 =========
@@ -196,8 +245,7 @@ Brace yourself. Here's the big set of UI changes related to filtering the overri
 + In Progress +
 +++++++++++++++
 
-UI layout code optimisation.
-HackyUpdates review
+- Scene Master override overhaul.
 
 ********
 * Bugs *
@@ -229,15 +277,9 @@ p0015 : Overrides with assigned items don't get bullet point until the lists are
 : Issues to check :
 :::::::::::::::::::
 
-- migrate override properties for each supported type into an array, and make the handling code aware of the array. Easier to extend with new features. Probably also need to make the UI code similarly flexible over time.
-- all features post-9.3.1 need to be reviewed and checked against the scene file.
-	- Scene Master override is the primary issue now.
-	- requires *heavy* research into the SceneGen code....
-	- radiosity example :
-	    new interface elements to allow access to the new features, probably revamping the scene master override type. Or maybe creating a new override type and method of assigning.
-		parse support for finding where in the scene the new radiosity information is stored. in other words, what's before it, and what's after it in the scene file?
-		parse support for writing that information, from the override properties, into the render scene. you'll have to set up and obey all the if/then switches of testing if the override is assigned, then testing if the information is already in the scene file, then if all the conditions are right, plugging in the override radiosity into the render scene instead of the live scene radiosity settings.
-
+- Lens flare toggle isn't working.
+- SceneGen code could be optimised to walk the array and use loops to greatly simplify the code.
+- Add Camera override, for camera settings.
 
 -------------
 - Reference -

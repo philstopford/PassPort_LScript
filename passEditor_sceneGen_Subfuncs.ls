@@ -91,13 +91,13 @@ generatePassFile: mode, pass
                 {
                     affectOpenglLine = "";
                 }
-                if(settingsArray[10] == "1")
+                if(settingsArray[10] == "0")
                 {
-                    LensFlareLine = "LensFlare 1\n";
+                    LensFlareLine = "LensFlare 0\n";
                 }
                 else
                 {
-                    LensFlareLine = "LensFlare 0\n";
+                    LensFlareLine = "LensFlare 1\n";
                 }
                 if(settingsArray[11] == "0")
                 {
@@ -816,9 +816,11 @@ generatePassFile: mode, pass
                         while(!done)
                         {
                             line = inputFile.read();
-                            if(size(line) > 14)
+                            mystring = "ShadowOptions ";
+                            mystring_len = size(mystring);
+                            if(size(line) > mystring_len)
                             {
-                                if(strleft(line,14) != "ShadowOptions ")
+                                if(strleft(line,mystring_len) != mystring)
                                 {
                                     outputFile.writeln(line);
                                     //excludedLightsTemp = 0;
@@ -1381,7 +1383,6 @@ generatePassFile: mode, pass
         chdirString = outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass];
         if(chdir(chdirString))
         {
-            // Missing getsep after outputFolder[1] - Matt Gorner
             saveRGBImagesPrefix = outputFolder[1] + getsep() + "CG" + getsep();
             if (mode == "frame")
             {
@@ -1397,7 +1398,6 @@ generatePassFile: mode, pass
             mkdir(outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass]);
             chdir(outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass]);
             
-            // Missing getsep after outputFolder[1] - Matt Gorner
             saveRGBImagesPrefix = outputFolder[1] + getsep() + "CG" + getsep();
             if (mode == "frame")
             {
@@ -1418,7 +1418,6 @@ generatePassFile: mode, pass
         mkdir(outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass]);
         chdir(outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass]);
         
-        // Missing getsep after outputFolder[1] - Matt Gorner
         saveRGBImagesPrefix = outputFolder[1] + getsep() + "CG" + getsep();
         if (mode == "frame")
         {
@@ -1490,14 +1489,10 @@ generatePassFile: mode, pass
         if(settingsArray[2] == "type6")
         {
 			overrideType[x] = 6;
-            resolutionMultiplierSetts   = integer(settingsArray[3]);
-            renderModeSetts             = integer(settingsArray[4]);
-            depthBufferAASetts          = integer(settingsArray[5]);
-            renderLinesSetts                = integer(settingsArray[6]);
-            rayRecursionLimitSetts      = integer(settingsArray[7]);
-            redirectBuffersSetts            = integer(settingsArray[8]);
-            disableAASetts                  = integer(settingsArray[9]);
-            
+            resolutionMultiplierSetts	= integer(settingsArray[3]);
+			redirectBuffersSetts 		= integer(settingsArray[8]);
+			disableAASetts 				= integer(settingsArray[9]);
+
             switch(resolutionMultiplierSetts)
             {
                 case 1:
@@ -1530,14 +1525,16 @@ generatePassFile: mode, pass
             while(!inputFile.eof())
             {
                 line = inputFile.read();
-                if(size(line) > 9)
+                mystring = "FrameSize ";
+                mystring_len = size(mystring);
+                if(size(line) > mystring_len)
                 {
-                    if(strleft(line,9) == "FrameSize")
+                    if(strleft(line,mystring_len) == mystring)
                     {
                         parsingArray = parse(" ",line);
                         newResWidth = integer(integer(parsingArray[2]) * resMult);
                         newResHeight = integer(integer(parsingArray[3]) * resMult);
-                        toWrite = "FrameSize " + string(newResWidth) + " " + string(newResHeight);
+                        toWrite = mystring + string(newResWidth) + " " + string(newResHeight);
                     }
                     else
                     {
@@ -1559,42 +1556,16 @@ generatePassFile: mode, pass
             while(!inputFile.eof())
             {
                 line = inputFile.read();
-                if(size(line) > 16)
+                mystring = "GlobalFrameSize ";
+                mystring_len = size(mystring);
+                if(size(line) > mystring_len)
                 {
-                    if(strleft(line,16) == "GlobalFrameSize ")
+                    if(strleft(line,mystring_len) == mystring)
                     {
                         parsingArray = parse(" ",line);
                         newResWidth = integer(integer(parsingArray[2]) * resMult);
                         newResHeight = integer(integer(parsingArray[3]) * resMult);
-                        toWrite = "GlobalFrameSize " + string(newResWidth) + " " + string(newResHeight);
-                    }
-                    else
-                    {
-                        toWrite = line;
-                    }
-                }
-                else
-                {
-                    toWrite = line;
-                }
-                tempOutput.writeln(toWrite);
-            }
-            inputFile.close();
-            tempOutput.close();
-            
-            inputFile = File(newScenePath,"r");
-            tempOutput = File("TEMPTESTRESMULTSCENE.LWS","w");
-            
-            while(!inputFile.eof())
-            {
-                line = inputFile.read();
-                //11 RenderMode
-                if(size(line) > 11)
-                {
-                    if(strleft(line,11) == "RenderMode ")
-                    {
-                        renderMode = renderModeSetts - 1;
-                        toWrite = "RenderMode " + string(renderMode);
+                        toWrite = mystring + string(newResWidth) + " " + string(newResHeight);
                     }
                     else
                     {
@@ -1610,86 +1581,20 @@ generatePassFile: mode, pass
             inputFile.close();
             tempOutput.close();
 
-            inputFile = File("TEMPTESTRESMULTSCENE.LWS","r");
-            tempOutput = File(newScenePath,"w");
+			renderModeSetts = integer(settingsArray[4]);
+			writeOverrideString("RenderMode ", renderModeSetts);
 
-            while(!inputFile.eof())
-            {
-                line = inputFile.read();
-                //14 "DepthBufferAA "
-                if(size(line) > 14)
-                {
-                    if(strleft(line,14) == "DepthBufferAA ")
-                    {
-                        toWrite = "DepthBufferAA " + string(depthBufferAASetts);
-                    }
-                    else
-                    {
-                        toWrite = line;
-                    }
-                }
-                else
-                {
-                    toWrite = line;
-                }
-                tempOutput.writeln(toWrite);
-            }
-            inputFile.close();
-            tempOutput.close();
+			renderModeSetts = integer(settingsArray[4]);
+			writeOverrideString("RenderMode ", renderModeSetts);
+            
+			depthBufferAASetts = integer(settingsArray[5]);
+			writeOverrideString("DepthBufferAA ", depthBufferAASetts);
+            
+			renderLinesSetts = integer(settingsArray[6]);
+			writeOverrideString("RenderLines ", renderLinesSetts);
 
-            inputFile = File(newScenePath,"r");
-            tempOutput = File("TEMPTESTRESMULTSCENE.LWS","w");
-            
-            while(!inputFile.eof())
-            {
-                line = inputFile.read();
-                //12 "RenderLines "
-                if(size(line) > 12)
-                {
-                    if(strleft(line,12) == "RenderLines ")
-                    {
-                        toWrite = "RenderLines " + string(renderLinesSetts);
-                    }
-                    else
-                    {
-                        toWrite = line;
-                    }
-                }
-                else
-                {
-                    toWrite = line;
-                }
-                tempOutput.writeln(toWrite);
-            }
-            inputFile.close();
-            tempOutput.close();
-            
-            inputFile = File("TEMPTESTRESMULTSCENE.LWS","r");
-            tempOutput = File(newScenePath,"w");
-            
-            while(!inputFile.eof())
-            {
-                line = inputFile.read();
-                //18 "RayRecursionLimit "
-                if(size(line) > 18)
-                {
-                    if(strleft(line,18) == "RayRecursionLimit ")
-                    {
-                        toWrite = "RayRecursionLimit " + string(rayRecursionLimitSetts);
-                    }
-                    else
-                    {
-                        toWrite = line;
-                    }
-                }
-                else
-                {
-                    toWrite = line;
-                }
-                tempOutput.writeln(toWrite);
-            }
-            inputFile.close();
-            tempOutput.close();
+			rayRecursionLimitSetts = integer(settingsArray[7]);
+			writeOverrideString("RayRecursionLimit ", rayRecursionLimitSetts);
             
         // dropping the AA samples
             inputFile = File(newScenePath,"r");
@@ -1698,14 +1603,15 @@ generatePassFile: mode, pass
             while(!inputFile.eof())
             {
                 line = inputFile.read();
-                //10 "AASamples "
-                if(size(line) > 10)
+                mystring = "AASamples ";
+                mystring_len = size(mystring);
+                if(size(line) > mystring_len)
                 {
-                    if(strleft(line,10) == "AASamples ")
+                    if(strleft(line,mystring_len) == mystring)
                     {
                         if(disableAASetts == 1)
                         {
-                            toWrite = "AASamples 1";
+                            toWrite = mystring + "1";
                         }
                         else
                         {
@@ -1725,55 +1631,165 @@ generatePassFile: mode, pass
             }
             inputFile.close();
             tempOutput.close();
-            
+
+			raytraceShadows				= integer(settingsArray[10]);
+			raytraceShadows_Flag		= 1;
+			raytraceFlags				= (raytraceShadows * raytraceShadows_Flag);
+
+			raytraceReflect				= integer(settingsArray[11]);
+			raytraceReflect_Flag		= 2;
+			raytraceFlags				+= (raytraceReflect * raytraceReflect_Flag);
+
+			raytraceRefract				= integer(settingsArray[12]);
+			raytraceRefract_Flag		= 4;
+			raytraceFlags				+= (raytraceRefract * raytraceRefract_Flag);
+
+			raytraceTrans				= integer(settingsArray[13]);
+			raytraceTrans_Flag			= 8;
+			raytraceFlags				+= (raytraceTrans * raytraceTrans_Flag);
+
+			raytraceOccl				= integer(settingsArray[14]);
+			raytraceOccl_Flag			= 16;
+			raytraceFlags				+= (raytraceOccl * raytraceOccl_Flag);
+			
+     		writeOverrideString("RayTraceEffects ", raytraceFlags);
+
+   			volumetricAA = integer(settingsArray[15]);
+     		writeOverrideString("VolumetricAA ", volumetricAA);
+
+   			gLensFlares = integer(settingsArray[16]);
+     		writeOverrideString("EnableLensFlares ", gLensFlares);
+
+   			shadowMaps = integer(settingsArray[17]);
+     		writeOverrideString("EnableShadowMaps ", shadowMaps);
+  
             inputFile = File("TEMPTESTRESMULTSCENE.LWS","r");
             tempOutput = File(newScenePath,"w");
             
-            while(!inputFile.eof())
-            {
-                line = inputFile.read();
-                //13 "Antialiasing "
-                if(size(line) > 13)
-                {
-                    if(strleft(line,13) == "Antialiasing ")
-                    {
-                        if(disableAASetts == 1)
-                        {
-                            toWrite = "Antialiasing 0";
-                        }
-                        else
-                        {
-                            toWrite = line;
-                        }
-                    }
-                    else
-                    {
-                        toWrite = line;
-                    }
-                }
-                else
-                {
-                    toWrite = line;
-                }
-                tempOutput.writeln(toWrite);
-            }
-            inputFile.close();
-            tempOutput.close();
+   			volLights = integer(settingsArray[18]);
+     		writeOverrideString("EnableVolumetricLights ", volLights);
+
+   			twoSidedALgts = integer(settingsArray[19]);
+     		writeOverrideString("DoubleSidedAreaLights ", twoSidedALgts);
+
+   			renderInstances = integer(settingsArray[20]);
+     		writeOverrideString("RenderInstances ", renderInstances);
+
+   			rayPrecision = number(settingsArray[21]);
+     		writeOverrideString("RayPrecision ", rayPrecision);
+
+   			rayCutoff = number(settingsArray[22]);
+     		writeOverrideString("RayCutoff ", rayCutoff);
+
+   			shadingSamples = integer(settingsArray[23]);
+     		writeOverrideString("ShadingSamples ", shadingSamples);
+  
+     		lightSamples = integer(settingsArray[24]);
+     		writeOverrideString("LightSamples ", lightSamples);
+
+     		gLightIntensity = number(settingsArray[25]);
+     		writeOverrideString("GlobalLightIntensity ", gLightIntensity);
+
+     		gFlareIntensity = number(settingsArray[26]);
+     		writeOverrideString("GlobalFlareIntensity ", gFlareIntensity);
+
+     		enableGI = number(settingsArray[27]);
+     		writeOverrideString("EnableRadiosity ", enableGI);
+
+     		giMode = integer(settingsArray[28]);
+     		giMode = giMode - 1; // decrement by one to match index in LW. Menus are 1-indexed.
+     		writeOverrideString("RadiosityType ", giMode);
+
+     		interpolateGI = integer(settingsArray[29]);
+     		writeOverrideString("RadiosityInterpolated ", interpolateGI);
+
+     		blurBGGI = integer(settingsArray[30]);
+     		writeOverrideString("BlurRadiosity ", blurBGGI);
+ 
+      		transparencyGI = integer(settingsArray[31]);
+     		writeOverrideString("RadiosityTransparency ", transparencyGI);
+
+      		volumetricGI = integer(settingsArray[32]);
+     		writeOverrideString("VolumetricRadiosity ", volumetricGI);
+
+      		ambOcclGI = integer(settingsArray[33]);
+     		writeOverrideString("RadiosityUseAmbient ", ambOcclGI);
+
+      		directionalGI = integer(settingsArray[34]);
+     		writeOverrideString("RadiosityDirectionalRays ", directionalGI);
+
+      		gradientsGI = integer(settingsArray[35]);
+     		writeOverrideString("RadiosityUseGradients ", gradientsGI);
+
+      		behindTestGI = integer(settingsArray[36]);
+     		writeOverrideString("RadiosityUseBehindTest ", behindTestGI);
+
+      		useBumpsGI = integer(settingsArray[37]);
+      		useBumpsGI = useBumpsGI * (-2147483648);
+     		writeOverrideString("RadiosityFlags ", useBumpsGI);
+
+      		giIntensity = integer(settingsArray[38]);
+     		writeOverrideString("RadiosityIntensity ", giIntensity);
+
+      		giAngTol = integer(settingsArray[39]);
+     		writeOverrideString("RadiosityTolerance ", giAngTol);
+
+      		giIndBounces = integer(settingsArray[40]);
+     		writeOverrideString("IndirectBounces ", giIndBounces);
+            
+            giMinSpacing = number(settingsArray[41]);
+     		writeOverrideString("RadiosityMinPixelSpacing ", giMinSpacing);
+
+            giRPE = number(settingsArray[42]);
+     		writeOverrideString("RadiosityRays ", giRPE);
+
+            giMaxSpacing = number(settingsArray[43]);
+     		writeOverrideString("RadiosityMaxPixelSpacing ", giMaxSpacing);
+
+            gi2ndBounces = integer(settingsArray[44]);
+     		writeOverrideString("SecondaryBounceRays ", gi2ndBounces);
+
+            giMultiplier = number(settingsArray[45]);
+     		writeOverrideString("RadiosityMultiplier ", giMultiplier);
+
+            enableCaustics = number(settingsArray[46]);
+     		writeOverrideString("EnableCaustics ", enableCaustics);
+
+            causticsAccuracy = integer(settingsArray[47]);
+     		writeOverrideString("CausticAccuracy ", causticsAccuracy);
+
+            causticsIntensity = number(settingsArray[48]);
+     		writeOverrideString("CausticIntensity ", causticsIntensity);
+
+            causticsSoftness = number(settingsArray[49]);
+     		writeOverrideString("CausticSoftness ", causticsSoftness);
+                                   
+            inputFile = File("TEMPTESTRESMULTSCENE.LWS","r");
+            tempOutput = File(newScenePath,"w");
+
+			// FIXME : Move to camera override.
+			disableAASetts = integer(settingsArray[9]);
+			if(disableAASetts == 1)
+				disableAASetts = 0;
+     		writeOverrideString("Antialiasing ", disableAASetts);
             
             inputFile = File(newScenePath,"r");
             tempOutput = File("TEMPTESTRESMULTSCENE.LWS","w");
             
+
+			// FIXME : Migrate to camera override.
             while(!inputFile.eof())
             {
                 line = inputFile.read();
-                //17 "AntiAliasingLevel "
-                if(size(line) > 17)
+                mystring = "AntiAliasingLevel ";
+                mystring_len = size(mystring);
+                if(size(line) > mystring_len)
                 {
-                    if(strleft(line,17) == "AntiAliasingLevel")
+                    if(strleft(line,mystring_len) == mystring)
                     {
                         if(disableAASetts == 1)
                         {
-                            toWrite = "AntiAliasingLevel -1";
+                            toWrite = mystring + "-1";
                         }
                         else
                         {
@@ -2348,4 +2364,44 @@ generatePath: mode, outputFolder, outputStr, fileOutputPrefix, userOutputString,
 
 	genPath = genPath + outputStr + "_" + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + baseName;
     return genPath;
+}
+
+writeOverrideString: outputString, outputValue
+{
+	inputFile = File("TEMPTESTRESMULTSCENE.LWS","r");
+	tempOutput = File(newScenePath,"w");
+	
+	parameterFound = 0;
+	while(!inputFile.eof())
+	{
+		toWrite;
+		line = inputFile.read();
+		outputString_len = size(outputString);
+		if(size(line) > outputString_len)
+		{
+			if(strleft(line,outputString_len) == outputString)
+			{
+				parameterFound = 1;
+				toWrite = outputString + string(outputValue);
+			}
+			else
+			{
+				toWrite = line;
+			}
+		}
+		else
+		{
+			toWrite = line;
+		}
+		tempOutput.writeln(toWrite);
+	}
+	if (parameterFound == 0)
+	{
+		// One of those annoying settings that disappear from the scene file when LW does its stuff. We'll have to append it to the end of the scene file.
+		tempOutput.line(tempOutput.linecount());
+		toWrite  = outputString + string(outputValue);
+		tempOutput.writeln(toWrite);
+	}
+	inputFile.close();
+	tempOutput.close(); 
 }

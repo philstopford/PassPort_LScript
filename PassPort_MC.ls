@@ -69,7 +69,7 @@ var supportedplatform = 0;
 @insert "@passEditor_globals.ls"
 @insert "@passEditor_UIglobals.ls"
 @insert "@passEditor_Interface_Subfuncs.ls"
-@insert "@passEditor_Interface_Subfuncs_UI.ls"
+@insert "@passEditor_Interface_Subfuncs_OverrideUI.ls"
 @insert "@passEditor_render_Subfuncs.ls"
 @insert "@passEditor_sceneGen_Subfuncs.ls"
 @insert "@passEditor_sceneParse_Subfuncs.ls"
@@ -473,7 +473,6 @@ load: what,io
                 userOutputString = "";
             }
             areYouSurePrompts = io.read().asInt();
-            useHackyUpdates = io.read().asInt();
             rgbSaveType = io.read().asInt();
             editorResolution = io.read().asInt();
             testResMultiplier = io.read().asInt();
@@ -580,7 +579,6 @@ load: what,io
                 io.writeln(fileOutputPrefix);
                 io.writeln(userOutputString);
                 io.writeln(areYouSurePrompts);
-                io.writeln(useHackyUpdates);
                 io.writeln(rgbSaveType);
                 io.writeln(editorResolution);
                 io.writeln(testResMultiplier);
@@ -590,7 +588,6 @@ load: what,io
                 
                 globalstore("passEditoruserOutputString",userOutputString);
                 globalstore("passEditorareYouSurePrompts",areYouSurePrompts);
-                globalstore("passEditoruseHackyUpdates",useHackyUpdates);
                 globalstore("passEditorrgbSaveType",rgbSaveType);
                 globalstore("passEditoreditorResolution",editorResolution);
                 globalstore("passEditortestResMultiplier",testResMultiplier);
@@ -629,7 +626,6 @@ process: event, command
         userOutputFolder = getdir("Content") + getsep() + "PassPort_Passes";
         userOutputString = string(globalrecall("passEditoruserOutputString",""));
         areYouSurePrompts = integer(globalrecall("passEditorareYouSurePrompts", 1));
-        useHackyUpdates = integer(globalrecall("passEditoruseHackyUpdates", 0));
         rgbSaveType = integer(globalrecall("passEditorrgbSaveType", 1));
         editorResolution = integer(globalrecall("passEditoreditorResolution", 1));
         testResMultiplier = integer(globalrecall("passEditortestResMultiplier", 3));

@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20121228c";
+var versionString = "20121229";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -57,7 +57,6 @@ var	userOutputString;
 var areYouSurePrompts;
 var doKeys;
 var platformVar;
-var useHackyUpdates;
 var rgbSaveType;
 var editorResolution;
 var testResMultiplier;
@@ -115,3 +114,5 @@ var beingEscaped;
 // motion mixer
 var overriddenObjectID;
 var overriddenObjectName;
+
+var newScenePath;
