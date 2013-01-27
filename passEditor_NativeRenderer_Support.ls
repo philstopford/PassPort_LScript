@@ -65,7 +65,16 @@ scnmasterOverride_UI_native: action
 			fiberFXSaveRGBAName			= string(settingsArray[53]);
 			fiberFXSaveDepth			= integer(settingsArray[54]);
 			fiberFXSaveDepthType		= integer(settingsArray[55]);
-			fiberFXSaveDepthName		= string(settingsArray[56]);		
+			fiberFXSaveDepthName		= string(settingsArray[56]);
+			// fog
+			fogType 					= integer(settingsArray[57]);
+			fogColorArray 				= <settingsArray[58], settingsArray[59], settingsArray[60]>;
+			fogBackdropColor			= integer(settingsArray[61]);
+			// compositing
+			useBackgroundColor			= integer(settingsArray[62]);
+			backgroundColorArray		= <settingsArray[63], settingsArray[64], settingsArray[65]>;
+			// backdrop
+			backdropColorArray			= <settingsArray[66], settingsArray[67], settingsArray[68]>;
 		}
 	
 		doKeys = 0;
@@ -84,7 +93,7 @@ scnmasterOverride_UI_native: action
 			newName = settingsArray[1];
 		}
 		c20 = ctlstring("Override Name:",newName);
-		ctlposition(c20, ScnMst_gad_x, ScnMst_gad_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+		ctlposition(c20, ScnMst_gad_x2, ScnMst_gad_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 		
 		ui_offset_y = ScnMst_ui_offset_y + ScnMst_ui_row_offset;
 
@@ -93,12 +102,7 @@ scnmasterOverride_UI_native: action
 		{
 			resolutionMultiplierSetts = integer(settingsArray[3]);
 		}
-		tempMultiplierArray[1] = "25 %";
-		tempMultiplierArray[2] = "50 %";
-		tempMultiplierArray[3] = "100 %";
-		tempMultiplierArray[4] = "200 %";
-		tempMultiplierArray[5] = "400 %";
-		c20_5 = ctlpopup("Resolution Multiplier",resolutionMultiplierSetts,tempMultiplierArray);
+		c20_5 = ctlpopup("Resolution Multiplier",resolutionMultiplierSetts,resolutionMultArray);
 		ctlposition(c20_5, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 		renderModeSetts = 3;
@@ -106,11 +110,16 @@ scnmasterOverride_UI_native: action
 		{
 			renderModeSetts = integer(settingsArray[4]);
 		}
-		tempTypeArray[1] = "Wireframe";
-		tempTypeArray[2] = "Quickshade";
-		tempTypeArray[3] = "Realistic";
-		c21 = ctlpopup("Render Mode",renderModeSetts,tempTypeArray);
+		c21 = ctlpopup("Render Mode",renderModeSetts,renderModeArray);
 		ctlposition(c21, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		fogType = 0;
+		if(action == "edit")
+		{
+			fogType = integer(settingsArray[57]);
+		}
+		c73 = ctlpopup("Fog Type",fogType,fogTypeArray);
+		ctlposition(c73, ScnMst_gad_x3, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 		ui_offset_y += ScnMst_ui_row_offset;
 
@@ -130,6 +139,14 @@ scnmasterOverride_UI_native: action
 		c30 = ctlcheckbox("RT Reflection",c30val);
 		ctlposition(c30, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
+		c74val = 255;
+		if(action == "edit")
+		{
+			c74val = fogColorArray;
+		}
+		c74 = ctlcolor("Fog Color", c74val);
+		ctlposition(c74, ScnMst_gad_x3, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
 		ui_offset_y += ScnMst_ui_row_offset;
 
 		c28val = 1;
@@ -147,6 +164,14 @@ scnmasterOverride_UI_native: action
 		}
 		c29 = ctlcheckbox("RT Refraction",c29val);
 		ctlposition(c29, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		c75val = 0;
+		if(action == "edit")
+		{
+			c75val = fogBackdropColor;
+		}
+		c75 = ctlcheckbox("Use Backdrop Color",c75val);
+		ctlposition(c75, ScnMst_gad_x3, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 		ui_offset_y += ScnMst_ui_row_offset;
 
@@ -181,8 +206,11 @@ scnmasterOverride_UI_native: action
 		{
 			c37val = renderInstances;
 		}
-		c37 = ctlcheckbox("Render Instances",c37val);
-		ctlposition(c37, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+		if(hostVersion() >= 11.5) // feature only added in 11.5
+		{
+			c37 = ctlcheckbox("Render Instances",c37val);
+			ctlposition(c37, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+		}
 
 		ui_offset_y += ScnMst_ui_row_offset + 2;
 		sep1 = ctlsep(0, ScnMst_ui_seperator_w + 4);
@@ -194,16 +222,29 @@ scnmasterOverride_UI_native: action
 		{
 			c24val = rayRecursionLimitSetts;
 		}
-		c24 = ctlminislider("Ray Recursion Limit", c24val, 0, 64);
+		c24 = ctlminislider("Ray Recursion Limit", c24val, 0, LWrecursionLimit);
 		ctlposition(c24, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w - 22, ScnMst_gad_h, ScnMst_gad_text_offset);
 
-		c40val = 1; // 11.0 uses 8, 11.5 uses 1
+		c40val = 1;  // 11.0 uses 8, 11.5 uses 1
+		if(hostVersion() < 11.5)
+			c40val = 8;
 		if(action == "edit")
 		{
 			c40val = shadingSamples;
 		}
 		c40 = ctlnumber("Shading Samples:",c40val);
 		ctlposition(c40, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		compLabel = ctltext("", "Compositing");
+		ctlposition(compLabel, ScnMst_gad_x3, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		c76val = 0;
+		if(action == "edit")
+		{
+			c76val = useBackgroundColor;
+		}
+		c76 = ctlcheckbox("Use Background Color",c76val);
+		ctlposition(c76, ScnMst_gad_x3, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 		ui_offset_y += ScnMst_ui_row_offset;
 		
@@ -215,13 +256,23 @@ scnmasterOverride_UI_native: action
 		c38 = ctlnumber("Ray Precision:",c38val);
 		ctlposition(c38, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
-		c41val = 1; // 11.0 uses 8, 11.5 uses 1
+		c41val = 1;  // 11.0 uses 8, 11.5 uses 1
+		if(hostVersion() < 11.5)
+			c41val = 8;
 		if(action == "edit")
 		{
 			c41val = lightSamples;
 		}
 		c41 = ctlnumber("Light Samples:",c41val);
 		ctlposition(c41, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		c77val = 0;
+		if(action == "edit")
+		{
+			c77val = backgroundColorArray;
+		}
+		c77 = ctlcolor("BG Color", c77val);
+		ctlposition(c77, ScnMst_gad_x3, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 		ui_offset_y += ScnMst_ui_row_offset;
 		
@@ -339,11 +390,16 @@ scnmasterOverride_UI_native: action
 		{
 			c45val = giMode;
 		}
-		giTypeArray[1] = "Backdrop Only";
-		giTypeArray[2] = "Monte Carlo";
-		giTypeArray[3] = "Final Gather";
 		c45 = ctlpopup("Render Mode",c45val,giTypeArray);
 		ctlposition(c45, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+
+		c78val = 0;
+		if(action == "edit")
+		{
+			c78val = backdropColorArray;
+		}
+		c78 = ctlcolor("Backdrop Color", c78val);
+		ctlposition(c78, ScnMst_gad_x3, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 		ui_offset_y += ScnMst_ui_row_offset;
 
@@ -624,7 +680,12 @@ scnmasterOverride_UI_native: action
 			shadowMaps 						= getvalue(c34);
 			volLights 						= getvalue(c35);
 			twoSidedALgts 					= getvalue(c36);
-			renderInstances 				= getvalue(c37);
+			if(hostVersion() < 11.5)
+			{
+				renderInstances 			= 1; // force on in case scene pushed to 11.5 for render, no impact on < 11.5
+			} else {
+				renderInstances 			= getvalue(c37);
+			}
 			rayPrecision 					= getvalue(c38);
 			rayCutoff 						= getvalue(c39);
 			shadingSamples 					= getvalue(c40);
@@ -660,6 +721,12 @@ scnmasterOverride_UI_native: action
 			fiberFXSaveDepth				= getvalue(c70);
 			fiberFXSaveDepthType			= getvalue(c71);
 			fiberFXSaveDepthName			= getvalue(c72);
+			fogType 						= getvalue(c73);
+			fogColorArray 					= getvalue(c74);
+			fogBackdropColor				= getvalue(c75);
+			useBackgroundColor				= getvalue(c76);
+			backgroundColorArray			= getvalue(c77);
+			backdropColorArray				= getvalue(c78);
 			doUpdate = 1;	
 		}
 		else
@@ -688,35 +755,41 @@ scnmasterOverride_UI_native: action
 				}
 			}
 			overrideNames[newNumber] = newName + "   (scene properties)";
-			overrideSettings[newNumber] = newName 								+ 	"||" 	+ "type6" 						+ 	"||"
+			overrideSettings[newNumber] = newName 								+ 	"||" 	+ "type6" 							+ 	"||"
 										+ string(overrideRenderer)				+ 	"||" 	
-										+ string(resolutionMultiplierSetts) 	+ 	"||" 	+ string(renderModeSetts)		+ 	"||"
-										+ string(depthBufferAASetts) 			+ 	"||" 	+ string(renderLinesSetts) 		+ 	"||"
-										+ string(rayRecursionLimitSetts) 		+	"||" 	+ string(redirectBuffersSetts)	+ 	"||"
-										+ string(disableAASetts) 				+ 	"||" 	+ string(raytraceShadows) 		+ 	"||"
-										+ string(raytraceReflect) 				+ 	"||" 	+ string(raytraceRefract) 		+ 	"||"
-										+ string(raytraceTrans) 				+ 	"||" 	+ string(raytraceOccl) 			+ 	"||"
-										+ string(volumetricAA) 					+ 	"||"	+ string(lensFlares)			+	"||"
-										+ string(shadowMaps)					+ 	"||"	+ string(volLights)				+	"||"
-										+ string(twoSidedALgts)					+ 	"||"	+ string(renderInstances)		+	"||"
-										+ string(rayPrecision)					+ 	"||"	+ string(rayCutoff)				+	"||"
-										+ string(shadingSamples)				+ 	"||"	+ string(lightSamples)			+	"||"
-										+ string(lightIntensity)				+ 	"||"	+ string(flareIntensity)		+	"||"
-										+ string(enableGI)						+ 	"||"	+ string(giMode)				+	"||"
-										+ string(interpolateGI)					+ 	"||"	+ string(blurBGGI)				+	"||"
-										+ string(transparencyGI)				+	"||"	+ string(volumetricGI)			+	"||"
-										+ string(ambOcclGI)						+	"||"	+ string(directionalGI)			+	"||"
-										+ string(gradientsGI)					+	"||"	+ string(behindTestGI)			+	"||"
-										+ string(useBumpsGI)					+	"||"	+ string(giIntensity)			+	"||"
-										+ string(giAngTol)						+	"||"	+ string(giIndBounces)			+	"||"
-										+ string(giMinSpacing)					+	"||"	+ string(giRPE)					+	"||"
-										+ string(giMaxSpacing)					+	"||"	+ string(gi2ndBounces)			+	"||"
-										+ string(giMultiplier)					+	"||"	+ string(enableCaustics)		+	"||"
-										+ string(causticsAccuracy)				+	"||"	+ string(causticsIntensity)		+	"||"
-										+ string(causticsSoftness)				+	"||"	+ string(fiberFXSaveRGBA)		+	"||"
-										+ string(fiberFXSaveRGBAType)			+	"||"	+ string(fiberFXSaveRGBAName)	+	"||"
-										+ string(fiberFXSaveDepth)				+	"||"	+ string(fiberFXSaveDepthType)	+	"||"
-										+ string(fiberFXSaveDepthName);
+										+ string(resolutionMultiplierSetts) 	+ 	"||" 	+ string(renderModeSetts)			+ 	"||"
+										+ string(depthBufferAASetts) 			+ 	"||" 	+ string(renderLinesSetts) 			+ 	"||"
+										+ string(rayRecursionLimitSetts) 		+	"||" 	+ string(redirectBuffersSetts)		+ 	"||"
+										+ string(disableAASetts) 				+ 	"||" 	+ string(raytraceShadows) 			+ 	"||"
+										+ string(raytraceReflect) 				+ 	"||" 	+ string(raytraceRefract) 			+ 	"||"
+										+ string(raytraceTrans) 				+ 	"||" 	+ string(raytraceOccl) 				+ 	"||"
+										+ string(volumetricAA) 					+ 	"||"	+ string(lensFlares)				+	"||"
+										+ string(shadowMaps)					+ 	"||"	+ string(volLights)					+	"||"
+										+ string(twoSidedALgts)					+ 	"||"	+ string(renderInstances)			+	"||"
+										+ string(rayPrecision)					+ 	"||"	+ string(rayCutoff)					+	"||"
+										+ string(shadingSamples)				+ 	"||"	+ string(lightSamples)				+	"||"
+										+ string(lightIntensity)				+ 	"||"	+ string(flareIntensity)			+	"||"
+										+ string(enableGI)						+ 	"||"	+ string(giMode)					+	"||"
+										+ string(interpolateGI)					+ 	"||"	+ string(blurBGGI)					+	"||"
+										+ string(transparencyGI)				+	"||"	+ string(volumetricGI)				+	"||"
+										+ string(ambOcclGI)						+	"||"	+ string(directionalGI)				+	"||"
+										+ string(gradientsGI)					+	"||"	+ string(behindTestGI)				+	"||"
+										+ string(useBumpsGI)					+	"||"	+ string(giIntensity)				+	"||"
+										+ string(giAngTol)						+	"||"	+ string(giIndBounces)				+	"||"
+										+ string(giMinSpacing)					+	"||"	+ string(giRPE)						+	"||"
+										+ string(giMaxSpacing)					+	"||"	+ string(gi2ndBounces)				+	"||"
+										+ string(giMultiplier)					+	"||"	+ string(enableCaustics)			+	"||"
+										+ string(causticsAccuracy)				+	"||"	+ string(causticsIntensity)			+	"||"
+										+ string(causticsSoftness)				+	"||"	+ string(fiberFXSaveRGBA)			+	"||"
+										+ string(fiberFXSaveRGBAType)			+	"||"	+ string(fiberFXSaveRGBAName)		+	"||"
+										+ string(fiberFXSaveDepth)				+	"||"	+ string(fiberFXSaveDepthType)		+	"||"
+										+ string(fiberFXSaveDepthName)			+	"||"	+ string(fogType)					+	"||"
+										+ string(fogColorArray.x) 				+	"||"	+ string(fogColorArray.y) 			+	"||"
+										+ string(fogColorArray.z) 				+	"||"	+ string(fogBackdropColor)			+	"||"
+										+ string(useBackgroundColor)			+	"||"	+ string(backgroundColorArray.x) 	+	"||"
+										+ string(backgroundColorArray.y) 		+	"||"	+ string(backgroundColorArray.z) 	+	"||"
+										+ string(backdropColorArray.x) 			+	"||"	+ string(backdropColorArray.y) 		+	"||"
+										+ string(backdropColorArray.z);
 		}
 	} else {
 		error("scnmasterOverride_UI: incorrect, or no, action passed");
@@ -901,7 +974,27 @@ scnGen_native:updatedCurrentScenePath, newScenePath
 
 	causticsSoftness = number(settingsArray[50]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "CausticSoftness ", causticsSoftness);
-						   
+
+	// FiberFX settings are written out in the main scene gen code. At least for now.
+
+	fogType = integer(settingsArray[57]);
+	writeOverrideString(updatedCurrentScenePath, newScenePath, "FogType ", fogType);
+
+	fogColorLine = string(number(settingsArray[58]) / 255) + " " + string(number(settingsArray[59]) / 255) + " " + string(number(settingsArray[60]) / 255);
+	writeOverrideString(updatedCurrentScenePath, newScenePath, "FogColor ", fogColorLine);
+
+	fogBackdropColor = integer(settingsArray[61]);
+	writeOverrideString(updatedCurrentScenePath, newScenePath, "BackdropFog ", fogBackdropColor);
+
+	useBackgroundColor = integer(settingsArray[62]);
+	writeOverrideString(updatedCurrentScenePath, newScenePath, "UseBackgroundColor ", useBackgroundColor);
+
+	bgColorLine = string(number(settingsArray[63]) / 255) + " " + string(number(settingsArray[64]) / 255) + " " + string(number(settingsArray[65]) / 255);
+	writeOverrideString(updatedCurrentScenePath, newScenePath, "BackgroundColor ", bgColorLine);
+
+	bdColorLine = string(number(settingsArray[66]) / 255) + " " + string(number(settingsArray[67]) / 255) + " " + string(number(settingsArray[68]) / 255);
+	writeOverrideString(updatedCurrentScenePath, newScenePath, "BackdropColor ", bdColorLine);
+
 	// FIXME : Move to camera override.
 	disableAASetts = integer(settingsArray[10]);
 	if(disableAASetts == 1)

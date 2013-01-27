@@ -11,8 +11,8 @@
   background-color: #FFFFFF;
   color: #000000;
  }
- :link { color: #0000BB }
- :visited { color: #000055 }
+ :link { color: #0000EE }
+ :visited { color: #551A8B }
  :active { color: #FF0000 }
  span.c6 {font-size: 120%}
  td.c5 {background-color: #FF99FF}
@@ -42,15 +42,6 @@
 <li><a href="#maininterface">Main Interface</a></li>
 <li><a href="#workingwithpasses">Working with Passes</a></li>
 <li><a href="#workingwithoverrides">Working with Overrides</a></li>
-<ul>
-<li><a href="#overrides_objprops">Object Properties</a></li>
-<li><a href="#overrides_altobj">Alternative Object</a></li>
-<li><a href="#overrides_motion">Motion File</a></li>
-<li><a href="#overrides_surface">Surface File</a></li>
-<li><a href="#overrides_light">Light Properties</a></li>
-<li><a href="#overrides_scene">Scene Master</a></li>
-<li><a href="#overrides_lightexcl">Light Exclusion</a></li>
-</ul>
 </ul>
 <li><strong><a href="#troubleshooting">Troubleshooting.</a></strong></li>
 
@@ -58,10 +49,10 @@
 <div class="c1">
 <h3><a name="whatispassport"></a>What is PassPort Renewed?</h3>
 </div>
-<p>PassPort Renewed is an ongoing rework of the LScript-based PassPort code. That code, designed for LightWave 3D 9.3.1, was open-sourced (GPL) by Jeremy Hardin in 2010. It was modified by Matt Gorner in 2010 to improve certain aspects. The author of PassPort Renewed is Phil Stopford. Compared to the original PassPort plugin, the code has been substantially revised. These changes were made for this release:</p>
+<p>PassPort Renewed is an ongoing rework of the LScript-based PassPort code. That code was open-sourced (GPL) by Jeremy Hardin. The author of PassPort Renewed is Phil Stopford. Compared to the original PassPort plugin, these changes were made for this release:</p>
 <ul>
 	<li>Extensive internal refactoring. The plugin code is now smaller, more efficient and more cleanly structured.</li>
-	<li>Internal support for custom overrides for alternative renderers has been prepared, but implementation is not exposed in the public release at this time.</li>
+	<li>Internal support for custom overrides for alternative renderers has been prepared, but implementation is not exposed in the public release.</li>
 	<li>Operation on Mac is now possible without crashing.</li>
 	<li>Growl support on Mac is optional, and disabled by default</li>
 	<li>Operation with the renamed 'lwsn' binary (previously called ScreamerNet)</li>
@@ -69,8 +60,6 @@
 	<li>The Scene Master override has been massively overhauled and is now aligned with the LightWave 11.0 feature set:</li>
 	<ul>
 		<li>All raytrace flags can be overridden</li>
-		<li>Universal sampling parameters can be overridden</li>
-		<li>The increased upper value for recursion depth (64) is now supported by the interface</li>
 		<li>Volumetric AA can be overridden</li>
 		<li>Render mode can be overridden</li>
 		<li>Caustics and radiosity values can all be overridden</li>
@@ -128,21 +117,21 @@
 <p align="center"><img src="images/override_menu.png" height="178" width="177" alt="Overrides Menu"></p>
 <p>When applied, these will override any parameter they cover. In other words, if the parameter exists in any state in the overrides, the override parameter will be used instead of the native LightWave parameter (please refer to the light override note for the volumetric setting). Also, there’s a bit of common sense in working with these. The PassPort Editor won’t allow you to assign an Alternative Object... override to a light, or light overrides to non-lights, etc. The Motion File... override will work on all items except the Scene Master.</p>
 <ul>
-	<p><a name="overrides_objprops"></a><strong>Object Properties</strong></p>
+	<p><strong>Object Properties</strong></p>
 	<p align="center"><img src="images/override_objprops.png" height="342" width="275" alt="Object Properties Override"></p>
-	<p><a name="overrides_altobj"></a><strong>Alternative Object</strong></p>
+	<p><strong>Alternative Object</strong></p>
 	<p align="center"><img src="images/override_altobj.png" height="108" width="284" alt="Alternative Object Override"></p>
-	<p><a name="overrides_motion"></a><strong>Motion File</strong></p>
+	<p><strong>Motion File</strong></p>
 	<p align="center"><img src="images/override_motion.png" height="108" width="285" alt="Motion Override"></p>
-	<p><a name="overrides_surface"></a><strong>Surface File</strong></p>
+	<p><strong>Surface File</strong></p>
 	<p align="center"><img src="images/override_surface.png" height="108" width="284" alt="Surface Override"></p>
-	<p><a name="overrides_light"></a><strong>Light Properties</strong></p>
+	<p><strong>Light Properties</strong></p>
 	<p align="center"><img src="images/override_light.png" height="262" width="275" alt="Light Properties"></p>
 	<p>Please note that, due to the way that LightWave 11 currently generates its scene files, the volumetric toggle will only work if the light being overridden had its volumetric properties set up through the main LW interface. The volumetrics can be deactivated within LW afterwards for that light - this override will then work fine. This is because LightWave will not write out the volumetric settings properly unless you have set them. There's also an element of common sense here - unless you've configured the volumetric light behaviour ahead of time on the light, how will the renderer know what to do. Note that the Scene Master override provides support for globally enabling/disabling volumetric lights (corresponding to the setting in LW's own render control panel).</p>
 	<p>In this version, the lens flare override is limited to a toggle. This may be supplemented by other options in a future revision. Note that the Scene Master override provides support for globally enabling/disabling lens flare (corresponding to the setting in LW's own render control panel).</p>
-	<p><a name="overrides_scene"></a><strong>Scene Master File</strong></p>
+	<p><strong>Scene Master File</strong></p>
 	<p align="center"><img src="images/override_scene.png" height="747" width="590" alt="Scene Master Override"></p>
-	<p><a name="overrides_lightexcl"></a><strong>Light Exclusion</strong></p>
+	<p><strong>Light Exclusion</strong></p>
 	<p align="center"><img src="images/override_lightexcl.png" height="158" width="306" alt="Light Exclusion"></p>
 	<p>The Light Exclusions override allows you to specify per-pass light exclusions. Assigning it to an object will exclude that object from any lights in the override settings in that pass. The Light Exclusions override is unique in that it can be assigned in addition to another override. So if you want to use a surface override AND a light exclusion override, you’d simply have the surface override higher in the overrides listbox and assign both to an object. If you ever find that the light exclusion is higher in the listbox than another override (and therefore preventing its stack-ability), simply hit Page Down on your keyboard to move the selected override to the bottom of the listbox.</p>
 </ul>

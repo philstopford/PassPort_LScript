@@ -17,6 +17,7 @@ generatePassFile: mode, pass
     lastObject = 0;
     lastLight = 0;
     lastCamera = 0;
+    lightSettingOffset = 0;
     contentDirectory = getdir("Content");
     chdir(tempDirectory);
     SaveSceneCopy("passEditorTempSceneCopy.lws");
@@ -40,7 +41,7 @@ generatePassFile: mode, pass
         // first the object lines
         tempNumber = setItems[passItem];
         tempObjectNames[passItem] = displayNames[tempNumber];
-        assignmentsArray = checkForOverrideAssignments(displayIDs[tempNumber], pass);
+        assignmentsArray = checkForOverrideAssignments(displayIDs[tempNumber], pass);        
     
         if(assignmentsArray != nil)
         {
@@ -76,7 +77,6 @@ generatePassFile: mode, pass
 				overrideType[passItem] = 0;
 			}
 			
-            lightSettingOffset = 0;
             if(settingsArray[2] == "type5")
             {
                 overrideType[passItem] = 5;
@@ -336,63 +336,73 @@ generatePassFile: mode, pass
 
             if(settingsArray[2] == "type8") // EXPERIMENTAL Camera override
             {
+
+                overrideSettings[newNumber] =   newName             + "||" +    "type8"             + "||"
+                                        +   zoomFactor              + "||" +    zoomType            + "||"
+                                        +   resolutionMultiplier    + "||" +    frameSizeH          + "||"
+                                        +   frameSizeV              + "||" +    pixelAspect         + "||"
+                                        +   motionBlur              + "||" +    motionBlurPasses    + "||"
+                                        +   shutterEfficiency       + "||" +    rollingShutter      + "||"
+                                        +   shutterOpen             + "||" +    oversampling        + "||"
+                                        +   fieldRendering          + "||" +    depthOfField        + "||"
+                                        +   sampler                 + "||" +    adaptiveThreshold   + "||"
+                                        +   minimumSamples          + "||" +    maximumSamples;
+
                 zoomFactor 						= string(settingsArray[3]);
                 cameraSettingsPartOne[passItem] =	"ZoomFactor " + zoomFactor + "\n";
+                cameraSettingsPartOneCount[passItem] = 1;
 				zoomType 						= string(settingsArray[4]);
                 cameraSettingsPartOne[passItem] +=	"ZoomType " + zoomType + "\n";
+                cameraSettingsPartOneCount[passItem]++;
 				resolutionMultiplier 			= string(settingsArray[5]);
                 cameraSettingsPartOne[passItem] +=	"ResolutionMultiplier " + resolutionMultiplier + "\n";
+                cameraSettingsPartOneCount[passItem]++;
 				frameSizeH 						= string(settingsArray[6]);
 				frameSizeV 						= string(settingsArray[7]);
                 cameraSettingsPartOne[passItem] +=	"FrameSize " + frameSizeH + " " + frameSizeV + "\n";
+                cameraSettingsPartOneCount[passItem]++;
 				pixelAspect 					= string(settingsArray[8]);
                 cameraSettingsPartOne[passItem] +=	"PixelAspect " + pixelAspect + "\n";
+                cameraSettingsPartOneCount[passItem]++;
 				motionBlur 						= string(settingsArray[9]);
                 cameraSettingsPartOne[passItem] +=	"MotionBlur " + motionBlur + "\n";
+                cameraSettingsPartOneCount[passItem]++;
 				motionBlurPasses 				= string(settingsArray[10]);
                 cameraSettingsPartOne[passItem] +=	"MotionBlurPasses " + motionBlurPasses + "\n";
+                cameraSettingsPartOneCount[passItem]++;
 				shutterEfficiency 				= string(settingsArray[11]);
                 cameraSettingsPartOne[passItem] +=	"ShutterEfficiency " + shutterEfficiency + "\n";
+                cameraSettingsPartOneCount[passItem]++;
 				rollingShutter 					= string(settingsArray[12]);
                 cameraSettingsPartOne[passItem] +=	"RollingShutter " + rollingShutter + "\n";
+                cameraSettingsPartOneCount[passItem]++;
 				shutterOpen 					= string(settingsArray[13]);
                 cameraSettingsPartOne[passItem] +=	"ShutterOpen " + shutterOpen + "\n";
+                cameraSettingsPartOneCount[passItem]++;
 				oversampling 					= string(settingsArray[14]);
                 cameraSettingsPartOne[passItem] +=	"Oversampling " + oversampling + "\n";
-				// UndockPreview 0
+                cameraSettingsPartOneCount[passItem]++;
+
 				fieldRendering 					= string(settingsArray[15]);
                 cameraSettingsPartTwo[passItem] +=	"FieldRendering " + fieldRendering + "\n";
-				apertureHeight 					= string(settingsArray[16]);
-                cameraSettingsPartTwo[passItem] +=	"ApertureHeight " + apertureHeight + "\n";
-				eyeSeparation 					= string(settingsArray[17]);
-                cameraSettingsPartTwo[passItem] +=	"EyeSeparation " + eyeSeparation + "\n";
-				convergencePoint 				= string(settingsArray[18]);
-                cameraSettingsPartTwo[passItem] +=	"ConvergencePoint " + convergencePoint + "\n";
-				useConvergence 					= string(settingsArray[19]);
-                cameraSettingsPartTwo[passItem] +=	"UseConvergence " + useConvergence + "\n";
-				// AnaglyphOpenGL 1
-				convergenceToeIn 					= string(settingsArray[20]);
-                cameraSettingsPartThree[passItem] 	+=	"ConvergenceToeIn " + convergenceToeIn + "\n";
-				depthOfField 						= string(settingsArray[21]);
-                cameraSettingsPartThree[passItem] 	+=	"DepthOfField " + depthOfField + "\n";
-				focalDistance 						= string(settingsArray[22]);
-                cameraSettingsPartThree[passItem] 	+=	"FocalDistance " + focalDistance + "\n";
-				lensFStop 							= string(settingsArray[23]);
-                cameraSettingsPartThree[passItem] 	+=	"LensFStop " + lensFStop + "\n";
-				diaphragmSides 						= string(settingsArray[24]);
-                cameraSettingsPartThree[passItem] 	+=	"DiaphragmSides " + diaphragmSides + "\n";
-				diaphragmRotation 					= string(settingsArray[25]);
-                cameraSettingsPartThree[passItem] 	+=	"DiaphragmRotation " + diaphragmRotation + "\n";
-				aASamples 							= string(settingsArray[26]);
-                cameraSettingsPartThree[passItem] 	+=	"AASamples " + aASamples + "\n";
-				sampler 							= string(settingsArray[27]);
-                cameraSettingsPartThree[passItem] 	+=	"Sampler " + sampler + "\n";
-				adaptiveThreshold 					= string(settingsArray[28]);
-                cameraSettingsPartThree[passItem] 	+=	"AdaptiveThreshold " + adaptiveThreshold + "\n";
-				minimumSamples 						= string(settingsArray[29]);
-                cameraSettingsPartThree[passItem] 	+=	"MinimumSamples " + minimumSamples + "\n";
-				maximumSamples 						= string(settingsArray[30]);
-                cameraSettingsPartThree[passItem] 	+=	"MaximumSamples " + maximumSamples + "\n";
+                cameraSettingsPartTwoCount[passItem] = 1;
+
+				depthOfField 						= string(settingsArray[16]);
+                cameraSettingsPartThree[passItem]   =  "DepthOfField " + depthOfField + "\n";
+                cameraSettingsPartThreeCount[passItem] = 1;
+
+				sampler 							= string(settingsArray[17]);
+                cameraSettingsPartFour[passItem] 	=	"Sampler " + sampler + "\n";
+                cameraSettingsPartFourCount[passItem] = 1;
+				adaptiveThreshold 					= string(settingsArray[18]);
+                cameraSettingsPartFour[passItem] 	+=	"AdaptiveThreshold " + adaptiveThreshold + "\n";
+                cameraSettingsPartFourCount[passItem]++;
+				minimumSamples 						= string(settingsArray[19]);
+                cameraSettingsPartFour[passItem] 	+=	"MinimumSamples " + minimumSamples + "\n";
+                cameraSettingsPartFourCount[passItem]++;
+				maximumSamples 						= string(settingsArray[20]);
+                cameraSettingsPartFour[passItem] 	+=	"MaximumSamples " + maximumSamples + "\n";
+                cameraSettingsPartFourCount[passItem]++;
 
                 overrideType[passItem] = 8;
             }
@@ -535,7 +545,9 @@ generatePassFile: mode, pass
             objLightTypeLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"LightType ",currentScenePath);
             objLensFlareLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"LensFlare ",currentScenePath);
             if(objLensFlareLine[passItem])
+            {
                 objLensFlareLine[passItem] += lightSettingOffset;
+            }
             objVolLightLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"VolumetricLighting ",currentScenePath);
             if(objVolLightLine[passItem])
                 objVolLightLine[passItem] += lightSettingOffset;
@@ -659,6 +671,13 @@ generatePassFile: mode, pass
         error("Please choose an output folder in the preferences.");
     }
 
+    if(!chdir(outputFolder[1]))
+    {
+        error("Output folder is invalid! Please choose a valid output folder in Preferences.");
+    }
+
+    chdir(contentDirectory);
+
     newScenePath = generateNewScenePath(outputFolder, outputStr, fileOuputPrefix, userOutputString, passNames, pass);
 
     if(platform() == INTEL)
@@ -769,7 +788,8 @@ generatePassFile: mode, pass
     sleep(1);
     
     saveRGBImagesPrefix = generateSaveRGBPath(mode, outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass);
-    
+    outputFile.writeln("OutputFilenameFormat 3");
+    outputFile.writeln("SaveRGB 1");
     outputFile.writeln("SaveRGBImagesPrefix " + saveRGBImagesPrefix);
     if (mode == "frame")
     {
@@ -909,6 +929,13 @@ writeHeader: inputFileName, inputFile, outputFile
             error("Unsupported version of LW!");
             break;
     }
+    if(hostVersion() < 11.5 && hostVersion() >= 11)
+    {
+        endLine = getPartialLine(0, 0, "FirstBackgroundImageSyncFrame", inputFileName);
+    }
+    if(!endLine || endLine == nil || endLine == 0)
+        error("writeHeader: couldn't find endLine");
+
     while(lineNumber <= endLine)
     {
         line = inputFile.read();
@@ -990,7 +1017,83 @@ writeCameras: inputFile, outputFile, lastObject, lastLight, lastCamera
                     break;
 
                 case 8:
-                    // FIXME : Camera override needed.
+                    if(cameraSettingsPartOne[cameraCounter] != nil && cameraSettingsPartTwo[cameraCounter] != nil && 
+                       cameraSettingsPartThree[cameraCounter] != nil && cameraSettingsPartFour[cameraCounter] != nil)
+                    {
+                        // write out the beginning of the camera
+                        inputFile.line(objStart[cameraCounter]);
+                        done = nil;
+                        while(!done)
+                        {
+                            line = inputFile.read();
+                            outputFile.writeln(line);
+                            if(inputFile.line() == (IKInitialState[cameraCounter]) + 1)
+                            {
+                                done = true;
+                                break;
+                            }
+                        }
+                        
+                        // write out the custom parameters
+                        outputFile.write(cameraSettingsPartOne[cameraCounter]);
+
+                        // Fill out content until the next .
+                        lineNumber = getPartialLine(objStart[cameraCounter],0,"Oversampling",currentScenePath) + 1;
+                        tempEndNumber = getPartialLine(lineNumber,0,"FieldRendering",currentScenePath);
+                        if(!tempEndNumber)
+                            error("writeCameras: Failed to find FieldRendering!");
+                        for(i = lineNumber; i < tempEndNumber; i++)
+                        {
+                           inputFile.line(i);
+                           line = inputFile.read();
+                           outputFile.writeln(line);
+                        }
+
+                        // Next set of changes.
+                        outputFile.write(cameraSettingsPartTwo[cameraCounter]);
+
+                        lineNumber = tempEndNumber + cameraSettingsPartTwoCount[cameraCounter] + 1;
+                        tempEndNumber = getPartialLine(lineNumber,0,"DepthOfField",currentScenePath);
+                        if(!tempEndNumber)
+                            error("writeCameras: Failed to find DepthOfField!");
+                        for(i = lineNumber; i < tempEndNumber; i++)
+                        {
+                           inputFile.line(i);
+                           line = inputFile.read();
+                           outputFile.writeln(line);
+                        }
+
+                        // Next set of changes.
+                        outputFile.write(cameraSettingsPartThree[cameraCounter]);
+
+                        lineNumber = tempEndNumber + cameraSettingsPartThreeCount[cameraCounter] + 1;
+                        tempEndNumber = getPartialLine(lineNumber,0,"Sampler",currentScenePath);
+                        if(!tempEndNumber)
+                            error("writeCameras: Failed to find Sampler!");
+                        for(i = lineNumber; i < tempEndNumber; i++)
+                        {
+                           inputFile.line(i);
+                           line = inputFile.read();
+                           outputFile.writeln(line);
+                        }
+
+                        // Next set of changes.
+                        outputFile.write(cameraSettingsPartFour[cameraCounter]);
+
+                        input.line(input.line() + cameraSettingsPartFourCount[cameraCounter] + 1);
+
+                        // Finish up
+                        while(!done)
+                        {
+                            line = inputFile.read();
+                            outputFile.writeln(line);
+                            if(inputFile.line() == objEnd[cameraCounter])
+                            {
+                                done = true;
+                                break;
+                            }
+                        }
+                    }
                     break;
 
                 default:
@@ -1638,27 +1741,27 @@ fiberFX: ffFile
 	checkFile.close();
 
 	// Hard-coded offsets from the detected pixel filter line, based on scene file inspection.
-	fiberFXSaveRGBA				= integer(settingsArray[50]);
+	fiberFXSaveRGBA				= integer(settingsArray[51]);
 	ffString = "SaveRGBA " + string(fiberFXSaveRGBA);
 	changeScnLine(ffString, ffFile, ffLine + 8);
 
-	fiberFXSaveDepth			= integer(settingsArray[53]);
+	fiberFXSaveDepth			= integer(settingsArray[54]);
 	ffString = "SaveDepth " + string(fiberFXSaveDepth);
 	changeScnLine(ffString, ffFile, ffLine + 9);
 
-	fiberFXSaveRGBAType			= integer(settingsArray[51]);
+	fiberFXSaveRGBAType			= integer(settingsArray[52]);
 	ffString = "RGBType " + string(image_formats_array[fiberFXSaveRGBAType]);
 	changeScnLine(ffString, ffFile, ffLine + 10);
 
-	fiberFXSaveDepthType		= integer(settingsArray[54]);
+	fiberFXSaveDepthType		= integer(settingsArray[55]);
 	ffString = "DepthType " + string(image_formats_array[fiberFXSaveDepthType]);
 	changeScnLine(ffString, ffFile, ffLine + 11);
 
-	fiberFXSaveRGBAName			= string(settingsArray[52]);
+	fiberFXSaveRGBAName			= string(settingsArray[53]);
 	ffString = "RGBName " + string(fiberFXSaveRGBAName);
 	changeScnLine(ffString, ffFile, ffLine + 12);
 
-	fiberFXSaveDepthName		= string(settingsArray[55]);
+	fiberFXSaveDepthName		= string(settingsArray[56]);
 	ffString = "DepthName " + string(fiberFXSaveDepthName);
 	changeScnLine(ffString, ffFile, ffLine + 13);
 

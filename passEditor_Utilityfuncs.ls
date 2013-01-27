@@ -173,8 +173,8 @@ writeOverrideString: inputFileName, outputFileName, outputString, outputValue
 	inputFile.close();
 	
 	// Didn't find the string, so assume it's one of those settings that LW drops from the scene file
-	// and opt to append it to force the condition.
-	if (parameterFound == 0)
+	// and opt to append it to force the condition. Don't do this if the global 'noAppend' flag has been set.
+	if (parameterFound == 0 && noAppend == 0)
 	{
 		tempOutput.reopen("a"); // append mode.
 		toWrite  = outputString + string(outputValue);

@@ -187,7 +187,7 @@ o_Filter: overrides_list
 		{	// object-genus specific overrides : only objects permitted. Type 4 debatable whether object-specific....
 			filtered = 1;
 			for (i = 2; i <= o_displayNames.size(); i++) { // no point considering the scene master in [1]
-				if (o_displayGenus[i] == 1)
+				if (o_displayGenus[i] == MESH)
 				{
 					o_displayNamesFiltered[o_displayFilterIndex] = o_displayNames[i];
 					o_displayIDsFiltered[o_displayFilterIndex] = o_displayIDs[i];
@@ -197,10 +197,10 @@ o_Filter: overrides_list
 		}
 		
 		if(tempOverrideType == "type3" && filtered == 0)
-		{	// light/object-genus specific overrides : only lights/objects permitted
+		{	// light/object-genus specific overrides : only lights/objects/cameras permitted
 			filtered = 1;
 			for (i = 2; i <= o_displayNames.size(); i++) { // no point considering the scene master in [1]
-				if (o_displayGenus[i] == 1 || o_displayGenus[i] == 2)
+				if (o_displayGenus[i] == MESH || o_displayGenus[i] == LIGHT  || o_displayGenus[i] == CAMERA)
 				{
 					o_displayNamesFiltered[o_displayFilterIndex] = o_displayNames[i];
 					o_displayIDsFiltered[o_displayFilterIndex] = o_displayIDs[i];
@@ -213,7 +213,20 @@ o_Filter: overrides_list
 		{	// light-genus specific overrides : only lights permitted
 			filtered = 1;
 			for (i = 2; i <= o_displayNames.size(); i++) { // no point considering the scene master in [1]
-				if (o_displayGenus[i] == 2)
+				if (o_displayGenus[i] == LIGHT)
+				{
+					o_displayNamesFiltered[o_displayFilterIndex] = o_displayNames[i];
+					o_displayIDsFiltered[o_displayFilterIndex] = o_displayIDs[i];
+					o_displayFilterIndex++;
+				}
+			}
+		}
+
+		if(tempOverrideType == "type8" && filtered == 0)
+		{	// camera-genus specific overrides : only cameras permitted
+			filtered = 1;
+			for (i = 2; i <= o_displayNames.size(); i++) { // no point considering the scene master in [1]
+				if (o_displayGenus[i] == CAMERA)
 				{
 					o_displayNamesFiltered[o_displayFilterIndex] = o_displayNames[i];
 					o_displayIDsFiltered[o_displayFilterIndex] = o_displayIDs[i];

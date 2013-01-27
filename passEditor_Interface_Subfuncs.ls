@@ -712,34 +712,25 @@ renderPassFrame
 {
 	frameRenderScene = generatePassFile("frame", currentChosenPass);
 
-
-	// windows frame rendering
-  	if(platform() == INTEL)
-	{
-		win_bg_frameRender(frameRenderScene,saveRGBImagesPrefix);
-	}
-
 	// mac UB frame rendering
  	if(platform() == MACUB || platform() == MAC64)
 	{
 		UB_bg_frameRender(frameRenderScene,saveRGBImagesPrefix);
+	} else {
+		win_bg_frameRender(frameRenderScene,saveRGBImagesPrefix);
 	}
 }
 
 renderPassScene
 {
 	seqRenderScene = generatePassFile("seq", currentChosenPass);
-	
-	// windows scene rendering
-	if(platform() == INTEL)
-	{
-		win_bg_sceneRender(seqRenderScene,saveRGBImagesPrefix);
-	}
-	
+		
 	// mac UB scene rendering
  	if(platform() == MACUB || platform() == MAC64)
 	{
 		UB_bg_sceneRender(seqRenderScene,saveRGBImagesPrefix);
+	} else {
+		win_bg_sceneRender(seqRenderScene,saveRGBImagesPrefix);
 	}
 }
 
@@ -749,17 +740,13 @@ renderAllScene
 	{
 		seqRenderScene[x] = generatePassFile("seq", x);
 	}
-	
-	// windows all scene rendering
-	if(platform() == INTEL)
-	{
-		win_bg_allSceneRender(seqRenderScene,saveRGBImagesPrefix);
-	}
-	
+		
 	// mac UB all scene rendering
  	if(platform() == MACUB || platform() == MAC64)
 	{
 		UB_bg_allSceneRender(seqRenderScene,saveRGBImagesPrefix);
+	} else {
+		win_bg_allSceneRender(seqRenderScene,saveRGBImagesPrefix);
 	}
 }
 

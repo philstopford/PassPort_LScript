@@ -94,6 +94,34 @@ ObjProp_ui_window_w			= 275;													// Window width
 ObjProp_ui_window_h			= (ObjProp_ui_row_offset*ObjProp_num_gads) + 11;		// Window height
 ObjProp_ui_seperator_w		= ObjProp_ui_window_w + 2;								// Width of seperators
 
+// Camera dialog UI
+
+CamProp_gad_x				= 6;													// Gadget X coord
+CamProp_gad_y				= 6;													// Gadget Y coord
+CamProp_gad_w				= 280;													// Gadget width
+CamProp_gad_h				= 19;													// Gadget height
+CamProp_gad_text_offset		= 105;													// Gadget text offset
+
+CamProp_num_gads			= 11;													// Total number of gadgets vertically (for calculating the max window height)
+CamProp_num_spacers			= 1;													// Total number of 'normal' spacers
+CamProp_num_text_spacers	= 0;													// Total number of spacers with text associated with them
+
+CamProp_ui_spacing_y		= 3;													// Spacing gap size Y
+CamProp_ui_spacing_x		= 3;													// Spacing gap size X
+
+CamProp_ui_offset_x 		= 0;													// Main X offset from 0
+CamProp_ui_offset_y 		= 6;													// Main Y offset from 0
+CamProp_ui_row				= 0;													// Row number
+CamProp_ui_column			= 0;													// Column number
+CamProp_ui_tab_offset		= CamProp_ui_offset_y + 23;								// Offset for tab height
+CamProp_ui_row_offset		= CamProp_gad_h + CamProp_ui_spacing_y;					// Row offset
+
+CamProp_ui_window_w			= 295 * 2;												// Window width
+CamProp_ui_window_h			= (CamProp_ui_row_offset * CamProp_num_gads) + 11;		// Window height
+CamProp_ui_seperator_w		= CamProp_ui_window_w + 2;								// Width of seperators
+
+CamProp_gad_x2				= (CamProp_ui_window_w / 2) + CamProp_gad_x;			// Gadget X coord2
+
 // Scene Master dialog UI
 
 ScnMst_gad_x				= 6;													// Gadget X coord
@@ -116,11 +144,12 @@ ScnMst_ui_column			= 0;													// Column number
 ScnMst_ui_tab_offset		= ScnMst_ui_offset_y + 23;								// Offset for tab height
 ScnMst_ui_row_offset		= ScnMst_gad_h + ScnMst_ui_spacing_y;					// Row offset
 
-ScnMst_ui_window_w			= 295 * 2;												// Window width
+ScnMst_ui_window_w			= 295 * 3;												// Window width
 ScnMst_ui_window_h			= (ScnMst_ui_row_offset*ScnMst_num_gads) + 11;			// Window height
-ScnMst_ui_seperator_w		= ScnMst_ui_window_w + 2;								// Width of seperators
+ScnMst_gad_x2				= (ScnMst_ui_window_w / 3) + ScnMst_gad_x;				// Gadget X coord2
+ScnMst_gad_x3				= (ScnMst_ui_window_w * 2 / 3) + ScnMst_gad_x;			// Gadget X coord3
+ScnMst_ui_seperator_w		= ScnMst_gad_x3 + 2;			// Width of seperators (was ScnMst_ui_window_w + 2)
 
-ScnMst_gad_x2				= (ScnMst_ui_window_w / 2) + ScnMst_gad_x;				// Gadget X coord2
 
 // Preferences UI
 

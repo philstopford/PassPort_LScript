@@ -1,3 +1,35 @@
+20130119 (beta 2 - safe to ignore settings warnings from beta 1)
+========
+
+- Fixed an obscure issue in the conditionals to the render function. Will need to revisit this because the failure makes little sense.
+- Fix to internals in the case that the output folder is invalid. We now throw up an error and ask the user to fix the output path selected.
+- Thanks to Luis Lopes: found and fixed an issue with 11.0 scenes where writeHeader failed to find its endLine. Added fix and countermeasures.
+- Fix to insert SaveRGB and filename format lines. Will need to add a preference for the output format.
+- Fix to lwsn path on Windows.
+
+20130118 (beta 1)
+========
+
+- Fixed a null variable issue with the light setting offset. Was not defined if there were no assignments, leading to breakage.
+- Fixed some issues with the scene master panel when editing an existing override.
+- Fixed some variable names to be clearer.
+- Fixed loading of LW version string from data block.
+
+20130117
+========
+
+- Added backdrop color support to native scene override.
+- Made render instances conditional on hostVersion() check.
+- Added background support to native scene override.
+- Added fog support (mode, color) to native scene override.
+- Fixed scene master override FiberFX settings array index error.
+- Enabled camera filtering and display in override listbox for compatible overrides (motion and camera).
+- Camera override code added to scene gen section.
+- Camera override UI added.
+- Show warnings if mismatch in either situation, to warn user about unexpected issues.
+- Plugin version string now written out to PassPort data block.
+- LW version now written to PassPort data block.
+
 20130116
 ========
 
@@ -388,7 +420,6 @@ Brace yourself. Here's the big set of UI changes related to filtering the overri
 + In Progress +
 +++++++++++++++
 
-- Add Camera override, for camera settings.
 - Prototype w/ Kray support.
 
 ********
@@ -431,6 +462,11 @@ p0020 : Line 2162 and 2168 errors with light override. (Fixed)
 - Need to check if growl interaction works with current growl versions.
 - Check if motion override breaks cameras (9 channels vs 6 for cameras)
 - Versioning of overrides for host application version and Passport version.
+- 3rd party lights/cameras end of block detection.
+- Active camera override in Scene Override.
+- Extend light override (caustics).
+- Fog support.
+- Added noAppend flag for writeOverride to avoid changing/appending lines if needed (e.g. FiberFX safety measure).
 
 -------------
 - Reference -

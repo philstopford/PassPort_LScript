@@ -81,9 +81,7 @@ var supportedplatform = 1;
 @insert "@passEditor_UDF_Passes.ls"
 @insert "@passEditor_UDF_Overrides.ls"
 @insert "@passEditor_NativeRenderer_Support.ls"
-@if enableKray
 @insert "@passEditor_Kray25Renderer_Support.ls"
-@end
 
 // icons
 blank_icon = @ "................",
@@ -413,209 +411,228 @@ load: what,io
         loadingInProgress = 1;
         if(what == SCENEMODE)
         {
-            passNamesSize = io.read().asInt();
-            for(x = 1; x <= passNamesSize; x++)
-            {
-                passNames[x] = io.read();
-                passAssItems[x] = io.read();
-                if(passAssItems[x] == nil)
-                {
-                    passAssItems[x] = "";
-                }
-            }
-            overrideNamesSize = io.read().asInt();
-            overrideNames[1] = io.read();
-            if(overrideNames[1] == "empty")
-            {
-                overrideSettings[1] = "";
-            }
-            else
-            {
-                overrideSettings[1] = io.read();
-            }
-            if(overrideNamesSize > 1)
-            {
-                for(x = 2; x <= overrideNamesSize; x++)
-                {
-                    overrideNames[x] = io.read();
-                    if(overrideNames[1] != "empty")
-                    {
-                        overrideSettings[x] = io.read();
-                    }
-                }
-            }
-            for(x = 1; x <= passNamesSize; x++)
-            {
-                for(y = 1; y <= overrideNamesSize; y++)
-                {
-                    if(overrideNames[1] != "empty")
-                    {
-                        passOverrideItems[x][y] = io.read();
-                        if(passOverrideItems[x][y] == nil)
-                        {
-                            passOverrideItems[x][y] = "";
-                        }
-                    }
-                    else
-                    {
-                        passOverrideItems[x][y] = "";
-                    }
-                }
-            }
-            userOutputFolder = io.read();
-            if(userOutputFolder == nil)
-            {
-                userOutputFolder = "";
-            }
-            fileOutputPrefix = io.read();
-            if(fileOutputPrefix == nil)
-            {
-                fileOutputPrefix = "";
-            }
-            userOutputString = io.read();
-            if(userOutputString == nil)
-            {
-                userOutputString = "";
-            }
-            useGrowl = io.read().asInt();
-            areYouSurePrompts = io.read().asInt();
-            rgbSaveType = io.read().asInt();
-            editorResolution = io.read().asInt();
-            testResMultiplier = io.read().asInt();
-            testRgbSaveType = io.read().asInt();
-            
-            setdesc("PassPort Renewed " + versionString);
-            sceneJustLoaded = 1;
-            interfaceRunYet = 1;
+          passPortVersion = io.read();
+          versionMismatch = 0;
+          if(passPortVersion != versionString)
+          {
+            info("WARNING: This scene contains settings for Passport version " + passPortVersion);
+            versionMismatch = 1;
+          }
+          lwVersion = io.read();
+          if(lwVersion != hostVersion().asStr())
+          {
+            info("WARNING: Passport override settings are for LW version " + lwVersion);
+            versionMismatch = 1;
+          }
+          if (versionMismatch == 1)
+          {
+            info("PassPort : One or more warnings were issued. Passport operation may be affected. See documentation for advice.");
+          }
+          passNamesSize = io.read().asInt();
+          for(x = 1; x <= passNamesSize; x++)
+          {
+              passNames[x] = io.read();
+              passAssItems[x] = io.read();
+              if(passAssItems[x] == nil)
+              {
+                  passAssItems[x] = "";
+              }
+          }
+          overrideNamesSize = io.read().asInt();
+          overrideNames[1] = io.read();
+          if(overrideNames[1] == "empty")
+          {
+              overrideSettings[1] = "";
+          }
+          else
+          {
+              overrideSettings[1] = io.read();
+          }
+          if(overrideNamesSize > 1)
+          {
+              for(x = 2; x <= overrideNamesSize; x++)
+              {
+                  overrideNames[x] = io.read();
+                  if(overrideNames[1] != "empty")
+                  {
+                      overrideSettings[x] = io.read();
+                  }
+              }
+          }
+          for(x = 1; x <= passNamesSize; x++)
+          {
+              for(y = 1; y <= overrideNamesSize; y++)
+              {
+                  if(overrideNames[1] != "empty")
+                  {
+                      passOverrideItems[x][y] = io.read();
+                      if(passOverrideItems[x][y] == nil)
+                      {
+                          passOverrideItems[x][y] = "";
+                      }
+                  }
+                  else
+                  {
+                      passOverrideItems[x][y] = "";
+                  }
+              }
+          }
+          userOutputFolder = io.read();
+          if(userOutputFolder == nil)
+          {
+              userOutputFolder = "";
+          }
+          fileOutputPrefix = io.read();
+          if(fileOutputPrefix == nil)
+          {
+              fileOutputPrefix = "";
+          }
+          userOutputString = io.read();
+          if(userOutputString == nil)
+          {
+              userOutputString = "";
+          }
+          useGrowl = io.read().asInt();
+          areYouSurePrompts = io.read().asInt();
+          rgbSaveType = io.read().asInt();
+          editorResolution = io.read().asInt();
+          testResMultiplier = io.read().asInt();
+          testRgbSaveType = io.read().asInt();
+          
+          setdesc("PassPort Renewed " + versionString);
+          sceneJustLoaded = 1;
+          interfaceRunYet = 1;
         }
     }
     
-    save: what,io
-    {
-		if(supportedplatform != 1)
-			return;
-        if(what == SCENEMODE)
-        {   
-            if(sceneJustLoaded == 1 || interfaceRunYet == 1)
-            {
-                passNamesSize = size(passNames);
-                io.writeln(passNamesSize);
-                for(x = 1; x <= passNamesSize; x++)
-                {
-                    io.writeln(passNames[x]);
-                    io.writeln(passAssItems[x]);
-                }
-                
-                 for(x = 1; x <= size(overrideNames); x++)
-                {
-                    if(strleft(overrideNames[x],1) == " ")
-                    {
-                        
-                        settingsArray = parse("||",overrideSettings[x]);
-                        settingsArrayNumber = integer(strright(settingsArray[2],1));
-                        switch(settingsArrayNumber)
-                        {
-                            case 1:
-                                overrideNames[x] = settingsArray[1] + "   (.srf file)";
-                                break;
-                                
-                            case 2:
-                                overrideNames[x] = settingsArray[1] + "   (object properties)";
-                                break;
-                                
-                            case 3:
-                                overrideNames[x] = settingsArray[1] + "   (.mot file)";
-                                break;
-                                
-                            case 4:
-                                overrideNames[x] = settingsArray[1] + "   (.lwo file)";
-                                break;
+save: what,io
+{
+  if(supportedplatform != 1)
+  	return;
+      if(what == SCENEMODE)
+      {   
+          if(sceneJustLoaded == 1 || interfaceRunYet == 1)
+          {
+              passNamesSize = size(passNames);
+              io.writeln(versionString);
+              io.writeln(hostVersion().asStr());
+              io.writeln(passNamesSize);
+              for(x = 1; x <= passNamesSize; x++)
+              {
+                  io.writeln(passNames[x]);
+                  io.writeln(passAssItems[x]);
+              }
+              
+               for(x = 1; x <= size(overrideNames); x++)
+              {
+                  if(strleft(overrideNames[x],1) == " ")
+                  {
+                      
+                      settingsArray = parse("||",overrideSettings[x]);
+                      settingsArrayNumber = integer(strright(settingsArray[2],1));
+                      switch(settingsArrayNumber)
+                      {
+                          case 1:
+                              overrideNames[x] = settingsArray[1] + "   (.srf file)";
+                              break;
+                              
+                          case 2:
+                              overrideNames[x] = settingsArray[1] + "   (object properties)";
+                              break;
+                              
+                          case 3:
+                              overrideNames[x] = settingsArray[1] + "   (.mot file)";
+                              break;
+                              
+                          case 4:
+                              overrideNames[x] = settingsArray[1] + "   (.lwo file)";
+                              break;
 
-                            case 5:
-                                overrideNames[x] = settingsArray[1] + "   (light properties)";
-                                break;
-                                
-                            case 6:
-                                overrideNames[x] = settingsArray[1] + "   (scene properties)";
-                                break;
-                            
-                            case 7:
-                                overrideNames[x] = settingsArray[1] + "   (light exclusion)";
-                                break;
+                          case 5:
+                              overrideNames[x] = settingsArray[1] + "   (light properties)";
+                              break;
+                              
+                          case 6:
+                              overrideNames[x] = settingsArray[1] + "   (scene properties)";
+                              break;
+                          
+                          case 7:
+                              overrideNames[x] = settingsArray[1] + "   (light exclusion)";
+                              break;
 
-                            case 8:
-                                overrideNames[x] = settingsArray[1] + "   (camera)";
-                                break;
+                          case 8:
+                              overrideNames[x] = settingsArray[1] + "   (camera)";
+                              break;
 
-                            default:
-                                overrideNames[x] = settingsArray[1];
-                                break;
-                        }
-                    }
+                          default:
+                              overrideNames[x] = settingsArray[1];
+                              break;
+                      }
+                  }
 
-                }
+              }
 
-                overrideNamesSize = size(overrideNames);
-                io.writeln(overrideNamesSize);
-                io.writeln(overrideNames[1]);
-                
-                if(overrideNames[1] != "empty")
-                {
-                    io.writeln(overrideSettings[1]);
-                }
-                if(overrideNamesSize > 1)
-                {
-                    for(x = 2; x <= overrideNamesSize; x++)
-                    {
-                        io.writeln(overrideNames[x]);
-                        if(overrideNames[1] != "empty")
-                        {
-                            io.writeln(overrideSettings[x]);
-                        }
-                    }
-                }
-                
-                for(x = 1; x <= passNamesSize; x++)
-                {
-                    for(y = 1; y <= overrideNamesSize; y++)
-                    {
-                        if(overrideNames[1] != "empty")
-                        {
-                            io.writeln(passOverrideItems[x][y]);
-                        }
-                    }
-                }
-                io.writeln(userOutputFolder);
-                io.writeln(fileOutputPrefix);
-                io.writeln(userOutputString);
-                io.writeln(useGrowl);
-                io.writeln(areYouSurePrompts);
-                io.writeln(rgbSaveType);
-                io.writeln(editorResolution);
-                io.writeln(testResMultiplier);
-                io.writeln(testRgbSaveType);
-                
-                unsaved = 0;
-                
-                globalstore("passEditoruserOutputString",userOutputString);
-                if(platform() == MACUB || platform() == MAC64)
-	                globalstore("passEditorUseGrowl",useGrowl);
-                globalstore("passEditorareYouSurePrompts",areYouSurePrompts);
-                globalstore("passEditorrgbSaveType",rgbSaveType);
-                globalstore("passEditoreditorResolution",editorResolution);
-                globalstore("passEditortestResMultiplier",testResMultiplier);
-                globalstore("passEditortestRgbSaveType",testRgbSaveType);
-            }
+              overrideNamesSize = size(overrideNames);
+              io.writeln(overrideNamesSize);
+              io.writeln(overrideNames[1]);
+              
+              if(overrideNames[1] != "empty")
+              {
+                  io.writeln(overrideSettings[1]);
+              }
+              if(overrideNamesSize > 1)
+              {
+                  for(x = 2; x <= overrideNamesSize; x++)
+                  {
+                      io.writeln(overrideNames[x]);
+                      if(overrideNames[1] != "empty")
+                      {
+                          io.writeln(overrideSettings[x]);
+                      }
+                  }
+              }
+              
+              for(x = 1; x <= passNamesSize; x++)
+              {
+                  for(y = 1; y <= overrideNamesSize; y++)
+                  {
+                      if(overrideNames[1] != "empty")
+                      {
+                          io.writeln(passOverrideItems[x][y]);
+                      }
+                  }
+              }
+              io.writeln(userOutputFolder);
+              io.writeln(fileOutputPrefix);
+              io.writeln(userOutputString);
+              io.writeln(useGrowl);
+              io.writeln(areYouSurePrompts);
+              io.writeln(rgbSaveType);
+              io.writeln(editorResolution);
+              io.writeln(testResMultiplier);
+              io.writeln(testRgbSaveType);
+              
+              unsaved = 0;
+              
+              globalstore("passEditoruserOutputString",userOutputString);
+              if(platform() == MACUB || platform() == MAC64)
+                globalstore("passEditorUseGrowl",useGrowl);
+              globalstore("passEditorareYouSurePrompts",areYouSurePrompts);
+              globalstore("passEditorrgbSaveType",rgbSaveType);
+              globalstore("passEditoreditorResolution",editorResolution);
+              globalstore("passEditortestResMultiplier",testResMultiplier);
+              globalstore("passEditortestRgbSaveType",testRgbSaveType);
+          }
 
-        }
-    }
-    
-    flags
-    {
-		if(!supportedplatform)
-			return;
-		return(SCENE,LWMASTF_RECEIVE_NOTIFICATIONS);
-    }
+      }
+  }
+
+  flags
+  {
+  if(!supportedplatform)
+  	return;
+  return(SCENE,LWMASTF_RECEIVE_NOTIFICATIONS);
+}
     
 process: event, command
 {

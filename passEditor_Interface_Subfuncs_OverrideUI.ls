@@ -14,29 +14,19 @@ cameraOverride_UI: action
 			resolutionMultiplier 			= number(settingsArray[5]);
 			frameSizeH 						= integer(settingsArray[6]);
 			frameSizeV 						= integer(settingsArray[7]);
-			pixelAspect 					= integer(settingsArray[8]);
+			pixelAspect 					= number(settingsArray[8]);
 			motionBlur 						= integer(settingsArray[9]);
 			motionBlurPasses 				= integer(settingsArray[10]);
-			shutterEfficiency 				= integer(settingsArray[11]);
-			rollingShutter 					= integer(settingsArray[12]);
-			shutterOpen 					= integer(settingsArray[13]);
-			oversampling 					= integer(settingsArray[14]);
+			shutterEfficiency 				= number(settingsArray[11]);
+			rollingShutter 					= number(settingsArray[12]);
+			shutterOpen 					= number(settingsArray[13]);
+			oversampling 					= number(settingsArray[14]);
 			fieldRendering 					= integer(settingsArray[15]);
-			apertureHeight 					= number(settingsArray[16]);
-			eyeSeparation 					= number(settingsArray[17]);
-			convergencePoint 				= integer(settingsArray[18]);
-			useConvergence 					= integer(settingsArray[19]);
-			convergenceToeIn 				= integer(settingsArray[20]);
-			depthOfField 					= integer(settingsArray[21]);
-			focalDistance 					= integer(settingsArray[22]);
-			lensFStop 						= integer(settingsArray[23]);
-			diaphragmSides 					= integer(settingsArray[24]);
-			diaphragmRotation 				= integer(settingsArray[25]);
-			aASamples 						= integer(settingsArray[26]);
-			sampler 						= integer(settingsArray[27]);
-			adaptiveThreshold 				= number(settingsArray[28]);
-			minimumSamples 					= integer(settingsArray[29]);
-			maximumSamples 					= integer(settingsArray[30]);
+			depthOfField 					= integer(settingsArray[16]);
+			sampler 						= integer(settingsArray[17]);
+			adaptiveThreshold 				= number(settingsArray[18]);
+			minimumSamples 					= integer(settingsArray[19]);
+			maximumSamples 					= integer(settingsArray[20]);
 		}
 		
 		doKeys = 0;
@@ -47,19 +37,260 @@ cameraOverride_UI: action
 			reqbeginstr = "Edit Camera Override";
 		}
 		reqbegin(reqbeginstr);
+		reqsize(CamProp_ui_window_w, 325);
 		
-		newName = "CameraOverride";
+		newName = "CamPropsOverride";
 		if(action == "edit")
 		{
 			newName = settingsArray[1];
 		}
 		c20 = ctlstring("Override Name:", newName);
 
+		ctlposition(c20, CamProp_gad_x, CamProp_gad_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		ui_offset_y = CamProp_ui_offset_y + CamProp_ui_row_offset;
+
+		c21val = 3.2;
+		if(action == "edit")
+		{
+			c21val = zoomFactor;
+		}
+		c21 = ctlnumber("Zoom Factor:",c21val);
+		ctlposition(c21, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		c22val = 1; //FIXME : Menu?
+		if(action == "edit")
+		{
+			c22val = zoomType;
+		}
+		c22 = ctlinteger("Zoom Type:",c22val);
+		ctlposition(c22, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		ui_offset_y += CamProp_ui_row_offset;
+
+		c23val = 3;
+		resolutionMultiplier = 1.0;
+		if(action == "edit")
+		{
+			switch(resolutionMultiplier * 100)
+			{
+				case 25:
+					c23val = 1;
+					break;
+				case 50:
+					c23val = 2;
+					break;
+				case 100:
+					c23val = 3;
+					break;
+				case 200:
+					c23val = 4;
+					break;
+				case 400:
+					c23val = 5;
+					break;
+				default:
+					c23val = 3;
+					break;
+			}
+		}
+		c23 = ctlpopup("Resolution Multiplier",c23val,resolutionMultArray);
+		ctlposition(c23, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		c24val = 1.0;
+		if(action == "edit")
+		{
+			c24val = pixelAspect;
+		}
+		c24 = ctlnumber("Pixel Aspect:",c24val);
+		ctlposition(c24, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		// ui_offset_y += CamProp_ui_row_offset;
+		ui_offset_y += CamProp_ui_row_offset + 2;
+		sep1 = ctlsep(0, CamProp_ui_seperator_w + 4);
+		ctlposition(sep1, -2, CamProp_gad_y + ui_offset_y);
+		ui_offset_y += CamProp_ui_spacing_y + 4;
+
+		c25val = 1280;
+		if(action == "edit")
+		{
+			c25val = frameSizeH;
+		}
+		c25 = ctlinteger("Horizontal Size:",c25val);
+		ctlposition(c25, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		c26val = 720;
+		if(action == "edit")
+		{
+			c26val = frameSizeV;
+		}
+		c26 = ctlinteger("Vertical Size:",c26val);
+		ctlposition(c26, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		// ui_offset_y += CamProp_ui_row_offset;
+		ui_offset_y += CamProp_ui_row_offset + 2;
+		sep2 = ctlsep(0, CamProp_ui_seperator_w + 4);
+		ctlposition(sep2, -2, CamProp_gad_y + ui_offset_y);
+		ui_offset_y += CamProp_ui_spacing_y + 4;
+
+		c27val = 0;
+		if(action == "edit")
+		{
+			c27val = motionBlur;
+		}
+		c27 = ctlcheckbox("Motion Blur",c27val);
+		ctlposition(c27, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		ui_offset_y += CamProp_ui_row_offset;
+
+		c28val = 1;
+		if(action == "edit")
+		{
+			c28val = motionBlurPasses;
+		}
+		c28 = ctlinteger("Passes:",c28val);
+		ctlposition(c28, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		c29val = 1;
+		if(action == "edit")
+		{
+			c29val = shutterEfficiency;
+		}
+		c29 = ctlpercent("Shutter Efficiency",c29val);
+		ctlposition(c29, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w - 22, CamProp_gad_h, CamProp_gad_text_offset);
+
+		ui_offset_y += CamProp_ui_row_offset;
+
+		c30val = 1;
+		if(action == "edit")
+		{
+			c30val = rollingShutter;
+		}
+		c30 = ctlpercent("Rolling Shutter",c30val);
+		ctlposition(c30, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w - 22, CamProp_gad_h, CamProp_gad_text_offset);
+
+		c31val = 1;
+		if(action == "edit")
+		{
+			c31val = shutterOpen;
+		}
+		c31 = ctlpercent("Shutter Open",c31val);
+		ctlposition(c31, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w - 22, CamProp_gad_h, CamProp_gad_text_offset);
+
+		ui_offset_y += CamProp_ui_row_offset + 2;
+		sep3 = ctlsep(0, CamProp_ui_seperator_w + 4);
+		ctlposition(sep3, -2, CamProp_gad_y + ui_offset_y);
+		ui_offset_y += CamProp_ui_spacing_y + 4;
+
+		c32val = 1;
+		fieldRendering = c32val - 1;
+		if(action == "edit")
+		{
+			c32val = fieldRendering + 1;
+		}
+		c32 = ctlpopup("Field Rendering",c32val,fieldRenderArray);
+		ctlposition(c32, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		c38val = 0;
+		if(action == "edit")
+		{
+			c38val = depthOfField;
+		}
+		c38 = ctlcheckbox("Depth of Field",c38val);
+		ctlposition(c38, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		ui_offset_y += CamProp_ui_row_offset + 2;
+		sep4 = ctlsep(0, CamProp_ui_seperator_w + 4);
+		ctlposition(sep4, -2, CamProp_gad_y + ui_offset_y);
+		ui_offset_y += CamProp_ui_spacing_y + 4;
+
+		c33val = 1;
+		sampler = c33val - 1;
+		if(action == "edit")
+		{
+			c33val = sampler + 1;
+		}
+		c33 = ctlpopup("Sampler",c33val,samplerArray);
+		ctlposition(c33, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		ui_offset_y += CamProp_ui_row_offset;
+
+		c34val = 1;
+		if(action == "edit")
+		{
+			c34val = minimumSamples;
+		}
+		c34 = ctlinteger("Min Samples",c34val);
+		ctlposition(c34, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		c35val = 0.01;
+		if(action == "edit")
+		{
+			c35val = adaptiveThreshold;
+		}
+		c35 = ctlnumber("Threshold",c35val);
+		ctlposition(c35, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		ui_offset_y += CamProp_ui_row_offset;
+
+		c36val = 1;
+		if(action == "edit")
+		{
+			c36val = maximumSamples;
+		}
+		c36 = ctlinteger("Max Samples",c36val);
+		ctlposition(c36, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
+		c37val = 0;
+		if(action == "edit")
+		{
+			c37val = oversampling;
+		}
+		c37 = ctlnumber("Oversampling",c37val);
+		ctlposition(c37, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+
 		if(reqpost())
 		{
-			newName = getvalue(c20);
-			newName = makeStringGood(newName);
-			doUpdate = 1;
+			newName 				= getvalue(c20);
+			newName 				= makeStringGood(newName);
+			zoomFactor 				= getvalue(c21);
+			zoomType 				= getvalue(c22);
+			switch(getvalue(c23))
+			{
+				case 1:
+					resolutionMultiplier = 0.25;
+					break;
+				case 2:
+					resolutionMultiplier = 0.5;
+					break;
+				case 3:
+					resolutionMultiplier = 1.0;
+					break;
+				case 4:
+					resolutionMultiplier = 2.0;
+					break;
+				case 5:
+					resolutionMultiplier = 4.0;
+					break;
+				default:
+					resolutionMultiplier = 1.0;
+					break;
+			}
+			frameSizeH				= getvalue(c25);
+			frameSizeV				= getvalue(c26);
+			pixelAspect				= getvalue(c24);
+			motionBlur 				= getvalue(c27);
+			motionBlurPasses 		= getvalue(c28);
+			shutterEfficiency		= getvalue(c29);
+			rollingShutter			= getvalue(c30);
+			shutterOpen				= getvalue(c31);
+			oversampling 			= getvalue(c37);
+			fieldRendering 			= getvalue(c32) - 1;
+			depthOfField			= getvalue(c38);
+			sampler 				= getvalue(c33) - 1;
+			adaptiveThreshold		= getvalue(c35);
+			minimumSamples			= getvalue(c34);
+			maximumSamples			= getvalue(c36);
+
+			doUpdate 				= 1;
 		}
 		else
 		{
@@ -95,12 +326,7 @@ cameraOverride_UI: action
 										+ 	motionBlur				+ "||" + 	motionBlurPasses	+ "||"
 										+ 	shutterEfficiency		+ "||" + 	rollingShutter		+ "||"
 										+ 	shutterOpen				+ "||" + 	oversampling		+ "||"
-										+ 	fieldRendering			+ "||" + 	apertureHeight		+ "||"
-										+ 	eyeSeparation			+ "||" + 	convergencePoint	+ "||"
-										+ 	useConvergence			+ "||" + 	convergenceToeIn	+ "||"
-										+ 	depthOfField			+ "||" + 	focalDistance		+ "||"
-										+ 	lensFStop				+ "||" + 	diaphragmSides		+ "||"
-										+ 	diaphragmRotation		+ "||" + 	aASamples			+ "||"
+										+ 	fieldRendering			+ "||" + 	depthOfField		+ "||"
 										+ 	sampler					+ "||" + 	adaptiveThreshold	+ "||"
 										+ 	minimumSamples			+ "||" + 	maximumSamples;
 		}

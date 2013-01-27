@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130116";
+var versionString = "20130119";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -117,6 +117,7 @@ var noOfStages;
 var lastObject = 0;
 var lastLight = 0;
 var lastCamera = 0;
+var noAppend = 0;
 
 // motion mixer
 var overriddenObjectID;
@@ -136,7 +137,7 @@ var usegrowl;
 
 // Renderer support extension - prototype!
 @if enableKray
-var renderers = @"Native","Kray 2.5(ALPHA)"@;
+var renderers = @"Native","Kray 2.5"@;
 @else
 var renderers = @"Native"@;
 @end
@@ -164,4 +165,12 @@ var lightSettingsPartThree;
 var cameraSettingsPartOne;
 var cameraSettingsPartTwo;
 var cameraSettingsPartThree;
-
+var LWrecursionLimit = 64;
+var giTypeArray = @"Backdrop Only","Monte Carlo","Final Gather"@;
+var cameraMotBlur = @"Off","Classic","Dither","Photoreal"@;
+var resolutionMultArray = @"25 %","50 %","100 %","200 %","400 %"@;
+var renderModeArray = @"Wireframe","Quickshade","Realistic"@;
+var samplerArray = @"Low-discrepancy","Fixed","Classic"@;
+var reconFilterArray = @"Classic","Box","Box (Soft)","Box (Sharp)","Gaussian","Gaussian (Soft)","Gaussian (Sharp)","Mitchell","Mitchell (Soft)","Mitchell (Sharp)","Lanczos","Lanczos (Soft)","Lanczos (Sharp)"@;
+var fieldRenderArray = @"Off","Even/Upper First","Odd/Lower First"@;
+var fogTypeArray = @"Off","Linear","Nonlinear 1","Nonlinear 2","Realistic"@;

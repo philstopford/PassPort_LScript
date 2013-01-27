@@ -6,6 +6,12 @@ Kray25Lines = @"ExternalRenderer KrayRenderer","Plugin ExtRendererHandler 1 Kray
 // scnMaster override UI stuff
 scnmasterOverride_UI_kray25: action
 {
+	if(renderers.indexOf("Kray 2.5") == 0)
+	{
+		info("Sorry - not ready yet.");
+		return;
+	}
+
 	// sel only used in edit action.
 	// action should be either 'new' or 'edit'
 	if (action == "new" || action == "edit")
