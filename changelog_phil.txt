@@ -1,3 +1,16 @@
+20130120 (beta 5 - no issue from beta 4)
+========
+
+- Numerous fixes to camera override:
+ - Misc other fixes in camera override code.
+ - IKInitialState[passItem] definition was missing for the camera override. Fixed.
+ - Fixed some variables that weren't exposed (cameraSettingsPartOneCount, etc.) for offset handling.
+ - Fixed a bug in the part two override creation in the camera override.
+ - Fixed a bug where the camera override part four array was not exposed to the scene gen code.
+ - Resolution multiplier override removed from scene master - it's better in the camera override.
+ - Bug fixes in resolution multiplier handling.
+ - Fixed a missing comment marker for the reference in the camera override code in the scene gen function.
+
 20130119 (beta 4 - users will need to re-do scene master overrides, they were broken in b1-3.)
 ========
 
@@ -488,7 +501,6 @@ p0028 : Wireframe mode change reported for Scene Master override. (Fixed, beta4)
 - 3rd party lights/cameras end of block detection.
 - Active camera override in Scene Override.
 - Extend light override (caustics).
-- Fog support.
 
 -------------
 - Reference -

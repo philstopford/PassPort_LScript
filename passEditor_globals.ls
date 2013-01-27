@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130119";
+var versionString = "20130120";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -163,8 +163,13 @@ var lightSettingsPartOne;
 var lightSettingsPartTwo;
 var lightSettingsPartThree;
 var cameraSettingsPartOne;
+var cameraSettingsPartOneCount;
 var cameraSettingsPartTwo;
+var cameraSettingsPartTwoCount;
 var cameraSettingsPartThree;
+var cameraSettingsPartThreeCount;
+var cameraSettingsPartFour;
+var cameraSettingsPartFourCount;
 var LWrecursionLimit = 64;
 var giTypeArray = @"Backdrop Only","Monte Carlo","Final Gather"@;
 var cameraMotBlur = @"Off","Classic","Dither","Photoreal"@;

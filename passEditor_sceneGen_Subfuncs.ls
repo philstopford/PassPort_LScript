@@ -337,7 +337,8 @@ generatePassFile: mode, pass
             if(settingsArray[2] == "type8") // EXPERIMENTAL Camera override
             {
 
-                overrideSettings[newNumber] =   newName             + "||" +    "type8"             + "||"
+// Reference - never intended to be active code.
+/*                overrideSettings[newNumber] =   newName             + "||" +    "type8"             + "||"
                                         +   zoomFactor              + "||" +    zoomType            + "||"
                                         +   resolutionMultiplier    + "||" +    frameSizeH          + "||"
                                         +   frameSizeV              + "||" +    pixelAspect         + "||"
@@ -347,6 +348,7 @@ generatePassFile: mode, pass
                                         +   fieldRendering          + "||" +    depthOfField        + "||"
                                         +   sampler                 + "||" +    adaptiveThreshold   + "||"
                                         +   minimumSamples          + "||" +    maximumSamples;
+*/
 
                 zoomFactor 						= string(settingsArray[3]);
                 cameraSettingsPartOne[passItem] =	"ZoomFactor " + zoomFactor + "\n";
@@ -357,8 +359,8 @@ generatePassFile: mode, pass
 				resolutionMultiplier 			= string(settingsArray[5]);
                 cameraSettingsPartOne[passItem] +=	"ResolutionMultiplier " + resolutionMultiplier + "\n";
                 cameraSettingsPartOneCount[passItem]++;
-				frameSizeH 						= string(settingsArray[6]);
-				frameSizeV 						= string(settingsArray[7]);
+				frameSizeH 						= string(int(settingsArray[6]) * number(resolutionMultiplier));
+				frameSizeV 						= string(int(settingsArray[7]) * number(resolutionMultiplier));
                 cameraSettingsPartOne[passItem] +=	"FrameSize " + frameSizeH + " " + frameSizeV + "\n";
                 cameraSettingsPartOneCount[passItem]++;
 				pixelAspect 					= string(settingsArray[8]);
@@ -384,7 +386,7 @@ generatePassFile: mode, pass
                 cameraSettingsPartOneCount[passItem]++;
 
 				fieldRendering 					= string(settingsArray[15]);
-                cameraSettingsPartTwo[passItem] +=	"FieldRendering " + fieldRendering + "\n";
+                cameraSettingsPartTwo[passItem] =	"FieldRendering " + fieldRendering + "\n";
                 cameraSettingsPartTwoCount[passItem] = 1;
 
 				depthOfField 						= string(settingsArray[16]);
@@ -572,6 +574,7 @@ generatePassFile: mode, pass
             {
                 objMotEnd[passItem] = getPartialLine((objMotEnd[passItem] + 1),objEnd[passItem],"}",currentScenePath);
             }
+            IKInitialState[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"IKInitialState",currentScenePath);
             lastCamera++;
 		}
 	}
@@ -1027,7 +1030,7 @@ writeCameras: inputFile, outputFile, lastObject, lastLight, lastCamera
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (IKInitialState[cameraCounter]) + 1)
+                            if(inputFile.line() == IKInitialState[cameraCounter] + 1)
                             {
                                 done = true;
                                 break;
@@ -1080,7 +1083,7 @@ writeCameras: inputFile, outputFile, lastObject, lastLight, lastCamera
                         // Next set of changes.
                         outputFile.write(cameraSettingsPartFour[cameraCounter]);
 
-                        input.line(input.line() + cameraSettingsPartFourCount[cameraCounter] + 1);
+                        inputFile.line(inputFile.line() + cameraSettingsPartFourCount[cameraCounter] + 1);
 
                         // Finish up
                         while(!done)

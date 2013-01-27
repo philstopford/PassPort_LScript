@@ -13,7 +13,7 @@ scnmasterOverride_UI_native: action
 			sel = getvalue(gad_OverridesListview).asInt();
 			settingsArray = parseOverrideSettings(overrideSettings[sel]);
 			overrideRenderer			= integer(settingsArray[3]);
-			resolutionMultiplierSetts 	= integer(settingsArray[4]);
+			resolutionMultiplierSetts 	= integer(settingsArray[4]); // unused - moved to camera override. Left to avoid breaking scene master compatibility.
 			renderModeSetts				= integer(settingsArray[5]);
 			depthBufferAASetts 			= integer(settingsArray[6]);
 			renderLinesSetts 			= integer(settingsArray[7]);
@@ -98,13 +98,16 @@ scnmasterOverride_UI_native: action
 		
 		ui_offset_y = ScnMst_ui_offset_y + ScnMst_ui_row_offset;
 
+		// Unused - moved to camera override. Left to retain compatibility with existing scene master override definitions in 1.x builds.
+		// FIXME : Remove in any post 1.x release.
 		resolutionMultiplierSetts = 3;
-		if(action == "edit")
+/*		if(action == "edit")
 		{
 			resolutionMultiplierSetts = integer(settingsArray[4]);
 		}
 		c20_5 = ctlpopup("Resolution Multiplier",resolutionMultiplierSetts,resolutionMultArray);
 		ctlposition(c20_5, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
+*/
 
 		renderModeSetts = 3;
 		if(action == "edit")
@@ -807,11 +810,12 @@ scnmasterOverride_UI_native_redraw
 
 scnGen_native:updatedCurrentScenePath, newScenePath
 {
-	resolutionMultiplierSetts	= integer(settingsArray[4]);
+//	resolutionMultiplierSetts	= integer(settingsArray[4]); // FIXME: Legacy, remove in post-1.x build
 	redirectBuffersSetts 		= integer(settingsArray[9]);
 	disableAASetts 				= integer(settingsArray[10]);
 
-	switch(resolutionMultiplierSetts)
+// FIXME: Legacy, remove in post-1.x build
+/*	switch(resolutionMultiplierSetts)
 	{
 		case 1:
 			resMult = 0.25;
@@ -836,8 +840,8 @@ scnGen_native:updatedCurrentScenePath, newScenePath
 		default:
 			break;
 	}
-	
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "FrameSize ", resMult);
+*/	
 				
 	renderModeSetts = integer(settingsArray[5]) - 1;
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderMode ", renderModeSetts);

@@ -11,8 +11,8 @@
   background-color: #FFFFFF;
   color: #000000;
  }
- :link { color: #0000EE }
- :visited { color: #551A8B }
+ :link { color: #0000BB }
+ :visited { color: #000055 }
  :active { color: #FF0000 }
  span.c6 {font-size: 120%}
  td.c5 {background-color: #FF99FF}
@@ -35,6 +35,7 @@
 <ul>
 <li><strong><a href="#whatispassport">What is PassPort Renewed</a></strong></li>
 <li><strong><a href="#beforeinstalling">Before Installing</a></strong></li>
+<li><strong><a href="#compatibility">Compatibility Notes</a></strong></li>
 <li><strong><a href="#installation">Installation</a></strong></li>
 <li><strong><a href="#usage">Usage</a></strong></li>
 <ul>
@@ -42,6 +43,15 @@
 <li><a href="#maininterface">Main Interface</a></li>
 <li><a href="#workingwithpasses">Working with Passes</a></li>
 <li><a href="#workingwithoverrides">Working with Overrides</a></li>
+<ul>
+<li><a href="#overrides_objprops">Object Properties</a></li>
+<li><a href="#overrides_altobj">Alternative Object</a></li>
+<li><a href="#overrides_motion">Motion File</a></li>
+<li><a href="#overrides_surface">Surface File</a></li>
+<li><a href="#overrides_light">Light Properties</a></li>
+<li><a href="#overrides_scene">Scene Master</a></li>
+<li><a href="#overrides_lightexcl">Light Exclusion</a></li>
+</ul>
 </ul>
 <li><strong><a href="#troubleshooting">Troubleshooting.</a></strong></li>
 
@@ -49,10 +59,10 @@
 <div class="c1">
 <h3><a name="whatispassport"></a>What is PassPort Renewed?</h3>
 </div>
-<p>PassPort Renewed is an ongoing rework of the LScript-based PassPort code. That code was open-sourced (GPL) by Jeremy Hardin. The author of PassPort Renewed is Phil Stopford. Compared to the original PassPort plugin, these changes were made for this release:</p>
+<p>PassPort Renewed is an ongoing rework of the LScript-based PassPort code. That code, designed for LightWave 3D 9.3.1, was open-sourced (GPL) by Jeremy Hardin in 2010. It was modified by Matt Gorner in 2010 to improve operation with autoscan plugins and to revise the code to work with LW10. The author of PassPort Renewed is Phil Stopford. Compared to the original PassPort plugin, the code has been substantially revised. These changes were made for this release:</p>
 <ul>
 	<li>Extensive internal refactoring. The plugin code is now smaller, more efficient and more cleanly structured.</li>
-	<li>Internal support for custom overrides for alternative renderers has been prepared, but implementation is not exposed in the public release.</li>
+	<li>Internal support for custom overrides for alternative renderers has been prepared, but implementation is not exposed in the public release at this time.</li>
 	<li>Operation on Mac is now possible without crashing.</li>
 	<li>Growl support on Mac is optional, and disabled by default</li>
 	<li>Operation with the renamed 'lwsn' binary (previously called ScreamerNet)</li>
@@ -60,26 +70,41 @@
 	<li>The Scene Master override has been massively overhauled and is now aligned with the LightWave 11.0 feature set:</li>
 	<ul>
 		<li>All raytrace flags can be overridden</li>
+		<li>Universal sampling parameters can be overridden</li>
+		<li>The increased upper value for recursion depth (64) is now supported by the interface</li>
 		<li>Volumetric AA can be overridden</li>
 		<li>Render mode can be overridden</li>
 		<li>Caustics and radiosity values can all be overridden</li>
+		<li>Fog, background and backdrop properties can be override. Not all aspects are implemented yet.</li>
 	</ul>
 	<li>The light override now permits disabling of lens flares and volumetrics. Creation is not enabled due to complexities in supporting these. Lens flare creation support may appear in a future revision, though.</li>
 	<li>Camera overrides are now available, for the first time. Limited settings are available in this initial public release, and no specialised propeties for 3rd party cameras are available at this time.</li>
 	<li>Pass generation for FiberFX has been enabled. Overrides are not available for FiberFX at this time.</li>
 	<li>PassPort has been made LWSN-safe as well. Previously, it used to crash the process.</li>
 	<li>Rendering at frame 0 is now supported. Previously, it used to fail to save an image for review.</li>
+	<li>Autoscan plugin operation is much improved.</li>
 </ul>
 <hr>
 <p><a name="beforeinstalling"></a><strong>Before Installing</strong></p>
 <ul>
 <li> This version has no compatibility with previous PassPort scenes. The overrides and code have been radically overhauled. There is no migration path.</li>
-<li> This version is locked to a minimum of LightWave 3D 11.0. The Scene Master is only compatible with LightWave 3D 11.5 due to the support for the render instances toggle.</li>
+<li> This version is locked to a minimum of LightWave 3D 11.0.</li>
 <li>This revision of PassPort has been tested on Windows XP (32-bit), Windows 7 (32-bit and 64-bit LightWave) and OS X Mountain Lion. The previous version of PassPort was restricted to LightWave 3D 9.3.1 on Windows and 32-bit LightWave 9.3.1 on Mac.</li>
 <li>Please note, at the time of writing, PassPort Renewed is a work-in-progress. It's currently implemented in LScript and will eventually be migrated to Python.</li>
 <li>3rd party lights and camera features are not available in overrides due to the complexities of supporting them. Only shared properties with the basic light and cameras will be modified.</li>
 <li>It is also extremely important that the LightWave 3D content folder is set according to the LightWave 3D documentation.</li>
+<li>As of beta 3, operation with autoscan plugins is now supported. There are some things to be aware of :</li>
+<ul>
+	<li>Autoscan plugins stores its data in a different file to the classical mode of operation for LW. In manual mode, the typical configuration file is named LWEXT.CFG (or some variation thereof). In autoscan mode, the plugin data is stored in some variation of 'Extensions Cache' in the same location. PassPort will read both of these files to obtain image saver data. If there is duplicate data in each file (e.g. two instances of JPEG savers) because you switched off autoscan plugins, but the cache file exists, PassPort will find and display both instances. LightWave doesn't offer a mechanism to avoid this. So, please review your configuration folder in cases like this to ensure nothing strange happens.</li>
+</ul></ul>
+<p><a name="compatibility"><strong>Compatibility Notes</strong></p>
+<p>There is no plan, right now, to migrate settings between PassPort versions (where major changes are made) and LW versions. Settings *may* be fine (changes will be noted in the release notes), but for safety, PassPort will show a dialog for each of</p>
+<ul>
+<li>A different version of PassPort than was in-use when the scene was saved.</li>
+<li>A different version of LW than was in-use when the scene was saved.</li>
 </ul>
+<p>The expected versions of each are shown to guide the user in case they want to adopt a matching configuration. In each case, the plugin will load its settings from the scene file, but the results cannot be guaranteed. Some override options may not apply/may be incorrect/may results in crashes during PassPort or render operations. Some changes may even cause PassPort to fail to open its interface. No data loss will occur - PassPort itself never writes to the master scene except when the user explicitly saves the scene through LightWave.</p>
+<p><strong>If a scene is saved in this state, the version strings currently in use will be written out to PassPort data block within that scene file. This will silence any future warnings for this scene, but the PassPort data block may still be problematic. It is strongly recommended that the user either adopt a compatible configuration or re-create the pass and overrides they need prior to saving.</strong></p>
 <hr>
 <p><a name="installation"></a><strong>Installation</strong></p>
 <p>The package consists of PassPort_MC.lsc. This has to be added to the plugin system and used directly from the Master Plugins drop-down list. The plugin will *not* function correctly if operated through the LScript/RT Master Plugin system.</p>
@@ -117,21 +142,21 @@
 <p align="center"><img src="images/override_menu.png" height="178" width="177" alt="Overrides Menu"></p>
 <p>When applied, these will override any parameter they cover. In other words, if the parameter exists in any state in the overrides, the override parameter will be used instead of the native LightWave parameter (please refer to the light override note for the volumetric setting). Also, there’s a bit of common sense in working with these. The PassPort Editor won’t allow you to assign an Alternative Object... override to a light, or light overrides to non-lights, etc. The Motion File... override will work on all items except the Scene Master.</p>
 <ul>
-	<p><strong>Object Properties</strong></p>
+	<p><a name="overrides_objprops"></a><strong>Object Properties</strong></p>
 	<p align="center"><img src="images/override_objprops.png" height="342" width="275" alt="Object Properties Override"></p>
-	<p><strong>Alternative Object</strong></p>
+	<p><a name="overrides_altobj"></a><strong>Alternative Object</strong></p>
 	<p align="center"><img src="images/override_altobj.png" height="108" width="284" alt="Alternative Object Override"></p>
-	<p><strong>Motion File</strong></p>
+	<p><a name="overrides_motion"></a><strong>Motion File</strong></p>
 	<p align="center"><img src="images/override_motion.png" height="108" width="285" alt="Motion Override"></p>
-	<p><strong>Surface File</strong></p>
+	<p><a name="overrides_surface"></a><strong>Surface File</strong></p>
 	<p align="center"><img src="images/override_surface.png" height="108" width="284" alt="Surface Override"></p>
-	<p><strong>Light Properties</strong></p>
+	<p><a name="overrides_light"></a><strong>Light Properties</strong></p>
 	<p align="center"><img src="images/override_light.png" height="262" width="275" alt="Light Properties"></p>
 	<p>Please note that, due to the way that LightWave 11 currently generates its scene files, the volumetric toggle will only work if the light being overridden had its volumetric properties set up through the main LW interface. The volumetrics can be deactivated within LW afterwards for that light - this override will then work fine. This is because LightWave will not write out the volumetric settings properly unless you have set them. There's also an element of common sense here - unless you've configured the volumetric light behaviour ahead of time on the light, how will the renderer know what to do. Note that the Scene Master override provides support for globally enabling/disabling volumetric lights (corresponding to the setting in LW's own render control panel).</p>
 	<p>In this version, the lens flare override is limited to a toggle. This may be supplemented by other options in a future revision. Note that the Scene Master override provides support for globally enabling/disabling lens flare (corresponding to the setting in LW's own render control panel).</p>
-	<p><strong>Scene Master File</strong></p>
+	<p><a name="overrides_scene"></a><strong>Scene Master File</strong></p>
 	<p align="center"><img src="images/override_scene.png" height="747" width="590" alt="Scene Master Override"></p>
-	<p><strong>Light Exclusion</strong></p>
+	<p><a name="overrides_lightexcl"></a><strong>Light Exclusion</strong></p>
 	<p align="center"><img src="images/override_lightexcl.png" height="158" width="306" alt="Light Exclusion"></p>
 	<p>The Light Exclusions override allows you to specify per-pass light exclusions. Assigning it to an object will exclude that object from any lights in the override settings in that pass. The Light Exclusions override is unique in that it can be assigned in addition to another override. So if you want to use a surface override AND a light exclusion override, you’d simply have the surface override higher in the overrides listbox and assign both to an object. If you ever find that the light exclusion is higher in the listbox than another override (and therefore preventing its stack-ability), simply hit Page Down on your keyboard to move the selected override to the bottom of the listbox.</p>
 </ul>
