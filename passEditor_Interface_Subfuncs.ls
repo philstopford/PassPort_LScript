@@ -1423,7 +1423,7 @@ preferencePanel
 
 	ui_offset_y += Pref_ui_row_offset;
 
-	if(platform() == 9)
+	if(platform() == 9 || platform() == 11) // FIXME : Might not be needed any more. Mac-specific hack.
 	{
 		c24 = ctlcheckbox("Enable auto close/reopen updates of Editor", useHackyUpdates);
 		ctlposition(c24, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);

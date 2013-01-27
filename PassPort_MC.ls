@@ -2,6 +2,7 @@
 // PassPort
 // by Jeremy Hardin
 // LightWave 9.6 fix - Matt Gorner
+// Major revision and Mac64 compatibility - Phil Stopford.
 
 /*
     About:
@@ -50,6 +51,11 @@
         the override assignments.  I use 2 dimensional arrays, with strings in each element.
         Each string is parseable to reveal a third dimension of elements (separated by the
         double pipe symbol "||").
+		
+	Hacky Saving:
+		Builds of LW earlier than 1281 had problems with arrays of more than 99 items. To workaround this,
+		Passport enters a 'hacky saving' mode. In this revision, I'm minded to nuke this to simplify the code.
+		
 */
 //
 //--------------------------------------
@@ -61,7 +67,7 @@
 
 // Inserts other functions ...
 @if dev == 1
-@if platform == 11
+@if platform == 11 || platform == MACUB
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_globals.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UIglobals.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_Interface_Subfuncs.ls"
@@ -779,9 +785,11 @@ process: event, command
         // do the experimental scene master override setup
         o_displayNames = nil; // clear it out
         o_displayGenus = nil; // clear it out
+		o_displayIDs = nil;
         o_displayNames[1] = "(Scene Master)";
         o_displayGenus[1] = 0;
-        
+		o_displayIDs[1] = "SM";
+				
         if(s != nil)
         {
             arraySize = size(s);
@@ -802,34 +810,27 @@ process: event, command
         {
             if(meshAgents[1] != "none")
             {
-				info("Found mesh: " + meshNames[y] + " x=" + x);
 				displayNames[x] = meshNames[y];
                 o_displayNames[x+1] = displayNames[x];
                 displayGenus[x] = 1;
                 o_displayGenus[x+1] = 1;
                 displayIDs[x] = meshIDs[y];
+				o_displayIDs[x+1] = displayIDs[x];
                 displayOldIDs[x] = meshOldIDs[y];
                 x++;
             }
         }
         for(y = 1; y <= size(lightAgents); y++)
         {
-			info("Found light: " + lightNames[y] + " x=" + x);
             displayNames[x] = lightNames[y];
             o_displayNames[x+1] = displayNames[x];
             displayGenus[x] = 2;
-  			info("displayGenus[" + x + "]: " + displayGenus[x]);
             o_displayGenus[x+1] = 2;
-			info("o_displayGenus[" + (x+1) + "]: " + o_displayGenus[x+1]);
             displayIDs[x] = lightIDs[y];
+			o_displayIDs[x+1] = displayIDs[x];
             displayOldIDs[x] = lightOldIDs[y];
             x++;
         }
-
-		// check override array
-		for (j = 1; j < o_displayNames.size(); j++) {
-			info(j.asStr() + ": item: " + o_displayNames[j] + " of type: " + o_displayGenus[j]);
-		}
 
         passNames[1] = "Default";
         overrideNames[1] = "empty";
@@ -1265,33 +1266,33 @@ reProcess
         // Scene Master override setup
         o_displayNames = nil; // clear it out
         o_displayGenus = nil; // clear it out
+		o_displayIDs = nil;
         o_displayNames[1] = "(Scene Master)";
         o_displayGenus[1] = 0;
+		o_displayIDs[1] = "SM";
         
         for(y = 1; y <= size(meshAgents); y++)
         {
             if(meshAgents[1] != "none")
             {
-				info("Found mesh: " + meshNames[y] + " x=" + x);
                 displayNames[x] = meshNames[y];
                 o_displayNames[x+1] = displayNames[x];
                 displayGenus[x] = 1;
                 o_displayGenus[x+1] = displayGenus[x];
                 displayIDs[x] = meshIDs[y];
+				o_displayIDs[x+1] = displayIDs[x];
                 displayOldIDs[x] = meshOldIDs[y];
                 x++;
             }
         }
         for(y = 1; y <= size(lightAgents); y++)
         {
-			info("Found light: " + lightNames[y] + " x=" + x);
             displayNames[x] = lightNames[y];
             o_displayNames[x+1] = displayNames[x];
             displayGenus[x] = 2;
-			info("displayGenus[" + x + "]: " + displayGenus[x]);
             o_displayGenus[x+1] = displayGenus[x];
-			info("o_displayGenus[" + (x+1) + "]: " + o_displayGenus[x+1]);
             displayIDs[x] = lightIDs[y];
+			o_displayIDs[x+1] = displayIDs[x];
             displayOldIDs[x] = lightOldIDs[y];
             x++;
         }

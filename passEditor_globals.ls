@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20121207";
+var versionString = "20121211";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -34,6 +34,8 @@ var o_displayNames; // holds all items for the override item listbox
 var o_displayNamesFiltered; // populates the listbox with compatible items for selected override type.
 var o_displayGenus; // used to filter the displayNames by type for compatibility.
 var displayIDs;
+var o_displayIDs; // exporting ID array for override items
+var o_displayIDsFiltered; // container for IDs for filtered items.
 var displayOldIDs;
 var passNames;
 var overrideNames;

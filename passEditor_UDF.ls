@@ -43,22 +43,25 @@ o_addAllButton // FIXME : This needs to be fundamentally re-worked. The items sh
     {
         previousPassOverrideItems[pass][sel] = passOverrideItems[pass][sel];
         passOverrideItems[pass][sel] = "";
-        o_items_size = sizeof(o_displayNames);
+        o_items_size = sizeof(o_displayNamesFiltered);
         o_items_array[1] = 1;
+        
+        // scene master, special case.
         passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + "(Scene Master)";
-        for(x = 2;x <= o_items_size;x++)
+        // else
+        for(x = 1;x <= o_items_size;x++)
         {
             o_items_array[x] = x;
-            passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + displayIDs[x - 1];
+            passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + o_displayIDsFiltered[x];
         }
-        passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + displayIDs[1]; 
-//        set_o_items = o_parseListItems(passOverrideItems[pass][sel]);
-//        setvalue(gad_SceneItems_forOverrides_Listview,set_o_items);
+
+        // set highlighting for matching items.
+        setvalue(gad_SceneItems_forOverrides_Listview,o_parseListItems(passOverrideItems[pass][sel]));
         req_update();
     }
     else
     {
-//        setvalue(gad_SceneItems_forOverrides_Listview,nil);
+        setvalue(gad_SceneItems_forOverrides_Listview,nil);
         req_update();
     }
 }
@@ -118,7 +121,7 @@ o_clearAllButton
             {
                 previousPassOverrideItems[pass][sel] = passOverrideItems[pass][sel];
                 passOverrideItems[pass][sel] = "";
-//                setvalue(gad_SceneItems_forOverrides_Listview,nil);
+                setvalue(gad_SceneItems_forOverrides_Listview,nil);
                 req_update();
             }
         }
@@ -138,7 +141,7 @@ o_clearAllButton
         if(overridesSelected == true && sel != 0)
         {
             passOverrideItems[pass][sel] = "";
-//            setvalue(gad_SceneItems_forOverrides_Listview,nil);
+            setvalue(gad_SceneItems_forOverrides_Listview,nil);
             req_update();
         }
     }
@@ -147,111 +150,106 @@ o_clearAllButton
 
 addSelButton
 {
-	items_array = nil;
+    items_array = nil;
     sel = getvalue(gad_PassesListview).asInt();
     if(passSelected == true && sel != 0)
     {
-    	s = masterScene.getSelect();
-    	if(s != nil)
-    	{
-			arraySize = sizeof(s);
-			
-			newNumber = sel;
-			for(x = 1; x <= arraySize; x++)
-			{
-				itemname = s[x].name;
-				previousPassAssItems[newNumber] = passAssItems[newNumber];
-				switch(s[x].genus)
-				{
-					case 1:
-//						info("AddSel: genus 1, mesh: " + itemname);
-						tempMeshAgents[x] = Mesh(itemname);
-						tempMeshNames[x] = tempMeshAgents[x].name;
-						tempMeshIDs[x] = tempMeshAgents[x].id;
-						passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempMeshIDs[x];
-						break;
-					
-					case 2:
-//						info("AddSel: genus 2, light: " + itemname);
-						tempLightAgents[x] = Light(itemname);
-						tempLightNames[x] = tempLightAgents[x].name;
-						tempLightIDs[x] = tempLightAgents[x].id;
-						passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempLightIDs[x];
-						break;
-						
-					default:
-//						info("AddSel: Unrecognised, not adding " + itemname);
-						break;
-				}
-			}
-			setitems = parseListItems(passAssItems[newNumber]);
-			setvalue(gad_SceneItems_forPasses_Listview,setitems);
-    	}
-    	else
-	    {
-			setvalue(gad_SceneItems_forPasses_Listview,nil);
-	    	req_update();
-		}
+        s = masterScene.getSelect();
+        if(s != nil)
+        {
+            arraySize = sizeof(s);
+            
+            newNumber = sel;
+            for(x = 1; x <= arraySize; x++)
+            {
+                itemname = s[x].name;
+                previousPassAssItems[newNumber] = passAssItems[newNumber];
+                switch(s[x].genus)
+                {
+                    case 1:
+                        tempMeshAgents[x] = Mesh(itemname);
+                        tempMeshNames[x] = tempMeshAgents[x].name;
+                        tempMeshIDs[x] = tempMeshAgents[x].id;
+                        passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempMeshIDs[x];
+                        break;
+                    
+                    case 2:
+                        tempLightAgents[x] = Light(itemname);
+                        tempLightNames[x] = tempLightAgents[x].name;
+                        tempLightIDs[x] = tempLightAgents[x].id;
+                        passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempLightIDs[x];
+                        break;
+                        
+                    default:
+                        break;
+                }
+            }
+            setitems = parseListItems(passAssItems[newNumber]);
+            setvalue(gad_SceneItems_forPasses_Listview,setitems);
+        }
+        else
+        {
+            setvalue(gad_SceneItems_forPasses_Listview,nil);
+            req_update();
+        }
     }
     else
     {
-		setvalue(gad_SceneItems_forPasses_Listview,nil);
-    	req_update();
-	}
+        setvalue(gad_SceneItems_forPasses_Listview,nil);
+        req_update();
+    }
 }
 
 o_addSelButton
-{	
-	o_items_array = nil;
+{   
+    o_items_array = nil;
     pass = currentChosenPass;
     sel = getvalue(gad_OverridesListview).asInt();
-	o_tempSettingsArray = parse("||",overrideSettings[sel]);
+    o_tempSettingsArray = parse("||",overrideSettings[sel]);
     if(overridesSelected == true && sel != 0)
     {
-    	s = masterScene.getSelect(); // picks up selected items in Layout, matching documentation.
-    	if(s != nil)
-    	{
-			arraySize = sizeof(s);
-			for(x = 1; x <= arraySize; x++)
-			{
-				itemname = s[x].name;
-				previousPassOverrideItems[pass][sel] = passOverrideItems[pass][sel];
-				if((s[x].genus == 1) && (o_tempSettingsArray[2] == "type1" || o_tempSettingsArray[2] == "type2"  || o_tempSettingsArray[2] == "type3"  || o_tempSettingsArray[2] == "type4" || o_tempSettingsArray[2] == "type7"))
-				{
-//					info("o_AddSel: genus 1, mesh: " + itemname);
-					tempMeshAgents[x] = Mesh(itemname);
-					tempMeshNames[x] = tempMeshAgents[x].name;
-					tempMeshIDs[x] = tempMeshAgents[x].id;
-					passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempMeshIDs[x];
-				}
-				if ((s[x].genus == 2) && (o_tempSettingsArray[2] == "type3" || o_tempSettingsArray[2] == "type5"))
-				{
-//					info("o_AddSel: genus 2, light: " + itemname);
-					tempLightAgents[x] = Light(itemname);
-					tempLightNames[x] = tempLightAgents[x].name;
-					tempLightIDs[x] = tempLightAgents[x].id;
-					passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempLightIDs[x];
-				}
-				if(o_tempSettingsArray[2] == "type6")
-				{
-					 // since working from Layout select, no ability to assign scene master.
-				}
-			}
-//			set_o_items = o_parseListItems(passOverrideItems[pass][sel]);
-//			setvalue(gad_SceneItems_forOverrides_Listview,set_o_items);
-			req_update();
-    	}
-    	else
-	    {
-//			setvalue(gad_SceneItems_forOverrides_Listview,nil);
-	    	req_update();
-		}
+        s = masterScene.getSelect(); // picks up selected items in Layout, matching documentation.
+        if(s != nil)
+        {
+            arraySize = sizeof(s);
+            for(x = 1; x <= arraySize; x++)
+            {
+                itemname = s[x].name;
+                previousPassOverrideItems[pass][sel] = passOverrideItems[pass][sel];
+                if((s[x].genus == 1) && (o_tempSettingsArray[2] == "type1" || o_tempSettingsArray[2] == "type2"  || o_tempSettingsArray[2] == "type3"  || o_tempSettingsArray[2] == "type4" || o_tempSettingsArray[2] == "type7"))
+                {
+                    tempMeshAgents[x] = Mesh(itemname);
+                    tempMeshNames[x] = tempMeshAgents[x].name;
+                    tempMeshIDs[x] = tempMeshAgents[x].id;
+                    passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempMeshIDs[x];
+                }
+                if ((s[x].genus == 2) && (o_tempSettingsArray[2] == "type3" || o_tempSettingsArray[2] == "type5"))
+                {
+                    tempLightAgents[x] = Light(itemname);
+                    tempLightNames[x] = tempLightAgents[x].name;
+                    tempLightIDs[x] = tempLightAgents[x].id;
+                    passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempLightIDs[x];
+                }
+                if(o_tempSettingsArray[2] == "type6")
+                {
+                     // since working from Layout select, no ability to assign scene master.
+                }
+            }
+            // Apply highlight to items assigned to override
+            setvalue(gad_SceneItems_forOverrides_Listview,o_parseListItems(passOverrideItems[pass][sel]));
+            req_update();
+        }
+        else
+        {
+            setvalue(gad_SceneItems_forOverrides_Listview,nil);
+            req_update();
+        }
     }
     else
     {
-//		setvalue(gad_SceneItems_forOverrides_Listview,nil);
-    	req_update();
-	}
+        setvalue(gad_SceneItems_forOverrides_Listview,nil);
+        req_update();
+    }
 }
 
 clearSelButton
@@ -260,136 +258,135 @@ clearSelButton
     sel = getvalue(gad_PassesListview).asInt();
     if(passSelected == true && sel != 0)
     {
-		s = masterScene.getSelect();
-		if(s != nil)
-		{
-			arraySize = sizeof(s);
-			newNumber = sel;
-			for(x = 1; x <= arraySize; x++)
-			{
-				itemname = s[x].name;
-				previousPassAssItems[newNumber] = passAssItems[newNumber];
-				switch(s[x].genus)
-				{
-					case 1:
-						tempMeshAgents[x] = Mesh(itemname);
-						tempMeshNames[x] = tempMeshAgents[x].name;
-						removeMeIDs[x] = tempMeshAgents[x].id;
-						tempParse = parse("||",passAssItems[newNumber]);
-						passAssItems[newNumber] = "";
-						for(y = 1; y <= size(tempParse); y++)
-						{
-							if(tempParse[y] != removeMeIDs[x])
-							{
-								passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempParse[y];
-							}
-						}
-						break;
-					
-					case 2:
-						tempLightAgents[x] = Light(itemname);
-						tempLightNames[x] = tempLightAgents[x].name;
-						removeMeIDs[x] = tempLightAgents[x].id;
-						tempParse = parse("||",passAssItems[newNumber]);
-						passAssItems[newNumber] = "";
-						for(y = 1; y <= size(tempParse); y++)
-						{
-							if(tempParse[y] != removeMeIDs[x])
-							{
-								passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempParse[y];
-							}
-						}
-						break;
-						
-					default:
-						break;
-				}
-			}
-			setitems = parseListItems(passAssItems[newNumber]);
-			setvalue(gad_SceneItems_forPasses_Listview,setitems);
-		}
-		else
-	    {
-			setvalue(gad_SceneItems_forPasses_Listview,nil);
-	    	req_update();
-		}
+        s = masterScene.getSelect();
+        if(s != nil)
+        {
+            arraySize = sizeof(s);
+            newNumber = sel;
+            for(x = 1; x <= arraySize; x++)
+            {
+                itemname = s[x].name;
+                previousPassAssItems[newNumber] = passAssItems[newNumber];
+                switch(s[x].genus)
+                {
+                    case 1:
+                        tempMeshAgents[x] = Mesh(itemname);
+                        tempMeshNames[x] = tempMeshAgents[x].name;
+                        removeMeIDs[x] = tempMeshAgents[x].id;
+                        tempParse = parse("||",passAssItems[newNumber]);
+                        passAssItems[newNumber] = "";
+                        for(y = 1; y <= size(tempParse); y++)
+                        {
+                            if(tempParse[y] != removeMeIDs[x])
+                            {
+                                passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempParse[y];
+                            }
+                        }
+                        break;
+                    
+                    case 2:
+                        tempLightAgents[x] = Light(itemname);
+                        tempLightNames[x] = tempLightAgents[x].name;
+                        removeMeIDs[x] = tempLightAgents[x].id;
+                        tempParse = parse("||",passAssItems[newNumber]);
+                        passAssItems[newNumber] = "";
+                        for(y = 1; y <= size(tempParse); y++)
+                        {
+                            if(tempParse[y] != removeMeIDs[x])
+                            {
+                                passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempParse[y];
+                            }
+                        }
+                        break;
+                        
+                    default:
+                        break;
+                }
+            }
+            setitems = parseListItems(passAssItems[newNumber]);
+            setvalue(gad_SceneItems_forPasses_Listview,setitems);
+        }
+        else
+        {
+            setvalue(gad_SceneItems_forPasses_Listview,nil);
+            req_update();
+        }
     }
-	else
+    else
     {
-		setvalue(gad_SceneItems_forPasses_Listview,nil);
-    	req_update();
-	}
+        setvalue(gad_SceneItems_forPasses_Listview,nil);
+        req_update();
+    }
 }
 
 o_clearSelButton
-{	
-	o_items_array = nil;
+{   
+    o_items_array = nil;
     pass = currentChosenPass;
     sel = getvalue(gad_OverridesListview).asInt();
     if(overridesSelected == true && sel != 0)
     {
-    	s = masterScene.getSelect();
-    	if(s != nil)
-    	{
-			arraySize = sizeof(s);
-			s = masterScene.getSelect();
-			arraySize = sizeof(s);
-			newNumber = sel;
-			for(x = 1; x <= arraySize; x++)
-			{
-				itemname = s[x].name;
-				previousPassOverrideItems[pass][sel] = passOverrideItems[pass][sel];
-				switch(s[x].genus)
-				{
-					case 1:
-						tempMeshAgents[x] = Mesh(itemname);
-						tempMeshNames[x] = tempMeshAgents[x].name;
-						removeMeIDs[x] = tempMeshAgents[x].id;
-						tempParse = parse("||",passOverrideItems[pass][sel]);
-						passOverrideItems[pass][sel] = "";
-						for(y = 1; y <= size(tempParse); y++)
-						{
-							if(tempParse[y] != removeMeIDs[x])
-							{
-								passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempParse[y];
-							}
-						}
-						break;
-					
-					case 2:
-						tempLightAgents[x] = Light(itemname);
-						tempLightNames[x] = tempLightAgents[x].name;
-						removeMeIDs[x] = tempLightAgents[x].id;
-						tempParse = parse("||",passOverrideItems[pass][sel]);
-						passOverrideItems[pass][sel] = "";
-						for(y = 1; y <= size(tempParse); y++)
-						{
-							if(tempParse[y] != removeMeIDs[x])
-							{
-								passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempParse[y];
-							}
-						}
-						break;
-						
-					default:
-						break;
-				}
-			}
-//			set_o_items = o_parseListItems(passOverrideItems[pass][sel]);
-//			setvalue(gad_SceneItems_forOverrides_Listview,set_o_items);
-			req_update();
-    	}
-    	else
-	    {
-//			setvalue(gad_SceneItems_forOverrides_Listview,nil);
-	    	req_update();
-		}
+        s = masterScene.getSelect();
+        if(s != nil)
+        {
+            arraySize = sizeof(s);
+            s = masterScene.getSelect();
+            arraySize = sizeof(s);
+            newNumber = sel;
+            for(x = 1; x <= arraySize; x++)
+            {
+                itemname = s[x].name;
+                previousPassOverrideItems[pass][sel] = passOverrideItems[pass][sel];
+                switch(s[x].genus)
+                {
+                    case 1:
+                        tempMeshAgents[x] = Mesh(itemname);
+                        tempMeshNames[x] = tempMeshAgents[x].name;
+                        removeMeIDs[x] = tempMeshAgents[x].id;
+                        tempParse = parse("||",passOverrideItems[pass][sel]);
+                        passOverrideItems[pass][sel] = "";
+                        for(y = 1; y <= size(tempParse); y++)
+                        {
+                            if(tempParse[y] != removeMeIDs[x])
+                            {
+                                passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempParse[y];
+                            }
+                        }
+                        break;
+                    
+                    case 2:
+                        tempLightAgents[x] = Light(itemname);
+                        tempLightNames[x] = tempLightAgents[x].name;
+                        removeMeIDs[x] = tempLightAgents[x].id;
+                        tempParse = parse("||",passOverrideItems[pass][sel]);
+                        passOverrideItems[pass][sel] = "";
+                        for(y = 1; y <= size(tempParse); y++)
+                        {
+                            if(tempParse[y] != removeMeIDs[x])
+                            {
+                                passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + tempParse[y];
+                            }
+                        }
+                        break;
+                        
+                    default:
+                        break;
+                }
+            }
+            setvalue(gad_SceneItems_forOverrides_Listview,passOverrideItems[pass][sel]);
+            req_update();
+        }
+        else
+        {
+            setvalue(gad_SceneItems_forOverrides_Listview,nil);
+            req_update();
+        }
     }
     else
     {
-//		setvalue(gad_SceneItems_forOverrides_Listview,nil);
-    	req_update();
-	}
+        setvalue(gad_SceneItems_forOverrides_Listview,nil);
+        req_update();
+    }
 }
 
 editSelectedPass
@@ -1367,7 +1364,8 @@ reqkeyboard: key
 @if dev == 1
 debugMe: val
 {
-	debug = val;
-	globalstore("passEditorDebugMode", debug);
+    debug = val;
+    globalstore("passEditorDebugMode", debug);
 }
 @end
+
