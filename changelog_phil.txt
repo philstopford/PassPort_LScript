@@ -1,3 +1,8 @@
+20121228c
+=========
+
+- Removed some binary character corruption from the scenegen file.
+
 20121228b
 =========
 

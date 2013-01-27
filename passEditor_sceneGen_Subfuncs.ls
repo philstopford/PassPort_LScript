@@ -2085,11 +2085,7 @@ generatePassFile: mode, pass
                             }
                         }
                     }
-                    
-                    
-                    
-                    
-                    
+
                     // if the item line exists in the motion mixer stuff, read the line before it to get the object name
                     if(mmItemIDLine != nil)
                     {
@@ -2126,22 +2122,21 @@ generatePassFile: mode, pass
                         inputFile.line(1);
                         
                         while(!inputFile.eof())
-                       {
-                           line = inputFile.read();
-                           linesize = size(line);
-                           stringsize = size(replaceStringOne);
-                           if(linesize >= stringsize)
-                           {
-                                if(strleft(line,size(replaceStringOne)) == replaceStringOne)
-                                {
-                                    n = size(line) - size(replaceStringOne);
-                                    lineTemp = replacementStringOne + strright(line,n);
-                                    line = lineTemp;
-                                }
-                           }
-                           
-                           tempOutput.writeln(line);
-                       }
+						{
+							line = inputFile.read();
+							linesize = size(line);
+							stringsize = size(replaceStringOne);
+							if(linesize >= stringsize)
+							{
+								if(strleft(line,size(replaceStringOne)) == replaceStringOne)
+								{
+									n = size(line) - size(replaceStringOne);
+									lineTemp = replacementStringOne + strright(line,n);
+									line = lineTemp;
+								}
+							}
+							tempOutput.writeln(line);
+						}
                         
                         inputFile.close();
                         tempOutput.close();
@@ -2154,23 +2149,21 @@ generatePassFile: mode, pass
                         
                         inputFile.line(1);
                         
-                        while(!inputFile.eof())
-                       {
-                           line = inputFile.read();
-                           if(size(line) > size(replaceStringTwo))
-                           {
-                                if(strleft(line,size(replaceStringTwo)) == replaceStringTwo)
-                                {
-                                    n = size(line) - size(replaceStringTwo);
-                                    lineTemp = replacementStringTwo + strright(line,n);
-                                    line = lineTemp;
-                                }
-                           }
-                           
-                           tempOutput.writeln(line);
-                       }
-                       
-                       inputFile.close();
+						while(!inputFile.eof())
+						{
+							line = inputFile.read();
+							if(size(line) > size(replaceStringTwo))
+							{
+								if(strleft(line,size(replaceStringTwo)) == replaceStringTwo)
+								{
+									n = size(line) - size(replaceStringTwo);
+									lineTemp = replacementStringTwo + strright(line,n);
+									line = lineTemp;
+								}
+							}
+							tempOutput.writeln(line);
+						}
+						inputFile.close();
                         tempOutput.close();
                         
                         filecopy("TEMPTESTRESMULTSCENE.LWS",newScenePath);
@@ -2181,23 +2174,21 @@ generatePassFile: mode, pass
                         
                         inputFile.line(1);
                         
-                        while(!inputFile.eof())
-                       {
-                           line = inputFile.read();
-                           if(size(line) > size(replaceStringThree))
-                           {
-                                if(strleft(line,size(replaceStringThree)) == replaceStringThree)
-                                {
-                                    n = size(line) - size(replaceStringThree);
-                                    lineTemp = replacementStringThree + strright(line,n);
-                                    line = lineTemp;
-                                }
-                           }
-                           
-                           tempOutput.writeln(line);
-                       }
-                       
-                       inputFile.close();
+						while(!inputFile.eof())
+						{
+							line = inputFile.read();
+							if(size(line) > size(replaceStringThree))
+							{
+								if(strleft(line,size(replaceStringThree)) == replaceStringThree)
+								{
+									n = size(line) - size(replaceStringThree);
+									lineTemp = replacementStringThree + strright(line,n);
+									line = lineTemp;
+								}
+							}
+							tempOutput.writeln(line);
+						}
+						inputFile.close();
                         tempOutput.close();
                         
                         filecopy("TEMPTESTRESMULTSCENE.LWS",newScenePath);
@@ -2208,21 +2199,20 @@ generatePassFile: mode, pass
                         
                         inputFile.line(1);
                         
-                        while(!inputFile.eof())
-                       {
-                           line = inputFile.read();
-                           if(size(line) > size(replaceStringFour))
-                           {
-                                if(strleft(line,size(replaceStringFour)) == replaceStringFour)
-                                {
-                                    n = size(line) - size(replaceStringFour);
-                                    lineTemp = replacementStringFour + strright(line,n);
-                                    line = lineTemp;
-                                }
-                           }
-                           
-                           tempOutput.writeln(line);
-                       }
+						while(!inputFile.eof())
+						{
+							line = inputFile.read();
+							if(size(line) > size(replaceStringFour))
+							{
+								if(strleft(line,size(replaceStringFour)) == replaceStringFour)
+								{
+									n = size(line) - size(replaceStringFour);
+									lineTemp = replacementStringFour + strright(line,n);
+									line = lineTemp;
+								}
+							}
+							tempOutput.writeln(line);
+						}
                         inputFile.close();
                         tempOutput.close();
                         
