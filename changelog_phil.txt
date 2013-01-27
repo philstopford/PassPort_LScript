@@ -1,6 +1,14 @@
+20121214
+========
+
+- Adjusted o_AddAll code to work with new system.
+- Fixed numerous silly errors - current favourite : .asStr instead of .asStr()
+- Fixed stupid item ID look-up bug in override event code. This was the cause of p0013, and it was a very silly error. *hangs head in shame*.
+
 20121212
 ========
 
+- Updated header images to credit Matt for his work.
 - Found various gaps in platform support for Win64. Closed.
 - Still fighting p0013....
  - Very odd. The arrays seem to be intact and valid. There's something odd going on in the look-up. A multiple selection, even with a gap between, always returns sequential numbers (1 2) rather than (3 5). Puzzling. Values coming into the parse function are correct.
@@ -144,12 +152,10 @@ Brace yourself. Here's the big set of UI changes related to filtering the overri
 + In Progress +
 +++++++++++++++
 
-p0013 @ high prio
+UI layout code optimisation.
 HackyUpdates review
 HackySaving deprecation
 Block operation on CFM LW.
-o_AddAll
-
 
 ********
 * Bugs *
@@ -161,13 +167,13 @@ p0003 : Start-up bug. (Fixed)
 p0004 : SceneGen routine blows up. (Fixed)
 p0005 : path incorrect. (Fixed)
 p0006 : LWO saver blowing up. (Fixed)
-p0007 : Master scene override failure if anything other than, or in addition to, (Scene Master) is assigned to it. (Fixed, better fix needed - see p0009)
+p0007 : Master scene override failure if anything other than, or in addition to, (Scene Master) is assigned to it. (Fixed)
 p0008 : Failsafe code for overrideType needs to be made more robust. (Fixed)
-p0009 : Possible to add (Scene Master) item to overrides that are not related. Need to engineer a fix (skip first item in list, or create a genus for this item). (In progress with 20121206; nominally working in 20121211, but some final tweaks are needed.)
+p0009 : Possible to add (Scene Master) item to overrides that are not related. Need to engineer a fix (skip first item in list, or create a genus for this item). (Fixed)
 p0010 : listbox selections are misfiring. (notabug? related to p0011 - user expectation was different to UI functionality)
 p0011 : AddSel seems to replace existing assignments of overrides, rather than adding to the existing selection. Odd and probably the cause for report p0010. (deferred)
 p0012 : Rebuilding lists causes script to explode. (Fixed)
-p0013 : Selecting second item in list causes highlight to be drawn (on repaint) for 1st item. (20121211 - new)
+p0013 : Selecting second item in list causes highlight to be drawn (on repaint) for 1st item. (Fixed)
 p0014 : Uncompiled version crashes out on Mac and fails to start-up roughly 70% of the time on WinXP. (closed, LScript bug)
 p0015 : Overrides with assigned items don't get bullet point until the lists are updated, or some major redraw occurs (also in original code)
 

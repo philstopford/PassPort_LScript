@@ -63,9 +63,24 @@
 @warnings
 @script master
 @name "PassPort_MC"
-@define dev 0
+@define dev 1
+@define compiledform 1
 
 // Inserts other functions ...
+@if compiledform == 1
+
+@insert "@passEditor_globals.ls"
+@insert "@passEditor_UIglobals.ls"
+@insert "@passEditor_Interface_Subfuncs.ls"
+@insert "@passEditor_render_Subfuncs.ls"
+@insert "@passEditor_sceneGen_Subfuncs.ls"
+@insert "@passEditor_sceneParse_Subfuncs.ls"
+@insert "@passEditor_UDF.ls"
+@insert "@passEditor_UDF_Passes.ls"
+@insert "@passEditor_UDF_Overrides.ls"
+
+@else
+
 @if dev == 1
 @if platform == MAC64 || platform == MACUB
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_globals.ls"
@@ -78,6 +93,7 @@
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UDF_Passes.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UDF_Overrides.ls"
 @end
+
 @if platform == INTEL || platform == WIN32 || platform == WIN64
 @insert "E:/PassPort/Source/passEditor_globals.ls"
 @insert "E:/PassPort/Source/passEditor_UIglobals.ls"
@@ -89,7 +105,9 @@
 @insert "E:/PassPort/Source/passEditor_UDF_Passes.ls"
 @insert "E:/PassPort/Source/passEditor_UDF_Overrides.ls"
 @end
+
 @else
+
 @insert "@passEditor_globals.ls"
 @insert "@passEditor_UIglobals.ls"
 @insert "@passEditor_Interface_Subfuncs.ls"
@@ -99,6 +117,9 @@
 @insert "@passEditor_UDF.ls"
 @insert "@passEditor_UDF_Passes.ls"
 @insert "@passEditor_UDF_Overrides.ls"
+
+@end
+
 @end
 
 // icons
@@ -239,7 +260,8 @@ destroy
 
 options
 {
-    
+    debug();
+
     if(interfaceRunYet == 1)
     {
         reProcess();
@@ -338,8 +360,7 @@ options
     ctlposition(gad_OverridesListview, Main_ui_gap, Main_banner_height + 55);
 
 @if dev == 1
-//    gad_Debug = ctlstate("DEBUG",debugmode,debugButtonWidth,"debugMe"); // use globalstore (defined in globals), defaults to 0 if not retrieved.
-    gad_Debug = ctlbutton("DEBUG",debugButtonWidth,"debugMe");
+    gad_Debug = ctlstate("DEBUG",debugmode,debugButtonWidth,"debugMe"); // use globalstore (defined in globals), defaults to 0 if not retrieved.
     ctlposition(gad_Debug,debugButtonXposition, Main_banner_height+5);
 @end
     
@@ -811,11 +832,11 @@ process: event, command
             if(meshAgents[1] != "none")
             {
 				displayNames[x] = meshNames[y];
-                o_displayNames[x+1] = displayNames[x];
+                o_displayNames[x+1] = meshNames[y];
                 displayGenus[x] = 1;
                 o_displayGenus[x+1] = 1;
                 displayIDs[x] = meshIDs[y];
-				o_displayIDs[x+1] = displayIDs[x];
+				o_displayIDs[x+1] = meshIDs[y];
                 displayOldIDs[x] = meshOldIDs[y];
                 x++;
             }
@@ -823,11 +844,11 @@ process: event, command
         for(y = 1; y <= size(lightAgents); y++)
         {
             displayNames[x] = lightNames[y];
-            o_displayNames[x+1] = displayNames[x];
+            o_displayNames[x+1] = lightNames[y];
             displayGenus[x] = 2;
             o_displayGenus[x+1] = 2;
             displayIDs[x] = lightIDs[y];
-			o_displayIDs[x+1] = displayIDs[x];
+			o_displayIDs[x+1] = lightIDs[y];
             displayOldIDs[x] = lightOldIDs[y];
             x++;
         }
@@ -1276,11 +1297,11 @@ reProcess
             if(meshAgents[1] != "none")
             {
                 displayNames[x] = meshNames[y];
-                o_displayNames[x+1] = displayNames[x];
+                o_displayNames[x+1] = meshNames[y];
                 displayGenus[x] = 1;
                 o_displayGenus[x+1] = displayGenus[x];
                 displayIDs[x] = meshIDs[y];
-				o_displayIDs[x+1] = displayIDs[x];
+				o_displayIDs[x+1] = meshIDs[y];
                 displayOldIDs[x] = meshOldIDs[y];
                 x++;
             }
@@ -1288,15 +1309,15 @@ reProcess
         for(y = 1; y <= size(lightAgents); y++)
         {
             displayNames[x] = lightNames[y];
-            o_displayNames[x+1] = displayNames[x];
+            o_displayNames[x+1] = lightNames[y];
             displayGenus[x] = 2;
             o_displayGenus[x+1] = displayGenus[x];
             displayIDs[x] = lightIDs[y];
-			o_displayIDs[x+1] = displayIDs[x];
+			o_displayIDs[x+1] = lightIDs[y];
             displayOldIDs[x] = lightOldIDs[y];
             x++;
         }
-                
+        
         if(originalSelection != nil)
         {
             //info(originalSelection);

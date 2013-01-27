@@ -36,7 +36,7 @@ o_itemslb_event: o_items // Add items to the selected override; need to filter d
 					}
 					else
 					{
-						passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + o_displayIDsFiltered[x]; // look up our ID in the filtered list.
+						passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + o_displayIDsFiltered[o_items[x]]; // look up our ID in the filtered list.
 					}
 				}
 			}
@@ -63,6 +63,7 @@ o_parseListItems: overrideItemsString
 {
 	if (overrideItemsString != nil)
 	{
+		debug();
 		sel = getvalue(gad_OverridesListview).asInt();
 		o_tempSettingsArray = parse("||",overrideSettings[sel]);
 		tempOverrideType = o_tempSettingsArray[2];
@@ -76,30 +77,8 @@ o_parseListItems: overrideItemsString
 		else
 		{
 			idsArray = parse("||",overrideItemsString);
-//			info("idsArray: " + idsArray);
-//			info("overrideItemsString: " + overrideItemsString);
-//			info("o_displayIDsFiltered: " + o_displayIDsFiltered);
-			z = 1;
-			
-/*			tempString = "";
-			for (ab = 1; ab <= size(o_displayIDsFiltered); ab++)
-			{
-				tempString += o_displayIDsFiltered[ab].asStr();
-				tempString += " ";
-			}
-			
-			info(tempString);
-			
-			tempString = "";
 
-			for (ab = 1; ab <= size(idsArray); ab++)
-			{
-				tempString += idsArray[ab].asStr();
-				tempString += " ";
-			}
-			
-			tempString = "";
-*/			
+			z = 1;
 			for(x = 1; x <= size(o_displayIDsFiltered); x++)
 			{
 				for(y = 1; y <= size(idsArray); y++)
@@ -162,7 +141,6 @@ overrideslb_event: overrides_list
 			overrides_size = 1;
         }
 
-		// MOVED TO o_Filter function.
 		o_Filter(overrides_list);
 		
 		// Update the listboxes with new content

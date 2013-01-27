@@ -34,27 +34,30 @@ addAllButton
     }
 }
 
-o_addAllButton // FIXME : This needs to be fundamentally re-worked. The items should only be assigned to compatible overrides.
+o_addAllButton
 {
     o_items_array = nil;
     pass = currentChosenPass;
     sel = getvalue(gad_OverridesListview).asInt();
+    o_tempSettingsArray = parse("||",overrideSettings[sel]);
+	
     if(overridesSelected == true && sel != 0)
     {
         previousPassOverrideItems[pass][sel] = passOverrideItems[pass][sel];
-        passOverrideItems[pass][sel] = "";
-        o_items_size = sizeof(o_displayNamesFiltered);
-        o_items_array[1] = 1;
-        
-        // scene master, special case.
-        passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + "(Scene Master)";
-        // else
-        for(x = 1;x <= o_items_size;x++)
-        {
-            o_items_array[x] = x;
-            passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + o_displayIDsFiltered[x];
-        }
+        passOverrideItems[pass][sel] = ""; // erase since we're going to add the universe.
 
+        if(o_tempSettingsArray[2] == "type6") // scene master - only one item, so no problem.
+		{
+	        passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + "(Scene Master)";
+		} else { // we don't need to care about override type - the list is already filtered against the selected override type.
+			o_items_size = sizeof(o_displayNamesFiltered);
+			o_items_array[1] = 1;
+			for(x = 1;x <= o_items_size;x++)
+			{
+				o_items_array[x] = x;
+				passOverrideItems[pass][sel] = passOverrideItems[pass][sel] + "||" + o_displayIDsFiltered[x];
+			}
+		}
         // set highlighting for matching items.
         setvalue(gad_SceneItems_forOverrides_Listview,o_parseListItems(passOverrideItems[pass][sel]));
         req_update();
@@ -989,7 +992,6 @@ currentPassMenu_refresh: value
     setvalue(gad_OverridesListview,nil);
     setvalue(gad_SceneItems_forOverrides_Listview,nil);
     //setvalue(gad_SelectedPass,currentChosenPass);
-    //setvalue(c7,currentChosenPassString,"");
     reProcess();
     req_update();
 }
@@ -1001,7 +1003,6 @@ currentPassMenu_select: currentPassMenu_item
     setvalue(gad_OverridesListview,nil);
     setvalue(gad_SceneItems_forOverrides_Listview,nil);
     setvalue(gad_SelectedPass,currentChosenPass);
-    //setvalue(c7,currentChosenPassString,"");
     reProcess();
     req_update();
 }
@@ -1362,11 +1363,10 @@ reqkeyboard: key
 }
 
 @if dev == 1
-debugMe //: val
+debugMe: val
 {
-//    debug = val;
-//    globalstore("passEditorDebugMode", debug);
-    debug();
+    debug = val;
+    globalstore("passEditorDebugMode", debug);
 }
 @end
 
