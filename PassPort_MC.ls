@@ -57,11 +57,11 @@
 @warnings
 @script master
 @name "PassPort_MC"
-@define dev "TRUE"
+//@define dev "TRUE"
 
 // Inserts other functions ...
 @if dev == TRUE
-@if platform == MACUB
+@if platform == 11
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_globals.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_UIglobals.ls"
 @insert "/Applications/NewTek/LightWave_3D_9.UB/3rdparty_plugins/LScripts/JeremyHardin/Passport/Source/passEditor_Interface_Subfuncs.ls"

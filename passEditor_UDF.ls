@@ -21,7 +21,6 @@ o_itemslb_name: index
 
 itemslb_event: items
 {
-	info("itemslb_event: items");
 	items_array = nil;
 	sel = getvalue(gad_PassesListview).asInt();
 	if(passSelected == true && sel != 0)
@@ -53,7 +52,7 @@ itemslb_event: items
 
 o_itemslb_event: o_items
 {
-	info("o_itemslb_event: o_items");
+
 	o_items_array = nil;
 	pass = currentChosenPass;
 	sel = getvalue(gad_OverridesListview).asInt();
@@ -109,7 +108,6 @@ passeslb_name: index
 }
 passeslb_event: passes_items
 {
-	info("passeslb_event: passes_items");
 	passes_array = nil;
 	if(passes_items != nil)
 	{
@@ -239,7 +237,6 @@ overrideslb_name: index
 }
 overrideslb_event: overrides_items
 {	
-	info("overrideslb_event: overrides_items");
 	pass = currentChosenPass;
 	overrides_array = nil;
 	if(overrides_items != nil)

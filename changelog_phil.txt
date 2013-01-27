@@ -41,10 +41,17 @@ PP-Phil_20121128
   - Bug p0007 identified - master scene override will fail if anything other than the (Scene Master) is added :
 	- Initial fix is to empty the assignmentArray for this override - it should be nil to avoid issues. Had to also add some safety checks for nil for size(assignmentArray) later in code due to this.
 - Bug p0008 identified and preliminary triage added - if the overrideType is (nil), size() will choke badly in the 'failsafe' conditional in sceneGen. Trying to avoid this and more cleanly handle the situation.
-- Bug p0009 related to the above - it is possible to add elements to overrides that are incompatible with that override (e.g. surfacing overrides to lights)
+- Bug p0009 related to the above - it seems to be possible to add elements to overrides that are incompatible with that override (e.g. surfacing overrides to lights)
  - Fix will be to screen right hand column contents to avoid listing incompatible types for overrides. UDF code needs serious work to address this (also for add all, etc. buttons).
 
 - 30 KB less code right now compared to original source.
+
+20121201
+========
+
+- Unpicked work related to false start to address issue p0009. Better fix needed.
+- Added platform ID of 11 to correspond to Mac64.
+- Listbox selections are misbehaving… p0010
 
 Bugs :
 ------
@@ -57,7 +64,8 @@ p0005 : path incorrect. (Fixed)
 p0006 : LWO saver blowing up. (Fixed)
 p0007 : Master scene override failure if anything other than, or in addition to, (Scene Master) is assigned to it. (Fixed, better fix needed - see p0009)
 p0008 : Failsafe code for overrideType needs to be made more robust. (Fixed)
-p0009 : Item list needs to be filtered based on override selection, to avoid assigning incompatible overrides to scene elements. (Assigned, ongoing)
+p0009 : Possible to add (Scene Master) item to overrides that are not related. Need to engineer a fix (skip first item in list, or create a genus for this item)
+p0010 : listbox selections are misfiring.
  
 Reference :
 -----------

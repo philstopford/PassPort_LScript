@@ -1,5 +1,5 @@
 // globals
-var versionString = "20121130";
+var versionString = "20121201";
 var parch = "Unknown";
 var aboutsize_x = 400;
 var aboutsize_y = 200;
