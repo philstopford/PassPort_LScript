@@ -13,68 +13,68 @@ scnmasterOverride_UI_native: action
 			sel = getvalue(gad_OverridesListview).asInt();
 			settingsArray = parseOverrideSettings(overrideSettings[sel]);
 			overrideRenderer			= integer(settingsArray[3]);
-			resolutionMultiplierSetts 	= integer(settingsArray[4]); // unused - moved to camera override. Left to avoid breaking scene master compatibility.
-			renderModeSetts				= integer(settingsArray[5]);
-			depthBufferAASetts 			= integer(settingsArray[6]);
-			renderLinesSetts 			= integer(settingsArray[7]);
-			rayRecursionLimitSetts 		= integer(settingsArray[8]);
-			redirectBuffersSetts 		= integer(settingsArray[9]);
-			disableAASetts 				= integer(settingsArray[10]);
-			raytraceShadows 			= integer(settingsArray[11]);
-			raytraceReflect 			= integer(settingsArray[12]);
-			raytraceRefract 			= integer(settingsArray[13]);
-			raytraceTrans 				= integer(settingsArray[14]);
-			raytraceOccl 				= integer(settingsArray[15]);
-			volumetricAA 				= integer(settingsArray[16]);
-			gLensFlares 				= integer(settingsArray[17]);
-			shadowMaps 					= integer(settingsArray[18]);
-			volLights 					= integer(settingsArray[19]);
-			twoSidedALgts 				= integer(settingsArray[20]);
-			renderInstances				= integer(settingsArray[21]);
-			rayPrecision 				= number(settingsArray[22]);
-			rayCutoff 					= number(settingsArray[23]);
-			shadingSamples 				= integer(settingsArray[24]);
-			lightSamples 				= integer(settingsArray[25]);
-			gLightIntensity 			= number(settingsArray[26]);
-			gFlareIntensity 			= number(settingsArray[27]);
-			enableGI 					= integer(settingsArray[28]);
-			giMode 						= integer(settingsArray[29]);
-			interpolateGI 				= integer(settingsArray[30]);
-			blurBGGI 					= integer(settingsArray[31]);
-			transparencyGI 				= integer(settingsArray[32]);
-			volumetricGI 				= integer(settingsArray[33]);
-			ambOcclGI 					= integer(settingsArray[34]);
-			directionalGI 				= integer(settingsArray[35]);
-			gradientsGI 				= integer(settingsArray[36]);
-			behindTestGI 				= integer(settingsArray[37]);
-			useBumpsGI 					= integer(settingsArray[38]);
-			giIntensity 				= number(settingsArray[39]);
-			giAngTol 					= number(settingsArray[40]);
-			giIndBounces 				= integer(settingsArray[41]);
-			giMinSpacing 				= number(settingsArray[42]);
-			giRPE 						= integer(settingsArray[43]);
-			giMaxSpacing 				= number(settingsArray[44]);
-			gi2ndBounces				= integer(settingsArray[45]);
-			giMultiplier				= number(settingsArray[46]);
-			enableCaustics				= integer(settingsArray[47]);
-			causticsAccuracy			= integer(settingsArray[48]);
-			causticsIntensity			= number(settingsArray[49]);
-			causticsSoftness			= integer(settingsArray[50]);
-			fiberFXSaveRGBA				= integer(settingsArray[51]);
-			fiberFXSaveRGBAType			= integer(settingsArray[52]);
-			fiberFXSaveRGBAName			= string(settingsArray[53]);
-			fiberFXSaveDepth			= integer(settingsArray[54]);
-			fiberFXSaveDepthType		= integer(settingsArray[55]);
-			fiberFXSaveDepthName		= string(settingsArray[56]);
+			renderModeSetts				= integer(settingsArray[4]);
+			depthBufferAASetts 			= integer(settingsArray[5]);
+			renderLinesSetts 			= integer(settingsArray[6]);
+			rayRecursionLimitSetts 		= integer(settingsArray[7]);
+			redirectBuffersSetts 		= integer(settingsArray[8]);
+			disableAASetts 				= integer(settingsArray[9]);
+			raytraceShadows 			= integer(settingsArray[10]);
+			raytraceReflect 			= integer(settingsArray[11]);
+			raytraceRefract 			= integer(settingsArray[12]);
+			raytraceTrans 				= integer(settingsArray[13]);
+			raytraceOccl 				= integer(settingsArray[14]);
+			volumetricAA 				= integer(settingsArray[15]);
+			gLensFlares 				= integer(settingsArray[16]);
+			shadowMaps 					= integer(settingsArray[17]);
+			volLights 					= integer(settingsArray[18]);
+			twoSidedALgts 				= integer(settingsArray[19]);
+			renderInstances				= integer(settingsArray[20]);
+			rayPrecision 				= number(settingsArray[21]);
+			rayCutoff 					= number(settingsArray[22]);
+			shadingSamples 				= integer(settingsArray[23]);
+			lightSamples 				= integer(settingsArray[24]);
+			gLightIntensity 			= number(settingsArray[25]);
+			gFlareIntensity 			= number(settingsArray[26]);
+			enableGI 					= integer(settingsArray[27]);
+			giMode 						= integer(settingsArray[28]);
+			interpolateGI 				= integer(settingsArray[29]);
+			blurBGGI 					= integer(settingsArray[30]);
+			transparencyGI 				= integer(settingsArray[31]);
+			volumetricGI 				= integer(settingsArray[32]);
+			ambOcclGI 					= integer(settingsArray[33]);
+			directionalGI 				= integer(settingsArray[34]);
+			gradientsGI 				= integer(settingsArray[35]);
+			behindTestGI 				= integer(settingsArray[36]);
+			useBumpsGI 					= integer(settingsArray[37]);
+			giIntensity 				= number(settingsArray[38]);
+			giAngTol 					= number(settingsArray[39]);
+			giIndBounces 				= integer(settingsArray[40]);
+			giMinSpacing 				= number(settingsArray[41]);
+			giRPE 						= integer(settingsArray[42]);
+			giMaxSpacing 				= number(settingsArray[43]);
+			gi2ndBounces				= integer(settingsArray[44]);
+			giMultiplier				= number(settingsArray[45]);
+			enableCaustics				= integer(settingsArray[46]);
+			causticsAccuracy			= integer(settingsArray[47]);
+			causticsIntensity			= number(settingsArray[48]);
+			causticsSoftness			= integer(settingsArray[49]);
+			fiberFXSaveRGBA				= integer(settingsArray[50]);
+			fiberFXSaveRGBAType			= integer(settingsArray[51]);
+			fiberFXSaveRGBAName			= string(settingsArray[52]);
+			fiberFXSaveDepth			= integer(settingsArray[53]);
+			fiberFXSaveDepthType		= integer(settingsArray[54]);
+			fiberFXSaveDepthName		= string(settingsArray[55]);
 			// fog
-			fogType 					= integer(settingsArray[57]);
-			fogColorArray 				= <integer(settingsArray[58]), integer(settingsArray[59]), integer(settingsArray[60])>;
-			fogBackdropColor			= integer(settingsArray[61]);
+			fogType 					= integer(settingsArray[56]);
+			fogColorArray 				= <integer(settingsArray[57]), integer(settingsArray[58]), integer(settingsArray[59])>;
+			fogBackdropColor			= integer(settingsArray[60]);
 			// compositing
-			useBackgroundColor			= integer(settingsArray[62]);
-			backgroundColorArray		= <integer(settingsArray[63]), integer(settingsArray[64]), integer(settingsArray[65])>;
+			useBackgroundColor			= integer(settingsArray[61]);
+			backgroundColorArray		= <integer(settingsArray[62]), integer(settingsArray[63]), integer(settingsArray[64])>;
 			// backdrop
-			backdropColorArray			= <integer(settingsArray[66]), integer(settingsArray[67]), integer(settingsArray[68])>;
+			backdropColorArray			= <integer(settingsArray[65]), integer(settingsArray[66]), integer(settingsArray[67])>;
+			adaptiveSampline			= integer(settingsArray[68]);
 		}
 	
 		doKeys = 0;
@@ -98,21 +98,10 @@ scnmasterOverride_UI_native: action
 		
 		ui_offset_y = ScnMst_ui_offset_y + ScnMst_ui_row_offset;
 
-		// Unused - moved to camera override. Left to retain compatibility with existing scene master override definitions in 1.x builds.
-		// FIXME : Remove in any post 1.x release.
-		resolutionMultiplierSetts = 3;
-/*		if(action == "edit")
-		{
-			resolutionMultiplierSetts = integer(settingsArray[4]);
-		}
-		c20_5 = ctlpopup("Resolution Multiplier",resolutionMultiplierSetts,resolutionMultArray);
-		ctlposition(c20_5, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
-*/
-
 		renderModeSetts = 3;
 		if(action == "edit")
 		{
-			renderModeSetts = integer(settingsArray[5]);
+			renderModeSetts = integer(settingsArray[4]);
 		}
 		c21 = ctlpopup("Render Mode",renderModeSetts,renderModeArray);
 		ctlposition(c21, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
@@ -120,7 +109,7 @@ scnmasterOverride_UI_native: action
 		fogType = 0;
 		if(action == "edit")
 		{
-			fogType = integer(settingsArray[57]);
+			fogType = integer(settingsArray[56]);
 		}
 		c73 = ctlpopup("Fog Type",fogType,fogTypeArray);
 		ctlposition(c73, ScnMst_gad_x3, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
@@ -312,6 +301,14 @@ scnmasterOverride_UI_native: action
 		ctlposition(c26, ScnMst_gad_x2, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 		ui_offset_y += ScnMst_ui_row_offset;
+
+		c79val = 1;
+		if(action == "edit")
+		{
+			c79val = adaptiveSampling;
+		}
+		c79 = ctlcheckbox("Adaptive Sampling AA",c79val);
+		ctlposition(c79, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
 		c32val = 1;
 		if(action == "edit")
@@ -670,7 +667,6 @@ scnmasterOverride_UI_native: action
 			newName 						= getvalue(c20);
 			newName 						= makeStringGood(newName);
 			overrideRenderer				= 1; // hard-coded.
-			resolutionMultiplierSetts 		= getvalue(c20_5);
 			renderModeSetts 				= getvalue(c21);
 			depthBufferAASetts 				= getvalue(c22);
 			renderLinesSetts 				= getvalue(c23);
@@ -734,6 +730,7 @@ scnmasterOverride_UI_native: action
 			useBackgroundColor				= getvalue(c76);
 			backgroundColorArray			= getvalue(c77);
 			backdropColorArray				= getvalue(c78);
+			adaptiveSampling				= getvalue(c79);
 			doUpdate = 1;	
 		}
 		else
@@ -763,8 +760,7 @@ scnmasterOverride_UI_native: action
 			}
 			overrideNames[newNumber] = newName + "   (scene properties)";
 			overrideSettings[newNumber] = newName 								+ 	"||" 	+ "type6" 							+ 	"||"
-										+ string(overrideRenderer)				+ 	"||" 	
-										+ string(resolutionMultiplierSetts) 	+ 	"||" 	+ string(renderModeSetts)			+ 	"||"
+										+ string(overrideRenderer)				+ 	"||" 	+ string(renderModeSetts)			+ 	"||"
 										+ string(depthBufferAASetts) 			+ 	"||" 	+ string(renderLinesSetts) 			+ 	"||"
 										+ string(rayRecursionLimitSetts) 		+	"||" 	+ string(redirectBuffersSetts)		+ 	"||"
 										+ string(disableAASetts) 				+ 	"||" 	+ string(raytraceShadows) 			+ 	"||"
@@ -796,7 +792,7 @@ scnmasterOverride_UI_native: action
 										+ string(useBackgroundColor)			+	"||"	+ string(backgroundColorArray.x) 	+	"||"
 										+ string(backgroundColorArray.y) 		+	"||"	+ string(backgroundColorArray.z) 	+	"||"
 										+ string(backdropColorArray.x) 			+	"||"	+ string(backdropColorArray.y) 		+	"||"
-										+ string(backdropColorArray.z);
+										+ string(backdropColorArray.z)			+	"||"	+ string(adaptiveSampling);
 		}
 	} else {
 		error("scnmasterOverride_UI: incorrect, or no, action passed");
@@ -810,206 +806,179 @@ scnmasterOverride_UI_native_redraw
 
 scnGen_native:updatedCurrentScenePath, newScenePath
 {
-//	resolutionMultiplierSetts	= integer(settingsArray[4]); // FIXME: Legacy, remove in post-1.x build
-	redirectBuffersSetts 		= integer(settingsArray[9]);
-	disableAASetts 				= integer(settingsArray[10]);
-
-// FIXME: Legacy, remove in post-1.x build
-/*	switch(resolutionMultiplierSetts)
-	{
-		case 1:
-			resMult = 0.25;
-			break;
-		
-		case 2:
-			resMult = 0.5;
-			break;
-			
-		case 3:
-			resMult = 1.0;
-			break;
-			
-		case 4:
-			resMult = 2.0;
-			break;
-			
-		case 5:
-			resMult = 4.0;
-			break;
-			
-		default:
-			break;
-	}
-	writeOverrideString(updatedCurrentScenePath, newScenePath, "FrameSize ", resMult);
-*/	
+	redirectBuffersSetts 		= integer(settingsArray[8]);
+	disableAASetts 				= integer(settingsArray[9]);
 				
-	renderModeSetts = integer(settingsArray[5]) - 1;
+	renderModeSetts = integer(settingsArray[4]) - 1;
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderMode ", renderModeSetts);
 	
-	depthBufferAASetts = integer(settingsArray[6]);
+	depthBufferAASetts = integer(settingsArray[5]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "DepthBufferAA ", depthBufferAASetts);
 	
-	renderLinesSetts = integer(settingsArray[7]);
+	renderLinesSetts = integer(settingsArray[6]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderLines ", renderLinesSetts);
 
-	rayRecursionLimitSetts = integer(settingsArray[8]);
+	rayRecursionLimitSetts = integer(settingsArray[7]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RayRecursionLimit ", rayRecursionLimitSetts);
 
 	if(disableAASetts == 1) {
 		writeOverrideString(updatedCurrentScenePath, newScenePath, "AASamples ", "1");
 	}
 	
-	raytraceShadows				= integer(settingsArray[11]);
+	raytraceShadows				= integer(settingsArray[10]);
 	raytraceShadows_Flag		= 1;
 	raytraceFlags				= (raytraceShadows * raytraceShadows_Flag);
 
-	raytraceReflect				= integer(settingsArray[12]);
+	raytraceReflect				= integer(settingsArray[11]);
 	raytraceReflect_Flag		= 2;
 	raytraceFlags				+= (raytraceReflect * raytraceReflect_Flag);
 
-	raytraceRefract				= integer(settingsArray[13]);
+	raytraceRefract				= integer(settingsArray[12]);
 	raytraceRefract_Flag		= 4;
 	raytraceFlags				+= (raytraceRefract * raytraceRefract_Flag);
 
-	raytraceTrans				= integer(settingsArray[14]);
+	raytraceTrans				= integer(settingsArray[13]);
 	raytraceTrans_Flag			= 8;
 	raytraceFlags				+= (raytraceTrans * raytraceTrans_Flag);
 
-	raytraceOccl				= integer(settingsArray[15]);
+	raytraceOccl				= integer(settingsArray[14]);
 	raytraceOccl_Flag			= 16;
 	raytraceFlags				+= (raytraceOccl * raytraceOccl_Flag);
 	
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RayTraceEffects ", raytraceFlags);
 
-	volumetricAA = integer(settingsArray[16]);
+	volumetricAA = integer(settingsArray[15]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "VolumetricAA ", volumetricAA);
 
-	gLensFlares = integer(settingsArray[17]);
+	gLensFlares = integer(settingsArray[16]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableLensFlares ", gLensFlares);
 
-	shadowMaps = integer(settingsArray[18]);
+	shadowMaps = integer(settingsArray[17]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableShadowMaps ", shadowMaps);
 
-	volLights = integer(settingsArray[19]);
+	volLights = integer(settingsArray[18]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableVolumetricLights ", volLights);
 
-	twoSidedALgts = integer(settingsArray[20]);
+	twoSidedALgts = integer(settingsArray[19]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "DoubleSidedAreaLights ", twoSidedALgts);
 
-	renderInstances = integer(settingsArray[21]);
+	renderInstances = integer(settingsArray[20]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderInstances ", renderInstances);
 
-	rayPrecision = number(settingsArray[22]);
+	rayPrecision = number(settingsArray[21]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RayPrecision ", rayPrecision);
 
-	rayCutoff = number(settingsArray[23]);
+	rayCutoff = number(settingsArray[22]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RayCutoff ", rayCutoff);
 
-	shadingSamples = integer(settingsArray[24]);
+	shadingSamples = integer(settingsArray[23]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "ShadingSamples ", shadingSamples);
 
-	lightSamples = integer(settingsArray[25]);
+	lightSamples = integer(settingsArray[24]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "LightSamples ", lightSamples);
 
-	gLightIntensity = number(settingsArray[26]);
+	gLightIntensity = number(settingsArray[25]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "GlobalLightIntensity ", gLightIntensity);
 
-	gFlareIntensity = number(settingsArray[27]);
+	gFlareIntensity = number(settingsArray[26]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "GlobalFlareIntensity ", gFlareIntensity);
 
-	enableGI = number(settingsArray[28]);
+	enableGI = number(settingsArray[27]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableRadiosity ", enableGI);
 
-	giMode = integer(settingsArray[29]);
+	giMode = integer(settingsArray[28]);
 	giMode = giMode - 1; // decrement by one to match index in LW. Menus are 1-indexed.
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityType ", giMode);
 
-	interpolateGI = integer(settingsArray[30]);
+	interpolateGI = integer(settingsArray[29]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityInterpolated ", interpolateGI);
 
-	blurBGGI = integer(settingsArray[31]);
+	blurBGGI = integer(settingsArray[30]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "BlurRadiosity ", blurBGGI);
 
-	transparencyGI = integer(settingsArray[32]);
+	transparencyGI = integer(settingsArray[31]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityTransparency ", transparencyGI);
 
-	volumetricGI = integer(settingsArray[33]);
+	volumetricGI = integer(settingsArray[32]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "VolumetricRadiosity ", volumetricGI);
 
-	ambOcclGI = integer(settingsArray[34]);
+	ambOcclGI = integer(settingsArray[33]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityUseAmbient ", ambOcclGI);
 
-	directionalGI = integer(settingsArray[35]);
+	directionalGI = integer(settingsArray[34]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityDirectionalRays ", directionalGI);
 
-	gradientsGI = integer(settingsArray[36]);
+	gradientsGI = integer(settingsArray[35]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityUseGradients ", gradientsGI);
 
-	behindTestGI = integer(settingsArray[37]);
+	behindTestGI = integer(settingsArray[36]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityUseBehindTest ", behindTestGI);
 
-	useBumpsGI = integer(settingsArray[38]);
+	useBumpsGI = integer(settingsArray[37]);
 	useBumpsGI = useBumpsGI * (-2147483648);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityFlags ", useBumpsGI);
 
-	giIntensity = integer(settingsArray[39]);
+	giIntensity = integer(settingsArray[38]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityIntensity ", giIntensity);
 
-	giAngTol = integer(settingsArray[40]);
+	giAngTol = integer(settingsArray[39]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityTolerance ", giAngTol);
 
-	giIndBounces = integer(settingsArray[41]);
+	giIndBounces = integer(settingsArray[40]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "IndirectBounces ", giIndBounces);
 	
-	giMinSpacing = number(settingsArray[42]);
+	giMinSpacing = number(settingsArray[41]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityMinPixelSpacing ", giMinSpacing);
 
-	giRPE = number(settingsArray[43]);
+	giRPE = number(settingsArray[42]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityRays ", giRPE);
 
-	giMaxSpacing = number(settingsArray[44]);
+	giMaxSpacing = number(settingsArray[43]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityMaxPixelSpacing ", giMaxSpacing);
 
-	gi2ndBounces = integer(settingsArray[45]);
+	gi2ndBounces = integer(settingsArray[44]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "SecondaryBounceRays ", gi2ndBounces);
 
-	giMultiplier = number(settingsArray[46]);
+	giMultiplier = number(settingsArray[45]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "RadiosityMultiplier ", giMultiplier);
 
-	enableCaustics = number(settingsArray[47]);
+	enableCaustics = number(settingsArray[46]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "EnableCaustics ", enableCaustics);
 
-	causticsAccuracy = integer(settingsArray[48]);
+	causticsAccuracy = integer(settingsArray[47]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "CausticAccuracy ", causticsAccuracy);
 
-	causticsIntensity = number(settingsArray[49]);
+	causticsIntensity = number(settingsArray[48]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "CausticIntensity ", causticsIntensity);
 
-	causticsSoftness = number(settingsArray[50]);
+	causticsSoftness = number(settingsArray[49]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "CausticSoftness ", causticsSoftness);
 
 	// FiberFX settings are written out in the main scene gen code. At least for now.
 
-	fogType = integer(settingsArray[57]) - 1;
+	fogType = integer(settingsArray[56]) - 1;
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "FogType ", fogType);
 
-	fogColorLine = string(number(settingsArray[58]) / 255) + " " + string(number(settingsArray[59]) / 255) + " " + string(number(settingsArray[60]) / 255);
+	fogColorLine = string(number(settingsArray[57]) / 255) + " " + string(number(settingsArray[58]) / 255) + " " + string(number(settingsArray[59]) / 255);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "FogColor ", fogColorLine);
 
-	fogBackdropColor = integer(settingsArray[61]);
+	fogBackdropColor = integer(settingsArray[60]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "BackdropFog ", fogBackdropColor);
 
-	useBackgroundColor = integer(settingsArray[62]);
+	useBackgroundColor = integer(settingsArray[61]);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "UseBackgroundColor ", useBackgroundColor);
 
-	bgColorLine = string(number(settingsArray[63]) / 255) + " " + string(number(settingsArray[64]) / 255) + " " + string(number(settingsArray[65]) / 255);
+	bgColorLine = string(number(settingsArray[62]) / 255) + " " + string(number(settingsArray[63]) / 255) + " " + string(number(settingsArray[64]) / 255);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "BackgroundColor ", bgColorLine);
 
-	bdColorLine = string(number(settingsArray[66]) / 255) + " " + string(number(settingsArray[67]) / 255) + " " + string(number(settingsArray[68]) / 255);
+	bdColorLine = string(number(settingsArray[65]) / 255) + " " + string(number(settingsArray[66]) / 255) + " " + string(number(settingsArray[67]) / 255);
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "BackdropColor ", bdColorLine);
 
+	adaptiveSampling = integer(settingsArray[68]);
+	writeOverrideString(updatedCurrentScenePath, newScenePath, "AdaptiveSampling ", adaptiveSampling);
+
 	// FIXME : Move to camera override.
-	disableAASetts = integer(settingsArray[10]);
+	disableAASetts = integer(settingsArray[9]);
 	if(disableAASetts == 1)
 		disableAASetts = 0;
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "Antialiasing ", disableAASetts);

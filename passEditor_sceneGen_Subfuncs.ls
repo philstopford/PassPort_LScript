@@ -336,20 +336,6 @@ generatePassFile: mode, pass
 
             if(settingsArray[2] == "type8") // EXPERIMENTAL Camera override
             {
-
-// Reference - never intended to be active code.
-/*                overrideSettings[newNumber] =   newName             + "||" +    "type8"             + "||"
-                                        +   zoomFactor              + "||" +    zoomType            + "||"
-                                        +   resolutionMultiplier    + "||" +    frameSizeH          + "||"
-                                        +   frameSizeV              + "||" +    pixelAspect         + "||"
-                                        +   motionBlur              + "||" +    motionBlurPasses    + "||"
-                                        +   shutterEfficiency       + "||" +    rollingShutter      + "||"
-                                        +   shutterOpen             + "||" +    oversampling        + "||"
-                                        +   fieldRendering          + "||" +    depthOfField        + "||"
-                                        +   sampler                 + "||" +    adaptiveThreshold   + "||"
-                                        +   minimumSamples          + "||" +    maximumSamples;
-*/
-
                 zoomFactor 						= string(settingsArray[3]);
                 cameraSettingsPartOne[passItem] =	"ZoomFactor " + zoomFactor + "\n";
                 cameraSettingsPartOneCount[passItem] = 1;
@@ -751,7 +737,7 @@ generatePassFile: mode, pass
         lineNumber = inputFile.line();
     }
 
-/*    if(hvDataLine != nil || includedHvObjects != nil)
+    /*    if(hvDataLine != nil || includedHvObjects != nil)
     {        
         //write out the HV data
         lineNumber = hvStartLine + 1;
@@ -784,7 +770,7 @@ generatePassFile: mode, pass
             lineNumber = inputFile.line();
         }        
     }
- */   
+    */   
     progressString = string(0.995);
     msgString = "{" + progressString + "}Generating Render Scene:  Finishing...";
     StatusMsg(msgString);
@@ -882,10 +868,10 @@ generatePassFile: mode, pass
 	// deal with the buffer savers now.
 	handleBuffers(updatedCurrentScenePath);
     
-	// and as a tack-on fix, replace motion-mixer stuff for overridden objects
+	// and as a tack-on fix, replace motion-mixer stuff for overridden objects. Calls finishFiles() for us.
 	motionMixerStuff(updatedCurrentScenePath);
 
-    // and the test frame resolution multiplier stuff
+    /*    // and the test frame resolution multiplier stuff
     switch(testResMultiplier)
     {
         case 1:
@@ -912,7 +898,7 @@ generatePassFile: mode, pass
             break;
     }
 	writeOverrideString(updatedCurrentScenePath, newScenePath, "FrameSize ", resMult);
-	finishFiles();
+    */
 	filedelete(updatedCurrentScenePath);
 
     return(newScenePath);
@@ -1573,8 +1559,40 @@ writeLights: inputFile, outputFile, lastObject, lastLight, IKInitialState, objLi
                         // write out the custom parameters
                         outputFile.write(lightSettingsPartOne[lightCounter]);
 
-                        // write out the rest of the light
+                        // write out the rest of the light, first volumetrics, then flare, then rest
                         inputFile.line(objAffectCausticsLine[lightCounter]);
+                        if(objVolLightLine[lightCounter] != nil)
+                        {
+                            done = nil;
+                            endLine = objVolLightLine[lightCounter];
+                            while(!done)
+                            {
+                                line = inputFile.read();
+                                outputFile.writeln(line);
+                                if(inputFile.line() == endLine)
+                                {
+                                    outputFile.writeln(lightSettingsPartThree[lightCounter]);
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if(objLensFlareLine[lightCounter] != nil)
+                        {
+                            endLine = objLensFlareLine[lightCounter];
+                            done = nil;
+                            while(!done)
+                            {
+                                line = inputFile.read();
+                                outputFile.writeln(line);
+                                if(inputFile.line() == endLine)
+                                {
+                                    outputFile.writeln(lightSettingsPartTwo[lightCounter]);
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }    
                         done = nil;
                         while(!done)
                         {
@@ -1586,29 +1604,6 @@ writeLights: inputFile, outputFile, lastObject, lastLight, IKInitialState, objLi
                                 break;
                             }
                         }
-                        
-                        // write out the lens flare line.
-                        if(objLensFlareLine != nil)
-                        {
-                            if(objLensFlareLine[lightCounter] != nil)
-                            {
-                                changeScnLine(lightSettingsPartTwo[lightCounter], newScenePath, objLensFlareLine[lightCounter]);
-                                inputFile.line(objLensFlareLine[lightCounter]);
-                                line = inputFile.read();
-                            }
-                        }
-
-                        // write out the volumetric line
-                        if(objVolLightLine != nil)
-                        {
-                            if(objVolLightLine[lightCounter] != nil)
-                            {
-                                changeScnLine(lightSettingsPartThree[lightCounter], newScenePath, objVolLightLine[lightCounter]);
-                                inputFile.line(objVolLightLine[lightCounter]);
-                                line = inputFile.read();
-                            }
-                        }
-                        
                     }
                     else
                     {
@@ -1744,27 +1739,27 @@ fiberFX: ffFile
 	checkFile.close();
 
 	// Hard-coded offsets from the detected pixel filter line, based on scene file inspection.
-	fiberFXSaveRGBA				= integer(settingsArray[51]);
+	fiberFXSaveRGBA				= integer(settingsArray[50]);
 	ffString = "SaveRGBA " + string(fiberFXSaveRGBA);
 	changeScnLine(ffString, ffFile, ffLine + 8);
 
-	fiberFXSaveDepth			= integer(settingsArray[54]);
+	fiberFXSaveDepth			= integer(settingsArray[53]);
 	ffString = "SaveDepth " + string(fiberFXSaveDepth);
 	changeScnLine(ffString, ffFile, ffLine + 9);
 
-	fiberFXSaveRGBAType			= integer(settingsArray[52]);
+	fiberFXSaveRGBAType			= integer(settingsArray[51]);
 	ffString = "RGBType " + string(image_formats_array[fiberFXSaveRGBAType]);
 	changeScnLine(ffString, ffFile, ffLine + 10);
 
-	fiberFXSaveDepthType		= integer(settingsArray[55]);
+	fiberFXSaveDepthType		= integer(settingsArray[54]);
 	ffString = "DepthType " + string(image_formats_array[fiberFXSaveDepthType]);
 	changeScnLine(ffString, ffFile, ffLine + 11);
 
-	fiberFXSaveRGBAName			= string(settingsArray[53]);
+	fiberFXSaveRGBAName			= string(settingsArray[52]);
 	ffString = "RGBName " + string(fiberFXSaveRGBAName);
 	changeScnLine(ffString, ffFile, ffLine + 12);
 
-	fiberFXSaveDepthName		= string(settingsArray[56]);
+	fiberFXSaveDepthName		= string(settingsArray[55]);
 	ffString = "DepthName " + string(fiberFXSaveDepthName);
 	changeScnLine(ffString, ffFile, ffLine + 13);
 
@@ -1773,11 +1768,11 @@ fiberFX: ffFile
 
 handleBuffers: hbFile
 {
-	inputFileName = prepareInputFile(hbFile);
-	inputFile = File(inputFileName, "r");
-	tempOutput = File(newScenePath,"w");
 	if(redirectBuffersSetts == 1)
 	{
+        inputFileName = prepareInputFile(hbFile);
+        inputFile = File(inputFileName, "r");
+        tempOutput = File(newScenePath,"w");
 		while(!inputFile.eof())
 		{
 			line = inputFile.read();
@@ -2004,12 +1999,11 @@ handleBuffers: hbFile
 				toWrite = line;
 			}
 			tempOutput.writeln(toWrite);
-		}
-		
+		}	
+        inputFile.close();
+        tempOutput.close();
+        finishFiles();
 	}
-    inputFile.close();
-    tempOutput.close();
-    finishFiles();
 }
 
 motionMixerStuff: mmFile

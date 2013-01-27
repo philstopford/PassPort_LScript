@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130120";
+var versionString = "20130120_b6";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -148,6 +148,8 @@ var lastLight;
 var lastCamera;
 var objStart;
 var objEnd;
+var objMotStart;
+var objMotEnd;
 var doOverride;
 
 // Global override variables settings.

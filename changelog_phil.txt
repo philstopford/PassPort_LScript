@@ -1,3 +1,14 @@
+20130120 (beta 6 - scene master changed since beta 5)
+========
+
+- p0030 fixed - Resolution multiplier wasn't sticking, for some odd reason.
+- Thanks to Luis for the report leading to p0029. This one is very strange. For a small number of lights, there was no issue. For larger number of lights assigned to overrides, the changeScnLine() function encountered problems. The root cause isn't clear. The light override code has been altered to not use changeScnLine and to direct-write instead.
+- Object motion start and end variables moved to global state.
+- Buffer handling function tweaked to avoid possible file corruption.
+- .bat files are now deleted after the render is complete. No need for diagnostic aids.
+- AS toggle added to scene master override.
+- To implement AS toggle, had to revise scene master override so removing some legacy stuff as well since we're breaking things anyway.
+
 20130120 (beta 5 - no issue from beta 4)
 ========
 
@@ -484,6 +495,8 @@ p0025 : Autoscan plugins operation is broken, leading to issues (Fixed, beta3)
 p0026 : 'Save All Passes As Scenes' dialog needs a validation check to ensure the user entered a path, and that it's valid. (Fixed, beta4)
 p0027 : Backdrop color not saved by Scene Master override. (Fixed, beta4)
 p0028 : Wireframe mode change reported for Scene Master override. (Fixed, beta4)
+p0029 : More than 3 lights causes 'exceeds file size' error. (Fixed, beta6)
+p0030 : Resolution Multiplier not sticking in camera override. (Fixed, beta6)
 
 ###############
 # Limitations #
@@ -501,6 +514,8 @@ p0028 : Wireframe mode change reported for Scene Master override. (Fixed, beta4)
 - 3rd party lights/cameras end of block detection.
 - Active camera override in Scene Override.
 - Extend light override (caustics).
+- Overriding multiple surfaces on an object. Doable?
+- Save/load override configuration files.
 
 -------------
 - Reference -

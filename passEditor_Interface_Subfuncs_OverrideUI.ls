@@ -72,26 +72,26 @@ cameraOverride_UI: action
 		resolutionMultiplier = 1.0;
 		if(action == "edit")
 		{
-			switch(resolutionMultiplier * 100)
+			c23val = 3;
+			if(resolutionMultiplier == 0.25)
 			{
-				case 25:
-					c23val = 1;
-					break;
-				case 50:
-					c23val = 2;
-					break;
-				case 100:
-					c23val = 3;
-					break;
-				case 200:
-					c23val = 4;
-					break;
-				case 400:
-					c23val = 5;
-					break;
-				default:
-					c23val = 3;
-					break;
+				c23val = 1;
+			}
+			if(resolutionMultiplier == 0.5)
+			{
+				c23val = 2;
+			}
+			if(resolutionMultiplier == 1.0)
+			{
+				c23val = 3;
+			}
+			if(resolutionMultiplier == 2.0)
+			{
+				c23val = 4;
+			}
+			if(resolutionMultiplier == 4.0)
+			{
+				c23val = 5;
 			}
 		}
 		c23 = ctlpopup("Resolution Multiplier",c23val,resolutionMultArray);

@@ -59,8 +59,7 @@ win_bg_frameRender: sceneFile, frameOutputPath
 
 	/* Matt Gorner - get rid of extra slashes that stops the del command in the Batch file */
     t = currentscene_patharray[1] + getsep() + strip_slashes(currentscene_patharray[2]) + "frameRender_bat.bat";
-    // bashOutput.writeln("@del \"" + bashFilePath + "\"\n");
-//    bashOutput.writeln("@del \"" + t + "\"\n");
+    bashOutput.writeln("@del \"" + t + "\"\n");
 
 	bashOutput.writeln("pause");
 
@@ -71,8 +70,6 @@ win_bg_frameRender: sceneFile, frameOutputPath
     info(bashFilePath);
 
 	result = spawn(bashFilePath);
-
-    //filedelete(scriptFilePath);
 
     /*
     commandadd =  "\"" + install_dir + getsep() + lwsn.exe\" -3 -c\"" + config_dir + "\" -d\"" + content_dir + "\" \"" + scenespaths[items_array[x]] + scenesnames[items_array[x]] + "\" " + scenesstart[items_array[1]] + " " + scenesend[items_array[1]] + " " + scenesstep[items_array[1]];
@@ -129,7 +126,6 @@ win_bg_sceneRender: sceneFile, frameOutputPath
 
 	/* Matt Gorner - get rid of extra slashes that stops the del command in the Batch file */
     t = currentscene_patharray[1] + getsep() + strip_slashes(currentscene_patharray[2]) + "frameRender_bat.bat";
-    // bashOutput.writeln("@del \"" + bashFilePath + "\"\n");
     bashOutput.writeln("@del \"" + t + "\"\n");
 
     bashOutput.writeln("pause");
