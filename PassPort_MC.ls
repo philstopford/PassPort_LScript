@@ -57,7 +57,7 @@
 @warnings
 @script master
 @name "PassPort_MC"
-//@define dev "TRUE"
+@define dev "TRUE"
 
 // Inserts other functions ...
 @if dev == TRUE

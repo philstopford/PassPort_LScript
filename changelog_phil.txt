@@ -67,6 +67,17 @@ PP-Phil_20121128
 - Re-jigged some changes related to override item assignment filtering, to make them more understandable.
 - Minor typo fixes.
 
+20121204
+========
+
+- Moved button functions out of Interface code file into UDF file. Makes more sense.
+
+20121206
+========
+
+- Brace yourself. Here's the big UI change. Many thanks to both Lernie and Matt for their help in showing me where I was going wrong in the original attempt to implement this. I wasn't far off, but overlooked the multi-selection aware nature of the listboxes and a couple of other issues.
+
+
 Bugs :
 ------
 
