@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130101";
+var versionString = "20130102";
 var parch = "Unknown";
 var icon;
 var scenesnames;
@@ -119,3 +119,7 @@ var overriddenObjectName;
 var newScenePath;
 var inputFileName;
 var filesPrepared = 0;
+
+// Mac stuff
+var useGrowl = 0; // shut off Growl by default.
+var usegrowl;

@@ -469,13 +469,14 @@ load: what,io
             {
                 userOutputString = "";
             }
+            useGrowl = io.read().asInt();
             areYouSurePrompts = io.read().asInt();
             rgbSaveType = io.read().asInt();
             editorResolution = io.read().asInt();
             testResMultiplier = io.read().asInt();
             testRgbSaveType = io.read().asInt();
             
-            setdesc("PassPort " + versionString);
+            setdesc("PassPort Renewed " + versionString);
             sceneJustLoaded = 1;
             interfaceRunYet = 1;
         }
@@ -575,6 +576,7 @@ load: what,io
                 io.writeln(userOutputFolder);
                 io.writeln(fileOutputPrefix);
                 io.writeln(userOutputString);
+                io.writeln(useGrowl);
                 io.writeln(areYouSurePrompts);
                 io.writeln(rgbSaveType);
                 io.writeln(editorResolution);
@@ -584,6 +586,8 @@ load: what,io
                 unsaved = 0;
                 
                 globalstore("passEditoruserOutputString",userOutputString);
+                if(platform() == MACUB || platform() == MAC64)
+	                globalstore("passEditorUseGrowl",useGrowl);
                 globalstore("passEditorareYouSurePrompts",areYouSurePrompts);
                 globalstore("passEditorrgbSaveType",rgbSaveType);
                 globalstore("passEditoreditorResolution",editorResolution);
@@ -622,6 +626,8 @@ process: event, command
         // Set 'userOutputFolder' to "Content/Passport_Passes" by default - Matt Gorner
         userOutputFolder = getdir("Content") + getsep() + "PassPort_Passes";
         userOutputString = string(globalrecall("passEditoruserOutputString",""));
+        if(platform() == MACUB || platform() == MAC64)
+	        useGrowl = integer(globalrecall("passEditorUseGrowl", 0));
         areYouSurePrompts = integer(globalrecall("passEditorareYouSurePrompts", 1));
         rgbSaveType = integer(globalrecall("passEditorrgbSaveType", 1));
         editorResolution = integer(globalrecall("passEditoreditorResolution", 1));

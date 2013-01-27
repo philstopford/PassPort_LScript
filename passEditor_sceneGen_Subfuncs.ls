@@ -610,7 +610,7 @@ generatePassFile: mode, pass
         {
             if(chdir("temp"))
             {
-
+				info(pass.asStr());
                 if(chdir("tempScenes"))
                 {
                     newScenePath = outputFolder[1] + getsep() + "CG" + getsep() + "temp" + getsep() + "tempScenes" + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + ".lws";
@@ -1463,6 +1463,11 @@ generatePassFile: mode, pass
     outputFile.close();
 
     // new stuff to go back and overwrite the scene settings
+	
+	// since the currentScenePath is a temporary file, let's push back the changes to it for the next iteration of write activity.
+	// FIXME: Might be better to use a temporary file, but this works for now
+	filecopy(newScenePath, currentScenePath);
+	
     // newScenePath
     if(overrideNames[1] != "empty")
     {
@@ -2237,7 +2242,7 @@ writeOverrideString: inputFileName, outputFileName, outputString, outputValue
 
 	// Finished with our output file, so close it.
 	tempOutput.close();
-	filecopy(outputFileName, inputFileName); // write back to the temporary input file in case of subsequent writeOverride events.
+	filecopy(outputFileName, inputFileName);
 }
 
 // Duplicate user's input file to a temp file and send back the path to the temp file to process elsewhere..

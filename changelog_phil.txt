@@ -1,7 +1,19 @@
+20130102
+========
+
+- Introduced new 'PassPort Renewed' naming to distinguish this effective fork/rewrite from the original project.
+- Growl system interoperation on Mac now configurable.
+ - Wrapped up growl code in OS X scene render functions with a preference setting to enable growl (or not).
+- Experimental fix to oversight in scene generation code. Line 1468. Might need a better fix.
+- Retired LW preference handling code for older LW versions from getImageFormats() as we've locked out versions prior to 11.0
+- Removed resizePanel() empty function.
+- Error message change in getCommand function.
+- Minor optimisation in getCommand function.
+
 20130101
 ========
 
-- Make use of runningUnder() to see if lwsn crashes can be avoided.
+- Make use of runningUnder() to avoid lwsn crashes.
 - Tweaked hard-coded, obsolete, reference to ScreamerNet.
 - First run under OS X!
 - Bumped minimum requirement to LW 11.0.
@@ -10,7 +22,7 @@
 - Moved buffer handling code to a separate function to reduce complexity.
 - Modified writeOverrideString function to handle 'special' case of FrameSize and GlobalFrameSize settings.
 - Deployed improved scene file writing code. Probably broken build for now. Will debug over time :)
-- NT helped with guidance to avoid the arithmetic error on OS X. It's that this_script[1] in the main file.
+- NT helped with guidance to avoid the arithmetic error on OS X. It's that this_script[1] in the main file (and also in the interface subfuncs file).
  - Reworked this code per NT's guidance.
  - Have followed up the reply with a query about why the error location is always wrong.
 
@@ -261,7 +273,7 @@ Brace yourself. Here's the big set of UI changes related to filtering the overri
 + In Progress +
 +++++++++++++++
 
-- Scene Master override overhaul.
+- Pending
 
 ********
 * Bugs *
@@ -294,9 +306,11 @@ p0015 : Overrides with assigned items don't get bullet point until the lists are
 :::::::::::::::::::
 
 - Lens flare toggle isn't working.
-- SceneGen code could be optimised to walk the array and use loops to greatly simplify the code.
+- SceneGen code could be optimised to walk the array and use loops to greatly simplify the code. (partially done with 20130101)
 - Add Camera override, for camera settings.
 - Autoscan plugin operation.
+- FiberFX pass generation integration possible?
+- Need to check if growl interaction works with current growl versions.
 
 -------------
 - Reference -

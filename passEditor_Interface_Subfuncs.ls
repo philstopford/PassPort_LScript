@@ -416,7 +416,9 @@ createSceneMasterOverride
 aboutPassPortDialog
 {
 	this_script = split(SCRIPTID);
-	this_script_path = this_script[1] + this_script[2];
+	this_script_path = this_script[2];
+	if(this_script[1])
+		this_script_path = this_script[1] + this_script[2] + getsep();
 
 	// Check if the script is compiled, if so, don't need to find the banner images on disk
 	compiled = 1;
@@ -526,7 +528,22 @@ preferencePanel
 	s20 = ctlsep();
 	ctlposition(s20, -2, ui_offset_y);
 
-	ui_offset_y += Pref_ui_row_offset + 5;
+	ui_offset_y += 5;
+
+	if(platform() == MACUB || platform() == MAC64)
+	{
+		usegrowl = ctlcheckbox("Use Growl",useGrowl);
+		ctlposition(usegrowl, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
+	
+		ui_offset_y += Pref_ui_row_offset + 5;
+		s201 = ctlsep();
+		ctlposition(s201, -2, ui_offset_y);
+		ui_offset_y += 6;
+
+	} else {
+		ui_offset_y += Pref_ui_row_offset;
+		ui_offset_y += Pref_ui_row_offset;
+	}
 
 	c23 = ctlcheckbox("Enable Confirmation Dialogs",areYouSurePrompts);
 	ctlposition(c23, Pref_gad_x, ui_offset_y, Pref_gad_w, Pref_gad_h, Pref_gad_text_offset);
@@ -568,6 +585,8 @@ preferencePanel
 		fileOutputPrefix = makeStringGood(fileOutputPrefix);
 		userOutputString = getvalue(c22);
 		userOutputString = makeStringGood(userOutputString);
+		if(platform() == MACUB || platform() == MAC64)
+			useGrowl = getvalue(usegrowl);
 		areYouSurePrompts = getvalue(c23);
 		rgbSaveType = getvalue(c25);
 		editorResolution = getvalue(c26);
@@ -720,70 +739,43 @@ getImageFormats
 		case MACUB:
 		case MAC64:
 			// Special case check for LW Extensions due to the "extension cache" file
-			if(integer(hostVersion()) >= 10)
+			tempString = config_dir + getsep() + "Extensions " + vers;
+			input = File(tempString);
+			(a,c,m,s,l,u,g) = filestat(tempString);
+			// Check for LW 10 'Autoscan Plugins'.  When it is on, LWEXT*.cfg is NOT filled in, but plugins are stored in 'Extension Cache' file instead
+			if(s.asNum() == 0)
 			{
-				tempString = config_dir + getsep() + "Extensions " + vers;
-				input = File(tempString);
-				(a,c,m,s,l,u,g) = filestat(tempString);
-				// Check for LW 10 'Autoscan Plugins'.  When it is on, LWEXT*.cfg is NOT filled in, but plugins are stored in 'Extension Cache' file instead
-				// Not sure of the General Options flag to test, so if the read line is NULL, it means it's not been filled in, and so Extension Cache is being used instead (probably)
-				//if(line == NULL)
-				if(s.asNum() == 0)
-				{
-					if(input)
-						input.close();
-					tempString = config_dir + getsep() + "Extension Cache";
-					input = File(tempString);
-				}
-			}else
-			{
-				tempString = config_dir + getsep() + "Extensions " + vers;
+				if(input)
+					input.close();
+				tempString = config_dir + getsep() + "Extension Cache";
 				input = File(tempString);
 			}
 			break;
 
 		case WIN32:
-			if(integer(hostVersion()) >= 10)
+			tempString = config_dir + getsep() + "LWEXT" + vers + ".CFG";
+			input = File(tempString);
+			(a,c,m,s,l,u,g) = filestat(tempString);
+			// Check for LW 10 'Autoscan Plugins'.  When it is on, LWEXT*.cfg is NOT filled in, but plugins are stored in 'Extension Cache' file instead
+			if(s.asNum() == 0)
 			{
-				tempString = config_dir + getsep() + "LWEXT" + vers + ".CFG";
-				input = File(tempString);
-				(a,c,m,s,l,u,g) = filestat(tempString);
-				// Check for LW 10 'Autoscan Plugins'.  When it is on, LWEXT*.cfg is NOT filled in, but plugins are stored in 'Extension Cache' file instead
-				// Not sure of the General Options flag to test, so if the read line is NULL, it means it's not been filled in, and so Extension Cache is being used instead (probably)
-				//if(line == NULL)
-				if(s.asNum() == 0)
-				{
-					if(input)
-						input.close();
-					tempString = config_dir + getsep() + "Extension Cache";
-					input = File(tempString);
-				}
-			}else
-			{
-				tempString = config_dir + getsep() + "LWEXT" + vers + ".CFG";
+				if(input)
+					input.close();
+				tempString = config_dir + getsep() + "Extension Cache";
 				input = File(tempString);
 			}
 			break;
 
 		case WIN64:
-			if(integer(hostVersion()) >= 10)
+			tempString = config_dir + getsep() + "LWEXT" + vers + "-64.CFG";
+			input = File(tempString);
+			(a,c,m,s,l,u,g) = filestat(tempString);
+			// Check for LW 10 'Autoscan Plugins'.  When it is on, LWEXT*.cfg is NOT filled in, but plugins are stored in 'Extension Cache' file instead
+			if(s.asNum() == 0)
 			{
-				tempString = config_dir + getsep() + "LWEXT" + vers + "-64.CFG";
-				input = File(tempString);
-				(a,c,m,s,l,u,g) = filestat(tempString);
-				// Check for LW 10 'Autoscan Plugins'.  When it is on, LWEXT*.cfg is NOT filled in, but plugins are stored in 'Extension Cache' file instead
-				// Not sure of the General Options flag to test, so if the read line is NULL, it means it's not been filled in, and so Extension Cache is being used instead (probably)
-				//if(line == NULL)
-				if(s.asNum() == 0)
-				{
-					if(input)
-						input.close();
-					tempString = config_dir + getsep() + "Extension Cache-64";
-					input = File(tempString);
-				}
-			}else
-			{
-				tempString = config_dir + getsep() + "LWEXT" + vers + "-64.CFG";
+				if(input)
+					input.close();
+				tempString = config_dir + getsep() + "Extension Cache-64";
 				input = File(tempString);
 			}
 			break;
@@ -872,7 +864,6 @@ generateSurfaceObjects: pass,srfLWOInputID,srfInputTemp,currentScenePath,objStar
 	}
 	else
 	{
-	
 		// get the surface base name
 		srfInputTempArray = split(srfInputTemp);
 
@@ -1058,11 +1049,6 @@ makeStringGood: string
 	}
 }
 
-resizePanel: w, h
-{
-
-}
-
 saveCurrentPassesSettings
 {
 	doKeys = 0;
@@ -1139,12 +1125,15 @@ saveCurrentPassesSettings
 		io.writeln(userOutputFolder);
 		io.writeln(fileOutputPrefix);
 		io.writeln(userOutputString);
+		io.writeln(useGrowl); // write this out no matter what, to keep parity across platforms.
 		io.writeln(areYouSurePrompts);
 		io.writeln(rgbSaveType);
 		io.writeln(editorResolution);
 		io.close();
 		
 		globalstore("passEditoruserOutputString",userOutputString);
+		if(platform() == MACUB || platform() == MAC64)
+			globalstore("passEditorUseGrowl", useGrowl);
 		globalstore("passEditorareYouSurePrompts",areYouSurePrompts);
 		globalstore("passEditorrgbSaveType",rgbSaveType);
 		globalstore("passEditoreditorResolution",editorResolution);
@@ -1248,6 +1237,7 @@ loadPassesSettings
 			{
 				userOutputString = "";
 			}
+			useGrowl = io.read().asInt();
 			areYouSurePrompts = io.read().asInt();
 			rgbSaveType = io.read().asInt();
 			editorResolution = io.read().asInt();
@@ -1734,7 +1724,7 @@ getCommand: event,data
 					}
 					else
 					{
-						error("Can't delete current pass!  Changes passes, then delete.");
+						error("Can't delete current pass!  Change to a different pass and then try again.");
 					}
 				}
 				break;
@@ -1876,30 +1866,7 @@ getCommand: event,data
 					reProcess();
 					req_update();
 				}
-				if(comRingCommand == "renderPassFrame")
-				{
-					if(passAssItems[currentChosenPass] != "")
-					{
-						renderPassFrame();
-					}
-					else
-					{
-						error("There are no items in this pass.  Can't render frame.");
-					}
-				}
-				if(comRingCommand == "renderPassScene")
-				{
-					if(passAssItems[currentChosenPass] != "")
-					{
-						renderPassScene();
-					}
-					else
-					{
-						error("There are no items in this pass.  Can't render frame.");
-					}
-						
-				}
-				if(comRingCommand == "renderAllPasses")
+				if(comRingCommand == "renderPassFrame" || comRingCommand == "renderPassScene" || comRingCommand == "renderAllPasses")
 				{
 					if(passAssItems[currentChosenPass] != "")
 					{
