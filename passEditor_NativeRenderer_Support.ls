@@ -84,6 +84,7 @@ scnmasterOverride_UI_native: action
             {
                 radFlags_Array[i] = integer(settingsArray[81 + i]);
             }
+            activeCameraID              = integer(settingsArray[90]);
         }
     
         doKeys = 0;
@@ -106,6 +107,58 @@ scnmasterOverride_UI_native: action
         ctlposition(c20, ScnMst_gad_x2, ScnMst_gad_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
         
         ui_offset_y = ScnMst_ui_offset_y + ScnMst_ui_row_offset;
+
+        passCamNameArray = nil;
+        passCamIDArray = nil;
+
+        passItemsIDsArray = parse("||",passAssItems[currentChosenPass]);
+        passCamArrayIndex = 1;
+        for (i = 1; i <= passItemsIDsArray.size(); i++)
+        {
+            for (j = 1; j <= cameraIDs.size(); j++)
+            {
+                if(passItemsIDsArray[i] == cameraIDs[j])
+                {
+                    passCamIDArray[passCamArrayIndex] = passItemsIDsArray[i];
+                    // Name look-up
+                    for(k = 1; k <= displayIDs.size(); k++)
+                    {
+                        if(displayIDs[k] == passItemsIDsArray[i])
+                        {
+                            nameIndex = k;
+                        }
+                    }
+                    passCamNameArray[passCamArrayIndex] = displayNames[nameIndex];
+                    passCamArrayIndex++;
+                }
+            }
+        }
+        if(passCamArrayIndex == 1)
+        {
+            passCamNameArray = @"No camera found in pass!"@;
+        }
+
+        activeCameraID = masterScene.renderCamera(0).id;
+        if(action == "edit")
+        {
+            activeCameraID = integer(settingsArray[90]);
+        }
+        activeCamera = 0; // will map to first camera.
+        counter = 0;
+        for (i = 1; i <= passCamIDArray.size(); i++)
+        {
+            if(passCamIDArray[i] == activeCameraID)
+            {
+                activeCamera = counter;
+            }
+            counter++;
+        }
+        if(activeCamera != 0)
+        {
+            activeCamera += 1; // Need to increment by one due to 1-based array and 0-based UI
+        }
+        c90 = ctlpopup("Active Camera",activeCamera,passCamNameArray);
+        ctlposition(c90, ScnMst_gad_x, ScnMst_gad_y + ui_offset_y, ScnMst_gad_w, ScnMst_gad_h, ScnMst_gad_text_offset);
 
         renderModeSetts = 3;
         if(action == "edit")
@@ -806,6 +859,13 @@ scnmasterOverride_UI_native: action
             radFlags_SecBounce              = integer(radFlags_Array[7]);
             radFlags_Behind                 = integer(radFlags_Array[8]);
 
+            if(!passCamIDArray)
+            {
+                activeCameraID              = 0;
+            } else {
+                activeCameraID              = passCamIDArray[getvalue(c90)]; // Offset as UI is 0-based; array is 1-based.
+            }
+
             newNumber = sel;
             if(action == "new")
             {
@@ -869,7 +929,7 @@ scnmasterOverride_UI_native: action
                                         + string(radFlags_Cells)                +   "||"    + string(radFlags_ColorCells)       +   "||"
                                         + string(radFlags_Samples)              +   "||"    + string(radFlags_MissPPSamples)    +   "||"
                                         + string(radFlags_MissRnSamples)        +   "||"    + string(radFlags_SecBounce)        +   "||"
-                                        + string(radFlags_Behind);
+                                        + string(radFlags_Behind)               +   "||"    + string(activeCameraID);
         }
         reqend();
     } else {
@@ -886,7 +946,46 @@ scnGen_native:updatedCurrentScenePath, newScenePath
 {
     redirectBuffersSetts        = integer(settingsArray[8]);
     disableAASetts              = integer(settingsArray[9]);
-                
+
+    activeCameraID = integer(settingsArray[90]);
+    if(activeCameraID == 0)
+    {
+        activeCamera = 0; // first camera in scene file, matching default behaviour for no cameras in pass.
+    } else {
+        passCamIDArray = nil;
+
+        passItemsIDsArray = parse("||",passAssItems[currentChosenPass]);
+        passCamArrayIndex = 1;
+        for (i = 1; i <= passItemsIDsArray.size(); i++)
+        {
+            for (j = 1; j <= cameraIDs.size(); j++)
+            {
+                if(passItemsIDsArray[i] == cameraIDs[j])
+                {
+                    passCamIDArray[passCamArrayIndex] = passItemsIDsArray[i];
+                    passCamArrayIndex++;
+                }
+            }
+        }
+
+        activeCamera = 0;
+        counter = 0;
+        for(i = 1; i <= passCamIDArray.size(); i++)
+        {
+            if(passCamIDArray[i] == activeCameraID)
+            {
+//                info("Found match for camera: " + counter.asStr());
+                activeCamera = counter;
+            }
+            counter++;
+        }
+    }
+
+    // We need to do both of these - the first because we will later overwrite this field because it's parked at the end of the file and gets re-written
+    // from the source file very late in the scene generation process.
+    writeOverrideString(updatedCurrentScenePath, updatedCurrentScenePath, "CurrentCamera ", activeCamera);
+    writeOverrideString(updatedCurrentScenePath, newScenePath, "CurrentCamera ", activeCamera);
+
     renderModeSetts = integer(settingsArray[4]) - 1;
     writeOverrideString(updatedCurrentScenePath, newScenePath, "RenderMode ", renderModeSetts);
     

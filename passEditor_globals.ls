@@ -6,12 +6,13 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "20130125_RC1";
+var versionString = "1.0";
 var rpeVersion = "1.0";
 var parch = "Unknown";
 var icon;
 var scenesnames;
 var passSelected = false;
+var currentPassMenu_item;
 var overridesSelected = false;
 var passAssItems;
 @if enablePBS == 1

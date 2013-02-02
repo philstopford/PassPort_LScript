@@ -68,7 +68,6 @@ cameraOverride_UI: action
 		ui_offset_y += CamProp_ui_row_offset;
 
 		c23val = 3;
-		resolutionMultiplier = 1.0;
 		if(action == "edit")
 		{
 			c23val = 3;

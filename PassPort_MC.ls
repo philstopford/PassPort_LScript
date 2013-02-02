@@ -694,7 +694,7 @@ process: event, command
 
         idMapping = 0;
         x = 1;
-        for(y = 1; y <= size(meshAgents); y++)
+        for(y = size(meshAgents); y >= 1; y--)
         {
             if(meshAgents[1] != "none")
             {
@@ -708,7 +708,7 @@ process: event, command
                 x++;
             }
         }
-        for(y = 1; y <= size(lightAgents); y++)
+        for(y = size(lightAgents); y >= 1; y--)
         {
             displayNames[x] = lightNames[y];
             o_displayNames[x+1] = lightNames[y];
@@ -720,7 +720,7 @@ process: event, command
             x++;
         }
 
-        for(y = 1; y <= size(cameraAgents); y++)
+        for(y = size(cameraAgents); y >= 1; y--)
         {
             displayNames[x] = cameraNames[y];
             o_displayNames[x+1] = cameraNames[y];
@@ -1207,7 +1207,7 @@ reProcess
         o_displayGenus[1] = 0;
         o_displayIDs[1] = "SM";
         
-        for(y = 1; y <= size(meshAgents); y++)
+        for(y = size(meshAgents); y >= 1; y--)
         {
             if(meshAgents[1] != "none")
             {
@@ -1221,7 +1221,7 @@ reProcess
                 x++;
             }
         }
-        for(y = 1; y <= size(lightAgents); y++)
+        for(y = size(lightAgents); y >= 1; y--)
         {
             displayNames[x] = lightNames[y];
             o_displayNames[x+1] = lightNames[y];
@@ -1233,7 +1233,7 @@ reProcess
             x++;
         }
 
-        for(y = 1; y <= size(cameraAgents); y++)
+        for(y = size(cameraAgents); y >= 1; y--)
         {
             displayNames[x] = cameraNames[y];
             o_displayNames[x+1] = cameraNames[y];

@@ -1,3 +1,11 @@
+20130130 (1.0 - change to enable active camera override)
+========
+
+- Flipped the y loops in Process() and Reprocess() to handle the reverse-order selection from Layout. Items now display in order rather than the bottom-top order evident up to now.
+- Implemented an active camera override in the scene override. Very cool.
+- Fixed camera override UI reverting resolution multiplier.
+- Version string now 1.0.
+
 20130125 (RC 1 - major changes in light override, scene master for final 1.0 feature delivery)
 ========
 
