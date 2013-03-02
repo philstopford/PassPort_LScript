@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "1.0";
+var versionString = "1.0.4";
 var rpeVersion = "1.0";
 var parch = "Unknown";
 var icon;
@@ -15,10 +15,8 @@ var passSelected = false;
 var currentPassMenu_item;
 var overridesSelected = false;
 var passAssItems;
-@if enablePBS == 1
 var defaultBufferExporters = @0,0,0,0,0,0,0,0,0@; // user setting to make changes, compositing buffer, exrTrader, special buffers, PSD export, extended RLA, extended RPF, Aura 2.5, iDof
 var passBufferExporters;
-@end // PBS
 var previousPassAssItems;
 var passOverrideItems;
 var previousPassOverrideItems;

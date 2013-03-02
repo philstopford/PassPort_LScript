@@ -1,3 +1,31 @@
+20130222 (No changes in overrides - just bug fixes for 1.0.4)
+========
+
+- Added extra separators for 'sensitive' image filter exporters.
+ - Special case handling in the generatePath function based on the mode (filter_2sep)
+
+20130207 (No changes in overrides - just bug fixes for 1.0.3)
+========
+
+- Fail operation on LW prior to 11.5 on the Mac platform. People don't read the documentation, it seems.
+
+20130206 (No changes in overrides - just bug fixes for 1.0.2)
+========
+
+- Restore getsep() in path generation functions. It turns out that sometimes we lack this, and the user may also omit it. That then breaks things.
+
+20130205 (No changes in overrides - just bug fixes for 1.0.1)
+========
+
+- Adjusted generatePath() to recognize a "filter" mode; we then have to check outputStr to determine whether we're in the equivalent of "frame" mode.
+ - This change puts redirected image filter output into the same location as the SaveRGB imagery.
+- Bug fix to generatePath() logic. Also avoids a double getsep() in some situations.
+- Tweaked generatePath() to add a "_" before the base name. Generates cleaner filenames.
+- Buffer redirect issue - seems to be coming from LScript Garbage Collection.
+ - Revised approach to retrieving the redirection setting to avoid GC clean-up.
+ - Extended the arguments to the handleBuffers function to address look-up failures due to the GC.
+- Removed compile-time toggle for Pass Buffer Support - it shipped in 1.0.
+
 20130130 (1.0 - change to enable active camera override)
 ========
 

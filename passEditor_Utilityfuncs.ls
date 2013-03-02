@@ -50,7 +50,7 @@ generateNewScenePath: outputFolder, outputStr, fileOuputPrefix, userOutputString
 
 generateSaveRGBPath: mode, outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass
 {
-    chdirString = outputFolder[1] + getsep() + "CG" + getsep();
+	chdirString = outputFolder[1] + getsep() + "CG" + getsep();
     if(mode == "frame")
     {
         chdirString = chdirString + "temp" + getsep();
@@ -61,12 +61,6 @@ generateSaveRGBPath: mode, outputFolder, outputStr, fileOutputPrefix, userOutput
         chdirString = outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass];
         if(chdir(chdirString))
         {
-            saveRGBImagesPrefix = outputFolder[1] + getsep() + "CG" + getsep();
-            if (mode == "frame")
-            {
-                saveRGBImagesPrefix = saveRGBImagesPrefix + "temp" + getsep();
-            }
-            saveRGBImagesPrefix = saveRGBImagesPrefix + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass];
         }
         else
         {
@@ -75,13 +69,6 @@ generateSaveRGBPath: mode, outputFolder, outputStr, fileOutputPrefix, userOutput
                 chdir("temp");
             mkdir(outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass]);
             chdir(outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass]);
-            
-            saveRGBImagesPrefix = outputFolder[1] + getsep() + "CG" + getsep();
-            if (mode == "frame")
-            {
-                saveRGBImagesPrefix = saveRGBImagesPrefix + "temp" + getsep();
-            }
-            saveRGBImagesPrefix = saveRGBImagesPrefix + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass];
         }
     }
     else
@@ -95,31 +82,54 @@ generateSaveRGBPath: mode, outputFolder, outputStr, fileOutputPrefix, userOutput
         }
         mkdir(outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass]);
         chdir(outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass]);
-        
-        saveRGBImagesPrefix = outputFolder[1] + getsep() + "CG" + getsep();
-        if (mode == "frame")
-        {
-            saveRGBImagesPrefix = saveRGBImagesPrefix + "temp" + getsep();
-        }
-        saveRGBImagesPrefix = saveRGBImagesPrefix + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass];
     }
+    saveRGBImagesPrefix = outputFolder[1] + getsep() + "CG" + getsep();
+    if (mode == "frame")
+    {
+        saveRGBImagesPrefix = saveRGBImagesPrefix + "temp" + getsep();
+    }
+    saveRGBImagesPrefix = saveRGBImagesPrefix + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass];
     return saveRGBImagesPrefix;
 }
 
 generatePath: mode, outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, baseName
 {
-	genPath = outputFolder + getsep() + "CG" + getsep();
-	if (mode == "LWO" || "frame")
+	if(mode == "filter_2sep")
+	{
+		tempArray_2sep = parse(getsep(), outputFolder[1]);
+		for(i = 1; i <= tempArray_2sep.size(); i++)
+		{
+			tempOutputFolderString = tempArray_2sep[i] + getsep() + getsep();
+		}
+		genPath = tempOutputFolderString + getsep()  + getsep() + "CG" + getsep() + getsep();
+	} else {
+		genPath = outputFolder[1] + getsep() + "CG" + getsep();
+	}
+	if (mode == "LWO" || mode == "frame" || ((mode == "filter" || mode == "filter_2sep") && outputStr == "testFrame_"))
 	{
 		genPath = genPath + "temp" + getsep();
+		if(mode == "filter_2sep")
+		{
+			genPath = genPath + getsep();
+		}
 	}
 	if (mode == "LWO")
 	{
-		genPath = genPath + getsep() + "tempScenes" + getsep() + "tempObjects" + getsep();
+		genPath = genPath + "tempScenes" + getsep() + "tempObjects" + getsep();
 	}
-
-	genPath = genPath + outputStr + "_" + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + baseName;
-
+	if (mode == "filter" || mode == "filter_2sep")
+	{
+		if(mode == "filter")
+		{
+			genPath = genPath + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + "_" + baseName;
+		}
+		if(mode == "filter_2sep")
+		{
+			genPath = genPath + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + getsep() + getsep() + outputStr + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + "_" + baseName;
+		}
+	} else {
+		genPath = genPath + outputStr + "_" + fileOutputPrefix + "_" + userOutputString + "_" + passNames[pass] + "_" + baseName;
+	}
     return genPath;
 }
 
@@ -348,7 +358,7 @@ generateSurfaceObjects: srfLWOInputID,srfInputTemp,currentScenePath,objStartLine
 			mkdir("tempObjects");
 			chdir("tempObjects");
 		}
-		tempLWOPath = generatePath("LWO", outputFolder[1], string(srfLWOInputID), srfInputTempArray[3], userOutputString, passNames, pass, ".lwo");
+		tempLWOPath = generatePath("LWO", outputFolder, string(srfLWOInputID), srfInputTempArray[3], userOutputString, passNames, pass, ".lwo");
 		
 		srf_file_path = split(srfInputTemp);
 		surfaceList = Surface(meshAgents[selectedMeshID]);

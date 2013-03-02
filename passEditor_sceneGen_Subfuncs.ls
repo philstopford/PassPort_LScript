@@ -744,41 +744,7 @@ generatePassFile: mode, pass
         outputFile.writeln(line);
         lineNumber = inputFile.line();
     }
-
-    /*    if(hvDataLine != nil || includedHvObjects != nil)
-    {        
-        //write out the HV data
-        lineNumber = hvStartLine + 1;
-        inputFile.line(lineNumber);
-        for(x = 1; x < 4; x++)
-        {
-            line = inputFile.read();
-            outputFile.writeln(line);
-        }
-        for(x = 1; x <= size(includedHvObjects); x++)
-        {
-            tempIterationNumber = includedHvObjects[x];
-            lineNumber = hvObjectLine[tempIterationNumber];
-            inputFile.line(lineNumber);
-            while(lineNumber <= hvObjectEndLine[tempIterationNumber])
-            {
-                line = inputFile.read();
-                outputFile.writeln(line);
-                lineNumber = inputFile.line();
-            }
-        }
-        
-        tempSizeNumber = size(hvObjectEndLine);
-        lineNumber = hvObjectEndLine[tempSizeNumber];
-        inputFile.line(lineNumber);
-        while(lineNumber <= dataOverlayLabelLine)
-        {
-            line = inputFile.read();
-            outputFile.writeln(line);
-            lineNumber = inputFile.line();
-        }        
-    }
-    */   
+  
     progressString = string(0.995);
     msgString = "{" + progressString + "}Generating Render Scene:  Finishing...";
     StatusMsg(msgString);
@@ -852,6 +818,7 @@ generatePassFile: mode, pass
         {
 			overrideType[passItem] = 6;
 			overrideRenderer = integer(settingsArray[3]);
+            redirectBuffersSetts = integer(settingsArray[8]);
 			switch(overrideRenderer)
 			{
 				case 1:
@@ -869,7 +836,9 @@ generatePassFile: mode, pass
     }
 
 	// deal with the buffer savers now.
-	handleBuffers(newScenePath, passNames, pass);
+    if(!redirectBuffersSetts)
+        redirectBuffersSetts = 0;
+	handleBuffers(mode, redirectBuffersSetts, newScenePath, outputFolder, outputStr, fileOuputPrefix, userOutputString, passNames, pass);
     
 	// and as a tack-on fix, replace motion-mixer stuff for overridden objects. Calls finishFiles() for us.
 	motionMixerStuff(newScenePath, passNames, pass);
@@ -1762,7 +1731,7 @@ fiberFX: ffFile, passNames, pass
 	return 1; // notify caller that we changed something.
 }
 
-handleBuffers: hbFile, passNames, pass // if you edit this, don't forget to extend defaultBufferExporters as well and the new/edit pass dialog to set the values accordingly. You'll also need to bump the version due to mismatches.
+handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, fileOuputPrefix, userOutputString, passNames, pass // if you edit this, don't forget to extend defaultBufferExporters as well and the new/edit pass dialog to set the values accordingly. You'll also need to bump the version due to mismatches.
 {
 	if(redirectBuffersSetts == 1)
 	{
@@ -1772,9 +1741,10 @@ handleBuffers: hbFile, passNames, pass // if you edit this, don't forget to exte
 		while(!inputFile.eof())
 		{
 			line = inputFile.read();
-			if(size(line) > 26)
+            searchString = "Plugin ImageFilterHandler ";
+			if(size(line) > searchString.size())
 			{
-				if(strleft(line,26) == "Plugin ImageFilterHandler ")
+				if(strleft(line,searchString.size()) == searchString)
 				{
                     bufferTestLineParse = parse(" ",line);
                     // compositing buffer exporter - experimental with beta 8
@@ -1789,11 +1759,11 @@ handleBuffers: hbFile, passNames, pass // if you edit this, don't forget to exte
                         if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
                         {
                             compositeBaseName = baseNameArray[size(baseNameArray)];
-                            updatedCompositeSaverPath = "   \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
+                            updatedCompositeSaverPath = "    \"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
 
                             if(platform() == INTEL)
                             {
-                                noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
+                                noIntroPath = "\"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
                                 tempFixedPath = fixPathForWin32(noIntroPath);
                                 noIntroPath = tempFixedPath;
                                 newPathFixed = "    " + noIntroPath;
@@ -1823,11 +1793,11 @@ handleBuffers: hbFile, passNames, pass // if you edit this, don't forget to exte
                         if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
                         {
                             compositeBaseName = baseNameArray[size(baseNameArray)];
-                            updatedCompositeSaverPath = "    \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
+                            updatedCompositeSaverPath = "    \"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
 
                             if(platform() == INTEL)
                             {
-                                noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
+                                noIntroPath = "\"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
                                 tempFixedPath = fixPathForWin32(noIntroPath);
                                 noIntroPath = tempFixedPath;
                                 newPathFixed = "    " + noIntroPath;
@@ -1861,7 +1831,7 @@ handleBuffers: hbFile, passNames, pass // if you edit this, don't forget to exte
 							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
 							{
 								bufferBaseName = baseNameArray[size(baseNameArray)];
-								updatedBufferSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, bufferBaseName);
+								updatedBufferSaverPath = "\"" + generatePath("filter", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, bufferBaseName);
 
 								if(platform() == INTEL)
 								{
@@ -1900,11 +1870,11 @@ handleBuffers: hbFile, passNames, pass // if you edit this, don't forget to exte
 							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
 							{
 								psdBaseName = baseNameArray[size(baseNameArray)];
-								updatedPsdSaverPath = "Path \"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, psdBaseName);
+								updatedPsdSaverPath = "Path \"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, psdBaseName);
 
 								if(platform() == INTEL)
 								{
-									noIntroPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, psdBaseName);
+									noIntroPath = "\"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, psdBaseName);
 									tempFixedPath = fixPathForWin32(noIntroPath);
 									noIntroPath = tempFixedPath;
 									newPathFixed = "Path " + noIntroPath;
@@ -1942,7 +1912,7 @@ handleBuffers: hbFile, passNames, pass // if you edit this, don't forget to exte
 							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
 							{
 								rlaBaseName = baseNameArray[size(baseNameArray)];
-								updatedRlaSaverPath = generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, rlaBaseName);
+								updatedRlaSaverPath = generatePath("filter", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, rlaBaseName);
 								toWrite = updatedRlaSaverPath;
 							}
 							else
@@ -1972,7 +1942,7 @@ handleBuffers: hbFile, passNames, pass // if you edit this, don't forget to exte
 							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
 							{
 								rpfBaseName = baseNameArray[size(baseNameArray)];
-								updatedRpfSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, rpfBaseName);
+								updatedRpfSaverPath = "\"" + generatePath("filter", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, rpfBaseName);
 								toWrite = updatedRpfSaverPath;
 							}
 							else
@@ -2001,7 +1971,7 @@ handleBuffers: hbFile, passNames, pass // if you edit this, don't forget to exte
 							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
 							{
 								auraBaseName = baseNameArray[size(baseNameArray)];
-								updatedAuraSaverPath = "\"" + generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, auraBaseName);
+								updatedAuraSaverPath = "\"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, auraBaseName);
 								toWrite = updatedAuraSaverPath;
 							}
 							else
@@ -2030,7 +2000,7 @@ handleBuffers: hbFile, passNames, pass // if you edit this, don't forget to exte
 							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
 							{
 								idofBaseName = baseNameArray[size(baseNameArray)];
-								updatedIdofSaverPath = generatePath(mode, outputFolder[1], outputStr, fileOutputPrefix, userOutputString, passNames, pass, idofBaseName);
+								updatedIdofSaverPath = generatePath("filter", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, idofBaseName);
 								toWrite = updatedIdofSaverPath;
 							}
 							else
@@ -2061,12 +2031,9 @@ handleBuffers: hbFile, passNames, pass // if you edit this, don't forget to exte
         finishFiles();
 	}
 
-@if enablePBS == 1
     passBufferSetup(hbFile, passNames, pass);
-@end
 }
 
-@if enablePBS == 1
 // This function is called from handleBuffers and it works to (de)activate buffer exporters (image filters) for the current pass. It's highly experimental and not scheduled for the 1.0 release.
 passBufferSetup: pbsFile, passNames, pass
 {
@@ -2160,7 +2127,6 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
                     insertScnLine("PluginEnabled 0", tempFilePBS, imageFilterLines[i] + lineOffset);
                     lineOffset++;
                 }
-                info("hold");
             }
         }
         if(makeChange == 1)
@@ -2173,7 +2139,6 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
     // Tidy up after outselves.
     scanFile.close();
 }
-@end // PBS
 
 motionMixerStuff: mmFile, passNames, pass
 {

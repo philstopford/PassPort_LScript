@@ -6,7 +6,6 @@
 
 // EXPERIMENTAL features
 // @define enableKray 1;
-@define enablePBS 1; // only for post-1.0.
 
 var supportedplatform = 1;
 
@@ -124,9 +123,19 @@ bullet_icon = @ "................",
 platformcheck
 {
     // Check to block operation on old LW versions - permitted removal of needHackySaving!
-    if (hostBuild() < 2238) {
-    	supportedplatform = 0;
+    if (platform() == MACUB || platform() == MAC64)
+    {
+      if (hostBuild() < 2519)
+      {
+        supportedplatform = 0;
+        error("This version of PassPort requires at least LightWave 3D 11.5 for Mac.");
+      }
+    } else {
+      if (hostBuild() < 2238)
+      {
+        supportedplatform = 0;
         error("This version of PassPort requires at least LightWave 3D 11.0.");
+      }
     }
 
 	return;
@@ -378,9 +387,7 @@ load: what,io
                   passAssItems[x] = "";
               }
 
-@if enablePBS == 1
               passBufferExporters[x] = io.read();
-@end
           }
           overrideNamesSize = io.read().asInt();
           overrideNames[1] = io.read();
@@ -397,7 +404,7 @@ load: what,io
               for(x = 2; x <= overrideNamesSize; x++)
               {
                   overrideNames[x] = io.read();
-                  if(overrideNames[1] != "empty")
+                  if(overrideNames[x] != "empty")
                   {
                       overrideSettings[x] = io.read();
                   }
@@ -407,7 +414,7 @@ load: what,io
           {
               for(y = 1; y <= overrideNamesSize; y++)
               {
-                  if(overrideNames[1] != "empty")
+                  if(overrideNames[x] != "empty")
                   {
                       passOverrideItems[x][y] = io.read();
                       if(passOverrideItems[x][y] == nil)
@@ -464,10 +471,7 @@ save: what,io
               {
                   io.writeln(passNames[x]);
                   io.writeln(passAssItems[x]);
-
-@if enablePBS == 1
                   io.writeln(passBufferExporters[x]);
-@end
               }
               
                for(x = 1; x <= size(overrideNames); x++)
@@ -734,7 +738,6 @@ process: event, command
 
         passNames[1] = "Default";
 
-@if enablePBS == 1
         changeImageFilterState = "0";
         compBufferToggle = "0";
         exrTraderToggle = "0";
@@ -746,7 +749,6 @@ process: event, command
         iDOFToggle = "0";
         passBufferExporters[1] = changeImageFilterState + "||" + compBufferToggle + "||" + exrTraderToggle + "||" + specBuffToggle + "||" + psdToggle
                                                         + "||" + rlaToggle + "||" + rpfToggle + "||" + auraToggle + "||" + iDOFToggle;
-@end
 
         overrideNames[1] = "empty";
         for(x = 1; x <= size(passNames); x++)
@@ -1644,11 +1646,7 @@ unProcess
     passSelected = nil;
     overridesSelected = nil;
     passAssItems = nil;
-
-@if enablePBS == 1
     passBufferExporters = nil;
-@end
-
     passOverrideItems = nil;
     masterScene = nil;
     originalSelection = nil;
