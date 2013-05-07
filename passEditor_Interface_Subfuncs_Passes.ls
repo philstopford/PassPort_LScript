@@ -54,9 +54,7 @@ passHandler: action, mode
 	    sel = getvalue(gad_PassesListview).asInt();
 	    if(passSelected == true && sel != 0)
 	    {
-@if enablePBS == 1
 	        bufferSettings = parse("||", passBufferExporters[sel]);
-@end
 	        dialogTitle = "Edit Pass";
 	        dialogString = passNames[sel];
 	        newNumber = sel;
@@ -72,7 +70,6 @@ passHandler: action, mode
 	reqbegin(dialogTitle);
 	c20 = ctlstring("Pass Name:",dialogString);
 
-@if enablePBS == 1
 	reqsize(Passes_ui_window_w, 325);
 	ctlposition(c20, Passes_gad_x, Passes_gad_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
 
@@ -170,14 +167,11 @@ passHandler: action, mode
 	}
 	c29 = ctlcheckbox("iDOF",iDOFToggle);
 	ctlposition(c29, Passes_gad_x, Passes_gad_y + ui_offset_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
-@end // PBS
 
     if(reqpost())
     {
         newName = getvalue(c20);
         newName = makeStringGood(newName);
-
-@if enablePBS == 1
         changeImageFilterState  = string(getvalue(c21));
         compBufferToggle        = string(getvalue(c22));
         exrTraderToggle         = string(getvalue(c23));
@@ -187,12 +181,9 @@ passHandler: action, mode
         rpfToggle               = string(getvalue(c27));
         auraToggle              = string(getvalue(c28));
         iDOFToggle              = string(getvalue(c29));
-@end // PBS
 
-@if enablePBS == 1
         passBufferExporters[newNumber] = changeImageFilterState + "||" + compBufferToggle + "||" + exrTraderToggle + "||" + specBuffToggle + "||" + psdToggle
                                                                 + "||" + rlaToggle + "||" + rpfToggle + "||" + auraToggle + "||" + iDOFToggle;
-@end // PBS
 
 		if(action == "edit")
 		{
@@ -293,11 +284,7 @@ deleteSelectedPass
                         {
                             passNames[sel] = nil;
                             passAssItems[sel] = "";
-
-@if enablePBS == 1
                             passBufferExporters[sel] = nil;
-@end // PBS
-
                             for(x = 1; x <= size(overrideNames); x++)
                             {
                                 passOverrideItems[sel][x] = "";
@@ -311,11 +298,7 @@ deleteSelectedPass
                                 {
                                     passNames[x] = passNames[x];
                                     passAssItems[x] = passAssItems[x];
-
-@if enablePBS == 1
                                     passBufferExporters[x] = passBufferExporters[x];
-@end // PBS
-
                                     for(y = 1; y <= size(overrideNames); y++)
                                     {
                                         passOverrideItems[x][y] = passOverrideItems[x][y];
@@ -328,11 +311,7 @@ deleteSelectedPass
                                     {
                                         passNames[x] = passNames[xPlusOne];
                                         passAssItems[x] = passAssItems[xPlusOne];
-
-@if enablePBS == 1
                                         passBufferExporters[x] = passBufferExporters[xPlusOne];
-@end // PBS
-
                                         for(y = 1; y <= size(overrideNames); y++)
                                         {
                                             passOverrideItems[x][y] = passOverrideItems[xPlusOne][y];
@@ -342,11 +321,7 @@ deleteSelectedPass
                             }
                             passNames[topNumber] = nil;
                             passAssItems[topNumber] = "";
-
-@if enablePBS == 1
                             passBufferExporters[topNumber] = nil;
-@end // PBS
-
                             for(y = 1; y <= size(overrideNames); y++)
                             {
                                 passOverrideItems[topNumber][y] = "";
@@ -385,11 +360,7 @@ deleteSelectedPass
                     {
                         passNames[sel] = nil;
                         passAssItems[sel] = "";
-
-@if enablePBS == 1
                         passBufferExporters[sel] = nil;
-@end // PBS
-
                         for(x = 1; x <= size(overrideNames); x++)
                         {
                             passOverrideItems[1][x] = "";
@@ -403,11 +374,7 @@ deleteSelectedPass
                             {
                                 passNames[x] = passNames[x];
                                 passAssItems[x] = passAssItems[x];
-
-@if enablePBS == 1
                                 passBufferExporters[x] = passBufferExporters[x];
-@end // PBS
-
                                 for(y = 1; y <= size(overrideNames); y++)
                                 {
                                     passOverrideItems[x][y] = passOverrideItems[x][y];
@@ -420,11 +387,7 @@ deleteSelectedPass
                                 {
                                     passNames[x] = passNames[xPlusOne];
                                     passAssItems[x] = passAssItems[xPlusOne];
-
-@if enablePBS == 1
                                     passBufferExporters[x] = passBufferExporters[xPlusOne];
-@end // PBS
-
                                     for(y = 1; y <= size(overrideNames); y++)
                                     {
                                         passOverrideItems[x][y] = passOverrideItems[xPlusOne][y];
@@ -434,11 +397,7 @@ deleteSelectedPass
                         }
                         passNames[topNumber] = nil;
                         passAssItems[topNumber] = "";
-
-@if enablePBS == 1
                         passBufferExporters[topNumber] = nil;
-@end // PBS
-
                         for(y = 1; y <= size(overrideNames); y++)
                         {
                             passOverrideItems[topNumber][y] = "";
@@ -470,11 +429,7 @@ duplicateSelectedPass
     	newNumber = size(passNames) + 1;
 		passNames[newNumber] = passNames[sel] + "_copy";
 	    passAssItems[newNumber] = passAssItems[sel];
-
-@if enablePBS == 1
 	    passBufferExporters[newNumber] = passBufferExporters[sel];
-@end // PBS
-
 	    passOverrideItems[newNumber][size(overrideNames)] = "";
 	    for(y = 1; y <= size(overrideNames); y++)
 	    {
@@ -490,8 +445,8 @@ savePassAsScene
 	c21 = ctlfilename("Save .lws file...", "*.lws",30,0);
 	if(reqpost())
 	{
-		savePassScene = generatePassFile("seq", currentChosenPass);
 		lwsFile = getvalue(c21);
+		savePassScene = generatePassFile("seq", currentChosenPass);
 		filecopy(savePassScene,lwsFile);
 		filedelete(savePassScene);
 	}
@@ -607,11 +562,7 @@ saveCurrentPassesSettings
 		{
 			io.writeln(passNames[x]);
 			io.writeln(passAssItems[x]);
-
-@if enablePBS == 1
 	    	io.writeln(passBufferExporters[x]);
-@end // PBS
-
 		}
 		
 		 for(x = 1; x <= size(overrideNames); x++)
@@ -728,11 +679,7 @@ loadPassesSettings
 				{
 					passAssItems[x] = "";
 				}
-
-@if enablePBS == 1
 				passBufferExporters[x] = io.read();
-@end // PBS
-
 			}
 			overrideNamesSize = io.read().asInt();
 			overrideNames[1] = io.read();
@@ -820,11 +767,7 @@ loadPassesSettings
 				{
 					passAssItems[x] = "";
 				}
-
-@if enablePBS == 1
 				passBufferExporters[x] = io.read();
-@end // PBS
-
 			}
 			overrideNamesSize = io.read().asInt();
 			if(overrideNames[1] != "empty")

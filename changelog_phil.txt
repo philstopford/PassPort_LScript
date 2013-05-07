@@ -1,3 +1,9 @@
+20130507 (No changes in overrides - just bug fixes for 1.0.5)
+========
+
+- Thanks to a bug report from 3dworks (Markus), an issue with the SavePassAsScene() function was fixed.
+ - Due to aggressive garbage collection in LScript, the reference to the UI control value was invalidated before we retrieved the value. This was avoided by grabbing the value before doing anything else in reqpost{}.
+
 20130222 (No changes in overrides - just bug fixes for 1.0.4)
 ========
 
