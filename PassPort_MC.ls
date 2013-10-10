@@ -414,7 +414,7 @@ load: what,io
           {
               for(y = 1; y <= overrideNamesSize; y++)
               {
-                  if(overrideNames[x] != "empty")
+                  if(overrideNames[y] != "empty")
                   {
                       passOverrideItems[x][y] = io.read();
                       if(passOverrideItems[x][y] == nil)

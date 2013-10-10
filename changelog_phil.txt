@@ -1,3 +1,8 @@
+20131010 (No changes in overrides - just bug fixes for 1.0.6)
+========
+
+- Critical fix for scene loadng. Oddly, no-one reported it. :/
+
 20130507 (No changes in overrides - just bug fixes for 1.0.5)
 ========
 
