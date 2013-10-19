@@ -1232,38 +1232,68 @@ radLines_native: radFileName
 // I've version-controlled them in case they move/change in future.
 prepareRadiosityLines_11: radFileName
 {
-    if (getPartialLine(0,0,"EnableRadiosity",radFileName) == nil)
+    pRLStage = 1;
+    pRLArray = @"EnableRadiosity 1","RadiosityType 1","RadiosityInterpolated 1","RadiosityTransparency 1","CacheRadiosity 1","PreprocessRadiosity 0","RadiosityIntensity 1",
+                "RadiosityTolerance 0.2928932","RadiosityRays 100","SecondaryBounceRays 50","RadiosityMinPixelSpacing 3","RadiosityMaxPixelSpacing 100","RadiosityMultiplier 1",
+                "VolumetricRadiosity 1","RadiosityUseAmbient 1","RadiosityDirectionalRays 1","RadiosityUseGradients 1","RadiosityUseBehindTest 1","BlurRadiosity 1",
+                "RadiosityFlags -2147483648","RadiosityCacheAnimation 1","RadiosityCacheModulus 1","RadiositySaveEachFrame 1","RadiosityCacheFilePath Radiosity/radiosity.cache"@;
+
+    // Let's just write the entire standard block. The appropriate settings will be adjusted by any override in a subsequent action.
+
+    pRL11StartLine = getPartialLine(0,0,"EnableRadiosity",radFileName);
+    if (pRL11StartLine == nil)
     {
-        insertScnLine("EnableRadiosity 0",radFileName,(getPartialLine(0,0,"DoubleSidedAreaLights",radFileName)));
+        pRL11StartLine = getPartialLine(0,0,"RadiosityType",radFileName);
     }
-    if(getPartialLine(0,0,"IndirectBounces",radFileName) == nil)
+    pRL11EndLine = getPartialLine(0,0,"PixelFilterForceMT", radFileName);
+    if (pRL11StartLine == nil)
     {
-        insertScnLine("IndirectBounces 1",radFileName,(getPartialLine(0,0,"RadiosityMultiplier",radFileName)));
+        error("Something went wrong - please report with bug ref pRL11_1 and attach scene file");
     }
-    if(getPartialLine(0,0,"VolumetricRadiosity",radFileName) == nil)
+
+    pRLSource = File(radFileName,"r");
+    tempFilePRL = ::tempDirectory + getsep() + "tempPassportFilePRL.lws";
+    pRLTarget = File(tempFilePRL, "w");
+
+    totalNumberOfActions = pRLSource.linecount() + size(pRLArray);
+
+    for (line = 1; line < pRL11StartLine; line++)
     {
-        insertScnLine("VolumetricRadiosity 0",radFileName,(getPartialLine(0,0,"IndirectBounces",radFileName)));
+        progressString = string(line / totalNumberOfActions);
+        msgString = "{" + progressString + "}Radiosity: Phase 1/3 - Preparing target scene...";
+        StatusMsg(msgString);
+        pRLTarget.writeln(pRLSource.read());
     }
-    if(getPartialLine(0,0,"RadiosityUseAmbient",radFileName) == nil)
+
+    for (i = 1; i <= size(pRLArray); i++)
     {
-        insertScnLine("RadiosityUseAmbient 0",radFileName,(getPartialLine(0,0,"VolumetricRadiosity",radFileName)));
+        progressString = string((i + pRL11StartLine) / totalNumberOfActions);
+        msgString = "{" + progressString + "}Radiosity: Phase 2/3 - Writing radiosity lines...";
+        StatusMsg(msgString);
+        pRLString = pRLArray[i];
+        pRLString_a = parse(" ", pRLString);
+        pRLString_t = pRLString_a[1];
+        pRLSLine = getPartialLine(0,0,pRLString_t,radFileName);
+        if(pRLSLine != nil)
+        {
+            pRLSource.line(pRLSLine);
+            pRLString = pRLSource.read();
+        }
+        pRLTarget.writeln(pRLString);
     }
-    if(getPartialLine(0,0,"EnableCaustics",radFileName) == nil)
+
+    pRLSource.line(pRL11EndLine);
+    while(!pRLSource.eof())
     {
-        insertScnLine("EnableCaustics 0",radFileName,(getPartialLine(0,0,"PixelFilterForceMT",radFileName)));
+        progressString = string((pRLSource.line() + size(pRLArray)) / totalNumberOfActions);
+        msgString = "{" + progressString + "}Radiosity: Phase 3/3 - Finishing target scene...";
+        StatusMsg(msgString);
+        pRLTarget.writeln(pRLSource.read());
     }
-    if(getPartialLine(0,0,"CausticIntensity",radFileName) == nil)
-    {
-        insertScnLine("CausticIntensity 0",radFileName,(getPartialLine(0,0,"EnableCaustics",radFileName)));
-    }
-    if(getPartialLine(0,0,"CausticAccuracy",radFileName) == nil)
-    {
-        insertScnLine("CausticAccuracy 100",radFileName,(getPartialLine(0,0,"CausticIntensity",radFileName)));
-    }
-    if(getPartialLine(0,0,"CausticSoftness",radFileName) == nil)
-    {
-        insertScnLine("CausticSoftness 20",radFileName,(getPartialLine(0,0,"CausticAccuracy",radFileName)));
-    }
+    pRLTarget.close();
+    pRLSource.close();
+    filecopy(tempFilePRL, radFileName);
+    filedelete(tempFilePRL);
 }
 
 radFlags

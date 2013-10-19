@@ -1,7 +1,13 @@
+20131018 (No changes in overrides - just bug fixes for 1.0.7)
+========
+
+- Fixed radiosity setting related scene generation failure (p0041). Thanks very much to David Blemur for the extremely useful bug report.
+ - Backported from dev code to 1.0.7.
+
 20131010 (No changes in overrides - just bug fixes for 1.0.6)
 ========
 
-- Critical fix for scene loadng. Oddly, no-one reported it. :/
+- Critical fix for scene loadng (p0040) backported from dev code. Oddly, no-one reported it. :/
 
 20130507 (No changes in overrides - just bug fixes for 1.0.5)
 ========
@@ -603,6 +609,8 @@ p0031 : object replacement override broken in beta 6. Issue was in MotionMixer c
 p0032 : missed code meant that pass renaming wasn't working. (Fixed, beta8 respin)
 p0033 : code regression in override listbox handling. (Fixed, beta8 respin)
 p0034 : LScript bug needed working around. (Fixed, beta8 respin)
+p0040 : Scene reload error w/ overrideNames. (Fixed, 20131010 - triggered by multiple passes due to incorrect index being used w/ overrideNames array where number of passes > overrides)
+p0041 : Radiosity preparation lines code was flawed and could put PPRN into an infinite loop. Code fix was to entirely re-write this code. (20131017)
 
 ###############
 # Limitations #

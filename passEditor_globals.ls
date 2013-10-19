@@ -6,7 +6,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "1.0.6";
+var versionString = "1.0.7";
 var rpeVersion = "1.0";
 var parch = "Unknown";
 var icon;
