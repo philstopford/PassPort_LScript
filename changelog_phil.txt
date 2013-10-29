@@ -1,3 +1,8 @@
+20131029 (No changes in overrides - just bug fixes for 1.0.8)
+========
+
+- Typo fix for radiosity setting change in 1.0.7 that escaped QA.
+
 20131018 (No changes in overrides - just bug fixes for 1.0.7)
 ========
 
