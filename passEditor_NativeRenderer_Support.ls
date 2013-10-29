@@ -1233,10 +1233,10 @@ radLines_native: radFileName
 prepareRadiosityLines_11: radFileName
 {
     pRLStage = 1;
-    pRLArray = @"EnableRadiosity 1","RadiosityType 1","RadiosityInterpolated 1","RadiosityTransparency 1","CacheRadiosity 1","PreprocessRadiosity 0","RadiosityIntensity 1",
+    pRLArray = @"EnableRadiosity 0","RadiosityType 0","RadiosityInterpolated 0","RadiosityTransparency 0","CacheRadiosity 0","PreprocessRadiosity 0","RadiosityIntensity 0",
                 "RadiosityTolerance 0.2928932","RadiosityRays 100","SecondaryBounceRays 50","RadiosityMinPixelSpacing 3","RadiosityMaxPixelSpacing 100","RadiosityMultiplier 1",
-                "VolumetricRadiosity 1","RadiosityUseAmbient 1","RadiosityDirectionalRays 1","RadiosityUseGradients 1","RadiosityUseBehindTest 1","BlurRadiosity 1",
-                "RadiosityFlags -2147483648","RadiosityCacheAnimation 1","RadiosityCacheModulus 1","RadiositySaveEachFrame 1","RadiosityCacheFilePath Radiosity/radiosity.cache"@;
+                "VolumetricRadiosity 0","RadiosityUseAmbient 0","RadiosityDirectionalRays 0","RadiosityUseGradients 0","RadiosityUseBehindTest 0","BlurRadiosity 0",
+                "RadiosityFlags 0","RadiosityCacheAnimation 0","RadiosityCacheModulus 1","RadiositySaveEachFrame 0","RadiosityCacheFilePath Radiosity/radiosity.cache"@;
 
     // Let's just write the entire standard block. The appropriate settings will be adjusted by any override in a subsequent action.
 
