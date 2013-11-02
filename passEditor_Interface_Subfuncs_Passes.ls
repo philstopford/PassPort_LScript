@@ -20,15 +20,15 @@ createNewPassFromSelection
 
 passHandler: action, mode
 {
-	doKeys = 0;
+	::doKeys = 0;
 
 	if(!action)
-		error("passHandler called without arguments");
+		logger("error","passHandler called without arguments");
 
 	if(action == "new")
 	{
 		if(!mode)
-			error("passHandler arg2 missing");
+			logger("error","passHandler arg2 missing");
 		if(mode == "full")
 		{
 			dialogTitle = "New Full Pass";
@@ -41,22 +41,22 @@ passHandler: action, mode
 		}
 		if(mode == "fromsel")
 		{
-			s = masterScene.getSelect();
+			s = ::masterScene.getSelect();
 			dialogTitle = "New Selection Pass";
 			dialogString = "Selection_Pass";
 		}
 		if(!dialogTitle)
-			error("passHandler arg2 invalid");
-		newNumber = size(passNames) + 1;
+			logger("error","passHandler arg2 invalid");
+		newNumber = size(::passNames) + 1;
 	}
 	if(action == "edit") // mode is disregarded.
 	{
 	    sel = getvalue(gad_PassesListview).asInt();
-	    if(passSelected == true && sel != 0)
+	    if(::passSelected == true && sel != 0)
 	    {
-	        bufferSettings = parse("||", passBufferExporters[sel]);
+	        bufferSettings = parse("||", ::passBufferExporters[sel]);
 	        dialogTitle = "Edit Pass";
-	        dialogString = passNames[sel];
+	        dialogString = ::passNames[sel];
 	        newNumber = sel;
 	    } else {
 	    	return; // skips error below.
@@ -64,109 +64,109 @@ passHandler: action, mode
 	}
 
 	if(!dialogTitle)
-		error("passHandler arg1 invalid");
+		logger("error","passHandler arg1 invalid");
 
 
 	reqbegin(dialogTitle);
 	c20 = ctlstring("Pass Name:",dialogString);
 
-	reqsize(Passes_ui_window_w, 325);
-	ctlposition(c20, Passes_gad_x, Passes_gad_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
+	reqsize(::Passes_ui_window_w, 325);
+	ctlposition(c20, ::Passes_gad_x, ::Passes_gad_y, ::Passes_gad_w, ::Passes_gad_h, ::Passes_gad_text_offset);
 
-	ui_offset_y = Passes_ui_offset_y + Passes_ui_row_offset;
+	ui_offset_y = ::Passes_ui_offset_y + ::Passes_ui_row_offset;
 
 	lbl = ctltext("","These options will only affect existing filters in the scene:");
-	ctlposition(lbl, Passes_gad_x, Passes_gad_y + ui_offset_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
+	ctlposition(lbl, ::Passes_gad_x, ::Passes_gad_y + ui_offset_y, ::Passes_gad_w, ::Passes_gad_h, ::Passes_gad_text_offset);
 
-	ui_offset_y += Passes_ui_row_offset + 6;
+	ui_offset_y += ::Passes_ui_row_offset + 6;
 
-	changeImageFilterState = defaultBufferExporters[1];
+	changeImageFilterState = ::defaultBufferExporters[1];
 	if(mode == "edit")
 	{
         changeImageFilterState = integer(bufferSettings[1]);
 	}
 	c21 = ctlcheckbox("Change image filter states for this pass",changeImageFilterState);
-	ctlposition(c21, Passes_gad_x - 22, Passes_gad_y + ui_offset_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
+	ctlposition(c21, ::Passes_gad_x - 22, ::Passes_gad_y + ui_offset_y, ::Passes_gad_w, ::Passes_gad_h, ::Passes_gad_text_offset);
 
-	ui_offset_y += Passes_ui_row_offset;
+	ui_offset_y += ::Passes_ui_row_offset;
 
-	compBufferToggle = defaultBufferExporters[2];
+	compBufferToggle = ::defaultBufferExporters[2];
 	if(mode == "edit")
 	{
         compBufferToggle = integer(bufferSettings[2]);
 	}
 	c22 = ctlcheckbox("Compositing Buffer",compBufferToggle);
-	ctlposition(c22, Passes_gad_x, Passes_gad_y + ui_offset_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
+	ctlposition(c22, ::Passes_gad_x, ::Passes_gad_y + ui_offset_y, ::Passes_gad_w, ::Passes_gad_h, ::Passes_gad_text_offset);
 
-	ui_offset_y += Passes_ui_row_offset;
+	ui_offset_y += ::Passes_ui_row_offset;
 
-	exrTraderToggle = defaultBufferExporters[3];
+	exrTraderToggle = ::defaultBufferExporters[3];
 	if(mode == "edit")
 	{
         exrTraderToggle = integer(bufferSettings[3]);
 	}	
 	c23 = ctlcheckbox("exrTrader",exrTraderToggle);
-	ctlposition(c23, Passes_gad_x, Passes_gad_y + ui_offset_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
+	ctlposition(c23, ::Passes_gad_x, ::Passes_gad_y + ui_offset_y, ::Passes_gad_w, ::Passes_gad_h, ::Passes_gad_text_offset);
 
-	ui_offset_y += Passes_ui_row_offset;
+	ui_offset_y += ::Passes_ui_row_offset;
 
-	specBuffToggle = defaultBufferExporters[4];
+	specBuffToggle = ::defaultBufferExporters[4];
 	if(mode == "edit")
 	{
         specBuffToggle = integer(bufferSettings[4]);
 	}
 	c24 = ctlcheckbox("Special Buffers",specBuffToggle);
-	ctlposition(c24, Passes_gad_x, Passes_gad_y + ui_offset_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
+	ctlposition(c24, ::Passes_gad_x, ::Passes_gad_y + ui_offset_y, ::Passes_gad_w, ::Passes_gad_h, ::Passes_gad_text_offset);
 
-	ui_offset_y += Passes_ui_row_offset;
+	ui_offset_y += ::Passes_ui_row_offset;
 
-	psdToggle = defaultBufferExporters[5];
+	psdToggle = ::defaultBufferExporters[5];
 	if(mode == "edit")
 	{
         psdToggle = integer(bufferSettings[5]);
 	}
 	c25 = ctlcheckbox("PSD Export",psdToggle);
-	ctlposition(c25, Passes_gad_x, Passes_gad_y + ui_offset_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
+	ctlposition(c25, ::Passes_gad_x, ::Passes_gad_y + ui_offset_y, ::Passes_gad_w, ::Passes_gad_h, ::Passes_gad_text_offset);
 
-	ui_offset_y += Passes_ui_row_offset;
+	ui_offset_y += ::Passes_ui_row_offset;
 
-	rlaToggle = defaultBufferExporters[6];
+	rlaToggle = ::defaultBufferExporters[6];
 	if(mode == "edit")
 	{
         rlaToggle = integer(bufferSettings[6]);
 	}
 	c26 = ctlcheckbox("Extended RLA Export",rlaToggle);
-	ctlposition(c26, Passes_gad_x, Passes_gad_y + ui_offset_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
+	ctlposition(c26, ::Passes_gad_x, ::Passes_gad_y + ui_offset_y, ::Passes_gad_w, ::Passes_gad_h, ::Passes_gad_text_offset);
 
-	ui_offset_y += Passes_ui_row_offset;
+	ui_offset_y += ::Passes_ui_row_offset;
 
-	rpfToggle = defaultBufferExporters[7];
+	rpfToggle = ::defaultBufferExporters[7];
 	if(mode == "edit")
 	{
         rlaToggle = integer(bufferSettings[7]);
 	}
 	c27 = ctlcheckbox("Extended RPF Export",rpfToggle);
-	ctlposition(c27, Passes_gad_x, Passes_gad_y + ui_offset_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
+	ctlposition(c27, ::Passes_gad_x, ::Passes_gad_y + ui_offset_y, ::Passes_gad_w, ::Passes_gad_h, ::Passes_gad_text_offset);
 
-	ui_offset_y += Passes_ui_row_offset;
+	ui_offset_y += ::Passes_ui_row_offset;
 
-	auraToggle = defaultBufferExporters[8];
+	auraToggle = ::defaultBufferExporters[8];
 	if(mode == "edit")
 	{
         auraToggle = integer(bufferSettings[8]);
 	}
 	c28 = ctlcheckbox("Aura 2.5",auraToggle);
-	ctlposition(c28, Passes_gad_x, Passes_gad_y + ui_offset_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
+	ctlposition(c28, ::Passes_gad_x, ::Passes_gad_y + ui_offset_y, ::Passes_gad_w, ::Passes_gad_h, ::Passes_gad_text_offset);
 
-	ui_offset_y += Passes_ui_row_offset;
+	ui_offset_y += ::Passes_ui_row_offset;
 
-	iDOFToggle = defaultBufferExporters[9];
+	iDOFToggle = ::defaultBufferExporters[9];
 	if(mode == "edit")
 	{
         iDOFToggle = integer(bufferSettings[9]);
 	}
 	c29 = ctlcheckbox("iDOF",iDOFToggle);
-	ctlposition(c29, Passes_gad_x, Passes_gad_y + ui_offset_y, Passes_gad_w, Passes_gad_h, Passes_gad_text_offset);
+	ctlposition(c29, ::Passes_gad_x, ::Passes_gad_y + ui_offset_y, ::Passes_gad_w, ::Passes_gad_h, ::Passes_gad_text_offset);
 
     if(reqpost())
     {
@@ -182,29 +182,29 @@ passHandler: action, mode
         auraToggle              = string(getvalue(c28));
         iDOFToggle              = string(getvalue(c29));
 
-        passBufferExporters[newNumber] = changeImageFilterState + "||" + compBufferToggle + "||" + exrTraderToggle + "||" + specBuffToggle + "||" + psdToggle
+        ::passBufferExporters[newNumber] = changeImageFilterState + "||" + compBufferToggle + "||" + exrTraderToggle + "||" + specBuffToggle + "||" + psdToggle
                                                                 + "||" + rlaToggle + "||" + rpfToggle + "||" + auraToggle + "||" + iDOFToggle;
 
 		if(action == "edit")
 		{
-			passNames[newNumber] = newName;		
+			::passNames[newNumber] = newName;		
 		}
 		if(action == "new")
 		{
-			passNames[newNumber] = newName;
-		    passOverrideItems[newNumber][size(overrideNames)] = "";
-		    passAssItems[newNumber] = "";
-		    for(y = 1; y <= size(overrideNames); y++)
+			::passNames[newNumber] = newName;
+		    ::passOverrideItems[newNumber][size(::overrideNames)] = "";
+		    ::passAssItems[newNumber] = "";
+		    for(y = 1; y <= size(::overrideNames); y++)
 		    {
-		    	passOverrideItems[newNumber][y] = "";
+		    	::passOverrideItems[newNumber][y] = "";
 		    }
 			if(mode == "full")
 			{
-				items_size = sizeof(displayNames);
+				items_size = sizeof(::displayNames);
 				for(x = 1;x <= items_size;x++)
 				{
 					items_array[x] = x;
-					passAssItems[newNumber] = passAssItems[newNumber] + "||" + displayIDs[x];
+					::passAssItems[newNumber] = ::passAssItems[newNumber] + "||" + ::displayIDs[x];
 				}
 			}
 			if(mode == "fromsel")
@@ -221,21 +221,21 @@ passHandler: action, mode
 								tempMeshAgents[x] = Mesh(itemname);
 								tempMeshNames[x] = tempMeshAgents[x].name;
 								tempMeshIDs[x] = tempMeshAgents[x].id;
-								passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempMeshIDs[x];
+								::passAssItems[newNumber] = ::passAssItems[newNumber] + "||" + tempMeshIDs[x];
 								break;
 							
 							case LIGHT:
 								tempLightAgents[x] = Light(itemname);
 								tempLightNames[x] = tempLightAgents[x].name;
 								tempLightIDs[x] = tempLightAgents[x].id;
-								passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempLightIDs[x];
+								::passAssItems[newNumber] = ::passAssItems[newNumber] + "||" + tempLightIDs[x];
 								break;
 
 							case CAMERA:
 								tempCameraAgents[x] = Camera(itemname);
 								tempCameraNames[x] = tempCameraAgents[x].name;
 								tempCameraIDs[x] = tempCameraAgents[x].id;
-								passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempCameraIDs[x];
+								::passAssItems[newNumber] = ::passAssItems[newNumber] + "||" + tempCameraIDs[x];
 								break;
 								
 							default:
@@ -252,7 +252,7 @@ passHandler: action, mode
 			}
 			if(mode == "full" || mode == "fromsel")
 			{
-				setitems = parseListItems(passAssItems[newNumber]);
+				setitems = parseListItems(::passAssItems[newNumber]);
 				setvalue(gad_SceneItems_forPasses_Listview,setitems);
 			}
 		}
@@ -264,44 +264,44 @@ passHandler: action, mode
 
 deleteSelectedPass
 {
-    if(size(passNames) > 1)
+    if(size(::passNames) > 1)
     {
         sel = getvalue(gad_PassesListview).asInt();
-        if( sel != currentChosenPass )
+        if( sel != ::currentChosenPass )
         {
-            if(areYouSurePrompts == 1)
+            if(::areYouSurePrompts == 1)
             {
-                doKeys = 0;
+                ::doKeys = 0;
                 reqbegin("Confirm Delete Pass");
                 c20 = ctltext("","Are you sure you want to delete selected pass?");
                 if(reqpost())
                 {
                     sel = getvalue(gad_PassesListview).asInt();
-                    if(passSelected == true && sel != 0)
+                    if(::passSelected == true && sel != 0)
                     {
-                        topNumber = size(passNames);
+                        topNumber = size(::passNames);
                         if(sel == topNumber)
                         {
-                            passNames[sel] = nil;
-                            passAssItems[sel] = "";
-                            passBufferExporters[sel] = nil;
-                            for(x = 1; x <= size(overrideNames); x++)
+                            ::passNames[sel] = nil;
+                            ::passAssItems[sel] = "";
+                            ::passBufferExporters[sel] = nil;
+                            for(x = 1; x <= size(::overrideNames); x++)
                             {
-                                passOverrideItems[sel][x] = "";
+                                ::passOverrideItems[sel][x] = "";
                             }
                         }
                         else
                         {
-                            for(x = 1; x <= size(passNames); x++)
+                            for(x = 1; x <= size(::passNames); x++)
                             {
                                 if(x < sel)
                                 {
-                                    passNames[x] = passNames[x];
-                                    passAssItems[x] = passAssItems[x];
-                                    passBufferExporters[x] = passBufferExporters[x];
-                                    for(y = 1; y <= size(overrideNames); y++)
+                                    ::passNames[x] = ::passNames[x];
+                                    ::passAssItems[x] = ::passAssItems[x];
+                                    ::passBufferExporters[x] = ::passBufferExporters[x];
+                                    for(y = 1; y <= size(::overrideNames); y++)
                                     {
-                                        passOverrideItems[x][y] = passOverrideItems[x][y];
+                                        ::passOverrideItems[x][y] = ::passOverrideItems[x][y];
                                     }
                                 }
                                 else if(x >= sel)
@@ -309,22 +309,22 @@ deleteSelectedPass
                                     xPlusOne = x + 1;
                                     if(xPlusOne <= topNumber)
                                     {
-                                        passNames[x] = passNames[xPlusOne];
-                                        passAssItems[x] = passAssItems[xPlusOne];
-                                        passBufferExporters[x] = passBufferExporters[xPlusOne];
-                                        for(y = 1; y <= size(overrideNames); y++)
+                                        ::passNames[x] = ::passNames[xPlusOne];
+                                        ::passAssItems[x] = ::passAssItems[xPlusOne];
+                                        ::passBufferExporters[x] = ::passBufferExporters[xPlusOne];
+                                        for(y = 1; y <= size(::overrideNames); y++)
                                         {
-                                            passOverrideItems[x][y] = passOverrideItems[xPlusOne][y];
+                                            ::passOverrideItems[x][y] = ::passOverrideItems[xPlusOne][y];
                                         }
                                     }
                                 }
                             }
-                            passNames[topNumber] = nil;
-                            passAssItems[topNumber] = "";
-                            passBufferExporters[topNumber] = nil;
-                            for(y = 1; y <= size(overrideNames); y++)
+                            ::passNames[topNumber] = nil;
+                            ::passAssItems[topNumber] = "";
+                            ::passBufferExporters[topNumber] = nil;
+                            for(y = 1; y <= size(::overrideNames); y++)
                             {
-                                passOverrideItems[topNumber][y] = "";
+                                ::passOverrideItems[topNumber][y] = "";
                             }
 
                         }
@@ -334,50 +334,50 @@ deleteSelectedPass
                 }
                 else
                 {
-                    warn("Pass deletion cancelled.");
+                    logger("warn","Pass deletion cancelled.");
                     doRefresh = 0;
                 }
                 reqend();
                 if(doRefresh == 1)
                 {
-                    if(currentChosenPass > 1)
+                    if(::currentChosenPass > 1)
                     {
-                        currentChosenPass = currentChosenPass - 1;
-                        currentChosenPassString = passNames[currentChosenPass];
+                        ::currentChosenPass = ::currentChosenPass - 1;
+                        ::currentChosenPassString = ::passNames[::currentChosenPass];
                     }
                 }
                 //reProcess();
                 req_update();
-                doKeys = 1;
+                ::doKeys = 1;
             }
             else
             {
                 sel = getvalue(gad_PassesListview).asInt();
-                if(passSelected == true && sel != 0)
+                if(::passSelected == true && sel != 0)
                 {
-                    topNumber = size(passNames);
+                    topNumber = size(::passNames);
                     if(sel == topNumber)
                     {
-                        passNames[sel] = nil;
-                        passAssItems[sel] = "";
-                        passBufferExporters[sel] = nil;
-                        for(x = 1; x <= size(overrideNames); x++)
+                        ::passNames[sel] = nil;
+                        ::passAssItems[sel] = "";
+                        ::passBufferExporters[sel] = nil;
+                        for(x = 1; x <= size(::overrideNames); x++)
                         {
-                            passOverrideItems[1][x] = "";
+                            ::passOverrideItems[1][x] = "";
                         }
                     }
                     else
                     {
-                        for(x = 1; x <= size(passNames); x++)
+                        for(x = 1; x <= size(::passNames); x++)
                         {
                             if(x < sel)
                             {
-                                passNames[x] = passNames[x];
-                                passAssItems[x] = passAssItems[x];
-                                passBufferExporters[x] = passBufferExporters[x];
-                                for(y = 1; y <= size(overrideNames); y++)
+                                ::passNames[x] = ::passNames[x];
+                                ::passAssItems[x] = ::passAssItems[x];
+                                ::passBufferExporters[x] = ::passBufferExporters[x];
+                                for(y = 1; y <= size(::overrideNames); y++)
                                 {
-                                    passOverrideItems[x][y] = passOverrideItems[x][y];
+                                    ::passOverrideItems[x][y] = ::passOverrideItems[x][y];
                                 }
                             }
                             else if(x >= sel)
@@ -385,37 +385,37 @@ deleteSelectedPass
                                 xPlusOne = x + 1;
                                 if(xPlusOne <= topNumber)
                                 {
-                                    passNames[x] = passNames[xPlusOne];
-                                    passAssItems[x] = passAssItems[xPlusOne];
-                                    passBufferExporters[x] = passBufferExporters[xPlusOne];
-                                    for(y = 1; y <= size(overrideNames); y++)
+                                    ::passNames[x] = ::passNames[xPlusOne];
+                                    ::passAssItems[x] = ::passAssItems[xPlusOne];
+                                    ::passBufferExporters[x] = ::passBufferExporters[xPlusOne];
+                                    for(y = 1; y <= size(::overrideNames); y++)
                                     {
-                                        passOverrideItems[x][y] = passOverrideItems[xPlusOne][y];
+                                        ::passOverrideItems[x][y] = ::passOverrideItems[xPlusOne][y];
                                     }
                                 }
                             }
                         }
-                        passNames[topNumber] = nil;
-                        passAssItems[topNumber] = "";
-                        passBufferExporters[topNumber] = nil;
-                        for(y = 1; y <= size(overrideNames); y++)
+                        ::passNames[topNumber] = nil;
+                        ::passAssItems[topNumber] = "";
+                        ::passBufferExporters[topNumber] = nil;
+                        for(y = 1; y <= size(::overrideNames); y++)
                         {
-                            passOverrideItems[topNumber][y] = "";
+                            ::passOverrideItems[topNumber][y] = "";
                         }
 
                     }
                 }
-                if(currentChosenPass > 1)
+                if(::currentChosenPass > 1)
                 {
-                    currentChosenPass = currentChosenPass - 1;
-                    currentChosenPassString = passNames[currentChosenPass];
+                    ::currentChosenPass = ::currentChosenPass - 1;
+                    ::currentChosenPassString = ::passNames[::currentChosenPass];
                 }
                 req_update();
             }
         }
         else
         {
-            error("Can't delete current pass!  Change to a different pass, then delete this one.");
+            logger("error","Can't delete current pass!  Change to a different pass, then delete this one.");
         }
     }
     req_update();
@@ -424,46 +424,46 @@ deleteSelectedPass
 duplicateSelectedPass
 {
 	sel = getvalue(gad_PassesListview).asInt();
-    if(passSelected == true && sel != 0)
+    if(::passSelected == true && sel != 0)
     {
-    	newNumber = size(passNames) + 1;
-		passNames[newNumber] = passNames[sel] + "_copy";
-	    passAssItems[newNumber] = passAssItems[sel];
-	    passBufferExporters[newNumber] = passBufferExporters[sel];
-	    passOverrideItems[newNumber][size(overrideNames)] = "";
-	    for(y = 1; y <= size(overrideNames); y++)
+    	newNumber = size(::passNames) + 1;
+		::passNames[newNumber] = ::passNames[sel] + "_copy";
+	    ::passAssItems[newNumber] = ::passAssItems[sel];
+	    ::passBufferExporters[newNumber] = ::passBufferExporters[sel];
+	    ::passOverrideItems[newNumber][size(::overrideNames)] = "";
+	    for(y = 1; y <= size(::overrideNames); y++)
 	    {
-	    	passOverrideItems[newNumber][y] = passOverrideItems[sel][y];
+	    	::passOverrideItems[newNumber][y] = ::passOverrideItems[sel][y];
 	    }
     }
 }
 
 savePassAsScene
 {
-	doKeys = 0;
+	::doKeys = 0;
 	reqbegin("Save Pass As Scene...");
 	c21 = ctlfilename("Save .lws file...", "*.lws",30,0);
 	if(reqpost())
 	{
 		lwsFile = getvalue(c21);
-		savePassScene = generatePassFile("seq", currentChosenPass);
+		savePassScene = generatePassFile("seq", ::currentChosenPass);
 		filecopy(savePassScene,lwsFile);
 		filedelete(savePassScene);
 	}
-	reqend();	
-	doKeys = 1;
+	reqend();
+	::doKeys = 1;
 }
 
 saveAllPassesAsScenes
 {
-	doKeys = 0;
+	::doKeys = 0;
 	reqbegin("Save All Passes As Scene...");
 	c21 = ctlfilename("Choose a folder...", "DO_NOT_CHANGE.LWS",30,0);
 	if(reqpost())
 	{
 		lwsFile = getvalue(c21);
 
-		for(x = 1; x <= size(passNames); x++)
+		for(x = 1; x <= size(::passNames); x++)
 		{
 			saveAllPassesScenes[x] = generatePassFile("seq", x);
 			
@@ -473,14 +473,14 @@ saveAllPassesAsScenes
 				if(lwsFileSplit[1] != nil)
 			    {
 			    	if(!chdir(lwsFileSplit[1] + lwsFileSplit[2]))
-			    		error("Invalid save location: " + lwsFileSplit[1] + lwsFileSplit[2]);
-			    	newLwsFile = lwsFileSplit[1] + lwsFileSplit[2] + getsep() + passNames[x] + ".lws";
+			    		logger("error","Invalid save location: " + lwsFileSplit[1] + lwsFileSplit[2]);
+			    	newLwsFile = lwsFileSplit[1] + lwsFileSplit[2] + getsep() + ::passNames[x] + ".lws";
 			    }
 			    else
 			    {
 			    	if(!chdir(lwsFileSplit[2]))
-			    		error("Invalid save location: " + lwsFileSplit[2]);
-			    	newLwsFile = lwsFileSplit[2] + getsep() + passNames[x] + ".lws";
+			    		logger("error","Invalid save location: " + lwsFileSplit[2]);
+			    	newLwsFile = lwsFileSplit[2] + getsep() + ::passNames[x] + ".lws";
 			    }
 			    
 			    filecopy(saveAllPassesScenes[x],newLwsFile);
@@ -489,42 +489,42 @@ saveAllPassesAsScenes
 			}
 			else
 			{
-				error("Invalid save location.");
+				logger("error","Invalid save location.");
 			}
 		}
 	}
 	reqend();
-	doKeys = 1;
+	::doKeys = 1;
 }
 
 renderPassFrame
 {
-	frameRenderScene = generatePassFile("frame", currentChosenPass);
+	frameRenderScene = generatePassFile("frame", ::currentChosenPass);
 	// mac UB frame rendering
  	if(platform() == MACUB || platform() == MAC64)
 	{
-		UB_bg_frameRender(frameRenderScene,saveRGBImagesPrefix);
+		UB_bg_frameRender(frameRenderScene,::saveRGBImagesPrefix);
 	} else {
-		win_bg_frameRender(frameRenderScene,saveRGBImagesPrefix);
+		win_bg_frameRender(frameRenderScene,::saveRGBImagesPrefix);
 	}
 }
 
 renderPassScene
 {
-	seqRenderScene = generatePassFile("seq", currentChosenPass);
+	seqRenderScene = generatePassFile("seq", ::currentChosenPass);
 		
 	// mac UB scene rendering
  	if(platform() == MACUB || platform() == MAC64)
 	{
-		UB_bg_sceneRender(seqRenderScene,saveRGBImagesPrefix);
+		UB_bg_sceneRender(seqRenderScene,::saveRGBImagesPrefix);
 	} else {
-		win_bg_sceneRender(seqRenderScene,saveRGBImagesPrefix);
+		win_bg_sceneRender(seqRenderScene,::saveRGBImagesPrefix);
 	}
 }
 
 renderAllScene
 {
-	for(x = 1; x <= size(passNames); x++)
+	for(x = 1; x <= size(::passNames); x++)
 	{
 		seqRenderScene[x] = generatePassFile("seq", x);
 	}
@@ -532,15 +532,15 @@ renderAllScene
 	// mac UB all scene rendering
  	if(platform() == MACUB || platform() == MAC64)
 	{
-		UB_bg_allSceneRender(seqRenderScene,saveRGBImagesPrefix);
+		UB_bg_allSceneRender(seqRenderScene,::saveRGBImagesPrefix);
 	} else {
-		win_bg_allSceneRender(seqRenderScene,saveRGBImagesPrefix);
+		win_bg_allSceneRender(seqRenderScene,::saveRGBImagesPrefix);
 	}
 }
 
 saveCurrentPassesSettings
 {
-	doKeys = 0;
+	::doKeys = 0;
 	reqbegin("Save PassPort Settings...");
 	c21 = ctlfilename("Save .rpe file...", "*.rpe",30,0);
 	if(reqpost())
@@ -550,46 +550,46 @@ saveCurrentPassesSettings
 		// do the saving here
 		if(rpeFile == nil || rpeFile == "*.rpe")
 		{
-			error("Not a valid save location.");
+			logger("error","Not a valid save location.");
 		}
 		io = File(rpeFile,"w");
-		io.writeln(string(rpeVersion)); // version tracking of rpe files. Allows us to handle changes in later revisions.
-		io.writeln(string(versionString)); // store passport version as well, for safety.
+		io.writeln(string(::rpeVersion)); // version tracking of rpe files. Allows us to handle changes in later revisions.
+		io.writeln(string(::versionString)); // store passport version as well, for safety.
 		io.writeln(lwVersion);
-		passNamesSize = size(passNames);
+		passNamesSize = size(::passNames);
 		io.writeln(passNamesSize);
 		for(x = 1; x <= passNamesSize; x++)
 		{
-			io.writeln(passNames[x]);
-			io.writeln(passAssItems[x]);
-	    	io.writeln(passBufferExporters[x]);
+			io.writeln(::passNames[x]);
+			io.writeln(::passAssItems[x]);
+	    	io.writeln(::passBufferExporters[x]);
 		}
 		
-		 for(x = 1; x <= size(overrideNames); x++)
+		 for(x = 1; x <= size(::overrideNames); x++)
 	    {
-			if(strleft(overrideNames[x],1) == " ")
+			if(strleft(::overrideNames[x],1) == " ")
     		{
-    			tempSize = size(overrideNames[x]) - 16;
-    			overrideNames[x] = strright(overrideNames[x],tempSize);
+    			tempSize = size(::overrideNames[x]) - 16;
+    			::overrideNames[x] = strright(::overrideNames[x],tempSize);
     		}
 	    }
 
-		overrideNamesSize = size(overrideNames);
+		overrideNamesSize = size(::overrideNames);
 		io.writeln(overrideNamesSize);
-		io.writeln(overrideNames[1]);
+		io.writeln(::overrideNames[1]);
 		
-		if(overrideNames[1] != "empty")
+		if(::overrideNames[1] != "empty")
 		{
-			io.writeln(overrideSettings[1]);
+			io.writeln(::overrideSettings[1]);
 		}
 		if(overrideNamesSize > 1)
 		{
 			for(x = 2; x <= overrideNamesSize; x++)
 			{
-				io.writeln(overrideNames[x]);
-				if(overrideNames[1] != "empty")
+				io.writeln(::overrideNames[x]);
+				if(::overrideNames[1] != "empty")
 				{
-					io.writeln(overrideSettings[x]);
+					io.writeln(::overrideSettings[x]);
 				}
 			}
 		}
@@ -597,31 +597,33 @@ saveCurrentPassesSettings
 		{
 			for(y = 1; y <= overrideNamesSize; y++)
 			{
-				if(overrideNames[1] != "empty")
+				if(::overrideNames[1] != "empty")
 				{
-					io.writeln(passOverrideItems[x][y]);
+					io.writeln(::passOverrideItems[x][y]);
 				}
 			}
 		}
-		io.writeln(userOutputFolder);
-		io.writeln(fileOutputPrefix);
-		io.writeln(userOutputString);
-		io.writeln(useGrowl); // write this out no matter what, to keep parity across platforms.
-		io.writeln(areYouSurePrompts);
-		io.writeln(rgbSaveType);
-		io.writeln(editorResolution);
+		io.writeln(::userOutputFolder);
+		io.writeln(::fileOutputPrefix);
+		io.writeln(::userOutputString);
+		io.writeln(::useGrowl); // write this out no matter what, to keep parity across platforms.
+		io.writeln(::areYouSurePrompts);
+		io.writeln(::errorOnDependency);
+		io.writeln(::rgbSaveType);
+		io.writeln(::editorResolution);
 		io.close();
 		
-		globalstore("passEditoruserOutputString",userOutputString);
+		globalstore("passEditoruserOutputString",::userOutputString);
 		if(platform() == MACUB || platform() == MAC64)
-			globalstore("passEditorUseGrowl", useGrowl);
-		globalstore("passEditorareYouSurePrompts",areYouSurePrompts);
-		globalstore("passEditorrgbSaveType",rgbSaveType);
-		globalstore("passEditoreditorResolution",editorResolution);
+			globalstore("passEditorUseGrowl", ::useGrowl);
+		globalstore("passEditorareYouSurePrompts",::areYouSurePrompts);
+		globalstore("passEditorerrorOnDependency",::errorOnDependency);
+		globalstore("passEditorrgbSaveType",::rgbSaveType);
+		globalstore("passEditoreditorResolution",::editorResolution);
 		
-		if(areYouSurePrompts == 1)
+		if(::areYouSurePrompts == 1)
 		{
-			info("Settings saved successfully.");
+			logger("info","Settings saved successfully.");
 		}
 	}
 	else
@@ -630,7 +632,7 @@ saveCurrentPassesSettings
 
 loadPassesSettings
 {
-	doKeys = 0;
+	::doKeys = 0;
 	reqbegin("Load PassPort Settings...");
 	c21 = ctlfilename("Load .rpe file...", "*.rpe",30,1);
 	c22 = ctlcheckbox("Replace existing settings?",0);
@@ -643,62 +645,62 @@ loadPassesSettings
 		{
 			if(rpeFile == nil || rpeFile == "*.rpe")
 			{
-				error("Not a valid settings file.");
+				logger("error","Not a valid settings file.");
 			}
 			io = File(rpeFile,"r");
 	        versionMismatch = 0;
 			passportRPEVersion = io.read();
-			if(passportRPEVersion == rpeVersion)
+			if(passportRPEVersion == ::rpeVersion)
 			{
 				passportVersion = io.read();
-				if(passportVersion != versionString)
+				if(passportVersion != ::versionString)
 				{
 		            versionMismatch = 1;
-					info("WARNING: This RPE file was written by Passport version " + passPortVersion);
+					logger("warn","WARNING: This RPE file was written by Passport version " + passPortVersion);
 				}
 			} else {
 				io.close();
-				error("Fatal error: This RPE file is for an obsolete version of Passport");
+				logger("error","Fatal error: This RPE file is for an obsolete version of Passport");
 			}
 			lwVersion = io.read();
 			if(lwVersion != hostVersion().asStr())
 			{
-				info("WARNING: RPE contains settings for LW version " + lwVersion);
+				logger("warn","WARNING: RPE contains settings for LW version " + lwVersion);
 				versionMismatch = 1;
 			}
 	        if (versionMismatch == 1)
 			{
-				info("PassPort : One or more warnings were issued. Passport operation may be affected. See documentation for advice.");
+				logger("info","PassPort : One or more warnings were issued. Passport operation may be affected. See documentation for advice.");
 			}
 			passNamesSize = io.read().asInt();
 			for(x = 1; x <= passNamesSize; x++)
 			{
-				passNames[x] = io.read();
-				passAssItems[x] = io.read();
-				if(passAssItems[x] == nil)
+				::passNames[x] = io.read();
+				::passAssItems[x] = io.read();
+				if(::passAssItems[x] == nil)
 				{
-					passAssItems[x] = "";
+					::passAssItems[x] = "";
 				}
-				passBufferExporters[x] = io.read();
+				::passBufferExporters[x] = io.read();
 			}
 			overrideNamesSize = io.read().asInt();
-			overrideNames[1] = io.read();
-			if(overrideNames[1] == "empty")
+			::overrideNames[1] = io.read();
+			if(::overrideNames[1] == "empty")
 			{
-				overrideSettings[1] = "";
+				::overrideSettings[1] = "";
 			}
 			else
 			{
-				overrideSettings[1] = io.read();
+				::overrideSettings[1] = io.read();
 			}
 			if(overrideNamesSize > 1)
 			{
 				for(x = 2; x <= overrideNamesSize; x++)
 				{
-					overrideNames[x] = io.read();
-					if(overrideNames[1] != "empty")
+					::overrideNames[x] = io.read();
+					if(::overrideNames[1] != "empty")
 					{
-						overrideSettings[x] = io.read();
+						::overrideSettings[x] = io.read();
 					}
 				}
 			}
@@ -706,39 +708,43 @@ loadPassesSettings
 			{
 				for(y = 1; y <= overrideNamesSize; y++)
 				{
-					if(overrideNames[1] != "empty")
+					if(::overrideNames[1] != "empty")
 					{
-						passOverrideItems[x][y] = io.read();
-						if(passOverrideItems[x][y] == nil)
+						::passOverrideItems[x][y] = io.read();
+						if(::passOverrideItems[x][y] == nil)
 						{
-							passOverrideItems[x][y] = "";
+							::passOverrideItems[x][y] = "";
 						}
 					}
 					else
 					{
-						passOverrideItems[x][y] = "";
+						::passOverrideItems[x][y] = "";
 					}
 				}
 			}
-			userOutputFolder = io.read();
-			if(userOutputFolder == nil)
+			::userOutputFolder = io.read();
+			if(::userOutputFolder == nil)
 			{
-				userOutputFolder = "";
+				::userOutputFolder = "";
 			}
-			fileOutputPrefix = io.read();
-			if(fileOutputPrefix == nil)
+			::fileOutputPrefix = io.read();
+			if(::fileOutputPrefix == nil)
 			{
-				fileOutputPrefix = "";
+				::fileOutputPrefix = "";
 			}
-			userOutputString = io.read();
-			if(userOutputString == nil)
+			::userOutputString = io.read();
+			if(::userOutputString == nil)
 			{
-				userOutputString = "";
+				::userOutputString = "";
 			}
-			useGrowl = io.read().asInt();
-			areYouSurePrompts = io.read().asInt();
-			rgbSaveType = io.read().asInt();
-			editorResolution = io.read().asInt();
+			::useGrowl = io.read().asInt();
+			::areYouSurePrompts = io.read().asInt();
+			if(number(strleft(passportVersion,3)) >= 1.6)
+			{
+				::errorOnDependency = io.read().asInt();
+			}
+			::rgbSaveType = io.read().asInt();
+			::editorResolution = io.read().asInt();
 			io.close();
 			
 			panelWidth = integer(globalrecall("passEditorpanelWidth", 640));
@@ -751,28 +757,28 @@ loadPassesSettings
 		{
 			if(rpeFile == nil || rpeFile == "*.rpe")
 			{
-				error("Not a valid settings file.");
+				logger("error","Not a valid settings file.");
 			}
 			io = File(rpeFile,"r");
 		
 			passNamesSize = io.read().asInt();
 			
-			newNumberVar = (size(passNames) + 1);
+			newNumberVar = (size(::passNames) + 1);
 			
 			for(x = newNumberVar; x < (newNumberVar + passNamesSize); x++)
 			{
-				passNames[x] = io.read();
-				passAssItems[x] = io.read();
-				if(passAssItems[x] == nil)
+				::passNames[x] = io.read();
+				::passAssItems[x] = io.read();
+				if(::passAssItems[x] == nil)
 				{
-					passAssItems[x] = "";
+					::passAssItems[x] = "";
 				}
-				passBufferExporters[x] = io.read();
+				::passBufferExporters[x] = io.read();
 			}
 			overrideNamesSize = io.read().asInt();
-			if(overrideNames[1] != "empty")
+			if(::overrideNames[1] != "empty")
 			{
-				originalOverrideSize =  size(overrideNames);
+				originalOverrideSize =  size(::overrideNames);
 			}
 			else
 			{
@@ -782,72 +788,68 @@ loadPassesSettings
 			
 			if(overrideNamesTemp[1] == "empty")
 			{
-				//overrideSettings[1] = "";
+				//::overrideSettings[1] = "";
 			}
 			else
 			{
-				if(overrideNames[1] == "empty")
+				if(::overrideNames[1] == "empty")
 				{
 					x = 1;
-					overrideNames[x] = overrideNamesTemp[1];
-					overrideSettings[x] = io.read();
+					::overrideNames[x] = overrideNamesTemp[1];
+					::overrideSettings[x] = io.read();
 				}
 				else
 				{
-					x = size(overrideNames) + 1;
-					overrideNames[x] = overrideNamesTemp[1];
-					overrideSettings[x] = io.read();
+					x = size(::overrideNames) + 1;
+					::overrideNames[x] = overrideNamesTemp[1];
+					::overrideSettings[x] = io.read();
 				}
 			}
 			if(overrideNamesSize > 1)
 			{
-				newNumberVar = size(overrideNames) + 1;
+				newNumberVar = size(::overrideNames) + 1;
 				for(x = newNumberVar; x < (newNumberVar + overrideNamesSize); x++)
 				{
-					overrideNames[x] = io.read();
+					::overrideNames[x] = io.read();
 					if(overrideNamesTemp[1] != "empty")
 					{
-						overrideSettings[x] = io.read();
+						::overrideSettings[x] = io.read();
 					}
 				}
 			}
 			
-			newNumberVarOne = (size(passNames) + 1);
+			newNumberVarOne = (size(::passNames) + 1);
 			newNumberVarTwo = (originalOverrideSize + 1);
 			
-			for(x = 1; x <= size(passNames); x++)
+			for(x = 1; x <= size(::passNames); x++)
 			{
 				if(newNumberVarTwo > 1)
 				{
 					for(y = 1; y <= originalOverrideSize; y++)
 					{
-						passOverrideItems[x][y] = "";
+						::passOverrideItems[x][y] = "";
 					}
 					for(y = newNumberVarTwo; y <= (originalOverrideSize + overrideNamesSize); y++)
 					{
 						if(overrideNamesTemp[1] != "empty")
 						{
-							if(x < (size(passNames) - passNamesSize) + 1)
+							if(x < (size(::passNames) - passNamesSize) + 1)
 							{
-								passOverrideItems[x][y] = "";
-								//info("this time i'm assigning nothing");
+								::passOverrideItems[x][y] = "";
 							}
 							else
 							{
-								passOverrideItems[x][y] = io.read();
-								if(passOverrideItems[x][y] == nil)
+								::passOverrideItems[x][y] = io.read();
+								if(::passOverrideItems[x][y] == nil)
 								{
-									passOverrideItems[x][y] = "";
+									::passOverrideItems[x][y] = "";
 								}
-								//info("this time I'm assigning the read value");
 							}
 						}
 						else
 						{
-							passOverrideItems[x][y] = "";
-							//info("i just plain shouldn't be here");
+							::passOverrideItems[x][y] = "";
 						}
-						//info(passOverrideItems[x][y]);
 					}
 				}
 				else
@@ -856,27 +858,26 @@ loadPassesSettings
 					{
 						if(overrideNamesTemp[1] != "empty")
 						{
-							if(x < (size(passNames) - passNamesSize) + 1)
+							if(x < (size(::passNames) - passNamesSize) + 1)
 							{
-								passOverrideItems[x][1] = "";
+								::passOverrideItems[x][1] = "";
 							}
 							else
 							{
 								
-								passOverrideItems[x][1] = io.read();
-								if(passOverrideItems[x][1] == nil)
+								::passOverrideItems[x][1] = io.read();
+								if(::passOverrideItems[x][1] == nil)
 								{
-									passOverrideItems[x][1] = "";
+									::passOverrideItems[x][1] = "";
 								}
 							}
 							
 						}
 						else
 						{
-							passOverrideItems[x][1] = "";
+							::passOverrideItems[x][1] = "";
 						}
 					}
-					//info(passOverrideItems[x][1]);
 				}
 			}
 			io.close();

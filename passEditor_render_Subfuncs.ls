@@ -6,7 +6,7 @@ win_bg_frameRender: sceneFile, frameOutputPath
     currentscene_filename = currentscene_patharray[3] + currentscene_patharray[4];
     currenttime = Scene().currenttime;
     currentframe = int(Scene().currenttime*Scene().fps);
-    extensionArray = parse("(",image_formats_array[testRgbSaveType]);
+    extensionArray = parse("(",::image_formats_array[::testRgbSaveType]);
     extension = strleft(extensionArray[2],4);
     if(currentframe < 10)
     {
@@ -46,7 +46,7 @@ win_bg_frameRender: sceneFile, frameOutputPath
 
     bashOutput = File(bashFilePath,"w");
     if(!bashOutput)
-        error("Can't create the batch file");
+        logger("error","win_bg_frameRender: Can't create the batch file");
 
     outputLine = "\"" + install_dir + getsep() + "lwsn.exe\" -3 -c\"" + config_dir + "\" -d\"" + content_dir + "\" \"" + sceneFile + "\" " + currentframe + " " + currentframe + " " + "1";
     bashOutput.writeln(outputLine);
@@ -90,7 +90,7 @@ win_bg_sceneRender: sceneFile, frameOutputPath
     currentscene_filename = currentscene_patharray[3] + currentscene_patharray[4];
     currenttime = Scene().currenttime;
     currentframe = int(Scene().currenttime*Scene().fps);
-    extensionArray = parse("(",image_formats_array[rgbSaveType]);
+    extensionArray = parse("(",::image_formats_array[::rgbSaveType]);
     extension = strleft(extensionArray[2],4);
     renderStart = Scene().renderstart;
     renderEnd = Scene().renderend;
@@ -120,11 +120,11 @@ win_bg_sceneRender: sceneFile, frameOutputPath
     bashOutput.writeln("pause");
     bashOutput.close();
 
-	if(debugmode == 0)
+	if(::debugmode == 0)
 	{
 		result = spawn(bashFilePath);
 	} else {
-		info(bashFilePath);
+		logger("log_info", "win_bg_sceneRender: bashFilePath: " + bashFilePath);
 	}
 }
 
@@ -137,7 +137,7 @@ win_bg_allSceneRender: sceneFile, frameOutputPath
     currentscene_filename = currentscene_patharray[3] + currentscene_patharray[4];
     currenttime = Scene().currenttime;
     currentframe = int(Scene().currenttime*Scene().fps);
-    extensionArray = parse("(",image_formats_array[rgbSaveType]);
+    extensionArray = parse("(",::image_formats_array[::rgbSaveType]);
     extension = strleft(extensionArray[2],4);
     renderStart = Scene().renderstart;
     renderEnd = Scene().renderend;
@@ -172,25 +172,24 @@ win_bg_allSceneRender: sceneFile, frameOutputPath
     bashOutput.writeln("pause");
     bashOutput.close();
 
-	if(debugmode == 0)
+	if(::debugmode == 0)
 	{
 		result = spawn(bashFilePath);
 	} else {
-		info(bashFilePath);
+        logger("log_info", "win_bg_allSceneRender: bashFilePath: " + bashFilePath);
 	}
 }
 
 
 UB_bg_frameRender: sceneFile, frameOutputPath
 {
-	
     temp_dir = getdir("Temp");
     currentscene_path = sceneFile;
     currentscene_patharray = split(currentscene_path);
     currentscene_filename = currentscene_patharray[3] + currentscene_patharray[4];
     currenttime = Scene().currenttime;
     currentframe = int(Scene().currenttime*Scene().fps);
-    extensionArray = parse("(",image_formats_array[testRgbSaveType]);
+    extensionArray = parse("(",::image_formats_array[::testRgbSaveType]);
     extension = strleft(extensionArray[2],4);
     if(currentframe < 10)
     {
@@ -223,7 +222,7 @@ UB_bg_frameRender: sceneFile, frameOutputPath
     {
     	bashFilePath = currentscene_patharray[1] + currentscene_patharray[2] + getsep() + "frameRender_bash.bash";
     	scriptFilePath = currentscene_patharray[1] + currentscene_patharray[2] + getsep() + "temp.scpt";
-		if(useGrowl == 1)
+		if(::useGrowl == 1)
 		{
 			growlAppleScriptPath = currentscene_patharray[1] + currentscene_patharray[2] + getsep() + "growlNotify.scpt";
 		}
@@ -232,20 +231,20 @@ UB_bg_frameRender: sceneFile, frameOutputPath
     {
     	bashFilePath = currentscene_patharray[2] + getsep() + "frameRender_bash.bash";
     	scriptFilePath = currentscene_patharray[2] + getsep() + "temp.scpt";
-		if(useGrowl == 1)
+		if(::useGrowl == 1)
 		{
 			growlAppleScriptPath = currentscene_patharray[2] + getsep() + "growlNotify.scpt";
     	}
     }
 	
-	if(useGrowl == 1)
+	if(::useGrowl == 1)
 	{
 		growlScriptOutput = File(growlAppleScriptPath,"w");
 		growlScriptOutput.writeln("tell application \"GrowlHelperApp\"");
 		growlScriptOutput.writeln("set the allNotificationsList to {\"PassPort Frame Render Complete Notification\",\"PassPort Pass Render Complete Notification\",\"PassPort All Passes Render Complete Notification\"}");
 		growlScriptOutput.writeln("set the enabledNotificationsList to {\"PassPort Frame Render Complete Notification\",\"PassPort Pass Render Complete Notification\",\"PassPort All Passes Render Complete Notification\"}");
 		growlScriptOutput.writeln("register as application \"PassPort for LightWave 3D\" all notifications allNotificationsList default notifications enabledNotificationsList icon of application \"Layout.app\"");
-		growlScriptOutput.writeln("notify with name \"PassPort Frame Render Complete Notification\" title \"PassPort Render Complete.\" description \"Your PassPort single frame render of \\\"" + currentChosenPassString + "\\\" at frame " + currentframe + " is complete.\" application name \"PassPort for LightWave 3D\"");
+		growlScriptOutput.writeln("notify with name \"PassPort Frame Render Complete Notification\" title \"PassPort Render Complete.\" description \"Your PassPort single frame render of \\\"" + ::currentChosenPassString + "\\\" at frame " + currentframe + " is complete.\" application name \"PassPort for LightWave 3D\"");
 		growlScriptOutput.writeln("end tell");
 		growlScriptOutput.close();
 	}
@@ -254,7 +253,7 @@ UB_bg_frameRender: sceneFile, frameOutputPath
    	outputLine = install_dir + getsep() + "bin/lwsn -3 -c" + config_dir + " -d" + content_dir + " " + sceneFile + " " + currentframe + " " + currentframe + " " + "1\;\n" + "open " + actualImageOutput + "\;";
     bashOutput.writeln(outputLine);
     bashOutput.writeln("rm " + bashFilePath);
-	if(useGrowl == 1)
+	if(::useGrowl == 1)
 	{
 		bashOutput.writeln("osascript \"" + growlAppleScriptPath + "\"");
 		bashOutput.writeln("rm " + growlAppleScriptPath);
@@ -288,7 +287,7 @@ UB_bg_sceneRender: sceneFile, frameOutputPath
     renderStart = Scene().renderstart;
     renderEnd = Scene().renderend;
     renderStep = Scene().renderstep;
-    extensionArray = parse("(",image_formats_array[rgbSaveType]);
+    extensionArray = parse("(",::image_formats_array[::rgbSaveType]);
     extension = strleft(extensionArray[2],4);
     
     install_dir = getdir("Install");
@@ -298,7 +297,7 @@ UB_bg_sceneRender: sceneFile, frameOutputPath
     {
     	bashFilePath = currentscene_patharray[1] + currentscene_patharray[2] + getsep() + "frameRender_bash.bash";
     	scriptFilePath = currentscene_patharray[1] + currentscene_patharray[2] + getsep() + "temp.scpt";
-		if(useGrowl == 1)
+		if(::useGrowl == 1)
 		{
 			growlAppleScriptPath = currentscene_patharray[1] + currentscene_patharray[2] + getsep() + "growlNotify.scpt";
     	}
@@ -307,20 +306,20 @@ UB_bg_sceneRender: sceneFile, frameOutputPath
     {
     	bashFilePath = currentscene_patharray[2] + getsep() + "frameRender_bash.bash";
     	scriptFilePath = currentscene_patharray[2] + getsep() + "temp.scpt";
-		if(useGrowl == 1)
+		if(::useGrowl == 1)
 		{
 			growlAppleScriptPath = currentscene_patharray[2] + getsep() + "growlNotify.scpt";
     	}
     }
     
-	if(useGrowl == 1)
+	if(::useGrowl == 1)
 	{
 		growlScriptOutput = File(growlAppleScriptPath,"w");
 		growlScriptOutput.writeln("tell application \"GrowlHelperApp\"");
 		growlScriptOutput.writeln("set the allNotificationsList to {\"PassPort Frame Render Complete Notification\",\"PassPort Pass Render Complete Notification\",\"PassPort All Passes Render Complete Notification\"}");
 		growlScriptOutput.writeln("set the enabledNotificationsList to {\"PassPort Frame Render Complete Notification\",\"PassPort Pass Render Complete Notification\",\"PassPort All Passes Render Complete Notification\"}");
 		growlScriptOutput.writeln("register as application \"PassPort for LightWave 3D\" all notifications allNotificationsList default notifications enabledNotificationsList icon of application \"Layout.app\"");
-		growlScriptOutput.writeln("notify with name \"PassPort Pass Render Complete Notification\" title \"PassPort Render Complete.\" description \"Your PassPort Pass render of \\\"" + currentChosenPassString + "\\\" from frame " + renderStart + " to frame " + renderEnd + " is complete.\" application name \"PassPort for LightWave 3D\"");
+		growlScriptOutput.writeln("notify with name \"PassPort Pass Render Complete Notification\" title \"PassPort Render Complete.\" description \"Your PassPort Pass render of \\\"" + ::currentChosenPassString + "\\\" from frame " + renderStart + " to frame " + renderEnd + " is complete.\" application name \"PassPort for LightWave 3D\"");
 		growlScriptOutput.writeln("end tell");
 		growlScriptOutput.close();
 	}
@@ -329,7 +328,7 @@ UB_bg_sceneRender: sceneFile, frameOutputPath
    	outputLine = install_dir + getsep() + "bin/lwsn -3 -c" + config_dir + " -d" + content_dir + " " + sceneFile + " " + renderStart + " " + renderEnd + " " + renderStep + "\;\n";
     bashOutput.writeln(outputLine);
     bashOutput.writeln("rm " + bashFilePath);
-	if(useGrowl == 1)
+	if(::useGrowl == 1)
 	{
 		bashOutput.writeln("osascript \"" + growlAppleScriptPath + "\"");
 		bashOutput.writeln("rm " + growlAppleScriptPath);
@@ -361,7 +360,7 @@ UB_bg_allSceneRender: sceneFile, frameOutputPath
     renderStart = Scene().renderstart;
     renderEnd = Scene().renderend;
     renderStep = Scene().renderstep;
-    extensionArray = parse("(",image_formats_array[rgbSaveType]);
+    extensionArray = parse("(",::image_formats_array[::rgbSaveType]);
     extension = strleft(extensionArray[2],4);
     
     install_dir = getdir("Install");
@@ -376,7 +375,7 @@ UB_bg_allSceneRender: sceneFile, frameOutputPath
     {
     	bashFilePath = currentscene_patharray[1] + currentscene_patharray[2] + getsep() + "frameRender_bash.bash";
     	scriptFilePath = currentscene_patharray[1] + currentscene_patharray[2] + getsep() + "temp.scpt";
-		if(useGrowl == 1)
+		if(::useGrowl == 1)
 		{
 			growlAppleScriptPath = currentscene_patharray[1] + currentscene_patharray[2] + getsep() + "growlNotify.scpt";
     	}
@@ -385,7 +384,7 @@ UB_bg_allSceneRender: sceneFile, frameOutputPath
     {
     	bashFilePath = currentscene_patharray[2] + getsep() + "frameRender_bash.bash";
     	scriptFilePath = currentscene_patharray[2] + getsep() + "temp.scpt";
-		if(useGrowl == 1)
+		if(::useGrowl == 1)
 		{
 			growlAppleScriptPath = currentscene_patharray[2] + getsep() + "growlNotify.scpt";
 		}
@@ -398,16 +397,16 @@ UB_bg_allSceneRender: sceneFile, frameOutputPath
 	    bashOutput.writeln(outputLine);
 	}
 	
-	allPassesString = passNames[1];
-	if(size(passNames) > 1)
+	allPassesString = ::passNames[1];
+	if(size(::passNames) > 1)
 	{
-		for(x = 2; x <= size(passNames); x++)
+		for(x = 2; x <= size(::passNames); x++)
 		{
-			allPassesString = allPassesString + " | " + passNames[x];
+			allPassesString = allPassesString + " | " + ::passNames[x];
 		}
 	}
 	
-	if(useGrowl == 1)
+	if(::useGrowl == 1)
 	{
 		growlScriptOutput = File(growlAppleScriptPath,"w");
 		growlScriptOutput.writeln("tell application \"GrowlHelperApp\"");
@@ -420,7 +419,7 @@ UB_bg_allSceneRender: sceneFile, frameOutputPath
 	}
 
     bashOutput.writeln("rm " + bashFilePath);
-	if(useGrowl == 1)
+	if(::useGrowl == 1)
 	{
 		bashOutput.writeln("osascript \"" + growlAppleScriptPath + "\"");
 		bashOutput.writeln("rm " + growlAppleScriptPath);

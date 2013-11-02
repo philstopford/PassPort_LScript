@@ -9,7 +9,6 @@ Main_ui_y_spacer			= 4;
 Main_ui_gap					= 5;
 Main_panelWidth 			= integer(globalrecall("passEditorpanelWidth", 640));
 Main_panelHeight 			= integer(globalrecall("passEditorpanelHeight", 540));
-// Main_panelWidthOnOpen 		= Main_panelWidth;
 Main_res1_panelWidth 		= 640;
 Main_res1_panelHeight 		= 540;
 Main_res2_panelWidth 		= 640;

@@ -1,29 +1,29 @@
 // Listbox
 itemslb_count
 {
-	return displayNames.size();
+	return ::displayNames.size();
 }
 
 itemslb_name: index
 {
-	return displayNames[index];
+	return ::displayNames[index];
 }
 
 itemslb_event: items
 {
 	items_array = nil;
 	sel = getvalue(gad_PassesListview).asInt();
-	if(passSelected == true && sel != 0)
+	if(::passSelected == true && sel != 0)
 	{
-		previousPassAssItems[sel] = passAssItems[sel];
-		passAssItems[sel] = "";
+		::previousPassAssItems[sel] = ::passAssItems[sel];
+		::passAssItems[sel] = "";
 		if(items != nil)
 		{
 			items_size = sizeof(items);
 			for(x = 1;x <= items_size;x++)
 			{
 				items_array[x] = items[x];
-				passAssItems[sel] = passAssItems[sel] + "||" + displayIDs[items[x]];
+				::passAssItems[sel] = ::passAssItems[sel] + "||" + ::displayIDs[items[x]];
 			}
 		}
 		else
@@ -41,12 +41,12 @@ itemslb_event: items
 
 passeslb_count
 {
-  return(passNames.size());
+  return(::passNames.size());
 }
 
 passeslb_name: index
 {
-	return(passNames[index]);
+	return(::passNames[index]);
 }
 
 passeslb_event: passes_items
@@ -62,7 +62,7 @@ passeslb_event: passes_items
 		}
 		if(passes_size != 1)
 		{
-			passSelected = false;
+			::passSelected = false;
 			setvalue(gad_OverridesListview,nil);
 			setvalue(gad_SceneItems_forPasses_Listview,nil);
 			req_update();
@@ -77,16 +77,16 @@ passeslb_event: passes_items
 		if(passes_size == 1)
 		{
 			passes_sel = passes_array[1];
-			setitems = parseListItems(passAssItems[passes_sel]);
+			setitems = parseListItems(::passAssItems[passes_sel]);
 			setvalue(gad_SceneItems_forPasses_Listview,setitems);
 			setvalue(gad_OverridesListview,nil);
 			req_update();
-			passSelected = true;
+			::passSelected = true;
 		} 
 	}
 	else
 	{
-		passSelected = false;
+		::passSelected = false;
 		setvalue(gad_PassesListview,nil);
 		setvalue(gad_OverridesListview,nil);
 		setvalue(gad_SceneItems_forPasses_Listview,nil);
@@ -100,17 +100,17 @@ addAllButton
 {
     items_array = nil;
     sel = getvalue(gad_PassesListview).asInt();
-    if(passSelected == true && sel != 0)
+    if(::passSelected == true && sel != 0)
     {
-        previousPassAssItems[sel] = passAssItems[sel];
-        passAssItems[sel] = "";
-        items_size = sizeof(displayNames);
+        ::previousPassAssItems[sel] = ::passAssItems[sel];
+        ::passAssItems[sel] = "";
+        items_size = sizeof(::displayNames);
         for(x = 1;x <= items_size;x++)
         {
             items_array[x] = x;
-            passAssItems[sel] = passAssItems[sel] + "||" + displayIDs[x];
+            ::passAssItems[sel] = ::passAssItems[sel] + "||" + ::displayIDs[x];
         }
-        setitems = parseListItems(passAssItems[sel]);
+        setitems = parseListItems(::passAssItems[sel]);
         setvalue(gad_SceneItems_forPasses_Listview,setitems);
         req_update();
     }
@@ -124,37 +124,37 @@ addAllButton
 
 clearAllButton
 {
-    if(areYouSurePrompts == 1)
+    if(::areYouSurePrompts == 1)
     {
-        doKeys = 0;
+        ::doKeys = 0;
         reqbegin("Confirm Clear Pass Assignments");
         c20 = ctltext("","Are you sure you want to clear all pass assignments?");
         if(reqpost())
         {
             items_array = nil;
             sel = getvalue(gad_PassesListview).asInt();
-            if(passSelected == true && sel != 0)
+            if(::passSelected == true && sel != 0)
             {
-                previousPassAssItems[sel] = passAssItems[sel];
-                passAssItems[sel] = "";
+                ::previousPassAssItems[sel] = ::passAssItems[sel];
+                ::passAssItems[sel] = "";
                 setvalue(gad_SceneItems_forPasses_Listview,nil);
                 req_update();
             }
         }
         else
         {
-            warn("Clearing of pass assignments cancelled.");
+            logger("warn","Clearing of pass assignments cancelled.");
         }
         reqend();
-        doKeys = 1;
+        ::doKeys = 1;
     }
     else
     {
         items_array = nil;
         sel = getvalue(gad_PassesListview).asInt();
-        if(passSelected == true && sel != 0)
+        if(::passSelected == true && sel != 0)
         {
-            passAssItems[sel] = "";
+            ::passAssItems[sel] = "";
             setvalue(gad_SceneItems_forPasses_Listview,nil);
             req_update();
         }
@@ -166,9 +166,9 @@ addSelButton
 {
     items_array = nil;
     sel = getvalue(gad_PassesListview).asInt();
-    if(passSelected == true && sel != 0)
+    if(::passSelected == true && sel != 0)
     {
-        s = masterScene.getSelect();
+        s = ::masterScene.getSelect();
         if(s != nil)
         {
             arraySize = sizeof(s);
@@ -177,35 +177,35 @@ addSelButton
             for(x = 1; x <= arraySize; x++)
             {
                 itemname = s[x].name;
-                previousPassAssItems[newNumber] = passAssItems[newNumber];
+                ::previousPassAssItems[newNumber] = ::passAssItems[newNumber];
                 switch(s[x].genus)
                 {
                     case MESH: // was 1 - trying to avoid hard-coding.
                         tempMeshAgents[x] = Mesh(itemname);
                         tempMeshNames[x] = tempMeshAgents[x].name;
                         tempMeshIDs[x] = tempMeshAgents[x].id;
-                        passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempMeshIDs[x];
+                        ::passAssItems[newNumber] = ::passAssItems[newNumber] + "||" + tempMeshIDs[x];
                         break;
                     
                     case LIGHT: // was 2 - trying to avoid hard-coding.
                         tempLightAgents[x] = Light(itemname);
                         tempLightNames[x] = tempLightAgents[x].name;
                         tempLightIDs[x] = tempLightAgents[x].id;
-                        passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempLightIDs[x];
+                        ::passAssItems[newNumber] = ::passAssItems[newNumber] + "||" + tempLightIDs[x];
                         break;
                         
                     case CAMERA: // was 3 - trying to avoid hard-coding.
                         tempCameraAgents[x] = Camera(itemname);
                         tempCameraNames[x] = tempCameraAgents[x].name;
                         tempCameraIDs[x] = tempCameraAgents[x].id;
-                        passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempCameraIDs[x];
+                        ::passAssItems[newNumber] = ::passAssItems[newNumber] + "||" + tempCameraIDs[x];
                         break;
 
 					default:
                         break;
                 }
             }
-            setitems = parseListItems(passAssItems[newNumber]);
+            setitems = parseListItems(::passAssItems[newNumber]);
             setvalue(gad_SceneItems_forPasses_Listview,setitems);
         }
         else
@@ -226,9 +226,9 @@ clearSelButton
 {
     items_array = nil;
     sel = getvalue(gad_PassesListview).asInt();
-    if(passSelected == true && sel != 0)
+    if(::passSelected == true && sel != 0)
     {
-        s = masterScene.getSelect();
+        s = ::masterScene.getSelect();
         if(s != nil)
         {
             arraySize = sizeof(s);
@@ -236,20 +236,20 @@ clearSelButton
             for(x = 1; x <= arraySize; x++)
             {
                 itemname = s[x].name;
-                previousPassAssItems[newNumber] = passAssItems[newNumber];
+                ::previousPassAssItems[newNumber] = ::passAssItems[newNumber];
                 switch(s[x].genus)
                 {
                     case MESH:
                         tempMeshAgents[x] = Mesh(itemname);
                         tempMeshNames[x] = tempMeshAgents[x].name;
                         removeMeIDs[x] = tempMeshAgents[x].id;
-                        tempParse = parse("||",passAssItems[newNumber]);
-                        passAssItems[newNumber] = "";
+                        tempParse = parse("||",::passAssItems[newNumber]);
+                        ::passAssItems[newNumber] = "";
                         for(y = 1; y <= size(tempParse); y++)
                         {
                             if(tempParse[y] != removeMeIDs[x])
                             {
-                                passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempParse[y];
+                                ::passAssItems[newNumber] = ::passAssItems[newNumber] + "||" + tempParse[y];
                             }
                         }
                         break;
@@ -258,13 +258,13 @@ clearSelButton
                         tempLightAgents[x] = Light(itemname);
                         tempLightNames[x] = tempLightAgents[x].name;
                         removeMeIDs[x] = tempLightAgents[x].id;
-                        tempParse = parse("||",passAssItems[newNumber]);
-                        passAssItems[newNumber] = "";
+                        tempParse = parse("||",::passAssItems[newNumber]);
+                        ::passAssItems[newNumber] = "";
                         for(y = 1; y <= size(tempParse); y++)
                         {
                             if(tempParse[y] != removeMeIDs[x])
                             {
-                                passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempParse[y];
+                                ::passAssItems[newNumber] = ::passAssItems[newNumber] + "||" + tempParse[y];
                             }
                         }
                         break;
@@ -273,13 +273,13 @@ clearSelButton
                         tempCameraAgents[x] = Camera(itemname);
                         tempCameraNames[x] = tempCameraAgents[x].name;
                         removeMeIDs[x] = tempCameraAgents[x].id;
-                        tempParse = parse("||",passAssItems[newNumber]);
-                        passAssItems[newNumber] = "";
+                        tempParse = parse("||",::passAssItems[newNumber]);
+                        ::passAssItems[newNumber] = "";
                         for(y = 1; y <= size(tempParse); y++)
                         {
                             if(tempParse[y] != removeMeIDs[x])
                             {
-                                passAssItems[newNumber] = passAssItems[newNumber] + "||" + tempParse[y];
+                                ::passAssItems[newNumber] = ::passAssItems[newNumber] + "||" + tempParse[y];
                             }
                         }
                         break;
@@ -288,7 +288,7 @@ clearSelButton
                         break;
                 }
             }
-            setitems = parseListItems(passAssItems[newNumber]);
+            setitems = parseListItems(::passAssItems[newNumber]);
             setvalue(gad_SceneItems_forPasses_Listview,setitems);
         }
         else
@@ -318,7 +318,7 @@ passMenu_select: passMenu_item
    
    if(passMenu_item == 2)
     {
-        justReopened = 1;
+        ::justReopened = 1;
         createNewEmptyPass();
         req_update();
     }
@@ -338,8 +338,8 @@ passMenu_select: passMenu_item
 
 currentPassMenu_refresh: value
 {
-    currentChosenPass = int(value);
-    currentChosenPassString = passNames[currentChosenPass];
+    ::currentChosenPass = int(value);
+    ::currentChosenPassString = ::passNames[::currentChosenPass];
     setvalue(gad_OverridesListview,nil);
     setvalue(gad_SceneItems_forOverrides_Listview,nil);
     reProcess();
@@ -348,18 +348,18 @@ currentPassMenu_refresh: value
 
 currentPassMenu_select: currentPassMenu_item
 {
-    currentChosenPass = int(currentPassMenu_item);
-    currentChosenPassString = passNames[currentChosenPass];
+    ::currentChosenPass = int(currentPassMenu_item);
+    ::currentChosenPassString = ::passNames[::currentChosenPass];
     setvalue(gad_OverridesListview,nil);
     setvalue(gad_SceneItems_forOverrides_Listview,nil);
-    setvalue(gad_SelectedPass,currentChosenPass);
+    setvalue(gad_SelectedPass,::currentChosenPass);
     reProcess();
     req_update();
 }
 
 currentPassMenu_update
 {
-    return(passNames);
+    return(::passNames);
 }
 
 
@@ -374,11 +374,11 @@ parseListItems: passItemsString
 {
 	idsArray = parse("||",passItemsString);
 	z = 1;
-	for(x = 1; x <= size(displayIDs); x++)
+	for(x = 1; x <= size(::displayIDs); x++)
 	{
 		for(y = 1; y <= size(idsArray); y++)
 		{
-			if(string(displayIDs[x]) == string(idsArray[y]))
+			if(string(::displayIDs[x]) == string(idsArray[y]))
 			{
 				itemsParsedArray[z] = x;
 				z++;

@@ -7,28 +7,28 @@ cameraOverride_UI: action
 		if(action == "edit")
 		{
 			sel = getvalue(gad_OverridesListview).asInt();
-			settingsArray = parseOverrideSettings(overrideSettings[sel]);
-            zoomFactor 						= number(settingsArray[3]);
-			zoomType 						= integer(settingsArray[4]);
-			resolutionMultiplier 			= number(settingsArray[5]);
-			frameSizeH 						= integer(settingsArray[6]);
-			frameSizeV 						= integer(settingsArray[7]);
-			pixelAspect 					= number(settingsArray[8]);
-			motionBlur 						= integer(settingsArray[9]);
-			motionBlurPasses 				= integer(settingsArray[10]);
-			shutterEfficiency 				= number(settingsArray[11]);
-			rollingShutter 					= number(settingsArray[12]);
-			shutterOpen 					= number(settingsArray[13]);
-			oversampling 					= number(settingsArray[14]);
-			fieldRendering 					= integer(settingsArray[15]);
-			depthOfField 					= integer(settingsArray[16]);
-			sampler 						= integer(settingsArray[17]);
-			adaptiveThreshold 				= number(settingsArray[18]);
-			minimumSamples 					= integer(settingsArray[19]);
-			maximumSamples 					= integer(settingsArray[20]);
+			::settingsArray = parseOverrideSettings(::overrideSettings[sel]);
+            zoomFactor 						= number(::settingsArray[3]);
+			zoomType 						= integer(::settingsArray[4]);
+			resolutionMultiplier 			= number(::settingsArray[5]);
+			frameSizeH 						= integer(::settingsArray[6]);
+			frameSizeV 						= integer(::settingsArray[7]);
+			pixelAspect 					= number(::settingsArray[8]);
+			motionBlur 						= integer(::settingsArray[9]);
+			motionBlurPasses 				= integer(::settingsArray[10]);
+			shutterEfficiency 				= number(::settingsArray[11]);
+			rollingShutter 					= number(::settingsArray[12]);
+			shutterOpen 					= number(::settingsArray[13]);
+			oversampling 					= number(::settingsArray[14]);
+			fieldRendering 					= integer(::settingsArray[15]);
+			depthOfField 					= integer(::settingsArray[16]);
+			sampler 						= integer(::settingsArray[17]);
+			adaptiveThreshold 				= number(::settingsArray[18]);
+			minimumSamples 					= integer(::settingsArray[19]);
+			maximumSamples 					= integer(::settingsArray[20]);
 		}
 		
-		doKeys = 0;
+		::doKeys = 0;
 
 		reqbeginstr = "New Camera Override";
 		if(action == "edit")
@@ -36,18 +36,18 @@ cameraOverride_UI: action
 			reqbeginstr = "Edit Camera Override";
 		}
 		reqbegin(reqbeginstr);
-		reqsize(CamProp_ui_window_w, 325);
+		reqsize(::CamProp_ui_window_w, 325);
 		
 		newName = "CamPropsOverride";
 		if(action == "edit")
 		{
-			newName = settingsArray[1];
+			newName = ::settingsArray[1];
 		}
 		c20 = ctlstring("Override Name:", newName);
 
-		ctlposition(c20, CamProp_gad_x, CamProp_gad_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c20, ::CamProp_gad_x, ::CamProp_gad_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
-		ui_offset_y = CamProp_ui_offset_y + CamProp_ui_row_offset;
+		ui_offset_y = ::CamProp_ui_offset_y + ::CamProp_ui_row_offset;
 
 		c21val = 3.2;
 		if(action == "edit")
@@ -55,7 +55,7 @@ cameraOverride_UI: action
 			c21val = zoomFactor;
 		}
 		c21 = ctlnumber("Zoom Factor:",c21val);
-		ctlposition(c21, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c21, ::CamProp_gad_x, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
 		c22val = 1; //FIXME : Menu?
 		if(action == "edit")
@@ -63,9 +63,9 @@ cameraOverride_UI: action
 			c22val = zoomType;
 		}
 		c22 = ctlinteger("Zoom Type:",c22val);
-		ctlposition(c22, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c22, ::CamProp_gad_x2, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
-		ui_offset_y += CamProp_ui_row_offset;
+		ui_offset_y += ::CamProp_ui_row_offset;
 
 		c23val = 3;
 		if(action == "edit")
@@ -92,8 +92,8 @@ cameraOverride_UI: action
 				c23val = 5;
 			}
 		}
-		c23 = ctlpopup("Resolution Multiplier",c23val,resolutionMultArray);
-		ctlposition(c23, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		c23 = ctlpopup("Resolution Multiplier",c23val,::resolutionMultArray);
+		ctlposition(c23, ::CamProp_gad_x, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
 		c24val = 1.0;
 		if(action == "edit")
@@ -101,12 +101,12 @@ cameraOverride_UI: action
 			c24val = pixelAspect;
 		}
 		c24 = ctlnumber("Pixel Aspect:",c24val);
-		ctlposition(c24, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
-		// ui_offset_y += CamProp_ui_row_offset;
-		ui_offset_y += CamProp_ui_row_offset + 2;
-		sep1 = ctlsep(0, CamProp_ui_seperator_w + 4);
-		ctlposition(sep1, -2, CamProp_gad_y + ui_offset_y);
-		ui_offset_y += CamProp_ui_spacing_y + 4;
+		ctlposition(c24, ::CamProp_gad_x2, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
+		// ui_offset_y += ::CamProp_ui_row_offset;
+		ui_offset_y += ::CamProp_ui_row_offset + 2;
+		sep1 = ctlsep(0, ::CamProp_ui_seperator_w + 4);
+		ctlposition(sep1, -2, ::CamProp_gad_y + ui_offset_y);
+		ui_offset_y += ::CamProp_ui_spacing_y + 4;
 
 		c25val = 1280;
 		if(action == "edit")
@@ -114,7 +114,7 @@ cameraOverride_UI: action
 			c25val = frameSizeH;
 		}
 		c25 = ctlinteger("Horizontal Size:",c25val);
-		ctlposition(c25, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c25, ::CamProp_gad_x, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
 		c26val = 720;
 		if(action == "edit")
@@ -122,12 +122,12 @@ cameraOverride_UI: action
 			c26val = frameSizeV;
 		}
 		c26 = ctlinteger("Vertical Size:",c26val);
-		ctlposition(c26, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
-		// ui_offset_y += CamProp_ui_row_offset;
-		ui_offset_y += CamProp_ui_row_offset + 2;
-		sep2 = ctlsep(0, CamProp_ui_seperator_w + 4);
-		ctlposition(sep2, -2, CamProp_gad_y + ui_offset_y);
-		ui_offset_y += CamProp_ui_spacing_y + 4;
+		ctlposition(c26, ::CamProp_gad_x2, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
+		// ui_offset_y += ::CamProp_ui_row_offset;
+		ui_offset_y += ::CamProp_ui_row_offset + 2;
+		sep2 = ctlsep(0, ::CamProp_ui_seperator_w + 4);
+		ctlposition(sep2, -2, ::CamProp_gad_y + ui_offset_y);
+		ui_offset_y += ::CamProp_ui_spacing_y + 4;
 
 		c27val = 0;
 		if(action == "edit")
@@ -135,9 +135,9 @@ cameraOverride_UI: action
 			c27val = motionBlur;
 		}
 		c27 = ctlcheckbox("Motion Blur",c27val);
-		ctlposition(c27, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c27, ::CamProp_gad_x, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
-		ui_offset_y += CamProp_ui_row_offset;
+		ui_offset_y += ::CamProp_ui_row_offset;
 
 		c28val = 1;
 		if(action == "edit")
@@ -145,7 +145,7 @@ cameraOverride_UI: action
 			c28val = motionBlurPasses;
 		}
 		c28 = ctlinteger("Passes:",c28val);
-		ctlposition(c28, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c28, ::CamProp_gad_x, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
 		c29val = 1;
 		if(action == "edit")
@@ -153,9 +153,9 @@ cameraOverride_UI: action
 			c29val = shutterEfficiency;
 		}
 		c29 = ctlpercent("Shutter Efficiency",c29val);
-		ctlposition(c29, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w - 22, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c29, ::CamProp_gad_x2, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w - 22, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
-		ui_offset_y += CamProp_ui_row_offset;
+		ui_offset_y += ::CamProp_ui_row_offset;
 
 		c30val = 1;
 		if(action == "edit")
@@ -163,7 +163,7 @@ cameraOverride_UI: action
 			c30val = rollingShutter;
 		}
 		c30 = ctlpercent("Rolling Shutter",c30val);
-		ctlposition(c30, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w - 22, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c30, ::CamProp_gad_x, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w - 22, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
 		c31val = 1;
 		if(action == "edit")
@@ -171,12 +171,12 @@ cameraOverride_UI: action
 			c31val = shutterOpen;
 		}
 		c31 = ctlpercent("Shutter Open",c31val);
-		ctlposition(c31, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w - 22, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c31, ::CamProp_gad_x2, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w - 22, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
-		ui_offset_y += CamProp_ui_row_offset + 2;
-		sep3 = ctlsep(0, CamProp_ui_seperator_w + 4);
-		ctlposition(sep3, -2, CamProp_gad_y + ui_offset_y);
-		ui_offset_y += CamProp_ui_spacing_y + 4;
+		ui_offset_y += ::CamProp_ui_row_offset + 2;
+		sep3 = ctlsep(0, ::CamProp_ui_seperator_w + 4);
+		ctlposition(sep3, -2, ::CamProp_gad_y + ui_offset_y);
+		ui_offset_y += ::CamProp_ui_spacing_y + 4;
 
 		c32val = 1;
 		fieldRendering = c32val - 1;
@@ -184,8 +184,8 @@ cameraOverride_UI: action
 		{
 			c32val = fieldRendering + 1;
 		}
-		c32 = ctlpopup("Field Rendering",c32val,fieldRenderArray);
-		ctlposition(c32, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		c32 = ctlpopup("Field Rendering",c32val,::fieldRenderArray);
+		ctlposition(c32, ::CamProp_gad_x, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
 		c38val = 0;
 		if(action == "edit")
@@ -193,12 +193,12 @@ cameraOverride_UI: action
 			c38val = depthOfField;
 		}
 		c38 = ctlcheckbox("Depth of Field",c38val);
-		ctlposition(c38, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c38, ::CamProp_gad_x2, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
-		ui_offset_y += CamProp_ui_row_offset + 2;
-		sep4 = ctlsep(0, CamProp_ui_seperator_w + 4);
-		ctlposition(sep4, -2, CamProp_gad_y + ui_offset_y);
-		ui_offset_y += CamProp_ui_spacing_y + 4;
+		ui_offset_y += ::CamProp_ui_row_offset + 2;
+		sep4 = ctlsep(0, ::CamProp_ui_seperator_w + 4);
+		ctlposition(sep4, -2, ::CamProp_gad_y + ui_offset_y);
+		ui_offset_y += ::CamProp_ui_spacing_y + 4;
 
 		c33val = 1;
 		sampler = c33val - 1;
@@ -206,10 +206,10 @@ cameraOverride_UI: action
 		{
 			c33val = sampler + 1;
 		}
-		c33 = ctlpopup("Sampler",c33val,samplerArray);
-		ctlposition(c33, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		c33 = ctlpopup("Sampler",c33val,::samplerArray);
+		ctlposition(c33, ::CamProp_gad_x, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
-		ui_offset_y += CamProp_ui_row_offset;
+		ui_offset_y += ::CamProp_ui_row_offset;
 
 		c34val = 1;
 		if(action == "edit")
@@ -217,7 +217,7 @@ cameraOverride_UI: action
 			c34val = minimumSamples;
 		}
 		c34 = ctlinteger("Min Samples",c34val);
-		ctlposition(c34, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c34, ::CamProp_gad_x, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
 		c35val = 0.01;
 		if(action == "edit")
@@ -225,9 +225,9 @@ cameraOverride_UI: action
 			c35val = adaptiveThreshold;
 		}
 		c35 = ctlnumber("Threshold",c35val);
-		ctlposition(c35, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c35, ::CamProp_gad_x2, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
-		ui_offset_y += CamProp_ui_row_offset;
+		ui_offset_y += ::CamProp_ui_row_offset;
 
 		c36val = 1;
 		if(action == "edit")
@@ -235,7 +235,7 @@ cameraOverride_UI: action
 			c36val = maximumSamples;
 		}
 		c36 = ctlinteger("Max Samples",c36val);
-		ctlposition(c36, CamProp_gad_x, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c36, ::CamProp_gad_x, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
 		c37val = 0;
 		if(action == "edit")
@@ -243,7 +243,7 @@ cameraOverride_UI: action
 			c37val = oversampling;
 		}
 		c37 = ctlnumber("Oversampling",c37val);
-		ctlposition(c37, CamProp_gad_x2, CamProp_gad_y + ui_offset_y, CamProp_gad_w, CamProp_gad_h, CamProp_gad_text_offset);
+		ctlposition(c37, ::CamProp_gad_x2, ::CamProp_gad_y + ui_offset_y, ::CamProp_gad_w, ::CamProp_gad_h, ::CamProp_gad_text_offset);
 
 		if(reqpost())
 		{
@@ -291,23 +291,23 @@ cameraOverride_UI: action
 			newNumber = sel;
 			if(action == "new")
 			{
-				pass = currentChosenPass;
-				if(overrideNames[1] != "empty")
+				::pass = ::currentChosenPass;
+				if(::overrideNames[1] != "empty")
 				{
-					newNumber = size(overrideNames) + 1;
+					newNumber = size(::overrideNames) + 1;
 				}
 				else
 				{
 					newNumber = 1;
 				}
-				passOverrideItems[pass][newNumber] = "";
-				for(y = 1; y <= size(passNames); y++)
+				::passOverrideItems[::pass][newNumber] = "";
+				for(y = 1; y <= size(::passNames); y++)
 				{
-					passOverrideItems[y][newNumber] = "";
+					::passOverrideItems[y][newNumber] = "";
 				}
 			}
-			overrideNames[newNumber] = newName + "   (camera)";
-			overrideSettings[newNumber] = 	newName 				+ "||" + 	"type8" 			+ "||"
+			::overrideNames[newNumber] = newName + "   (camera)";
+			::overrideSettings[newNumber] = 	newName 				+ "||" + 	"type8" 			+ "||"
 										+ 	zoomFactor				+ "||" + 	zoomType 			+ "||"
 										+ 	resolutionMultiplier	+ "||" + 	frameSizeH 			+ "||"
 										+ 	frameSizeV				+ "||" + 	pixelAspect			+ "||"
@@ -320,7 +320,7 @@ cameraOverride_UI: action
 		}
 		reqend();
 	} else {
-		error("cameraOverride_UI: incorrect, or no, action passed");
+		logger("error","cameraOverride_UI: incorrect, or no, action passed");
 	}
     req_update();
 }
@@ -334,10 +334,10 @@ srfOverride_UI: action
 		if(action == "edit")
 		{
 		    sel = getvalue(gad_OverridesListview).asInt();
-			settingsArray = parseOverrideSettings(overrideSettings[sel]);
+			::settingsArray = parseOverrideSettings(::overrideSettings[sel]);
 		}
 		
-		doKeys = 0;
+		::doKeys = 0;
 
 		reqbeginstr = "New .srf Override";
 		if(action == "edit")
@@ -349,14 +349,14 @@ srfOverride_UI: action
 		newName = "SurfaceOverride";
 		if(action == "edit")
 		{
-			newName = settingsArray[1];
+			newName = ::settingsArray[1];
 		}
 		c20 = ctlstring("Override Name:", newName);
 
 		srfFile = "*.srf";
 		if(action == "edit")
 		{
-			srfFile = settingsArray[3];
+			srfFile = ::settingsArray[3];
 		}
 		c21 = ctlfilename("Load .srf file...", srfFile,30,1);
 
@@ -369,27 +369,27 @@ srfOverride_UI: action
 			newNumber = sel;
 			if(action == "new")
 			{
-				pass = currentChosenPass;
-				if(overrideNames[1] != "empty")
+				::pass = ::currentChosenPass;
+				if(::overrideNames[1] != "empty")
 				{
-					newNumber = size(overrideNames) + 1;
+					newNumber = size(::overrideNames) + 1;
 				}
 				else
 				{
 					newNumber = 1;
 				}
-				passOverrideItems[pass][newNumber] = "";
-				for(y = 1; y <= size(passNames); y++)
+				::passOverrideItems[::pass][newNumber] = "";
+				for(y = 1; y <= size(::passNames); y++)
 				{
-					passOverrideItems[y][newNumber] = "";
+					::passOverrideItems[y][newNumber] = "";
 				}
 			}
-			overrideNames[newNumber] = newName + "   (.srf file)";
-			overrideSettings[newNumber] = newName + "||" + "type1" + "||" + string(srfFile);
+			::overrideNames[newNumber] = newName + "   (.srf file)";
+			::overrideSettings[newNumber] = newName + "||" + "type1" + "||" + string(srfFile);
 		}
 		reqend();
 	} else {
-		error("srfOverride_UI: incorrect, or no, action passed");
+		logger("error","srfOverride_UI: incorrect, or no, action passed");
 	}
     req_update();
 }
@@ -403,22 +403,22 @@ lightOverride_UI: action
 		if(action == "edit")
 		{
 		    sel = getvalue(gad_OverridesListview).asInt();
-			settingsArray = parseOverrideSettings(overrideSettings[sel]);
+			::settingsArray = parseOverrideSettings(::overrideSettings[sel]);
 
-			lightColorSettsArrays[1] = integer(settingsArray[3]);
-			lightColorSettsArrays[2] = integer(settingsArray[4]);
-			lightColorSettsArrays[3] = integer(settingsArray[5]);
+			lightColorSettsArrays[1] = integer(::settingsArray[3]);
+			lightColorSettsArrays[2] = integer(::settingsArray[4]);
+			lightColorSettsArrays[3] = integer(::settingsArray[5]);
 			lightColorSettsArray = <lightColorSettsArrays[1], lightColorSettsArrays[2], lightColorSettsArrays[3]>;
 
-			lightIntensitySetts = number(settingsArray[6]);
-			affectDiffuseSetts = integer(settingsArray[7]);
-			affectSpecularSetts = integer(settingsArray[8]);
-			affectCausticsSetts = integer(settingsArray[9]);
-			lensFlareSetts = integer(settingsArray[10]);
-			volumetricLightingSetts = integer(settingsArray[11]);
+			lightIntensitySetts = number(::settingsArray[6]);
+			affectDiffuseSetts = integer(::settingsArray[7]);
+			affectSpecularSetts = integer(::settingsArray[8]);
+			affectCausticsSetts = integer(::settingsArray[9]);
+			lensFlareSetts = integer(::settingsArray[10]);
+			volumetricLightingSetts = integer(::settingsArray[11]);
 		}
 		
-		doKeys = 0;
+		::doKeys = 0;
 		reqbeginstr = "New Light Override";
 		if(action == "edit") 
 		{
@@ -426,17 +426,17 @@ lightOverride_UI: action
 		}
 		reqbegin(reqbeginstr);
 
-		reqsize(LgtProp_ui_window_w, 240);
+		reqsize(::LgtProp_ui_window_w, 240);
 
 		newName = "LgtPropsOverride";
 		if(action == "edit")
 		{
-			newName = settingsArray[1];
+			newName = ::settingsArray[1];
 		}
 		c20 = ctlstring("Override Name",newName, 131);
-		ctlposition(c20, LgtProp_gad_x, LgtProp_gad_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+		ctlposition(c20, ::LgtProp_gad_x, ::LgtProp_gad_y, ::LgtProp_gad_w, ::LgtProp_gad_h, ::LgtProp_gad_text_offset);
 
-		ui_offset_y = LgtProp_ui_offset_y + LgtProp_ui_row_offset;
+		ui_offset_y = ::LgtProp_ui_offset_y + ::LgtProp_ui_row_offset;
 
 		c22val = 255;
 		if(action == "edit")
@@ -444,9 +444,9 @@ lightOverride_UI: action
 			c22val = lightColorSettsArray;
 		}
 		c22 = ctlcolor("Light Color", c22val);
-		ctlposition(c22, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+		ctlposition(c22, ::LgtProp_gad_x, ::LgtProp_gad_y + ui_offset_y, ::LgtProp_gad_w, ::LgtProp_gad_h, ::LgtProp_gad_text_offset);
 
-		ui_offset_y += LgtProp_ui_row_offset;
+		ui_offset_y += ::LgtProp_ui_row_offset;
 
 		c23val =  1.0;
 		if(action == "edit")
@@ -454,12 +454,12 @@ lightOverride_UI: action
 			c23val = lightIntensitySetts;
 		}
 		c23 = ctlpercent("Light Intensity", c23val);
-		ctlposition(c23, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w - 22, LgtProp_gad_h, LgtProp_gad_text_offset);
+		ctlposition(c23, ::LgtProp_gad_x, ::LgtProp_gad_y + ui_offset_y, ::LgtProp_gad_w - 22, ::LgtProp_gad_h, ::LgtProp_gad_text_offset);
 
-		ui_offset_y += LgtProp_ui_row_offset + 12;
-		s20 = ctlsep(0, LgtProp_ui_seperator_w + 4);
+		ui_offset_y += ::LgtProp_ui_row_offset + 12;
+		s20 = ctlsep(0, ::LgtProp_ui_seperator_w + 4);
 		ctlposition(s20, -2, ui_offset_y);
-		ui_offset_y += LgtProp_ui_spacing_y + 2;
+		ui_offset_y += ::LgtProp_ui_spacing_y + 2;
 
 		c24val = 1;
 		if(action == "edit")
@@ -467,9 +467,9 @@ lightOverride_UI: action
 			c24val = affectDiffuseSetts;
 		}
 		c24 = ctlcheckbox("Affect Diffuse          ",c24val);
-		ctlposition(c24, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+		ctlposition(c24, ::LgtProp_gad_x, ::LgtProp_gad_y + ui_offset_y, ::LgtProp_gad_w, ::LgtProp_gad_h, ::LgtProp_gad_text_offset);
 
-		ui_offset_y += LgtProp_ui_row_offset;
+		ui_offset_y += ::LgtProp_ui_row_offset;
 
 		c25val = 1;
 		if(action == "edit")
@@ -477,9 +477,9 @@ lightOverride_UI: action
 			c25val = affectSpecularSetts;
 		}
 		c25 = ctlcheckbox("Affect Specular     ",c25val);
-		ctlposition(c25, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+		ctlposition(c25, ::LgtProp_gad_x, ::LgtProp_gad_y + ui_offset_y, ::LgtProp_gad_w, ::LgtProp_gad_h, ::LgtProp_gad_text_offset);
 
-		ui_offset_y += LgtProp_ui_row_offset;
+		ui_offset_y += ::LgtProp_ui_row_offset;
 
 		c26val = 1;
 		if(action == "edit")
@@ -487,9 +487,9 @@ lightOverride_UI: action
 			c26val = affectCausticsSetts;
 		}
 		c26 = ctlcheckbox("Affect Caustics     ",c26val);
-		ctlposition(c26, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+		ctlposition(c26, ::LgtProp_gad_x, ::LgtProp_gad_y + ui_offset_y, ::LgtProp_gad_w, ::LgtProp_gad_h, ::LgtProp_gad_text_offset);
 
-		ui_offset_y += LgtProp_ui_row_offset;
+		ui_offset_y += ::LgtProp_ui_row_offset;
 
 		c27val = 0;
 		if(action == "edit")
@@ -497,9 +497,9 @@ lightOverride_UI: action
 			c27val = lensFlareSetts;
 		}
 		c27 = ctlcheckbox("Lens Flare               ",c27val);
-		ctlposition(c27, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+		ctlposition(c27, ::LgtProp_gad_x, ::LgtProp_gad_y + ui_offset_y, ::LgtProp_gad_w, ::LgtProp_gad_h, ::LgtProp_gad_text_offset);
 
-		ui_offset_y += LgtProp_ui_row_offset;
+		ui_offset_y += ::LgtProp_ui_row_offset;
 
 		c28val = 0;
 		if(action == "edit")
@@ -508,7 +508,7 @@ lightOverride_UI: action
 		}
 		c28 = ctlcheckbox("Volumetric Lighting",c28val);
 		
-		ctlposition(c28, LgtProp_gad_x, LgtProp_gad_y + ui_offset_y, LgtProp_gad_w, LgtProp_gad_h, LgtProp_gad_text_offset);
+		ctlposition(c28, ::LgtProp_gad_x, ::LgtProp_gad_y + ui_offset_y, ::LgtProp_gad_w, ::LgtProp_gad_h, ::LgtProp_gad_text_offset);
 		if(reqpost())
 		{
 			newName = getvalue(c20);
@@ -521,30 +521,30 @@ lightOverride_UI: action
 			lensFlareSetts = getvalue(c27);
 			volumetricLightingSetts = getvalue(c28);
 
-			pass = currentChosenPass;
+			::pass = ::currentChosenPass;
 			newNumber = sel;
 			if(action == "new")
 			{
-				if(overrideNames[1] != "empty")
+				if(::overrideNames[1] != "empty")
 				{
-					newNumber = size(overrideNames) + 1;
+					newNumber = size(::overrideNames) + 1;
 				}
 				else
 				{
 					newNumber = 1;
 				}
-				passOverrideItems[pass][newNumber] = "";
-				for(y = 1; y <= size(passNames); y++)
+				::passOverrideItems[::pass][newNumber] = "";
+				for(y = 1; y <= size(::passNames); y++)
 				{
-					passOverrideItems[y][newNumber] = "";
+					::passOverrideItems[y][newNumber] = "";
 				}
 			}
-			overrideNames[newNumber] = newName + "   (light properties)";
-			overrideSettings[newNumber] = newName + "||" + "type5" + "||" +	string(lightColorSettsArray.x) +  "||" + string(lightColorSettsArray.y) + "||" + string(lightColorSettsArray.z) + "||" + string(lightIntensitySetts) + "||" + string(affectDiffuseSetts) + "||" + string(affectSpecularSetts) + "||" + string(affectCausticsSetts) + "||" + string(lensFlareSetts)  + "||" + string(volumetricLightingSetts);
+			::overrideNames[newNumber] = newName + "   (light properties)";
+			::overrideSettings[newNumber] = newName + "||" + "type5" + "||" +	string(lightColorSettsArray.x) +  "||" + string(lightColorSettsArray.y) + "||" + string(lightColorSettsArray.z) + "||" + string(lightIntensitySetts) + "||" + string(affectDiffuseSetts) + "||" + string(affectSpecularSetts) + "||" + string(affectCausticsSetts) + "||" + string(lensFlareSetts)  + "||" + string(volumetricLightingSetts);
 		}
 		reqend();
 	} else {
-		error("lightOverride_UI: incorrect, or no, action passed");
+		logger("error","lightOverride_UI: incorrect, or no, action passed");
 	}
     req_update();
 }
@@ -558,7 +558,7 @@ objpropsOverride_UI: action
 		if(action == "edit")
 		{
 		    sel = getvalue(gad_OverridesListview).asInt();
-			settingsArray = parseOverrideSettings(overrideSettings[sel]);
+			::settingsArray = parseOverrideSettings(::overrideSettings[sel]);
 			/* so for this system, the resulting parsed array will be
 				1.  name
 				2.  type
@@ -573,16 +573,16 @@ objpropsOverride_UI: action
 				11. receive shadow (0 or 1)
 			*/
 
-			matteObjectSetts = integer(settingsArray[3]);
-			alphaChannelSetts = integer(settingsArray[4]);
-			unseenByRaysSetts = integer(settingsArray[5]);
-			unseenByCameraSetts = integer(settingsArray[6]);
-			unseenByRadiositySetts = integer(settingsArray[7]);
-			unseenByFogSetts = integer(settingsArray[8]);
-			selfShadowSetts = integer(settingsArray[9]);
-			castShadowSetts = integer(settingsArray[10]);
-			receiveShadowSetts = integer(settingsArray[11]);
-			matteColorSettsArray = < integer(settingsArray[12]), integer(settingsArray[13]), integer(settingsArray[14]) >;
+			matteObjectSetts = integer(::settingsArray[3]);
+			alphaChannelSetts = integer(::settingsArray[4]);
+			unseenByRaysSetts = integer(::settingsArray[5]);
+			unseenByCameraSetts = integer(::settingsArray[6]);
+			unseenByRadiositySetts = integer(::settingsArray[7]);
+			unseenByFogSetts = integer(::settingsArray[8]);
+			selfShadowSetts = integer(::settingsArray[9]);
+			castShadowSetts = integer(::settingsArray[10]);
+			receiveShadowSetts = integer(::settingsArray[11]);
+			matteColorSettsArray = < integer(::settingsArray[12]), integer(::settingsArray[13]), integer(::settingsArray[14]) >;
 		}
 		
 		
@@ -590,7 +590,7 @@ objpropsOverride_UI: action
 		tempAlphaArray[2] = "Unaffected by Object";
 		tempAlphaArray[3] = "Constant Black";
 		
-		doKeys = 0;
+		::doKeys = 0;
 		
 		reqbeginstr = "New ObjProps Override";
 		if(action == "edit")
@@ -599,17 +599,17 @@ objpropsOverride_UI: action
 		}
 		reqbegin(reqbeginstr);
 		
-		reqsize(ObjProp_ui_window_w,320);
+		reqsize(::ObjProp_ui_window_w,320);
 
 		newName = "ObjPropsOverride";
 		if(action == "edit")
 		{
-			newName = settingsArray[1];
+			newName = ::settingsArray[1];
 		}
 		c20 = ctlstring("Override Name:",newName);
-		ctlposition(c20, ObjProp_gad_x, ObjProp_gad_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+		ctlposition(c20, ::ObjProp_gad_x, ::ObjProp_gad_y, ::ObjProp_gad_w, ::ObjProp_gad_h, ::ObjProp_gad_text_offset);
 		
-		ui_offset_y = ObjProp_ui_offset_y + ObjProp_ui_row_offset;
+		ui_offset_y = ::ObjProp_ui_offset_y + ::ObjProp_ui_row_offset;
 
 		c21val = 0;
 		if(action == "edit")
@@ -617,9 +617,9 @@ objpropsOverride_UI: action
 			c21val = matteObjectSetts;
 		}
 		c21 = ctlcheckbox("Matte Object",c21val);
-		ctlposition(c21, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+		ctlposition(c21, ::ObjProp_gad_x, ::ObjProp_gad_y + ui_offset_y, ::ObjProp_gad_w, ::ObjProp_gad_h, ::ObjProp_gad_text_offset);
 
-		ui_offset_y += ObjProp_ui_row_offset;
+		ui_offset_y += ::ObjProp_ui_row_offset;
 
 		c21_5val = 0;
 		if(action == "edit")
@@ -627,9 +627,9 @@ objpropsOverride_UI: action
 			c21_5val = matteColorSettsArray;
 		}
 		c21_5 = ctlcolor("Color",c21_5val);
-		ctlposition(c21_5, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+		ctlposition(c21_5, ::ObjProp_gad_x, ::ObjProp_gad_y + ui_offset_y, ::ObjProp_gad_w, ::ObjProp_gad_h, ::ObjProp_gad_text_offset);
 
-		ui_offset_y += ObjProp_ui_row_offset;
+		ui_offset_y += ::ObjProp_ui_row_offset;
 
 		c22val = 1;
 		if(action == "edit")
@@ -637,12 +637,12 @@ objpropsOverride_UI: action
 			c22val = alphaChannelSetts;
 		}
 		c22 = ctlpopup("Alpha Channel",c22val,tempAlphaArray);
-		ctlposition(c22, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+		ctlposition(c22, ::ObjProp_gad_x, ::ObjProp_gad_y + ui_offset_y, ::ObjProp_gad_w, ::ObjProp_gad_h, ::ObjProp_gad_text_offset);
 
-		ui_offset_y += ObjProp_ui_row_offset + 12;
-		s20 = ctlsep(0, ObjProp_ui_seperator_w + 4);
+		ui_offset_y += ::ObjProp_ui_row_offset + 12;
+		s20 = ctlsep(0, ::ObjProp_ui_seperator_w + 4);
 		ctlposition(s20, -2, ui_offset_y);
-		ui_offset_y += ObjProp_ui_spacing_y + 2;
+		ui_offset_y += ::ObjProp_ui_spacing_y + 2;
 
 		c23val = 0;
 		if(action == "edit")
@@ -650,9 +650,9 @@ objpropsOverride_UI: action
 			c23val = unseenByRaysSetts;
 		}
 		c23 = ctlcheckbox("Unseen by Rays      ",c23val);
-		ctlposition(c23, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+		ctlposition(c23, ::ObjProp_gad_x, ::ObjProp_gad_y + ui_offset_y, ::ObjProp_gad_w, ::ObjProp_gad_h, ::ObjProp_gad_text_offset);
 
-		ui_offset_y += ObjProp_ui_row_offset;
+		ui_offset_y += ::ObjProp_ui_row_offset;
 
 		c24val = 0;
 		if(action == "edit")
@@ -660,9 +660,9 @@ objpropsOverride_UI: action
 			c24val = unseenByCameraSetts;
 		}
 		c24 = ctlcheckbox("Unseen by Camera",c24val);
-		ctlposition(c24, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+		ctlposition(c24, ::ObjProp_gad_x, ::ObjProp_gad_y + ui_offset_y, ::ObjProp_gad_w, ::ObjProp_gad_h, ::ObjProp_gad_text_offset);
 
-		ui_offset_y += ObjProp_ui_row_offset;
+		ui_offset_y += ::ObjProp_ui_row_offset;
 
 		c25val = 0;
 		if(action == "edit")
@@ -670,9 +670,9 @@ objpropsOverride_UI: action
 			c25val = unseenByRadiositySetts;
 		}
 		c25 = ctlcheckbox("Unseen by Radiosity",c25val);
-		ctlposition(c25, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+		ctlposition(c25, ::ObjProp_gad_x, ::ObjProp_gad_y + ui_offset_y, ::ObjProp_gad_w, ::ObjProp_gad_h, ::ObjProp_gad_text_offset);
 
-		ui_offset_y += ObjProp_ui_row_offset;
+		ui_offset_y += ::ObjProp_ui_row_offset;
 
 		c26val = 0;
 		if(action == "edit")
@@ -680,12 +680,12 @@ objpropsOverride_UI: action
 			c26val = unseenByFogSetts;
 		}
 		c26 = ctlcheckbox("Unaffected by Fog  ",c26val);
-		ctlposition(c26, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+		ctlposition(c26, ::ObjProp_gad_x, ::ObjProp_gad_y + ui_offset_y, ::ObjProp_gad_w, ::ObjProp_gad_h, ::ObjProp_gad_text_offset);
 
-		ui_offset_y += ObjProp_ui_row_offset + 12;
-		s21 = ctlsep(0, ObjProp_ui_seperator_w + 4);
+		ui_offset_y += ::ObjProp_ui_row_offset + 12;
+		s21 = ctlsep(0, ::ObjProp_ui_seperator_w + 4);
 		ctlposition(s21, -2, ui_offset_y);
-		ui_offset_y += ObjProp_ui_spacing_y + 2;
+		ui_offset_y += ::ObjProp_ui_spacing_y + 2;
 
 		c27val = 1;
 		if(action == "edit")
@@ -693,9 +693,9 @@ objpropsOverride_UI: action
 			c27val = selfShadowSetts;
 		}
 		c27 = ctlcheckbox("Self Shadow     ",c27val);
-		ctlposition(c27, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+		ctlposition(c27, ::ObjProp_gad_x, ::ObjProp_gad_y + ui_offset_y, ::ObjProp_gad_w, ::ObjProp_gad_h, ::ObjProp_gad_text_offset);
 
-		ui_offset_y += ObjProp_ui_row_offset;
+		ui_offset_y += ::ObjProp_ui_row_offset;
 
 		c28val = 1;
 		if(action == "edit")
@@ -703,9 +703,9 @@ objpropsOverride_UI: action
 			c28val = castShadowSetts;
 		}
 		c28 = ctlcheckbox("Cast Shadow     ",c28val);
-		ctlposition(c28, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+		ctlposition(c28, ::ObjProp_gad_x, ::ObjProp_gad_y + ui_offset_y, ::ObjProp_gad_w, ::ObjProp_gad_h, ::ObjProp_gad_text_offset);
 
-		ui_offset_y += ObjProp_ui_row_offset;
+		ui_offset_y += ::ObjProp_ui_row_offset;
 
 		c29val = 1;
 		if(action == "edit")
@@ -713,7 +713,7 @@ objpropsOverride_UI: action
 			c29val = receiveShadowSetts;
 		}
 		c29 = ctlcheckbox("Receive Shadow",c29val);
-		ctlposition(c29, ObjProp_gad_x, ObjProp_gad_y + ui_offset_y, ObjProp_gad_w, ObjProp_gad_h, ObjProp_gad_text_offset);
+		ctlposition(c29, ::ObjProp_gad_x, ::ObjProp_gad_y + ui_offset_y, ::ObjProp_gad_w, ::ObjProp_gad_h, ::ObjProp_gad_text_offset);
 		
 		if(reqpost())
 		{
@@ -733,27 +733,27 @@ objpropsOverride_UI: action
 			newNumber = sel;
 			if(action == "new")
 			{
-				pass = currentChosenPass;
-				if(overrideNames[1] != "empty")
+				::pass = ::currentChosenPass;
+				if(::overrideNames[1] != "empty")
 				{
-					newNumber = size(overrideNames) + 1;
+					newNumber = size(::overrideNames) + 1;
 				}
 				else
 				{
 					newNumber = 1;
 				}
-				passOverrideItems[pass][newNumber] = "";
-				for(y = 1; y <= size(passNames); y++)
+				::passOverrideItems[::pass][newNumber] = "";
+				for(y = 1; y <= size(::passNames); y++)
 				{
-					passOverrideItems[y][newNumber] = "";
+					::passOverrideItems[y][newNumber] = "";
 				}
 			}
-			overrideNames[newNumber] = newName + "   (object properties)";
-			overrideSettings[newNumber] = newName + "||" + "type2" + "||" + string(matteObjectSetts) + "||" + string(alphaChannelSetts) + "||" + string(unseenByRaysSetts) + "||" + string(unseenByCameraSetts) + "||" + string(unseenByRadiositySetts) + "||" + string(unseenByFogSetts) + "||" + string(selfShadowSetts) + "||" + string(castShadowSetts) + "||" + string(receiveShadowSetts) + "||" + string(matteColorSettsArray.x) + "||" + string(matteColorSettsArray.y) + "||" + string(matteColorSettsArray.z);
+			::overrideNames[newNumber] = newName + "   (object properties)";
+			::overrideSettings[newNumber] = newName + "||" + "type2" + "||" + string(matteObjectSetts) + "||" + string(alphaChannelSetts) + "||" + string(unseenByRaysSetts) + "||" + string(unseenByCameraSetts) + "||" + string(unseenByRadiositySetts) + "||" + string(unseenByFogSetts) + "||" + string(selfShadowSetts) + "||" + string(castShadowSetts) + "||" + string(receiveShadowSetts) + "||" + string(matteColorSettsArray.x) + "||" + string(matteColorSettsArray.y) + "||" + string(matteColorSettsArray.z);
 		}
 		reqend();
 	} else {
-		error("objpropsOverride_UI: incorrect, or no, action passed");
+		logger("error","objpropsOverride_UI: incorrect, or no, action passed");
 	}
     req_update();
 }
@@ -767,9 +767,9 @@ motOverride_UI: action
 		if(action == "edit")
 		{
 		    sel = getvalue(gad_OverridesListview).asInt();
-			settingsArray = parseOverrideSettings(overrideSettings[sel]);
+			::settingsArray = parseOverrideSettings(::overrideSettings[sel]);
 		}
-		doKeys = 0;
+		::doKeys = 0;
 
 		reqbeginstr = "New .mot Override";
 		if(action == "edit")
@@ -781,14 +781,14 @@ motOverride_UI: action
 		newName = "MotionOverride";
 		if(action == "edit")
 		{
-			newName = settingsArray[1];
+			newName = ::settingsArray[1];
 		}
 		c20 = ctlstring("Override Name:",newName);
 		
 		motFile = "*.mot";
 		if(action == "edit")
 		{
-			motFile = settingsArray[3];
+			motFile = ::settingsArray[3];
 		}
 		c21 = ctlfilename("Load .mot file...", motFile,30,1);
 		if(reqpost())
@@ -800,27 +800,27 @@ motOverride_UI: action
 			newNumber = sel;
 			if(action == "new")
 			{
-				pass = currentChosenPass;
-				if(overrideNames[1] != "empty")
+				::pass = ::currentChosenPass;
+				if(::overrideNames[1] != "empty")
 				{
-					newNumber = size(overrideNames) + 1;
+					newNumber = size(::overrideNames) + 1;
 				}
 				else
 				{
 					newNumber = 1;
 				}
-				passOverrideItems[pass][newNumber] = "";
-				for(y = 1; y <= size(passNames); y++)
+				::passOverrideItems[::pass][newNumber] = "";
+				for(y = 1; y <= size(::passNames); y++)
 				{
-					passOverrideItems[y][newNumber] = "";
+					::passOverrideItems[y][newNumber] = "";
 				}				
 			}
-			overrideNames[newNumber] = newName + "   (.mot file)";
-			overrideSettings[newNumber] = newName + "||" + "type3" + "||" + string(motFile);
+			::overrideNames[newNumber] = newName + "   (.mot file)";
+			::overrideSettings[newNumber] = newName + "||" + "type3" + "||" + string(motFile);
 		}
 		reqend();
 	} else {
-		error("motOverride_UI: incorrect, or no, action passed");
+		logger("error","motOverride_UI: incorrect, or no, action passed");
 	}
     req_update();
 }
@@ -834,9 +834,9 @@ lwoOverride_UI: action
 		if(action == "edit")
 		{
 		    sel = getvalue(gad_OverridesListview).asInt();
-			settingsArray = parseOverrideSettings(overrideSettings[sel]);
+			::settingsArray = parseOverrideSettings(::overrideSettings[sel]);
 		}
-		doKeys = 0;
+		::doKeys = 0;
 
 		reqbeginstr = "New .lwo Override";
 		if(action == "edit")
@@ -848,7 +848,7 @@ lwoOverride_UI: action
 		newName = "AltObjOverride";
 		if(action == "edit")
 		{
-			newName = settingsArray[1];
+			newName = ::settingsArray[1];
 		}
 		c20 = ctlstring("Override Name:",newName);
 
@@ -856,7 +856,7 @@ lwoOverride_UI: action
 		lwoFile = "*.lwo";
 		if(action == "edit")
 		{
-			lwoFile = settingsArray[3];
+			lwoFile = ::settingsArray[3];
 		}
 		c21 = ctlfilename("Load .lwo file...", lwoFile,30,1);
 		if(reqpost())
@@ -868,27 +868,27 @@ lwoOverride_UI: action
 			newNumber = sel;
 			if(action == "new")
 			{
-				pass = currentChosenPass;
-				if(overrideNames[1] != "empty")
+				::pass = ::currentChosenPass;
+				if(::overrideNames[1] != "empty")
 				{
-					newNumber = size(overrideNames) + 1;
+					newNumber = size(::overrideNames) + 1;
 				}
 				else
 				{
 					newNumber = 1;
 				}
-				passOverrideItems[pass][newNumber] = "";
-				for(y = 1; y <= size(passNames); y++)
+				::passOverrideItems[::pass][newNumber] = "";
+				for(y = 1; y <= size(::passNames); y++)
 				{
-					passOverrideItems[y][newNumber] = "";
+					::passOverrideItems[y][newNumber] = "";
 				}
 			}
-			overrideNames[newNumber] = newName + "   (.lwo file)";
-			overrideSettings[newNumber] = newName + "||" + "type4" + "||" + string(lwoFile);
+			::overrideNames[newNumber] = newName + "   (.lwo file)";
+			::overrideSettings[newNumber] = newName + "||" + "type4" + "||" + string(lwoFile);
 		}
 		reqend();
 	} else {
-		error("lwoOverride_UI: incorrect, or no, action passed");
+		logger("error","lwoOverride_UI: incorrect, or no, action passed");
 	}
     req_update();
 }
@@ -902,17 +902,17 @@ lightexclOverride_UI: action
 		if(action == "edit")
 		{
 		    sel = getvalue(gad_OverridesListview).asInt();
-			settingsArray = parseOverrideSettings(overrideSettings[sel]);
+			::settingsArray = parseOverrideSettings(::overrideSettings[sel]);
 		}
-		for(x = 0; x < size(lightNames); x++)
+		for(x = 0; x < size(::lightNames); x++)
 		{
-			xInverse = size(lightNames) - x;
-			lightListArray[x + 1] = lightNames[xInverse];
+			xInverse = size(::lightNames) - x;
+			::lightListArray[x + 1] = ::lightNames[xInverse];
 		}
-		lightListArray[size(lightNames) + 1] = "Radiosity";
-		lightListArray[size(lightNames) + 2] = "Caustics";
+		::lightListArray[size(::lightNames) + 1] = "Radiosity";
+		::lightListArray[size(::lightNames) + 2] = "Caustics";
 		
-		doKeys = 0;
+		::doKeys = 0;
 		
 		reqbeginstr = "New Light Exclusion Override";
 		if(action == "edit")
@@ -924,85 +924,97 @@ lightexclOverride_UI: action
 		newName = "LgtExclusion";
 		if(action == "edit")
 		{
-			newName = settingsArray[1];
+			newName = ::settingsArray[1];
 		}
 		c20 = ctlstring("Override Name",newName,131);
-		ctlposition(c20, LgtExcl_gad_x, LgtExcl_gad_y, LgtExcl_gad_w, LgtExcl_gad_h, LgtExcl_gad_text_offset);
+		ctlposition(c20, ::LgtExcl_gad_x, ::LgtExcl_gad_y, ::LgtExcl_gad_w, ::LgtExcl_gad_h, ::LgtExcl_gad_text_offset);
 
-		ui_offset_y = LgtExcl_ui_offset_y + LgtExcl_ui_row_offset;
+		ui_offset_y = LgtExcl_ui_offset_y + ::LgtExcl_ui_row_offset;
 
-		light21 = ctlpopup("Select Light:", 1, lightListArray);
-		ctlposition(light21, LgtExcl_gad_x, LgtExcl_gad_y + ui_offset_y, LgtExcl_gad_w, LgtExcl_gad_h, LgtExcl_gad_text_offset);
+		::light21 = ctlpopup("Select Light:", 1, ::lightListArray);
+		ctlposition(::light21, ::LgtExcl_gad_x, ::LgtExcl_gad_y + ui_offset_y, ::LgtExcl_gad_w, ::LgtExcl_gad_h, ::LgtExcl_gad_text_offset);
 
-		ui_offset_y += LgtExcl_ui_row_offset;
+		ui_offset_y += ::LgtExcl_ui_row_offset;
 
 		c22 = ctlbutton("Add Light",100,"lightExclusionAddLight");
-		ctlposition(c22, LgtExcl_gad_x, LgtExcl_gad_y + ui_offset_y, LgtExcl_gad_w, LgtExcl_gad_h, LgtExcl_gad_text_offset);
+		ctlposition(c22, ::LgtExcl_gad_x, ::LgtExcl_gad_y + ui_offset_y, ::LgtExcl_gad_w, ::LgtExcl_gad_h, ::LgtExcl_gad_text_offset);
 
-		ui_offset_y += LgtExcl_ui_row_offset;
+		ui_offset_y += ::LgtExcl_ui_row_offset;
 
-		tempLightTransferring = "";			
+		::tempLightTransferring = "";			
 		if (action == "edit")
 		{
-			if(size(settingsArray) >= 3)
+			if(size(::settingsArray) >= 3)
 			{
-				if(settingsArray[3] != nil && settingsArray[3] != "")
+				if(::settingsArray[3] != nil && ::settingsArray[3] != "")
 				{
-					tempLightTransferring = settingsArray[3];
+					::tempLightTransferring = ::settingsArray[3];
 				}
 			}
 		}
 		
-		light23 = ctlstring("Excluded Lights:",tempLightTransferring,200);
-		ctlposition(light23, LgtExcl_gad_x, LgtExcl_gad_y + ui_offset_y, LgtExcl_gad_w, LgtExcl_gad_h, LgtExcl_gad_text_offset);
+		::light23 = ctlstring("Excluded Lights:",::tempLightTransferring,200);
+		ctlposition(::light23, ::LgtExcl_gad_x, ::LgtExcl_gad_y + ui_offset_y, ::LgtExcl_gad_w, ::LgtExcl_gad_h, ::LgtExcl_gad_text_offset);
 		
 		if(reqpost())
 		{
 			newName = getvalue(c20);
 			newName = makeStringGood(newName);
-			excludedLightsSetts = getvalue(light23);
+			excludedLightsSetts = getvalue(::light23);
 
 			newNumber = sel;
 			if(action == "new")
 			{
-				pass = currentChosenPass;
-				if(overrideNames[1] != "empty")
+				::pass = ::currentChosenPass;
+				if(::overrideNames[1] != "empty")
 				{
-					newNumber = size(overrideNames) + 1;
+					newNumber = size(::overrideNames) + 1;
 				}
 				else
 				{
 					newNumber = 1;
 				}
-				passOverrideItems[pass][newNumber] = "";
-				for(y = 1; y <= size(passNames); y++)
+				::passOverrideItems[::pass][newNumber] = "";
+				for(y = 1; y <= size(::passNames); y++)
 				{
-					passOverrideItems[y][newNumber] = "";
+					::passOverrideItems[y][newNumber] = "";
 				}
 			}
-			overrideNames[newNumber] = newName + "   (light exclusion)";
-			overrideSettings[newNumber] = newName + "||" + "type7" + "||" + string(excludedLightsSetts);
+			::overrideNames[newNumber] = newName + "   (light exclusion)";
+			::overrideSettings[newNumber] = newName + "||" + "type7" + "||" + string(excludedLightsSetts);
 		}
 		reqend();
 	} else {
-		error("lightexclOverride_UI: incorrect, or no, action passed");
+		logger("error","lightexclOverride_UI: incorrect, or no, action passed");
 	}
     req_update();
 }
 
-scnmasterOverride_UI: rendererindex, action
+scnmasterOverride_UI: renderer, action
 {
-	switch(rendererindex)
+	renderer_called = 0;
+	if(renderer == 3)
 	{
-		case 1:
-			scnmasterOverride_UI_native(action);
-			break;
-		case 2:
-			scnmasterOverride_UI_kray25(action);
-			break;
-		default:
-			scnmasterOverride_UI_native(action);
-			break;
+@if enableArnold043
+		scnmasterOverride_UI_arnold043(action);
+@else
+		logger("info","Sorry - this is not available in this build.");
+@end
+		renderer_called = 1;
+	}
+	if(renderer == 2)
+	{
+@if enableKray
+		scnmasterOverride_UI_kray25(action);
+@else
+		logger("info","Sorry - this is not available in this build.");
+@end
+		renderer_called = 1;
+	}
+	if(renderer_called == 0)
+	{
+		scnmasterOverride_UI_native(action);
+		renderer_called = 1;
 	}
     req_update();
 }

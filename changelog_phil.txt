@@ -1,24 +1,292 @@
-20131029 (No changes in overrides - just bug fixes for 1.0.8)
+20131031 (LWtoA update. Native functionality build went to public beta Nov-2.)
 ========
 
-- Typo fix for radiosity setting change in 1.0.7 that escaped QA.
+- LWtoA support upgraded to 0.4.3.
+ - 0.4.1 removed.
 
-20131018 (No changes in overrides - just bug fixes for 1.0.7)
+20131029 (Kray base R&D to complete featureset.)
 ========
 
-- Fixed radiosity setting related scene generation failure (p0041). Thanks very much to David Blemur for the extremely useful bug report.
- - Backported from dev code to 1.0.7.
+- LWtoA needed some special quirking : unless we perform a useless copy to/from ::tempArray at each step of building the settings array, it gets thumped by the last action on it. LScript oddness.
+- Interesting quirk that had unexpected ramifications. parse() handles sequential separators as a single separator. I previously through this was only for spaces, but we got odd errors with the previously ~stable Kray code. Triage highlighted that storing blanks (i.e. |||| results in that field going MIA when parse() looks at it).
+ - We need mitigating code to handle deliberately blank fields (e.g. "" or nil) otherwise our settings array goes out of whack. It's a little ugly.
+  - We store "__PPRN__BLANK__ENTRY__" for blank entries and then map between that and "" for the scene generation and UI code.
+ - Possible to have other areas where we will die with this. Needs more digging.
+- Radiosity setting bugfix (p0043).
+ - Backported to 1.0.8.
+- Implemented the following in Kray.
+ - Cam object
+ - DOF object
+ - Cam UV
+- Implemented helpers to extract VMaps and items by type in the utility library.
+ - Will use this to refine the physical sky light plugin handlingq
+ - Can also utilize for the camera lists in the scene overrides, for the active camera.
 
-20131010 (No changes in overrides - just bug fixes for 1.0.6)
+20131024 (QA, bug fixes, general enhancements)
 ========
 
-- Critical fix for scene loadng (p0040) backported from dev code. Oddly, no-one reported it. :/
+- Bumped RPE version to 1.1 following recent changes.
+ - We do try to map 1.0 files, but there may be issues.
+- Kray PS lighting needed revisiting.
+ - Caused a failure if no light in pass. Now fixed.
+ - Didn't seem to handle the case where no lights are to be ignored.
+  - First attempt at a fix. Looks sound.
+- Arnold QA exposed issues in the path manipulation for a path of "". Fixed by adding guarding to the various functions for re-slashing paths in the utility library.
+- Now extract Kray plugin script location from config files to write script location.
+- Build option to disable inclusion of images in Kray headers since we're adapting their code. Leaving the images in place is potentially misleading.
+- Restored call to stripPassEditor() at the end of scene generation. This was lost at some point in the distant past.
+- Added generic logging/message box function. Simplifies debug, etc.
+ - Migrated all info(), error() and warn() callers. Dropped a bunch of disabled/useless such calls as well.
+- Scene Master overrides other than native were not assignable. (p0042)
+ - Turns out to be a slightly different issue than reported. Timing quirk. Revised req_update calls in overrides listbox callback to see if they can mitigate the problem.
+- Reviewed these systems to check if they generate artifacts or crash for missing dependencies. No issues seen :
+ - Pixie dust
+ - Instancer
+ - HDInstance
 
-20130507 (No changes in overrides - just bug fixes for 1.0.5)
+20131022 (QA, docs.)
 ========
 
+- Moved HV3 handling into a dedicated function, based on the FiberFX work.
+ - Will drop settings for items not in the pass.
+- Added a volumetric plugin line retrieval helper.
+- Tweaked fixPathForWin32() to use quotation helpers.
+- Comring work.
+ - Was pretty broken before for loading; should be better now. No-one complained, so not backporting to stable.
+- Added preference option to toggle error for dependency checking. Set to on by default.
+- Relativity dependency handling overhauled to be more capable and QA passed.
+- Fixed major issue in getPartialLine() code.
+- Docs update.
+
+20131017
+========
+
+- Fixed p0041. Thanks very much to David Blemur for the extremely useful bug report.
+ - Backported to 1.0.7.
+
+20131016 (QA ongoing)
+========
+
+- Completed light hook-up for Kray physical sky
+- FiberFX QA complete. Phew.
+
+20131015 (QA ongoing)
+========
+
+- Reworking aspects of the scene generation code to make it more robust. Probably need to rethink the whole approach at some point to make it more robust (related to a difficult to resolve bug in scene generation where the input line from the source LWS wasn't being retrieved correctly and was breaking the output scene).
+- Misc bug fixes and optimizations of varying impact.
+- FFx QA:
+ - New handling of items in pass required change in call path to the handler function. It is now called no-matter-what.
+ - FFx handler updated since FFx bumped to version 4. We can't support v3 for per-item adjustment and version 4 is what comes with 11.6; running prior scenes through PPRN under 11.6 still won't enable per-item handling unless the scenes are re-saved to get the per-item IDs.
+ - Also handle cases where FiberFilter is not the first pixel filter.
+ - Utilize new pixel filter line locator in utility to find the FFx line. We don't anticipate or handle multiple instances in the scene file.
+ - Significant optimizations and robustness checks.
+- Bug fix to writeHeader() following variable system rework.
+- Dependency checking QA related bug fixes.
+
+20131010 (QA start-up; QuickLWF Kray plugin added - rest will be added ASAP)
+========
+
+- Introduce settingIndex handling for the Kray plugin codepath when moving from each plugin retrieval function.
+- Tweak to Kray plugin scene generation approach - more efficient.
+- Kray tonemap plugin initial code added.
+- Issue with scene reload fixed. (p0040)
+ - QA suite extended to test number of passes > overrides in case of regression in future. Cause was pass index being used to iterate override array. If you had more passes than overrides, you'd overflow the array and get an error. Oops.
+ - Backported fix to 1.0.6 (no-one reported this, though!)
+- Experimental fix for pass store/retrieval during scene generation.
+- Light matching function added to Kray physical sky for the ignore feature. (start on addressing p0038)
+ - Not fully wired up yet. Based on camera indexing code used elsewhere.
+- Bug fixing from labelled variable work now that #2716 is available for QA.
+- Aligned function naming in Kray PS to address inconsistency.
+- Initial code for the QuickLWF Kray plugin.
+- Dependency checking for Relativity
+ - Enhanced code for Relativity keyword searching with a more efficient and readable sequence.
+  - Brought improved handling of clone references in the Relativity parsing.
+- Utilized doubleSlashPath to simplify the escaped filter path creation.
+- Eliminated 'CG' from path construction : user feedback indicated it was not desired.
+
+20131006 (experimental dependency checking code: still writing - not enabled in any build)
+========
+
+- Adding post-scene generation dependency check to warn user of broken references in current pass. We can't do this earlier, sadly, due to the absence of any meaningful way to query Layout for scene dependencies.
+ - We don't resolve the situation - there's no one-size-fits-all option here : nulls can still have a render contribution (e.g. HV blobs) or may lead to crashes. We also don't error this situation, just notify. Not all broken dependencies may be fatal or undesirable. This also limits impact of false positives until we gain confidence that the detection is sound.
+- Tweaked some function names for consistency.
+
+20131005 (Arnold support, Kray support, global variable referencing re-work, FFx enhancement : lots of churn, expect bugs. No override setting change.)
+========
+
+- LW 11.6 compound node in scene file - not yet checked, but code review indicates that all should be well.
+- Extended FFx section to drop FFx blocks for unmatched IDs in pass. Requires LW #2715 or later. (Closes p0039)
+- Reorganising some functions to drop fixed references to global variables given the new :: keyword guaranteeing availability.
+- Shifted all UI ctl and variable references to label by implementation (e.g. prefix kray25_ to the Kray references). Avoids any collisions.
+ - Main Kray migrated.
+ - Physical sky migrated.
+ - Arnold migrated.
+ ! Compile tested; expecting bugs.
+- PPRN is now dependent on LW build 2716 or later due to the use of the '::' global variable prefix. This resolves some quirks in variable handling that were exposed by the Kray implementation (p0037).
+ - Resolves the Kray plugins issues and will enable these to be fully implemented once the variable naming migration has been completed. This is a long job, though, and not easily automated.
+ - Build 2715 also fixed a bug requiring some workarounds for the helper functions before now (these have been removed in this build of PPRN).
+ - Significant code churn from this change due to the potential for leaving unprefixed variables. Will need careful testing.
+  - Will need to adjust arguments passed to all functions to drop global var references since we're now really global :)
+ - Build check updated to prevent operation below #2716 for this feature.
+ - Trawl of variables enabled some to be removed that were no longer being utilised.
+
+20131001 (Arnold support)
+========
+
+- Utilized helper functions for string handling in Arnold code.
+
+20130925 (Arnold support, Kray_PS UI fix)
+========
+
+- Working on helper functions to apply/remove quotes on strings and to convert to/from escaped backslashes.
+- Huge thanks to James Willmott for the nudge regarding mouse callbacks - the Kray physical sky panel is now tracking mouse events properly.
+- Misc bug fixes from initial QA runs.
+- GUI now completed.
+ - Some linger quirks that are being dealt with - double slashes and quotation are required for the scene file, but not for the override definition. However, the UI requires double slashes (it seems) to avoid issues for backslashes, etc.
+- Added better handling in scene generation codepath for cases where the build doesn't support the scene master-override defined renderer choice.
+- Preprocessor limitations required a change in approach for the renderer[] set-up. Adjusted the guidance.
+ - We now show all options in the drop-down, even if the renderer support is not included in the build. We indicate it is not available by adjusting the text (see the globals include) and we also show a message box if the user chooses any disabled renderer as well (see scnmasterOverride_UI()). It's not as graceful as I'd have liked, but it will have to do.
+- Fundamental plumbing completed.
+ - Bodging the volumetric section right now... Not sure how to handle since it's nodal...
+  - Write the standard section if no Arnold renderer section in source file. Otherwise, we just copy it from the source file for now.
+
+20130918 (Arnold support)
+========
+
+- Tweaked scnmasterOverride_UI() codepath to work reliably within the extended renderer implementations.
+- Culled alpha strings. This may take a while.
+- Arnold support started. The Kray plugin work is stalled until LW3DG provide guidance.
+ - Based on Kray 2.5 code which has been well-tested.
+ - Imported variables into global Arnold list.
+
+20130909 alpha 9 (Initial work on Kray plugin support; Kray overrides massively changed)
+================
+
+> Work to understand/mitigate settings array issues.
+ - Fixed unencapsulated debug related Physical Sky info() statement; can now disable Physical Sky and get a clean build with core Kray functionality only.
+ - Also made the Kray plugin system truly modular and further wrapped everything up in a sanity Kray check to ensure you need Kray to get plugins and plugins to get physical sky, etc.
+
+20130905 alpha 8 (Initial work on Kray plugin support; Kray overrides massively changed)
+================
+
+- Kray physical sky continues and, except for some niggles, is close to completion.
+ > Getting some vanishing array issues that require mitigation (p0038).
+ - Resolved issues with setting retrieval, etc. Sun and Sky checkboxes are now functional in connection with this fix.
+ - Still having callback issues w/ crosshair drawing. Will address other problems and come back to this.
+  - Reverted workarounds to try and expose the issue in the meantime.
+ - Reworked storage method to directly load array rather than using indirect methods.
+ > Light ignore is not remembered due to ID expectation...not sure how to handle. Might need something like the active camera handling to deal with this (p0037).
+ - Improved comments in main Kray support code to better explain what's happening wrt plugins.
+ - Renamed default setting variables to clearly break from working variables. Should help to trap some suspected bugs.
+ - Changed scene gen code to populate variables from array.
+  - Initial pass, untested right now.
+ - UI overflow fixed.
+
+20130826 alpha 7 (Initial work on Kray plugin support; Kray overrides massively changed)
+================
+
+- Kray implementation now strips 3rd party renderer entry if it exists for a renderer other than Kray when the scene is generated for rendering.
+- Fixed positioning of redirect buffer export checkbox in Kray panel.
+- Finally got Physical Sky dialog to come up.
+ - Some lingering issues with checkboxes.
+  - skyON and sunON controls are currently disabled.
+ - Some controls overlap.
+ - Crosshair callback not working as expected....get drawerase related error.
+- Reworking the Kray plugins approach to try and maintain plugin-specific array blocks that are then appended to the main Kray settings block. We will no longer have dynamic setting presence for Kray plugins as a result.
+- Numerous bug fixes to a6 code.
+
+20130821 alpha 6 (Initial work on Kray plugin support; Kray overrides should be fine despite this)
+================
+
+- Starting to consider how to handle Kray plugins (e.g. physical sky)
+ - Can handle dynamic settings blocks within main override for Kray for Kray plugin configuration variations.
+  - Use a header to mark blocks for plugins. No terminating marker in the current approach, but parameters are static.
+   - Definition by type flag concatenated with text to reduce collision risk.
+  - Once a plugin has been activated in a Kray SMO, no mechanism to remove those settings - can disable, but not delete (via the UI).
+ - Main Kray code extended to handle arbitrary extended settings array for plugin settings via scnGen_kray25_appendPlugins(). Settings are appended to the main Kray settings block, untouched.
+ - Each plugin is a separate master plugin, so we can use our existing Kray 2.5 master code for handling these.
+ - Starting with the big one : physical sky. This is a good target for initial implementation.
+  - UI code wired up
+  - Override infrastructure in place.
+  - UI hookup needed. Can retrieve from original Kray panel code.
+  - Call from main to plugin saver code is implemented.
+  - Hooked into the build via Kray master file.
+  - find_image() replaced with approach used elsewhere in PPRN to locate images.
+ - These plugins will be tied to the specific Kray override against which they are applied.
+- Minor code cleanups (removed a couple of debug info() calls and some commented-out code)
+- Pass the settings array and associated items for the pass to render engine functions now.
+
+Alpha 5 has ~mature Kray support. Plugins are next.
+
+20130508 alpha 5 (No changes in existing features; working on the Kray 2.5 support for version 1.5)
+================
+
+- Added a warning system when Layout is being used in Discovery Mode. Since scene savers are disabled in that configuration, PassPort operation is heavily compromised. The implementation is a warning (for now) and only shows up once in the session.
 - Thanks to a bug report from 3dworks (Markus), an issue with the SavePassAsScene() function was fixed.
- - Due to aggressive garbage collection in LScript, the reference to the UI control value was invalidated before we retrieved the value. This was avoided by grabbing the value before doing anything else in reqpost{}.
+ - Due to aggressive garbage collection in LScript, the reference to the UI control value was invalidated before we retrieved the value. This was avoided by grabbing the value before doing anything else in reqpost{}. This has also been backported to 1.0.5.
+
+20130425 alpha 4 (No changes in existing features; working on the Kray 2.5 support for version 1.5)
+================
+
+- Set 'send to LightWave' to on by default in Kray presets. That should ensure that images are output. Follow Kray's lead on the save handling otherwise.
+- Minor clean-up of redundant code.
+ - Will need to remove code that has been disabled for QA of the new getRendererPluginLine() function. Left in in case there's a need to revert. Next build will remove the disabled code.
+- Implemented use of the new getRendererPluginLine() function to simplify renderer handling in Kray and the native system (also used in the stripping function).
+> Pondering light type and shadow type overrides.
+> Should Kray mismatch yield a warning or an error? Right now, we trap this with an error to avoid problems.
+
+20130423 alpha 3 (No changes in existing features; working on the Kray 2.5 support for version 1.5)
+================
+
+- 3rd party renderer stripping code was not functional.
+ - Typo in the stripping function for 3rd party renderer.
+ - Partial line search string was not complete, so failed.
+ - Added a utility function to extract the line for a given master plugin. Simplifies handling.
+ - Fix to address zero-length scene creation.
+- Kray scene code tweaked slightly to avoid clobbering of the reference scene file in later functions.
+
+20130408 alpha 2 (No changes in existing features; working on the Kray 2.5 support for version 1.5)
+================
+
+- Tweaked color variable handling in Kray UI to address bug. Odd one, this. The array handling in LScript is a little peculiar in LScript.
+- Bug fix for missed important variable.
+- Misc scene generation bug fixes.
+- Buffer re-direction implemented.
+- Bug fix for version retrieval.
+- Enable Kray when it hasn't been applied before.
+ - Major adjustments to the code pipeline were needed.
+- Kray implementation deliberately fails if no camera is assigned to the pass.
+- Bugs fixed in camera name retrieval code in Kray code.
+- Tweaked code in Kray to refine behavior where Kray has not been applied outside PPRN.
+- Enabled Kray rendering call in the render frame/scene function.
+- Editing Kray override throws an error - array is overflowed.
+ - Bug in color handling.
+ - Also found a missed iteration of the index for look-up.
+- Now handle render engine toggle:
+ - Generic external renderer strip function added.
+ - Kray renderer addition function added. Uses the external renderer strip in case there's a different 3rd party renderer configured.
+  - Kray renderer chunk appended to scene file.
+
+20130401 alpha 1 (No changes in existing features; working on the Kray 2.5 support for version 1.5)
+================
+
+Kray 2.5 work:
+ - Fixed issue with 'edit override' following new renderer support.
+ - Initial hook up of settingsArray code.
+ - Re-implemented scene modification code; original approach wasn't ideal.
+ - Re-matching Kray default layout, etc. and will then drop features/adjust as needed.
+ - Tweaked Kray detection code to be more robust.
+ - Misc fixes to code.
+ - Fixed UI layout.
+ - Split Kray 2.5 code up, just to keep source files manageable. The monolithic approach was yielding a 160 KB code file, which was unusable.
+ - Imported script code and migrated implementation to use it. Kray uses the script chunk; we write both so that generated pass scene files can be utilised.
+  - Tweaked internals to resolve a startup issue if Kray support disabled with partial support implemented as in this build.
+ - Active camera code for UI lifted from native and hooked into the Kray system.
+ - Initial UI code imported.
+  - Have to rename functions and variables to avoid collisions.
+  - Trimmed unsupported features (in terms of PPRN) - first pass.
+ - Started code work on the Kray 2.5 support.
 
 20130222 (No changes in overrides - just bug fixes for 1.0.4)
 ========
@@ -574,7 +842,8 @@ Brace yourself. Here's the big set of UI changes related to filtering the overri
 + In Progress +
 +++++++++++++++
 
-- Prototype w/ Kray support.
+- Prototype w/ Arnold support.
+- Kray plugin support.
 
 ********
 * Bugs *
@@ -614,8 +883,14 @@ p0031 : object replacement override broken in beta 6. Issue was in MotionMixer c
 p0032 : missed code meant that pass renaming wasn't working. (Fixed, beta8 respin)
 p0033 : code regression in override listbox handling. (Fixed, beta8 respin)
 p0034 : LScript bug needed working around. (Fixed, beta8 respin)
+p0036 : Transient error switching back from Kray-rendered pass to a native-rendered pass when rendering a frame or sequence. Bad size(), line 251. (Assumed resolved w/ 20131002 build for LW 2716+ due to variable system handling.)
+p0037 : Physical sky settings array goes MIA due to LScript GC? (Fixed w/ 20131002 build for LW 2716+)
+p0038 : Light drop-down in Physical sky needs special handling similar to active camera. (addressing, 20131009+)
+p0039 : FFx handling not ideal - need to trim settings for unmatched items in pass. (Fixed w/ 20131016 build)
 p0040 : Scene reload error w/ overrideNames. (Fixed, 20131010 - triggered by multiple passes due to incorrect index being used w/ overrideNames array where number of passes > overrides)
 p0041 : Radiosity preparation lines code was flawed and could put PPRN into an infinite loop. Code fix was to entirely re-write this code. (20131017)
+p0042 : Non-native scene master overrides don't show the scene master item in the RHS listbox. (Fixed w/ 20131024 - timing quirk with req_update() calls that seem to race somehow)
+p0043 : Passes rendering with radiosity. (Fixed 20131029, backported to 1.0.8)
 
 ###############
 # Limitations #
@@ -631,6 +906,7 @@ p0041 : Radiosity preparation lines code was flawed and could put PPRN into an i
 - 3rd party lights/cameras end of block detection.
 - Overriding multiple surfaces on an object. Doable?
 - Save/load override configuration files.
+- Light type override would make sense?
 
 -------------
 - Reference -
@@ -671,4 +947,34 @@ In the original code, prior to the filtered item list for overrides, the code wo
 3) overrideslb_event:
 
 	This uses o_parseListItems to retrieve the indices of the selected items from the array.
-	
+
+C. How are additional renderers handled?
+----------------------------------------
+
+Note that PPRN 1.6 has seen some changes in this area, responding to bug fixes for array/variable handling at a global level. This has also changed the way that some functions are to be called (reducing the arguments).
+
+The original code was only ever written to drive settings for the native renderer. During the rework for PPRN 1.0, the native renderer code was pushed into separate functions and this allowed the support of additional renderers to be enabled. This is achieved by :
+
+ - Preprocessor wrapping of the include statements and function calls to the additional renderer (e.g. enableKray for Kray 2.5 support). This allows, at compile time, the alternative renderer support to be omitted without any errors being reported.
+ - The passEditor_globals.ls file has a renderers array variable. The array is used to populate the drop-down menu for the scene master override with human readable labels for render engine choice. It is assumed that the native renderer is the first element in the array. Note that the renderer support is via an index value that is linked to the array position, so you should not re-order the array without reason and due care.
+ - Renderer support is modularized by preprocessor. To avoid errors, you must handle the case where the user choices from the renderer drop-down menu and you have not compiled in support for that renderer (i.e. like the current code, show a not implemented message and/or manipulate the text label being shown for the renderer choice). This is unavoidable right now, even though it's irritating for the end-user.
+ - In the passEditor_sceneGen_Subfuncs.ls code, where the generation codepath starts for the scene file construction, the index of the external renderer in the renderers array is queried. This is currently hard-coded so we expect the native renderer at index 1, Kray 2.5 at index 2, etc (1-based array index in LScript). This could be refined in a future revision. The fall-through case is the native renderer.
+ - The external renderer support is up to the developer to handle.
+ - Buffer manipulation, MotionMixer and FiberFX modifications happen after the renderer configuration functions, as part of the scene generation code. No effort is needed for these when implementing additional render engine support. Buffer manipulation implementation should be exposed on the UI as a toggle control - see the native renderer scene master override for an example. Without this control, or a hard-coded value for the setting, the modification will not be done.
+ - Active camera handling is left to the developer of the additional render engine support. Kray, for example, does its own thing about active cameras so that we cannot utilise the code from the native renderer support.
+ - Registering the alternative renderer in the scene file and managing any existing renderer statements (e.g. activating Arnold when Kray is already defined) is likewise left to the developer. Due to the lack of 3rd party renderer examples, it's not clear whether a generic function could be made available. We do, though, provide a utility to strip instances of external renderers from the scene file because the user may want to use an alternative renderer. It does need to be called by the developer in their code, assuming that they want to use it.
+ - Master plugin query for renderer is available in order to determine if the chosen renderer has a settings block in the scene. See getMasterPluginLine() in the parsing functions source file.
+ - External renderer query function is also available, to enable handling of that as well.
+
+C.1 How are renderer plugins (e.g. Kray plugins) handled?
+---------------------------------------------------------
+
+Physical Sky support is currently under development. The approach taken is to store/retrieve the settings from the main settingsArray for the scene override into a dedicated array. This makes referencing easier in case the main array is restructed.
+The main renderer support code must call to the plugin support in order that the split-out array(s) are instantiated and populated with default values (if a new override) or values are retrieved from the main settingsArray into that split-out array.
+Dynamic status is not supported in shipping code due to complexity of tracking, although it would conceptually be possible to enable this because of the use of marker entities (see later in this section).
+To find the settings in the main settingsArray, a marker is used. In the split-out array, this is maintained in index 0 and never changed. There is no corresponding end marker.
+The split-out array is updated when the plugins panel is closed.
+The split-out array for each plugin is appended to the main settingsArray when the scene override panel is closed.
+Various helper functions exist for this and at this time each plugin has its own. A generic set will be established and utilized before the 1.5 cycle is completed.
+
+The LWtoA support is slightly different because LWtoA writes its settings into the ExternalRenderer section, without any master plugins.

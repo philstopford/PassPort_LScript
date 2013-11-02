@@ -1,5 +1,7 @@
-generatePassFile: mode, pass
+generatePassFile: mode, gPass
 {
+    tempPass = ::pass;
+    ::pass = gPass;
     if (mode == "frame")
     {
         outputStr = "testFrame_";
@@ -9,80 +11,80 @@ generatePassFile: mode, pass
         outputStr = "seq_";
     }
 
-    noOfStages = 4; // drives progress value - currently parse, object, light and render stages.
+    ::noOfStages = 4; // drives progress value - currently parse, object, light and render stages.
 
     // initial stuff
-    overriddenObjectID = nil;
-    overriddenObjectName = nil;
-    lastObject = 0;
-    lastLight = 0;
-    lastCamera = 0;
+    ::overriddenObjectID = nil;
+    ::overriddenObjectName = nil;
+    ::lastObject = 0;
+    ::lastLight = 0;
+    ::lastCamera = 0;
     lightSettingOffset = 0;
     contentDirectory = getdir("Content");
-    chdir(tempDirectory);
+    chdir(::tempDirectory);
     SaveSceneCopy("passEditorTempSceneCopy.lws");
-    currentScenePath = tempDirectory + getsep() + "passEditorTempSceneCopy.lws";
+    ::currentScenePath = ::tempDirectory + getsep() + "passEditorTempSceneCopy.lws";
 
      // Insert missing radiosity lines in the file passed in.
-    radLines_native(currentScenePath);
+    radLines_native(::currentScenePath);
 
     chdir(contentDirectory);
 
-    // get the item start and stop lines for copying
-    setItems = parseListItems(passAssItems[pass]);
-	
-    for(passItem = 1; passItem <= size(setItems); passItem++)
+    // get the item start and stop lines for copying. We also use the setItems array later for dep checking.
+    setItems = parseListItems(::passAssItems[::pass]);
+    
+    for(::passItem = 1; ::passItem <= size(setItems); ::passItem++)
     {
-        progressString = string((passItem / size(setItems)) / noOfStages);
+        progressString = string((::passItem / size(setItems)) / ::noOfStages);
         msgString = "{" + progressString + "}Generating Render Scene:  Cataloging Items and Overrides...";
         StatusMsg(msgString);
         sleep(1);
 
         // first the object lines
-        tempNumber = setItems[passItem];
-        tempObjectNames[passItem] = displayNames[tempNumber];
-        assignmentsArray = checkForOverrideAssignments(displayIDs[tempNumber], pass);        
+        tempNumber = setItems[::passItem];
+        tempObjectNames[::passItem] = ::displayNames[tempNumber];
+        assignmentsArray = checkForOverrideAssignments(::displayIDs[tempNumber], ::pass);
     
         if(assignmentsArray != nil)
         {
             // Set up the values. Overrides will then adjust their own values of interest.
-            overrideType[passItem] = nil;
-            motInputTemp[passItem] = nil;
-            lwoInputTemp[passItem] = nil;
-            srfLWOInputID[passItem] = nil;
-            srfInputTemp[passItem] = nil;
-            objPropOverrideSets[passItem] = nil;
-            objPropOverrideShadowOpts[passItem] = nil;
-            lightSettingsPartOne[passItem] = nil;
-            lightSettingsPartTwo[passItem] = nil;
-            lightSettingsPartThree[passItem] = nil;
-            cameraSettingsPartOne[passItem] = nil;
-            cameraSettingsPartTwo[passItem] = nil;
-            cameraSettingsPartThree[passItem]= nil;
+            ::overrideType[::passItem] = nil;
+            ::motInputTemp[::passItem] = nil;
+            ::lwoInputTemp[::passItem] = nil;
+            ::srfLWOInputID[::passItem] = nil;
+            ::srfInputTemp[::passItem] = nil;
+            ::objPropOverrideSets[::passItem] = nil;
+            ::objPropOverrideShadowOpts[::passItem] = nil;
+            ::lightSettingsPartOne[::passItem] = nil;
+            ::lightSettingsPartTwo[::passItem] = nil;
+            ::lightSettingsPartThree[::passItem] = nil;
+            ::cameraSettingsPartOne[::passItem] = nil;
+            ::cameraSettingsPartTwo[::passItem] = nil;
+            ::cameraSettingsPartThree[::passItem]= nil;
 
-            doOverride[passItem] = 1;
+            ::doOverride[::passItem] = 1;
             a = assignmentsArray[1];
-            settingsArray = parse("||", overrideSettings[a]);
+            ::settingsArray = parse("||", ::overrideSettings[a]);
             if( size(assignmentsArray) > 1)
             {
                 b = assignmentsArray[2];
-                secondSettingsArray = parse("||",overrideSettings[b]);
+                secondSettingsArray = parse("||",::overrideSettings[b]);
             }
 
-			// Scene Master override is incompatible with an assignment array, so empty it in this case :			
-			if(settingsArray[2] == "type6")
-			{
-				assignmentsArray = nil;
-				doOverride[passItem] = 0;
-				overrideType[passItem] = 0;
-			}
-			
-            if(settingsArray[2] == "type5")
+            // Scene Master override is incompatible with an assignment array, so empty it in this case :           
+            if(::settingsArray[2] == "type6")
             {
-                overrideType[passItem] = 5;
-                lightColorLine = "LightColor " + string(number(settingsArray[3]) / 255) + " " + string(number(settingsArray[4]) / 255) + " " + string(number(settingsArray[5]) / 255) + "\n";
-                lightIntensityLine = "LightIntensity " + settingsArray[6] + "\n";
-                if(settingsArray[7] == "0")
+                assignmentsArray = nil;
+                ::doOverride[::passItem] = 0;
+                ::overrideType[::passItem] = 0;
+            }
+            
+            if(::settingsArray[2] == "type5")
+            {
+                ::overrideType[::passItem] = 5;
+                lightColorLine = "LightColor " + string(number(::settingsArray[3]) / 255) + " " + string(number(::settingsArray[4]) / 255) + " " + string(number(::settingsArray[5]) / 255) + "\n";
+                lightIntensityLine = "LightIntensity " + ::settingsArray[6] + "\n";
+                if(::settingsArray[7] == "0")
                 {
                     affectDiffuseLine = "AffectDiffuse 0\n";
                     lightSettingOffset++;
@@ -91,7 +93,7 @@ generatePassFile: mode, pass
                 {
                     affectDiffuseLine = "";
                 }
-                if(settingsArray[8] == "0")
+                if(::settingsArray[8] == "0")
                 {
                     affectSpecularLine = "AffectSpecular 0\n";
                     lightSettingOffset++;
@@ -100,7 +102,7 @@ generatePassFile: mode, pass
                 {
                     affectSpecularLine = "";
                 }
-                if(settingsArray[9] == "0")
+                if(::settingsArray[9] == "0")
                 {
                     affectCausticsLine = "AffectCaustics 0\n";
                 }
@@ -108,7 +110,7 @@ generatePassFile: mode, pass
                 {
                     affectCausticsLine = "AffectCaustics 1\n";
                 }
-                if(settingsArray[10] == "0") // deliberately omit carriage returns.
+                if(::settingsArray[10] == "0") // deliberately omit carriage returns.
                 {
                     LensFlareLine = "LensFlare 0";
                 }
@@ -116,7 +118,7 @@ generatePassFile: mode, pass
                 {
                     LensFlareLine = "LensFlare 1";
                 }
-                if(settingsArray[11] == "0") // deliberately omit carriage returns.
+                if(::settingsArray[11] == "0") // deliberately omit carriage returns.
                 {
                     VolumetricsLine = "VolumetricLighting 0";
                 }
@@ -125,45 +127,45 @@ generatePassFile: mode, pass
                     VolumetricsLine = "VolumetricLighting 1";
                 }
                 
-                lightSettingsPartOne[passItem] = lightColorLine + lightIntensityLine + affectDiffuseLine + affectSpecularLine + affectCausticsLine;
-                lightSettingsPartTwo[passItem] = LensFlareLine;
-                lightSettingsPartThree[passItem] = VolumetricsLine;
+                ::lightSettingsPartOne[::passItem] = lightColorLine + lightIntensityLine + affectDiffuseLine + affectSpecularLine + affectCausticsLine;
+                ::lightSettingsPartTwo[::passItem] = LensFlareLine;
+                ::lightSettingsPartThree[::passItem] = VolumetricsLine;
             
             }
 
-            if(settingsArray[2] == "type1")
+            if(::settingsArray[2] == "type1")
             {
-                overrideType[passItem] = 1;
-                srfLWOInputID[passItem] = displayIDs[tempNumber];
-                srfInputTemp[passItem] = settingsArray[3];
+                ::overrideType[::passItem] = 1;
+                ::srfLWOInputID[::passItem] = ::displayIDs[tempNumber];
+                ::srfInputTemp[::passItem] = ::settingsArray[3];
             }   
 
-            if(settingsArray[2] == "type4")
+            if(::settingsArray[2] == "type4")
             {
-                overrideType[passItem] = 4;
-                lwoInputTemp[passItem] = settingsArray[3];
+                ::overrideType[::passItem] = 4;
+                ::lwoInputTemp[::passItem] = ::settingsArray[3];
             }   
 
-            if(settingsArray[2] == "type3")
+            if(::settingsArray[2] == "type3")
             {
-                overrideType[passItem] = 3;
-                motInputTemp[passItem] = settingsArray[3];
+                ::overrideType[::passItem] = 3;
+                ::motInputTemp[::passItem] = ::settingsArray[3];
             }
 
-            if(settingsArray[2] == "type2")
+            if(::settingsArray[2] == "type2")
             {
-                overrideType[passItem] = 2;
-                if(settingsArray[3] == "1")
+                ::overrideType[::passItem] = 2;
+                if(::settingsArray[3] == "1")
                 {
                     //matteObjectLine = "MatteObject 1\nMatteColor 0 0 0\n";
-                    matteObjectLine = "MatteObject 1\nMatteColor " + string(number(settingsArray[12]) / 255) + " " + string(number(settingsArray[13]) / 255) + " " + string(number(settingsArray[14]) / 255) + "\n";
+                    matteObjectLine = "MatteObject 1\nMatteColor " + string(number(::settingsArray[12]) / 255) + " " + string(number(::settingsArray[13]) / 255) + " " + string(number(::settingsArray[14]) / 255) + "\n";
                 }
                 else
                 {
                     matteObjectLine = "";
                 }
 
-                switch(integer(settingsArray[4]))
+                switch(integer(::settingsArray[4]))
                 {
                     case 1:
                         alphaLine = "";
@@ -180,7 +182,7 @@ generatePassFile: mode, pass
                     default:
                         break;
                 }
-                if(settingsArray[5] == "1")
+                if(::settingsArray[5] == "1")
                 {
                     unseenByRaysLine = "UnseenByRays 1\n";
                 }
@@ -188,7 +190,7 @@ generatePassFile: mode, pass
                 {
                     unseenByRaysLine = "";
                 }
-                if(settingsArray[6] == "1")
+                if(::settingsArray[6] == "1")
                 {
                     unseenByCameraLine = "UnseenByCamera 1\n";
                 }
@@ -196,7 +198,7 @@ generatePassFile: mode, pass
                 {
                     unseenByCameraLine = "";
                 }
-                if(settingsArray[7] == "1")
+                if(::settingsArray[7] == "1")
                 {
                     unseenByRadiosityLine = "UnseenByRadiosity 1\n";
                 }
@@ -204,7 +206,7 @@ generatePassFile: mode, pass
                 {
                     unseenByRadiosityLine = "";
                 }
-                if(settingsArray[8] == "1")
+                if(::settingsArray[8] == "1")
                 {
                     unseenByFogLine = "UnaffectedByFog 1\n";
                 }
@@ -212,11 +214,11 @@ generatePassFile: mode, pass
                 {
                     unseenByFogLine = "";
                 }
-                if(settingsArray[9] == "0")
+                if(::settingsArray[9] == "0")
                 {
-                    if(settingsArray[10] == "0")
+                    if(::settingsArray[10] == "0")
                     {
-                        if(settingsArray[11] == "0")
+                        if(::settingsArray[11] == "0")
                         {
                             shadowOptionsLine = "ShadowOptions 0\n";
                         }
@@ -227,7 +229,7 @@ generatePassFile: mode, pass
                     }
                     else
                     {
-                        if(settingsArray[11] == "0")
+                        if(::settingsArray[11] == "0")
                         {
                             shadowOptionsLine = "ShadowOptions 2\n";
                         }
@@ -239,9 +241,9 @@ generatePassFile: mode, pass
                 }
                 else
                 {
-                    if(settingsArray[10] == "0")
+                    if(::settingsArray[10] == "0")
                     {
-                        if(settingsArray[11] == "0")
+                        if(::settingsArray[11] == "0")
                         {
                             shadowOptionsLine = "ShadowOptions 1\n";
                         }
@@ -252,7 +254,7 @@ generatePassFile: mode, pass
                     }
                     else
                     {
-                        if(settingsArray[11] == "0")
+                        if(::settingsArray[11] == "0")
                         {
                             shadowOptionsLine = "ShadowOptions 3\n";
                         }
@@ -274,18 +276,18 @@ generatePassFile: mode, pass
 
                     */
                 }
-                objPropOverrideSets[passItem] = matteObjectLine + unseenByFogLine + unseenByRadiosityLine + unseenByRaysLine + unseenByCameraLine + alphaLine;
-                objPropOverrideShadowOpts[passItem] = shadowOptionsLine;
+                ::objPropOverrideSets[::passItem] = matteObjectLine + unseenByFogLine + unseenByRadiosityLine + unseenByRaysLine + unseenByCameraLine + alphaLine;
+                ::objPropOverrideShadowOpts[::passItem] = shadowOptionsLine;
             }
 
-            if(settingsArray[2] == "type7")
+            if(::settingsArray[2] == "type7")
             {
-                overrideType[passItem] = 7;
-                if(size(settingsArray) >= 3)
+                ::overrideType[::passItem] = 7;
+                if(size(::settingsArray) >= 3)
                 {
-                    if(settingsArray[3] != nil && settingsArray[3] != "")
+                    if(::settingsArray[3] != nil && ::settingsArray[3] != "")
                     {
-                        excludedLightNames = parse(";",settingsArray[3]);
+                        excludedLightNames = parse(";",::settingsArray[3]);
                     }
                     else
                     {
@@ -298,17 +300,17 @@ generatePassFile: mode, pass
                 }
                 if(excludedLightNames != nil && excludedLightNames != "")
                 {
-                    lightExclusion[passItem] = nil;
+                    lightExclusion[::passItem] = nil;
                     doneRad = 0;
                     doneCaus = 0;                   
-                    for(k = 1; k <= size(lightNames); k++)
+                    for(k = 1; k <= size(::lightNames); k++)
                     {
                         for(m = 1; m <= size(excludedLightNames); m++)
                         {
-                            if(lightNames[k] == excludedLightNames[m])
+                            if(::lightNames[k] == excludedLightNames[m])
                             {
-                                tempID = lightOldIDs[k];
-                                lightExclusion[passItem] = string(lightExclusion[passItem]) + "ExcludeLight " + string(tempID) + "\n";
+                                tempID = ::lightOldIDs[k];
+                                lightExclusion[::passItem] = string(lightExclusion[::passItem]) + "ExcludeLight " + string(tempID) + "\n";
                             }
                             else
                             {
@@ -316,7 +318,7 @@ generatePassFile: mode, pass
                                 {
                                     if(doneRad == 0)
                                     {
-                                        lightExclusion[passItem] = string(lightExclusion[passItem]) + "ExcludeLight 21000000\n";
+                                        lightExclusion[::passItem] = string(lightExclusion[::passItem]) + "ExcludeLight 21000000\n";
                                         doneRad = 1;
                                     }
                                 }
@@ -326,7 +328,7 @@ generatePassFile: mode, pass
                                     {
                                         if(doneCaus == 0)
                                         {
-                                            lightExclusion[passItem] = string(lightExclusion[passItem]) + "ExcludeLight 22000000\n";
+                                            lightExclusion[::passItem] = string(lightExclusion[::passItem]) + "ExcludeLight 22000000\n";
                                             doneCaus = 1;
                                         }
                                     }
@@ -337,77 +339,77 @@ generatePassFile: mode, pass
                 }
                 else
                 {
-                    lightExclusion[passItem] = nil;
+                    lightExclusion[::passItem] = nil;
                 }
                 
             }
 
-            if(settingsArray[2] == "type8") // EXPERIMENTAL Camera override
+            if(::settingsArray[2] == "type8") // EXPERIMENTAL Camera override
             {
-                zoomFactor 						= string(settingsArray[3]);
-                cameraSettingsPartOne[passItem] =	"ZoomFactor " + zoomFactor + "\n";
-                cameraSettingsPartOneCount[passItem] = 1;
-				zoomType 						= string(settingsArray[4]);
-                cameraSettingsPartOne[passItem] +=	"ZoomType " + zoomType + "\n";
-                cameraSettingsPartOneCount[passItem]++;
-				resolutionMultiplier 			= string(settingsArray[5]);
-                cameraSettingsPartOne[passItem] +=	"ResolutionMultiplier " + resolutionMultiplier + "\n";
-                cameraSettingsPartOneCount[passItem]++;
-				frameSizeH 						= string(int(settingsArray[6]) * number(resolutionMultiplier));
-				frameSizeV 						= string(int(settingsArray[7]) * number(resolutionMultiplier));
-                cameraSettingsPartOne[passItem] +=	"FrameSize " + frameSizeH + " " + frameSizeV + "\n";
-                cameraSettingsPartOneCount[passItem]++;
-				pixelAspect 					= string(settingsArray[8]);
-                cameraSettingsPartOne[passItem] +=	"PixelAspect " + pixelAspect + "\n";
-                cameraSettingsPartOneCount[passItem]++;
-				motionBlur 						= string(settingsArray[9]);
-                cameraSettingsPartOne[passItem] +=	"MotionBlur " + motionBlur + "\n";
-                cameraSettingsPartOneCount[passItem]++;
-				motionBlurPasses 				= string(settingsArray[10]);
-                cameraSettingsPartOne[passItem] +=	"MotionBlurPasses " + motionBlurPasses + "\n";
-                cameraSettingsPartOneCount[passItem]++;
-				shutterEfficiency 				= string(settingsArray[11]);
-                cameraSettingsPartOne[passItem] +=	"ShutterEfficiency " + shutterEfficiency + "\n";
-                cameraSettingsPartOneCount[passItem]++;
-				rollingShutter 					= string(settingsArray[12]);
-                cameraSettingsPartOne[passItem] +=	"RollingShutter " + rollingShutter + "\n";
-                cameraSettingsPartOneCount[passItem]++;
-				shutterOpen 					= string(settingsArray[13]);
-                cameraSettingsPartOne[passItem] +=	"ShutterOpen " + shutterOpen + "\n";
-                cameraSettingsPartOneCount[passItem]++;
-				oversampling 					= string(settingsArray[14]);
-                cameraSettingsPartOne[passItem] +=	"Oversampling " + oversampling + "\n";
-                cameraSettingsPartOneCount[passItem]++;
+                zoomFactor                      = string(::settingsArray[3]);
+                ::cameraSettingsPartOne[::passItem] =   "ZoomFactor " + zoomFactor + "\n";
+                ::cameraSettingsPartOneCount[::passItem] = 1;
+                zoomType                        = string(::settingsArray[4]);
+                ::cameraSettingsPartOne[::passItem] +=  "ZoomType " + zoomType + "\n";
+                ::cameraSettingsPartOneCount[::passItem]++;
+                resolutionMultiplier            = string(::settingsArray[5]);
+                ::cameraSettingsPartOne[::passItem] +=  "ResolutionMultiplier " + resolutionMultiplier + "\n";
+                ::cameraSettingsPartOneCount[::passItem]++;
+                frameSizeH                      = string(int(::settingsArray[6]) * number(resolutionMultiplier));
+                frameSizeV                      = string(int(::settingsArray[7]) * number(resolutionMultiplier));
+                ::cameraSettingsPartOne[::passItem] +=  "FrameSize " + frameSizeH + " " + frameSizeV + "\n";
+                ::cameraSettingsPartOneCount[::passItem]++;
+                pixelAspect                     = string(::settingsArray[8]);
+                ::cameraSettingsPartOne[::passItem] +=  "PixelAspect " + pixelAspect + "\n";
+                ::cameraSettingsPartOneCount[::passItem]++;
+                motionBlur                      = string(::settingsArray[9]);
+                ::cameraSettingsPartOne[::passItem] +=  "MotionBlur " + motionBlur + "\n";
+                ::cameraSettingsPartOneCount[::passItem]++;
+                motionBlurPasses                = string(::settingsArray[10]);
+                ::cameraSettingsPartOne[::passItem] +=  "MotionBlurPasses " + motionBlurPasses + "\n";
+                ::cameraSettingsPartOneCount[::passItem]++;
+                shutterEfficiency               = string(::settingsArray[11]);
+                ::cameraSettingsPartOne[::passItem] +=  "ShutterEfficiency " + shutterEfficiency + "\n";
+                ::cameraSettingsPartOneCount[::passItem]++;
+                rollingShutter                  = string(::settingsArray[12]);
+                ::cameraSettingsPartOne[::passItem] +=  "RollingShutter " + rollingShutter + "\n";
+                ::cameraSettingsPartOneCount[::passItem]++;
+                shutterOpen                     = string(::settingsArray[13]);
+                ::cameraSettingsPartOne[::passItem] +=  "ShutterOpen " + shutterOpen + "\n";
+                ::cameraSettingsPartOneCount[::passItem]++;
+                oversampling                    = string(::settingsArray[14]);
+                ::cameraSettingsPartOne[::passItem] +=  "Oversampling " + oversampling + "\n";
+                ::cameraSettingsPartOneCount[::passItem]++;
 
-				fieldRendering 					= string(settingsArray[15]);
-                cameraSettingsPartTwo[passItem] =	"FieldRendering " + fieldRendering + "\n";
-                cameraSettingsPartTwoCount[passItem] = 1;
+                fieldRendering                  = string(::settingsArray[15]);
+                ::cameraSettingsPartTwo[::passItem] =   "FieldRendering " + fieldRendering + "\n";
+                ::cameraSettingsPartTwoCount[::passItem] = 1;
 
-				depthOfField 						= string(settingsArray[16]);
-                cameraSettingsPartThree[passItem]   =  "DepthOfField " + depthOfField + "\n";
-                cameraSettingsPartThreeCount[passItem] = 1;
+                depthOfField                        = string(::settingsArray[16]);
+                ::cameraSettingsPartThree[::passItem]   =  "DepthOfField " + depthOfField + "\n";
+                ::cameraSettingsPartThreeCount[::passItem] = 1;
 
-				sampler 							= string(settingsArray[17]);
-                cameraSettingsPartFour[passItem] 	=	"Sampler " + sampler + "\n";
-                cameraSettingsPartFourCount[passItem] = 1;
-				adaptiveThreshold 					= string(settingsArray[18]);
-                cameraSettingsPartFour[passItem] 	+=	"AdaptiveThreshold " + adaptiveThreshold + "\n";
-                cameraSettingsPartFourCount[passItem]++;
-				minimumSamples 						= string(settingsArray[19]);
-                cameraSettingsPartFour[passItem] 	+=	"MinimumSamples " + minimumSamples + "\n";
-                cameraSettingsPartFourCount[passItem]++;
-				maximumSamples 						= string(settingsArray[20]);
-                cameraSettingsPartFour[passItem] 	+=	"MaximumSamples " + maximumSamples + "\n";
-                cameraSettingsPartFourCount[passItem]++;
+                sampler                             = string(::settingsArray[17]);
+                ::cameraSettingsPartFour[::passItem]    =   "Sampler " + sampler + "\n";
+                ::cameraSettingsPartFourCount[::passItem] = 1;
+                adaptiveThreshold                   = string(::settingsArray[18]);
+                ::cameraSettingsPartFour[::passItem]    +=  "AdaptiveThreshold " + adaptiveThreshold + "\n";
+                ::cameraSettingsPartFourCount[::passItem]++;
+                minimumSamples                      = string(::settingsArray[19]);
+                ::cameraSettingsPartFour[::passItem]    +=  "MinimumSamples " + minimumSamples + "\n";
+                ::cameraSettingsPartFourCount[::passItem]++;
+                maximumSamples                      = string(::settingsArray[20]);
+                ::cameraSettingsPartFour[::passItem]    +=  "MaximumSamples " + maximumSamples + "\n";
+                ::cameraSettingsPartFourCount[::passItem]++;
 
-                overrideType[passItem] = 8;
+                ::overrideType[::passItem] = 8;
             }
 
             if(assignmentsArray != nil && size(assignmentsArray) > 1)
             {
                 if(secondSettingsArray[2] == "type7")
                 {
-                    secondOverrideType[passItem] = 7;
+                    secondOverrideType[::passItem] = 7;
                     if(size(secondSettingsArray) >= 3)
                     {
                         if(secondSettingsArray[3] != nil && secondSettingsArray[3] != "")
@@ -425,17 +427,17 @@ generatePassFile: mode, pass
                     }
                     if(excludedLightNames != nil && excludedLightNames != "")
                     {
-                        lightExclusion[passItem] = nil;
+                        lightExclusion[::passItem] = nil;
                         doneRad = 0;
                         doneCaus = 0;                   
-                        for(k = 1; k <= size(lightNames); k++)
+                        for(k = 1; k <= size(::lightNames); k++)
                         {
                             for(m = 1; m <= size(excludedLightNames); m++)
                             {
-                                if(lightNames[k] == excludedLightNames[m])
+                                if(::lightNames[k] == excludedLightNames[m])
                                 {
-                                    tempID = lightOldIDs[k];
-                                    lightExclusion[passItem] = string(lightExclusion[passItem]) + "ExcludeLight " + string(tempID) + "\n";
+                                    tempID = ::lightOldIDs[k];
+                                    lightExclusion[::passItem] = string(lightExclusion[::passItem]) + "ExcludeLight " + string(tempID) + "\n";
                                 }
                                 else
                                 {
@@ -443,7 +445,7 @@ generatePassFile: mode, pass
                                     {
                                         if(doneRad == 0)
                                         {
-                                            lightExclusion[passItem] = string(lightExclusion[passItem]) + "ExcludeLight 21000000\n";
+                                            lightExclusion[::passItem] = string(lightExclusion[::passItem]) + "ExcludeLight 21000000\n";
                                             doneRad = 1;
                                         }
                                     }
@@ -453,7 +455,7 @@ generatePassFile: mode, pass
                                         {
                                             if(doneCaus == 0)
                                             {
-                                                lightExclusion[passItem] = string(lightExclusion[passItem]) + "ExcludeLight 22000000\n";
+                                                lightExclusion[::passItem] = string(lightExclusion[::passItem]) + "ExcludeLight 22000000\n";
                                                 doneCaus = 1;
                                             }
                                         }
@@ -464,235 +466,156 @@ generatePassFile: mode, pass
                     }
                     else
                     {
-                        lightExclusion[passItem] = nil;
+                        lightExclusion[::passItem] = nil;
                     }
                 }
                 else
                 {
-                    secondOverrideType[passItem] = nil;
+                    secondOverrideType[::passItem] = nil;
                 }
             }
             else
             {
-                secondOverrideType[passItem] = nil;
-            }
-            
+                secondOverrideType[::passItem] = nil;
+            }            
         }
         else
         {
-			doOverride[passItem] = 0;
-            overrideType[passItem] = 0;
+            ::doOverride[::passItem] = 0;
+            ::overrideType[::passItem] = 0;
         }
-        if(size(doOverride) < passItem)
+        if(size(::doOverride) < ::passItem)
         {
-            doOverride[passItem] = 0;
+            ::doOverride[::passItem] = 0;
         }
-        if(overrideType == nil || size(overrideType) < passItem)
+        if(::overrideType == nil || size(::overrideType) < ::passItem)
         {
-			errorString = "An internal error has been detected: overrideType is: " + overrideType;
-			info(errorString);
-			errorString = "Will render a full pass of type '" + mode + "' instead. Sorry.";
-			info(errorString);
-			doOverride[passItem] = 0;
-            overrideType[passItem] = 0;
+            errorString = "An internal error has been detected: overrideType is: " + ::overrideType;
+            logger("warn","errorString");
+            errorString = "Will render a full pass of type '" + mode + "' instead. Sorry.";
+            logger("warn","errorString");
+            ::doOverride[::passItem] = 0;
+            ::overrideType[::passItem] = 0;
         }
         
-        if(strleft(string(displayOldIDs[tempNumber]),1) == string(MESH))
+        if(strleft(string(::displayOldIDs[tempNumber]),1) == string(MESH))
         {
-            objStart[passItem] = getObjectLines(displayOldIDs[tempNumber],currentScenePath);
-            objStartTemp = number(objStart[passItem]);
+            ::objStart[::passItem] = getObjectLine(::displayOldIDs[tempNumber],::currentScenePath);
+            objStartTemp = number(::objStart[::passItem]);
             objStartPlusOne = objStartTemp + 1;
-            objEnd[passItem] = getObjectEndLine(objStartPlusOne,displayOldIDs[tempNumber],currentScenePath);
-            objMotStart[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"NumChannels",currentScenePath);
+            ::objEnd[::passItem] = getObjectEndLine(objStartPlusOne,::displayOldIDs[tempNumber],::currentScenePath);
+            ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels",::currentScenePath);
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
             // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
             // We use parse to split the line by spaces, the second is assumed to be the number of channels. We cast that to an integer.
-            noc_Array = parse(" ",readSpecificLine(objMotStart[passItem],currentScenePath));
+            noc_Array = parse(" ",readSpecificLine(::objMotStart[::passItem],::currentScenePath));
             numberOfChannels = integer(noc_Array[2]);
-            objMotEnd[passItem] = objMotStart[passItem];
+            ::objMotEnd[::passItem] = ::objMotStart[::passItem];
             for(b = 1; b <= numberOfChannels; b++)
             {
-                objMotEnd[passItem] = getPartialLine((objMotEnd[passItem] + 1),objEnd[passItem],"}",currentScenePath);
+                ::objMotEnd[::passItem] = getPartialLine((::objMotEnd[::passItem] + 1),::objEnd[::passItem],"}",::currentScenePath);
             }
-            lastObject = passItem;
+            ::lastObject = ::passItem;
+            // logger("info","objstart: " + ::objStart[::passItem].asStr());
+            // logger("info","objend: " + ::objEnd[::passItem].asStr());
         }
 
 
         // then the light lines
-        if(strleft(string(displayOldIDs[tempNumber]),1) == string(LIGHT))
+        if(strleft(string(::displayOldIDs[tempNumber]),1) == string(LIGHT))
         {
-            objStart[passItem] = getLightLines(displayOldIDs[tempNumber],currentScenePath);
-            objStartTemp = number(objStart[passItem]);
+            ::objStart[::passItem] = getLightLine(::displayOldIDs[tempNumber],::currentScenePath);
+            objStartTemp = number(::objStart[::passItem]);
             objStartPlusOne = objStartTemp + 1;
-            objEnd[passItem] = getLightEndLine(objStartPlusOne,displayOldIDs[tempNumber],currentScenePath);
-            objMotStart[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"NumChannels",currentScenePath);
+            ::objEnd[::passItem] = getLightEndLine(objStartPlusOne,::displayOldIDs[tempNumber],::currentScenePath);
+            ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels",::currentScenePath);
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
             // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
             // We use parse to split the line by spaces, the second is assumed to be the number of channels. We cast that to an integer.
-            noc_Array = parse(" ",readSpecificLine(objMotStart[passItem],currentScenePath));
+            noc_Array = parse(" ",readSpecificLine(::objMotStart[::passItem],::currentScenePath));
             numberOfChannels = integer(noc_Array[2]);
-            objMotEnd[passItem] = objMotStart[passItem];
+            ::objMotEnd[::passItem] = ::objMotStart[::passItem];
             for(b = 1; b <= numberOfChannels; b++)
             {
-                objMotEnd[passItem] = getPartialLine((objMotEnd[passItem] + 1),objEnd[passItem],"}",currentScenePath);
+                ::objMotEnd[::passItem] = getPartialLine((::objMotEnd[::passItem] + 1),::objEnd[::passItem],"}",::currentScenePath);
             }
-            IKInitialState[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"IKInitialState",currentScenePath);
-            objAffectCausticsLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"AffectCaustics",currentScenePath);
-            objLightTypeLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"LightType ",currentScenePath);
-            objLensFlareLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"LensFlare ",currentScenePath);
-            if(objLensFlareLine[passItem])
+            IKInitialState[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"IKInitialState",::currentScenePath);
+            objAffectCausticsLine[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"AffectCaustics",::currentScenePath);
+            objLightTypeLine[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"LightType ",::currentScenePath);
+            objLensFlareLine[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"LensFlare ",::currentScenePath);
+            if(objLensFlareLine[::passItem])
             {
-                objLensFlareLine[passItem] += lightSettingOffset;
+                objLensFlareLine[::passItem] += lightSettingOffset;
             }
-            objVolLightLine[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"VolumetricLighting ",currentScenePath);
-            if(objVolLightLine[passItem])
-                objVolLightLine[passItem] += lightSettingOffset;
-            lastLight++;
+            objVolLightLine[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"VolumetricLighting ",::currentScenePath);
+            if(objVolLightLine[::passItem])
+                objVolLightLine[::passItem] += lightSettingOffset;
+            ::lastLight++;
+            // logger("info","lightstart: " + ::objStart[::passItem].asStr());
+            // logger("info","lightend: " + ::objEnd[::passItem].asStr());
         }
-		
+        
         // then the camera lines
-        if(strleft(string(displayOldIDs[tempNumber]),1) == string(CAMERA))
+        if(strleft(string(::displayOldIDs[tempNumber]),1) == string(CAMERA))
         {
-            objStart[passItem] = getCameraLines(displayOldIDs[tempNumber],currentScenePath);
-            objStartTemp = number(objStart[passItem]);
+            ::objStart[::passItem] = getCameraLine(::displayOldIDs[tempNumber],::currentScenePath);
+            objStartTemp = number(::objStart[::passItem]);
             objStartPlusOne = objStartTemp + 1;
-            objEnd[passItem] = getCameraEndLine(objStartPlusOne,displayOldIDs[tempNumber],currentScenePath);
-            objMotStart[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"NumChannels",currentScenePath);
+            ::objEnd[::passItem] = getCameraEndLine(objStartPlusOne,::displayOldIDs[tempNumber],::currentScenePath);
+            ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels",::currentScenePath);
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
             // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
             // We use parse to split the line by spaces, the second is assumed to be the number of channels. We cast that to an integer.
-            noc_Array = parse(" ",readSpecificLine(objMotStart[passItem],currentScenePath));
+            noc_Array = parse(" ",readSpecificLine(::objMotStart[::passItem],::currentScenePath));
             numberOfChannels = integer(noc_Array[2]);
-            objMotEnd[passItem] = objMotStart[passItem];
+            ::objMotEnd[::passItem] = ::objMotStart[::passItem];
             for(b = 1; b <= numberOfChannels; b++)
             {
-                objMotEnd[passItem] = getPartialLine((objMotEnd[passItem] + 1),objEnd[passItem],"}",currentScenePath);
+                ::objMotEnd[::passItem] = getPartialLine((::objMotEnd[::passItem] + 1),::objEnd[::passItem],"}",::currentScenePath);
             }
-            IKInitialState[passItem] = getPartialLine(objStart[passItem],objEnd[passItem],"IKInitialState",currentScenePath);
-            lastCamera++;
-		}
-	}
-
-    // then the ambient color line
-    ambientColorLine = getPartialLine(0,0,"AmbientColor",currentScenePath);
-
-    // get the start light line
-    startLightsLine = getPartialLine(0,0,"AddLight",currentScenePath);
-
-    // then the camera line
-    cameraStartLine = getPartialLine(0,0,"AddCamera",currentScenePath);
-
-    // data overlay label
-    dataOverlayLabelLine = getPartialLine(0,0,"DataOverlayLabel",currentScenePath);
-
-    // get the save RGB line
-    saveRGBLine = getPartialLine(cameraStartLine,0,"SaveRGB ",currentScenePath);
-
-    // try to get the alpha multiplication settings line
-    alphaMultSettingsLine =  getPartialLine(saveRGBLine,0,"AlphaMode ",currentScenePath);
-
-    // get the ViewConfiguration line
-    viewConfigurationLine = getPartialLine(saveRGBLine,0,"ViewConfiguration ",currentScenePath);
-
-    // check for HV data
-    hvStartLine;
-    hvDataLine = getPartialLine(0,0,"{ HyperVoxelData",currentScenePath);
-
-    if(hvDataLine)
-    {
-        hvStartLine = hvDataLine - 1;
-        inputTemp = File(currentScenePath,"r");
-        hvObjectTotal = 0;
-        inputTemp.line(hvDataLine);
-        while(!inputTemp.eof())
-        {
-            line = inputTemp.read();
-            if(line == "  { HVObject")
-            {
-                hvObjectTotal = hvObjectTotal + 1;
-            }
-        }
-        inputTemp.close();
-        if(hvObjectTotal != 0)
-        {
-            hvObjectLine[1] = getPartialLine(hvDataLine,0,"  { HVObject",currentScenePath);
-            hvObjectEndLineTemp = getPartialLine(hvObjectLine[1],0,"    { HVoxelCache",currentScenePath);
-            hvObjectEndLine[1] = hvObjectEndLineTemp + 5;
-            if(hvObjectTotal > 1)
-            {
-                for(hvCount = 2; hvCount <= integer(hvObjectTotal); hvCount++)
-                {
-                    xMinusOne = hvCount - 1;
-                    linePlusOne = hvObjectLine[xMinusOne] + 1;
-                    hvObjectLine[hvCount] = getPartialLine(linePlusOne,0,"  { HVObject",currentScenePath);
-                    hvObjectEndLineTemp = getPartialLine(hvObjectLine[hvCount],0,"    { HVoxelCache",currentScenePath);
-                    hvObjectEndLine[hvCount] = hvObjectEndLineTemp + 5;
-
-                }
-            }
-
-            inputTemp = File(currentScenePath,"r");
-            for(hvCount = 1; hvCount <= integer(hvObjectTotal); hvCount++)
-            {
-                lineTempNumber = hvObjectLine[hvCount] + 2;
-                inputTemp.line(lineTempNumber);
-                hvObjectNameTemp = inputTemp.read();
-                tempNameArray = parse("\"",hvObjectNameTemp);
-                hvObjectName[hvCount] = tempNameArray[2];
-            }
-            inputTemp.close();
-
-            z = 1;
-            for(x = 1; x <= size(tempObjectNames); x++)
-            {
-                for(y = 1; y <= size(hvObjectName); y++)
-                {
-                    if(tempObjectNames[x] == hvObjectName[y])
-                    {
-                        includedHvObjects[z] = y;
-                        z++;
-                    }
-                }
-            }
-        }
-        else
-        {
-            hvObjectEndLine[1] = hvDataLine + 4;
+            IKInitialState[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"IKInitialState",::currentScenePath);
+            ::lastCamera++;
+            // logger("info","camstart: " + ::objStart[::passItem].asStr());
+            // logger("info","camend: " + ::objEnd[::passItem].asStr());
         }
     }
 
-    outputFolder = parse("(", userOutputFolder);
+    outputFolder = parse("(", ::userOutputFolder);
 
     if(outputFolder[1] == nil || outputFolder[1] == "leave empty)")
     {
-        error("Please choose an output folder in the preferences.");
+        logger("error","Please choose an output folder in the preferences.");
     }
 
     if(!chdir(outputFolder[1]))
     {
-        error("Output folder is invalid! Please choose a valid output folder in Preferences.");
+        logger("error","Output folder is invalid! Please choose a valid output folder in Preferences.");
     }
 
     chdir(contentDirectory);
 
-    newScenePath = generateNewScenePath(outputFolder, outputStr, fileOuputPrefix, userOutputString, passNames, pass);
+    ::newScenePath = generateNewScenePath(outputFolder, outputStr);
 
     if(platform() == INTEL)
     {
-        newScenePath = fixPathForWin32(newScenePath);        
-        currentScenePath = fixPathForWin32(currentScenePath);
+        ::newScenePath = fixPathForWin32(::newScenePath);        
+        ::currentScenePath = fixPathForWin32(::currentScenePath);
     }
 
-    inputFile = File(currentScenePath, "r");
-    outputFile = File(newScenePath, "w");
+    inputFile = File(::currentScenePath, "r");
+    outputFile = File(::newScenePath, "w");
 
     // write out the header stuff
-    writeHeader(currentScenePath, inputFile, outputFile, passNames, pass);
+    writeHeader(inputFile, outputFile);
     
     // write out the objects
-    writeObjects(inputFile, outputFile, passNames, pass, lastObject);
+    writeObjects(inputFile, outputFile);
 
     // write out the stuff between the lights and objects
+    // get the start light line
+    startLightsLine = getPartialLine(0,0,"AddLight",::currentScenePath);
+    // then the ambient color line
+    ambientColorLine = getPartialLine(0,0,"AmbientColor",::currentScenePath);
     lineNumber = ambientColorLine;
     inputFile.line(lineNumber);
     while(lineNumber < (startLightsLine - 1))
@@ -701,14 +624,24 @@ generatePassFile: mode, pass
         line = inputFile.read();
         outputFile.writeln(line);
     }
-    
+
     // write out the lights
-    writeLights(inputFile, outputFile, passNames, pass, lastObject, lastLight, IKInitialState, objLightTypeLine, objAffectCausticsLine, objLensFlareLine, objVolLightLine, lightSettingsPartOne, lightSettingsPartTwo, lightSettingsPartThree);
+    writeLights(inputFile, outputFile, IKInitialState);
+
+    // then the camera line
+    cameraStartLine = getPartialLine(0,0,"AddCamera",::currentScenePath);
+    lineNumber = cameraStartLine;
+    inputFile.line(lineNumber);
 
     // write out the cameras
-    writeCameras(inputFile, outputFile, passNames, pass, lastObject, lastLight, lastCamera);
+    writeCameras(inputFile, outputFile, lineNumber);
 
-    lineNumber = objEnd[lastLight + lastObject + lastCamera];
+    //  lineNumber = ::objEnd[::lastLight + ::lastObject + ::lastCamera];
+    // then the AA line
+    antialiasingLine = getPartialLine(0,0,"Antialiasing",::currentScenePath);
+    // data overlay label
+    dataOverlayLabelLine = getPartialLine(0,0,"DataOverlayLabel",::currentScenePath);
+    lineNumber = antialiasingLine;
     inputFile.line(lineNumber);
     while(lineNumber <= dataOverlayLabelLine)
     {
@@ -750,17 +683,23 @@ generatePassFile: mode, pass
     StatusMsg(msgString);
     sleep(1);
     
-    saveRGBImagesPrefix = generateSaveRGBPath(mode, outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass);
+    // get the save RGB line
+    saveRGBLine = getPartialLine(cameraStartLine,0,"SaveRGB ",::currentScenePath);
+
+    ::saveRGBImagesPrefix = generateSaveRGBPath(mode, outputFolder, outputStr);
     outputFile.writeln("OutputFilenameFormat 3");
     outputFile.writeln("SaveRGB 1");
-    outputFile.writeln("SaveRGBImagesPrefix " + saveRGBImagesPrefix);
+    outputFile.writeln("SaveRGBImagesPrefix " + ::saveRGBImagesPrefix);
     if (mode == "frame")
     {
-        outputFile.writeln("RGBImageSaver " + image_formats_array[testRgbSaveType]);
+        outputFile.writeln("RGBImageSaver " + ::image_formats_array[::testRgbSaveType]);
     } else {
-        outputFile.writeln("RGBImageSaver " + image_formats_array[rgbSaveType]);
+        outputFile.writeln("RGBImageSaver " + ::image_formats_array[::rgbSaveType]);
     }
     outputFile.writeln("SaveAlpha 0");
+
+    // try to get the alpha multiplication settings line
+    alphaMultSettingsLine =  getPartialLine(saveRGBLine,0,"AlphaMode ",::currentScenePath);
     if(alphaMultSettingsLine != nil)
     {
         // write out the alpha multiplication settings if they exist
@@ -775,30 +714,35 @@ generatePassFile: mode, pass
     outputFile.writeln("");
     
     // write out the rest of the scene file
+    // get the ViewConfiguration line
+    viewConfigurationLine = getPartialLine(0,0,"ViewConfiguration ",::currentScenePath);
     lineNumber = viewConfigurationLine;
     inputFile.line(lineNumber);
+
+    outputFile.close();
+    outputFile = File(::newScenePath, "a");
     while(!inputFile.eof())
     {
         line = inputFile.read();
         outputFile.writeln(line);
         lineNumber = inputFile.line();
-    }  
+    }
 
     // close them up
     inputFile.close();
     outputFile.close();
 
-    updatedCurrentScenePath = tempDirectory + getsep() + "passEditorTempSceneUpdated.lws";
-	filecopy(newScenePath, updatedCurrentScenePath);
-	
-    // newScenePath
-    if(overrideNames[1] != "empty")
+    ::updatedCurrentScenePath = ::tempDirectory + getsep() + "passEditorTempSceneUpdated.lws";
+    filecopy(::newScenePath, ::updatedCurrentScenePath);
+
+    // ::newScenePath
+    if(::overrideNames[1] != "empty")
     {
         z = 1;
-        for(x = 1; x <= size(overrideNames); x++)
+        for(x = 1; x <= size(::overrideNames); x++)
         {
-            //set_o_items = parseListItems(passOverrideItems[pass][x]);
-            overrideItemsString = passOverrideItems[pass][x];
+            //set_o_items = parseListItems(::passOverrideItems[::pass][x]);
+            overrideItemsString = ::passOverrideItems[::pass][x];
             idsArray = parse("||",overrideItemsString);
             for(y = 1; y <= size(idsArray); y++)
             {
@@ -813,40 +757,67 @@ generatePassFile: mode, pass
     if(itemsParsedArray != nil)
     {
         a = itemsParsedArray[1];
-        settingsArray = parse("||",overrideSettings[a]);
-        if(settingsArray[2] == "type6")
+        ::settingsArray = parse("||",::overrideSettings[a]);
+        if(::settingsArray[2] == "type6")
         {
-			overrideType[passItem] = 6;
-			overrideRenderer = integer(settingsArray[3]);
-            redirectBuffersSetts = integer(settingsArray[8]);
-			switch(overrideRenderer)
-			{
-				case 1:
-				// native renderer - call the support
-				scnGen_native(updatedCurrentScenePath, newScenePath);
-				break;
-				
-				default:
-				scnGen_native(updatedCurrentScenePath, newScenePath);
-				break;
-			}
-            // FiberFX stuff. Due to poor parameter naming, we need to do this in a more specific manner.
-            fiberFX(newScenePath, passNames, pass);
-		}
+            ::overrideType[::passItem] = 6;
+            ::overrideRenderer = integer(::settingsArray[3]);
+            redirectBuffersSetts = integer(::settingsArray[8]);
+            switch(::overrideRenderer)
+            {
+                case 1:
+                // native renderer - call the support
+                scnGen_native();
+                break;
+                case 2:
+                // kray renderer - call the support
+@if enableKray
+                scnGen_kray25();
+@else
+                logger("error","Scene Master override calls for Kray 2.5, but this build doesn't offer support.");
+@end
+                break;
+
+                case 3:
+                // arnold renderer - call the support
+@if enableArnold043
+                scnGen_arnold043();
+@else
+                logger("error","Scene Master override calls for LWtoA 0.4.3, but this build doesn't offer support.");
+@end
+                break;
+
+                default:
+                scnGen_native();
+                break;
+            }
+            fiberFXOverride(::newScenePath);
+        }
     }
 
-	// deal with the buffer savers now.
+    // FiberFX stuff. Overrides are handled earlier - this is just about pass alignment.
+    fiberFX(::newScenePath);
+
+    // Hypervoxel 3 pass alignment.
+    hyperVoxels3(::newScenePath);
+
+    // deal with the buffer savers now.
     if(!redirectBuffersSetts)
         redirectBuffersSetts = 0;
-	handleBuffers(mode, redirectBuffersSetts, newScenePath, outputFolder, outputStr, fileOuputPrefix, userOutputString, passNames, pass);
+    handleBuffers(mode, redirectBuffersSetts, ::newScenePath, outputFolder, outputStr, fileOuputPrefix, ::userOutputString);
     
-	// and as a tack-on fix, replace motion-mixer stuff for overridden objects. Calls finishFiles() for us.
-	motionMixerStuff(newScenePath, passNames, pass);
+    // and as a tack-on fix, replace motion-mixer stuff for overridden objects. Calls finishFiles() for us.
+    motionMixerStuff(::newScenePath);
 
-    return(newScenePath);
+    dependencyCheck(::newScenePath);
+    
+    stripPassEditor(::newScenePath);
+
+    ::pass = tempPass;
+    return(::newScenePath);
 } // generatePass
 
-writeHeader: inputFileName, inputFile, outputFile, passNames, pass
+writeHeader: inputFile, outputFile
 {
     lineNumber = 1;
     endLine;
@@ -854,23 +825,23 @@ writeHeader: inputFileName, inputFile, outputFile, passNames, pass
     switch(int(hostVersion()))
     {
         case 11:
-            endLine = getPartialLine(0, 0, "NavigationDesiredDevice", inputFileName);
+            endLine = getPartialLine(0, 0, "NavigationDesiredDevice", ::currentScenePath);
+            if(hostVersion() < 11.5 && hostVersion() >= 11)
+            {
+                endLine = getPartialLine(0, 0, "FirstBackgroundImageSyncFrame", ::currentScenePath);
+            }
             break;
         default:
             inputFile.close();
             outputFile.close();
-            error("Unsupported version of LW!");
+            logger("error","Unsupported version of LW!");
             break;
-    }
-    if(hostVersion() < 11.5 && hostVersion() >= 11)
-    {
-        endLine = getPartialLine(0, 0, "FirstBackgroundImageSyncFrame", inputFileName);
     }
     if(!endLine || endLine == nil || endLine == 0)
     {
         inputFile.close();
         outputFile.close();
-        error("writeHeader: couldn't find endLine");
+        logger("error","writeHeader: couldn't find endLine");
     }
 
     while(lineNumber <= endLine)
@@ -882,32 +853,32 @@ writeHeader: inputFileName, inputFile, outputFile, passNames, pass
     outputFile.writeln("");
 }
 
-writeCameras: inputFile, outputFile, passNames, pass, lastObject, lastLight, lastCamera
+writeCameras: inputFile, outputFile, lineNumber
 {
-    for(cameraCounter = lastObject + lastLight + 1; cameraCounter <= lastObject + lastLight + lastCamera; cameraCounter++)
+    for(cameraCounter = ::lastObject + ::lastLight + 1; cameraCounter <= ::lastObject + ::lastLight + ::lastCamera; cameraCounter++)
     {
-        progressString = string(((cameraCounter/(lastObject + lastLight + lastCamera))/4) + (3 / noOfStages));
+        progressString = string(((cameraCounter/(::lastObject + ::lastLight + ::lastCamera))/4) + (3 / ::noOfStages));
         msgString = "{" + progressString + "}Generating Render Scene:  Writing Cameras...";
         StatusMsg(msgString);
         sleep(1);
 
-        if(doOverride[cameraCounter] == 1)
+        if(::doOverride[cameraCounter] == 1)
         {
-            switch(overrideType[cameraCounter])
+            switch(::overrideType[cameraCounter])
             {
                 case 3:
                     // begin case 3 here, which is the motion override type
-                    if(motInputTemp[cameraCounter] != nil)
+                    if(::motInputTemp[cameraCounter] != nil)
                     {
-                        fileCheck(motInputTemp[cameraCounter]);
-                        motFile = File(motInputTemp[cameraCounter], "r");
-                        inputFile.line(objStart[cameraCounter]);
+                        fileCheck(::motInputTemp[cameraCounter]);
+                        motFile = File(::motInputTemp[cameraCounter], "r");
+                        inputFile.line(::objStart[cameraCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objMotStart[cameraCounter]))
+                            if(inputFile.line() == (::objMotStart[cameraCounter]))
                             {
                                 done = true;
                                 break;
@@ -915,20 +886,20 @@ writeCameras: inputFile, outputFile, passNames, pass, lastObject, lastLight, las
                         }
                         lineNumber = 4;
                         motFile.line(lineNumber);
-                        endLine = getPartialLine(0,0,"Channel 6",motInputTemp[cameraCounter]); // cameras don't support scale channels (the last 3 in a traditional LW .mot file).
+                        endLine = getPartialLine(0,0,"Channel 6",::motInputTemp[cameraCounter]); // cameras don't support scale channels (the last 3 in a traditional LW .mot file).
                         while(lineNumber < endLine)
                         {
                             line = motFile.read();
                             outputFile.writeln(line);
                             lineNumber = motFile.line();
                         }
-                        inputFile.line(objMotEnd[cameraCounter] + 1);
+                        inputFile.line(::objMotEnd[cameraCounter] + 1);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[cameraCounter]))
+                            if(inputFile.line() == (::objEnd[cameraCounter]))
                             {
                                 done = true;
                                 break;
@@ -938,13 +909,13 @@ writeCameras: inputFile, outputFile, passNames, pass, lastObject, lastLight, las
                     }
                     else
                     {
-                        inputFile.line(objStart[cameraCounter]);
+                        inputFile.line(::objStart[cameraCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[cameraCounter]))
+                            if(inputFile.line() == (::objEnd[cameraCounter]))
                             {
                                 done = true;
                                 break;
@@ -955,11 +926,11 @@ writeCameras: inputFile, outputFile, passNames, pass, lastObject, lastLight, las
                     break;
 
                 case 8:
-                    if(cameraSettingsPartOne[cameraCounter] != nil && cameraSettingsPartTwo[cameraCounter] != nil && 
-                       cameraSettingsPartThree[cameraCounter] != nil && cameraSettingsPartFour[cameraCounter] != nil)
+                    if(::cameraSettingsPartOne[cameraCounter] != nil && ::cameraSettingsPartTwo[cameraCounter] != nil && 
+                       ::cameraSettingsPartThree[cameraCounter] != nil && ::cameraSettingsPartFour[cameraCounter] != nil)
                     {
                         // write out the beginning of the camera
-                        inputFile.line(objStart[cameraCounter]);
+                        inputFile.line(::objStart[cameraCounter]);
                         done = nil;
                         while(!done)
                         {
@@ -973,16 +944,16 @@ writeCameras: inputFile, outputFile, passNames, pass, lastObject, lastLight, las
                         }
                         
                         // write out the custom parameters
-                        outputFile.write(cameraSettingsPartOne[cameraCounter]);
+                        outputFile.write(::cameraSettingsPartOne[cameraCounter]);
 
                         // Fill out content until the next .
-                        lineNumber = getPartialLine(objStart[cameraCounter],0,"Oversampling",currentScenePath) + 1;
-                        tempEndNumber = getPartialLine(lineNumber,0,"FieldRendering",currentScenePath);
+                        lineNumber = getPartialLine(::objStart[cameraCounter],0,"Oversampling",::currentScenePath) + 1;
+                        tempEndNumber = getPartialLine(lineNumber,0,"FieldRendering",::currentScenePath);
                         if(!tempEndNumber)
                         {
                             inputFile.close();
                             outputFile.close();
-                            error("writeCameras: Failed to find FieldRendering!");
+                            logger("error","writeCameras: Failed to find FieldRendering!");
                         }
                         for(i = lineNumber; i < tempEndNumber; i++)
                         {
@@ -992,15 +963,15 @@ writeCameras: inputFile, outputFile, passNames, pass, lastObject, lastLight, las
                         }
 
                         // Next set of changes.
-                        outputFile.write(cameraSettingsPartTwo[cameraCounter]);
+                        outputFile.write(::cameraSettingsPartTwo[cameraCounter]);
 
-                        lineNumber = tempEndNumber + cameraSettingsPartTwoCount[cameraCounter] + 1;
-                        tempEndNumber = getPartialLine(lineNumber,0,"DepthOfField",currentScenePath);
+                        lineNumber = tempEndNumber + ::cameraSettingsPartTwoCount[cameraCounter] + 1;
+                        tempEndNumber = getPartialLine(lineNumber,0,"DepthOfField",::currentScenePath);
                         if(!tempEndNumber)
                         {
                             inputFile.close();
                             outputFile.close();
-                            error("writeCameras: Failed to find DepthOfField!");
+                            logger("error","writeCameras: Failed to find DepthOfField!");
                         }
                         for(i = lineNumber; i < tempEndNumber; i++)
                         {
@@ -1010,15 +981,15 @@ writeCameras: inputFile, outputFile, passNames, pass, lastObject, lastLight, las
                         }
 
                         // Next set of changes.
-                        outputFile.write(cameraSettingsPartThree[cameraCounter]);
+                        outputFile.write(::cameraSettingsPartThree[cameraCounter]);
 
-                        lineNumber = tempEndNumber + cameraSettingsPartThreeCount[cameraCounter] + 1;
-                        tempEndNumber = getPartialLine(lineNumber,0,"Sampler",currentScenePath);
+                        lineNumber = tempEndNumber + ::cameraSettingsPartThreeCount[cameraCounter] + 1;
+                        tempEndNumber = getPartialLine(lineNumber,0,"Sampler",::currentScenePath);
                         if(!tempEndNumber)
                         {
                             inputFile.close();
                             outputFile.close();
-                            error("writeCameras: Failed to find Sampler!");
+                            logger("error","writeCameras: Failed to find Sampler!");
                         }
                         for(i = lineNumber; i < tempEndNumber; i++)
                         {
@@ -1028,16 +999,16 @@ writeCameras: inputFile, outputFile, passNames, pass, lastObject, lastLight, las
                         }
 
                         // Next set of changes.
-                        outputFile.write(cameraSettingsPartFour[cameraCounter]);
+                        outputFile.write(::cameraSettingsPartFour[cameraCounter]);
 
-                        inputFile.line(inputFile.line() + cameraSettingsPartFourCount[cameraCounter] + 1);
+                        inputFile.line(inputFile.line() + ::cameraSettingsPartFourCount[cameraCounter] + 1);
 
                         // Finish up
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == objEnd[cameraCounter])
+                            if(inputFile.line() == ::objEnd[cameraCounter])
                             {
                                 done = true;
                                 break;
@@ -1047,13 +1018,13 @@ writeCameras: inputFile, outputFile, passNames, pass, lastObject, lastLight, las
                     break;
 
                 default:
-                    inputFile.line(objStart[cameraCounter]);
+                    inputFile.line(::objStart[cameraCounter]);
                     done = nil;
                     while(!done)
                     {
                         line = inputFile.read();
                         outputFile.writeln(line);
-                        if(inputFile.line() == (objEnd[cameraCounter]))
+                        if(inputFile.line() == (::objEnd[cameraCounter]))
                         {
                             done = true;
                             break;
@@ -1064,46 +1035,42 @@ writeCameras: inputFile, outputFile, passNames, pass, lastObject, lastLight, las
         }
         else
         {
-            inputFile.line(objStart[cameraCounter]);
-            done = nil;
-            while(!done)
+            lineCounter = ::objStart[cameraCounter]; // first camera line.
+            inputFile.line(lineCounter);
+            while(lineCounter <= ::objEnd[cameraCounter])
             {
                 line = inputFile.read();
                 outputFile.writeln(line);
-                if(inputFile.line() == (objEnd[cameraCounter]))
-                {
-                    done = true;
-                    break;
-                }
+                lineCounter++;
             }
         }
     }
 }
 
-writeObjects: inputFile, outputFile, passNames, pass, lastObject
+writeObjects: inputFile, outputFile
 {
-    if(lastObject != nil)
+    if(::lastObject != nil)
     {
         mmInt = 1;
-        for(objectCounter = 1; objectCounter <= lastObject; objectCounter++)
+        for(objectCounter = 1; objectCounter <= ::lastObject; objectCounter++)
         {
-            progressString = string(((objectCounter/size(lastObject))/4) + (1 / noOfStages));
+            progressString = string(((objectCounter/size(::lastObject))/4) + (1 / ::noOfStages));
             msgString = "{" + progressString + "}Generating Render Scene:  Writing Objects...";
             StatusMsg(msgString);
             sleep(1);
             
-            if(doOverride[objectCounter] == 1)
+            if(::doOverride[objectCounter] == 1)
             {
-                switch(overrideType[objectCounter])
+                switch(::overrideType[objectCounter])
                 {
                     case 1:
                         // begin case 1 here, which is the surface type
-                        if(srfInputTemp[objectCounter] != nil && srfLWOInputID[objectCounter] != nil)
+                        if(::srfInputTemp[objectCounter] != nil && ::srfLWOInputID[objectCounter] != nil)
                         {
-                            surfacedLWO = generateSurfaceObjects(srfLWOInputID[objectCounter],srfInputTemp[objectCounter],currentScenePath,objStart[objectCounter], passNames, pass);
+                            surfacedLWO = generateSurfaceObjects(::srfLWOInputID[objectCounter],::srfInputTemp[objectCounter],::currentScenePath,::objStart[objectCounter]);
                             if(surfacedLWO != nil)
                             {
-                                inputFile.line(objStart[objectCounter]);
+                                inputFile.line(::objStart[objectCounter]);
                                 line = inputFile.read();
                                 if(line != nil && line != "")
                                 {
@@ -1114,9 +1081,8 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                                         
                                         surfacedLWO_nameArray = split(surfacedLWO);
                                         surfacedLWO_baseName = surfacedLWO_nameArray[3];
-                                        overriddenObjectID[mmInt] = parseObjLineTemp[3];
-                                        //info("overriding properly");
-                                        overriddenObjectName[mmInt] = surfacedLWO_baseName;
+                                        ::overriddenObjectID[mmInt] = parseObjLineTemp[3];
+                                        ::overriddenObjectName[mmInt] = surfacedLWO_baseName;
                                         mmInt = mmInt + 1;
                                     }
                                 }
@@ -1126,13 +1092,13 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                                 {
                                     line = inputFile.read();
                                     outputFile.writeln(line);
-                                    if(inputFile.line() == (objEnd[objectCounter] - 2))
+                                    if(inputFile.line() == ::objEnd[objectCounter])
                                     {
                                         done = true;
                                         break;
                                     }
                                 }
-                                inputFile.line(objEnd[objectCounter] - 2);
+                                inputFile.line(::objEnd[objectCounter]);
                                 line = inputFile.read();
                                 outputFile.writeln(line);
                                 if(lightExclusion)
@@ -1147,19 +1113,19 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                             }
                             else
                             {
-                                inputFile.line(objStart[objectCounter]);
+                                inputFile.line(::objStart[objectCounter]);
                                 done = nil;
                                 while(!done)
                                 {
                                     line = inputFile.read();
                                     outputFile.writeln(line);
-                                    if(inputFile.line() == (objEnd[objectCounter] - 2))
+                                    if(inputFile.line() == ::objEnd[objectCounter])
                                     {
                                         done = true;
                                         break;
                                     }
                                 }
-                                inputFile.line(objEnd[objectCounter] - 2);
+                                inputFile.line(::objEnd[objectCounter]);
                                 line = inputFile.read();
                                 outputFile.writeln(line);
                                 if(lightExclusion)
@@ -1176,19 +1142,19 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                         }
                         else
                         {
-                            inputFile.line(objStart[objectCounter]);
+                            inputFile.line(::objStart[objectCounter]);
                             done = nil;
                             while(!done)
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == (objEnd[objectCounter] - 2))
+                                if(inputFile.line() == ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            inputFile.line(objEnd[objectCounter] - 2);
+                            inputFile.line(::objEnd[objectCounter]);
                             line = inputFile.read();
                             outputFile.writeln(line);
                             if(lightExclusion)
@@ -1206,7 +1172,7 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                     
                     case 2:
                         // begin case 2 here, which is the object properties override type
-                        inputFile.line(objStart[objectCounter]);
+                        inputFile.line(::objStart[objectCounter]);
                         done = nil;
                         excludedLightsTemp = 0;
                         while(!done)
@@ -1223,8 +1189,8 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                                 }
                                 else
                                 {
-                                    outputFile.write(objPropOverrideSets[objectCounter]);
-                                    outputFile.write(objPropOverrideShadowOpts[objectCounter]);
+                                    outputFile.write(::objPropOverrideSets[objectCounter]);
+                                    outputFile.write(::objPropOverrideShadowOpts[objectCounter]);
                                     excludedLightsTemp = 1;
                                 }
                             }
@@ -1232,7 +1198,7 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                             {
                                 outputFile.writeln(line);
                             }
-                            if(inputFile.line() == (objEnd[objectCounter] - 2))
+                            if(inputFile.line() == ::objEnd[objectCounter])
                             {
                                 done = true;
                                 break;
@@ -1240,15 +1206,15 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                         }
                         if(excludedLightsTemp == 1)
                         {
-                            inputFile.line(objEnd[objectCounter] - 2);
+                            inputFile.line(::objEnd[objectCounter]);
                             line = inputFile.read();
                             outputFile.writeln(line);
                             outputFile.writeln("");
                         }
                         else
                         {
-                            outputFile.write(objPropOverrideSets[objectCounter]);
-                            outputFile.writeln(objPropOverrideShadowOpts[objectCounter]);
+                            outputFile.write(::objPropOverrideSets[objectCounter]);
+                            outputFile.writeln(::objPropOverrideShadowOpts[objectCounter]);
                         }
                         if(lightExclusion)
                         {
@@ -1263,18 +1229,18 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                         
                     case 3:
                         // begin case 3 here, which is the motion override type
-                        if(motInputTemp[objectCounter] != nil)
+                        if(::motInputTemp[objectCounter] != nil)
                         {
                             // Check that we can find the motion file.
-                            fileCheck(motInputTemp[objectCounter]);
-                            motFile = File(motInputTemp[objectCounter], "r");
-                            inputFile.line(objStart[objectCounter]);
+                            fileCheck(::motInputTemp[objectCounter]);
+                            motFile = File(::motInputTemp[objectCounter], "r");
+                            inputFile.line(::objStart[objectCounter]);
                             done = nil;
                             while(!done)
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == (objMotStart[objectCounter]))
+                                if(inputFile.line() == ::objMotStart[objectCounter])
                                 {
                                     done = true;
                                     break;
@@ -1286,20 +1252,20 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                                 line = motFile.read();
                                 outputFile.writeln(line);
                             }
-                            inputFile.line(objMotEnd[objectCounter] + 1);
+                            inputFile.line(::objMotEnd[objectCounter] + 1);
                             done = nil;
                             while(!done)
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == (objEnd[objectCounter] - 2))
+                                if(inputFile.line() == ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
                                 }
                             }
                             motFile.close();
-                            inputFile.line(objEnd[objectCounter] - 2);
+                            inputFile.line(::objEnd[objectCounter]);
                             line = inputFile.read();
                             outputFile.writeln(line);
                             if(lightExclusion)
@@ -1313,19 +1279,19 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                         }
                         else
                         {
-                            inputFile.line(objStart[objectCounter]);
+                            inputFile.line(::objStart[objectCounter]);
                             done = nil;
                             while(!done)
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == (objEnd[objectCounter] - 2))
+                                if(inputFile.line() == ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            inputFile.line(objEnd[objectCounter] - 2);
+                            inputFile.line(::objEnd[objectCounter]);
                             line = inputFile.read();
                             outputFile.writeln(line);
                             if(lightExclusion)
@@ -1342,22 +1308,22 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                         
                     case 4:
                         // begin case 4 here, which is the alternate object type
-                        if(lwoInputTemp[objectCounter] != nil)
+                        if(::lwoInputTemp[objectCounter] != nil)
                         {
                             // Check that we can find the file.
-                            fileCheck(lwoInputTemp[objectCounter]);
-                            inputFile.line(objStart[objectCounter]);
+                            fileCheck(::lwoInputTemp[objectCounter]);
+                            inputFile.line(::objStart[objectCounter]);
                             line = inputFile.read();
                             if(line != nil && line != "")
                             {
                                 parseObjLineTemp = parse(" ",line);
                                 if(parseObjLineTemp[1] == "LoadObjectLayer")
                                 {
-                                    line = parseObjLineTemp[1] + " 1 " + parseObjLineTemp[3] + " " + lwoInputTemp[objectCounter];
-                                    replacedLWO_nameArray = split(lwoInputTemp[objectCounter]);
+                                    line = parseObjLineTemp[1] + " 1 " + parseObjLineTemp[3] + " " + ::lwoInputTemp[objectCounter];
+                                    replacedLWO_nameArray = split(::lwoInputTemp[objectCounter]);
                                     replacedLWO_baseName = replacedLWO_nameArray[3];
-                                    overriddenObjectID[mmInt] = parseObjLineTemp[3];
-                                    overriddenObjectName[mmInt] = replacedLWO_baseName;
+                                    ::overriddenObjectID[mmInt] = parseObjLineTemp[3];
+                                    ::overriddenObjectName[mmInt] = replacedLWO_baseName;
                                     mmInt = mmInt + 1;
                                 }
                             }
@@ -1367,13 +1333,13 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == (objEnd[objectCounter] - 2))
+                                if(inputFile.line() == ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            inputFile.line(objEnd[objectCounter] - 2);
+                            inputFile.line(::objEnd[objectCounter]);
                             line = inputFile.read();
                             outputFile.writeln(line);
                             if(lightExclusion)
@@ -1388,19 +1354,19 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                         }
                         else
                         {
-                            inputFile.line(objStart[objectCounter]);
+                            inputFile.line(::objStart[objectCounter]);
                             done = nil;
                             while(!done)
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == (objEnd[objectCounter] - 2))
+                                if(inputFile.line() == ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            inputFile.line(objEnd[objectCounter] - 2);
+                            inputFile.line(::objEnd[objectCounter]);
                             line = inputFile.read();
                             outputFile.writeln(line);
                             if(lightExclusion)
@@ -1416,19 +1382,19 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                         break;
                         
                     case 7:
-                        inputFile.line(objStart[objectCounter]);
+                        inputFile.line(::objStart[objectCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[objectCounter] - 2))
+                            if(inputFile.line() == ::objEnd[objectCounter])
                             {
                                 done = true;
                                 break;
                             }
                         }
-                        inputFile.line(objEnd[objectCounter] - 2);
+                        inputFile.line(::objEnd[objectCounter]);
                         line = inputFile.read();
                         outputFile.writeln(line);
                         if(lightExclusion)
@@ -1442,19 +1408,19 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
                         break;
                         
                     default:
-                        inputFile.line(objStart[objectCounter]);
+                        inputFile.line(::objStart[objectCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[objectCounter] - 2))
+                            if(inputFile.line() == ::objEnd[objectCounter])
                             {
                                 done = true;
                                 break;
                             }
                         }
-                        inputFile.line(objEnd[objectCounter] - 2);
+                        inputFile.line(::objEnd[objectCounter]);
                         line = inputFile.read();
                         outputFile.writeln(line);
                         outputFile.writeln("");
@@ -1466,19 +1432,19 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
             }
             else
             {
-                inputFile.line(objStart[objectCounter]);
+                inputFile.line(::objStart[objectCounter]);
                 done = nil;
                 while(!done)
                 {
                     line = inputFile.read();
                     outputFile.writeln(line);
-                    if(inputFile.line() == (objEnd[objectCounter] - 2))
+                    if(inputFile.line() == (::objEnd[objectCounter]))
                     {
                         done = true;
                         break;
                     }
                 }
-                inputFile.line(objEnd[objectCounter] - 2);
+                inputFile.line(::objEnd[objectCounter]);
                 line = inputFile.read();
                 outputFile.writeln(line);
                 outputFile.writeln("");
@@ -1487,29 +1453,29 @@ writeObjects: inputFile, outputFile, passNames, pass, lastObject
     }
     else
     {
-        lastObject = 0;
+        ::lastObject = 0;
     }
 }
 
-writeLights: inputFile, outputFile, passNames, pass, lastObject, lastLight, IKInitialState, objLightTypeLine, objAffectCausticsLine, objLensFlareLine, objVolLightLine, lightSettingsPartOne, lightSettingsPartTwo, lightSettingsPartThree
+writeLights: inputFile, outputFile, IKInitialState
 {
-    for(lightCounter = lastObject + 1; lightCounter <= lastObject + lastLight; lightCounter++)
+    for(lightCounter = ::lastObject + 1; lightCounter <= ::lastObject + ::lastLight; lightCounter++)
     {
-        progressString = string(((lightCounter/(lastObject + lastLight))/4) + (2 / noOfStages));
+        progressString = string(((lightCounter/(::lastObject + ::lastLight))/4) + (2 / ::noOfStages));
         msgString = "{" + progressString + "}Generating Render Scene:  Writing Lights...";
         StatusMsg(msgString);
         sleep(1);
         
-        if(doOverride[lightCounter] == 1)
+        if(::doOverride[lightCounter] == 1)
         {
-            switch(overrideType[lightCounter])
+            switch(::overrideType[lightCounter])
             {
                 case 5:
                     // begin case 5 here, which is the light properties override type
-                    if(lightSettingsPartOne[lightCounter] != nil)
+                    if(::lightSettingsPartOne[lightCounter] != nil)
                     {
                         // write out the beginning of the light
-                        inputFile.line(objStart[lightCounter]);
+                        inputFile.line(::objStart[lightCounter]);
                         done = nil;
                         while(!done)
                         {
@@ -1523,29 +1489,29 @@ writeLights: inputFile, outputFile, passNames, pass, lastObject, lastLight, IKIn
                         }
                         
                         // write out the custom parameters
-                        outputFile.write(lightSettingsPartOne[lightCounter]);
+                        outputFile.write(::lightSettingsPartOne[lightCounter]);
 
                         // write out the rest of the light, first volumetrics, then flare, then rest
-                        inputFile.line(objAffectCausticsLine[lightCounter]);
-                        if(objVolLightLine[lightCounter] != nil)
+                        inputFile.line(::objAffectCausticsLine[lightCounter]);
+                        if(::objVolLightLine[lightCounter] != nil)
                         {
                             done = nil;
-                            endLine = objVolLightLine[lightCounter];
+                            endLine = ::objVolLightLine[lightCounter];
                             while(!done)
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
                                 if(inputFile.line() == endLine)
                                 {
-                                    outputFile.writeln(lightSettingsPartThree[lightCounter]);
+                                    outputFile.writeln(::lightSettingsPartThree[lightCounter]);
                                     done = true;
                                     break;
                                 }
                             }
                         }
-                        if(objLensFlareLine[lightCounter] != nil)
+                        if(::objLensFlareLine[lightCounter] != nil)
                         {
-                            endLine = objLensFlareLine[lightCounter];
+                            endLine = ::objLensFlareLine[lightCounter];
                             done = nil;
                             while(!done)
                             {
@@ -1553,7 +1519,7 @@ writeLights: inputFile, outputFile, passNames, pass, lastObject, lastLight, IKIn
                                 outputFile.writeln(line);
                                 if(inputFile.line() == endLine)
                                 {
-                                    outputFile.writeln(lightSettingsPartTwo[lightCounter]);
+                                    outputFile.writeln(::lightSettingsPartTwo[lightCounter]);
                                     done = true;
                                     break;
                                 }
@@ -1564,7 +1530,7 @@ writeLights: inputFile, outputFile, passNames, pass, lastObject, lastLight, IKIn
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[lightCounter]))
+                            if(inputFile.line() == (::objEnd[lightCounter]))
                             {
                                 done = true;
                                 break;
@@ -1573,13 +1539,13 @@ writeLights: inputFile, outputFile, passNames, pass, lastObject, lastLight, IKIn
                     }
                     else
                     {
-                        inputFile.line(objStart[lightCounter]);
+                        inputFile.line(::objStart[lightCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[lightCounter]))
+                            if(inputFile.line() == (::objEnd[lightCounter]))
                             {
                                 done = true;
                                 break;
@@ -1591,18 +1557,18 @@ writeLights: inputFile, outputFile, passNames, pass, lastObject, lastLight, IKIn
                 
                 case 3:
                     // begin case 3 here, which is the motion override type
-                    if(motInputTemp[lightCounter] != nil)
+                    if(::motInputTemp[lightCounter] != nil)
                     {
                         // Check file is valid.
-                        fileCheck(motInputTemp[lightCounter]);
-                        motFile = File(motInputTemp[lightCounter],"r");
-                        inputFile.line(objStart[lightCounter]);
+                        fileCheck(::motInputTemp[lightCounter]);
+                        motFile = File(::motInputTemp[lightCounter],"r");
+                        inputFile.line(::objStart[lightCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objMotStart[lightCounter]))
+                            if(inputFile.line() == (::objMotStart[lightCounter]))
                             {
                                 done = true;
                                 break;
@@ -1614,13 +1580,13 @@ writeLights: inputFile, outputFile, passNames, pass, lastObject, lastLight, IKIn
                             line = motFile.read();
                             outputFile.writeln(line);
                         }
-                        inputFile.line(objMotEnd[lightCounter] + 1);
+                        inputFile.line(::objMotEnd[lightCounter] + 1);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[lightCounter]))
+                            if(inputFile.line() == (::objEnd[lightCounter]))
                             {
                                 done = true;
                                 break;
@@ -1630,13 +1596,13 @@ writeLights: inputFile, outputFile, passNames, pass, lastObject, lastLight, IKIn
                     }
                     else
                     {
-                        inputFile.line(objStart[lightCounter]);
+                        inputFile.line(::objStart[lightCounter]);
                         done = nil;
                         while(!done)
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == (objEnd[lightCounter]))
+                            if(inputFile.line() == (::objEnd[lightCounter]))
                             {
                                 done = true;
                                 break;
@@ -1647,13 +1613,13 @@ writeLights: inputFile, outputFile, passNames, pass, lastObject, lastLight, IKIn
                     break;
                 
                 default:
-                    inputFile.line(objStart[lightCounter]);
+                    inputFile.line(::objStart[lightCounter]);
                     done = nil;
                     while(!done)
                     {
                         line = inputFile.read();
                         outputFile.writeln(line);
-                        if(inputFile.line() == (objEnd[lightCounter]))
+                        if(inputFile.line() == (::objEnd[lightCounter]))
                         {
                             done = true;
                             break;
@@ -1664,13 +1630,13 @@ writeLights: inputFile, outputFile, passNames, pass, lastObject, lastLight, IKIn
         }
         else
         {
-            inputFile.line(objStart[lightCounter]);
+            inputFile.line(::objStart[lightCounter]);
             done = nil;
             while(!done)
             {
                 line = inputFile.read();
                 outputFile.writeln(line);
-                if(inputFile.line() == (objEnd[lightCounter]))
+                if(inputFile.line() == (::objEnd[lightCounter]))
                 {
                     done = true;
                     break;
@@ -1681,71 +1647,228 @@ writeLights: inputFile, outputFile, passNames, pass, lastObject, lastLight, IKIn
     outputFile.writeln("");
 }
 
-fiberFX: ffFile, passNames, pass
+fiberFXOverride: ffxFile
 {
-	// Let's check if FiberFX was even applied.
-	ffLine = getPartialLine(0,0,"Plugin PixelFilterHandler 1 FiberFilter",ffFile);
-	if(ffLine == nil)
-	{
-		return 0;
-	}
-	
-	// Let's check if it's version 3
-	checkFile = File(ffFile, "r");
-	checkFile.line(ffLine + 2);
-	line = checkFile.read();
-	if(line != "Version 3")
-	{
-		checkFile.close();
-		return 0;
-	}
-	
-	// If we got here, we're happy that everything is good to go.
-	checkFile.close();
+    ffxLine = getPixelFilterLine("FiberFilter", ffxFile);
+    if (!ffxLine)
+    {
+        // No FFx entries
+        return 0;
+    }
 
-	// Hard-coded offsets from the detected pixel filter line, based on scene file inspection.
-	fiberFXSaveRGBA				= integer(settingsArray[50]);
-	ffString = "SaveRGBA " + string(fiberFXSaveRGBA);
-	changeScnLine(ffString, ffFile, ffLine + 8);
+    // Let's check if it's version 3 or 4 - we support both.
+    checkFile = File(ffxFile, "r");
+    checkFile.line(ffxLine + 2);
+    ffxVersion = int(strright(checkFile.read(),1));
+    checkFile.close();
+    if(ffxVersion != "3" && ffxVersion != "4")
+    {
+        logger("warn","FiberFX detected, but version mismatched - we support version 3 or version 4.");
+        return 0;
+    }
 
-	fiberFXSaveDepth			= integer(settingsArray[53]);
-	ffString = "SaveDepth " + string(fiberFXSaveDepth);
-	changeScnLine(ffString, ffFile, ffLine + 9);
+    ::fiberFXSaveRGBA             = integer(::settingsArray[50]);
+    ::fiberFXSaveRGBAType         = integer(::settingsArray[51]);
+    ::fiberFXSaveRGBAName         = string(::settingsArray[52]);
+    ::fiberFXSaveDepth            = integer(::settingsArray[53]);
+    ::fiberFXSaveDepthType        = integer(::settingsArray[54]);
+    ::fiberFXSaveDepthName        = string(::settingsArray[55]);
 
-	fiberFXSaveRGBAType			= integer(settingsArray[51]);
-	ffString = "RGBType " + string(image_formats_array[fiberFXSaveRGBAType]);
-	changeScnLine(ffString, ffFile, ffLine + 10);
+    // Hard-coded offsets from the detected pixel filter line, based on scene file inspection.
+    ffxString = "SaveRGBA " + string(fiberFXSaveRGBA);
+    changeScnLine(ffxString, ffxFile, ffxLine + 8);
 
-	fiberFXSaveDepthType		= integer(settingsArray[54]);
-	ffString = "DepthType " + string(image_formats_array[fiberFXSaveDepthType]);
-	changeScnLine(ffString, ffFile, ffLine + 11);
+    ffxString = "SaveDepth " + string(fiberFXSaveDepth);
+    changeScnLine(ffxString, ffxFile, ffxLine + 9);
 
-	fiberFXSaveRGBAName			= string(settingsArray[52]);
-	ffString = "RGBName " + string(fiberFXSaveRGBAName);
-	changeScnLine(ffString, ffFile, ffLine + 12);
+    ffxString = "RGBType " + string(::image_formats_array[fiberFXSaveRGBAType]);
+    changeScnLine(ffxString, ffxFile, ffxLine + 10);
 
-	fiberFXSaveDepthName		= string(settingsArray[55]);
-	ffString = "DepthName " + string(fiberFXSaveDepthName);
-	changeScnLine(ffString, ffFile, ffLine + 13);
+    ffxString = "DepthType " + string(::image_formats_array[fiberFXSaveDepthType]);
+    changeScnLine(ffxString, ffxFile, ffxLine + 11);
 
-	return 1; // notify caller that we changed something.
+    ffxString = "RGBName " + string(fiberFXSaveRGBAName);
+    changeScnLine(ffxString, ffxFile, ffxLine + 12);
+
+    ffxString = "DepthName " + string(fiberFXSaveDepthName);
+    changeScnLine(ffxString, ffxFile, ffxLine + 13);
+
+    return 1;
 }
 
-handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, fileOuputPrefix, userOutputString, passNames, pass // if you edit this, don't forget to extend defaultBufferExporters as well and the new/edit pass dialog to set the values accordingly. You'll also need to bump the version due to mismatches.
+fiberFX: ffxFile
 {
-	if(redirectBuffersSetts == 1)
-	{
-        inputFileName = prepareInputFile(hbFile);
-        inputFile = File(inputFileName, "r");
-        tempOutput = File(newScenePath,"w");
-		while(!inputFile.eof())
-		{
-			line = inputFile.read();
+    // LW only allows one instance of the plugin, so we only need one check and adjustment sequence.
+    ffxDebug = 0;
+    // Let's check if FiberFX was even applied.
+    ffxLine = getPixelFilterLine("FiberFilter", ffxFile);
+    if (!ffxLine)
+    {
+        // No FFx entries
+        return 0;
+    }
+    
+    // Let's check if it's version 3 or later - we support both.
+    checkFile = File(ffxFile, "r");
+    checkFile.line(ffxLine + 2);
+    ffxVersion = int(strright(checkFile.read(),1));
+    checkFile.close();
+    if(ffxVersion != "4")
+    {
+        logger("warn","FiberFX detected, but version mismatched - we only support 11.6-authored FiberFX scenes!");
+        return 0;
+    }
+
+    ffxHeaderEndLine = getPartialLine(ffxLine,0,"ToggleOff",ffxFile); // This line is the last before the item specific entries.
+
+    ffxEndLine = getPartialLine(ffxLine,0,"EndPlugin",ffxFile); // End of plugin block.
+
+
+    // We need to extract item IDs from the scene file to then check against our pass items.
+    ffxItems = getFFxItems(ffxFile, ffxLine);
+    if (ffxItems == nil)
+    {
+        // No item IDs found. Nothing to do.
+        if (ffxDebug == 1)
+        {
+            logger("log_info","fiberFX: Nothing found");
+        }
+        return 0;
+    }
+
+    // Let's get our start and end lines for each item using FFx.
+    // We'll need to make a temporary, translated array of IDs from our pass items.
+    passItems = parse("||", ::passAssItems[::pass]);
+    for (j = 1; j <= size(passItems); j++)
+    {
+        // passAssItems stores the decimal ID value. FFx and the scene file use the hexadecimal representation (also stored in the oldIDs array)
+        // We need to get creative in comparing them.
+        tArray = parse("x",hex(int(passItems[j])));
+        tempID[j] = tArray[2];
+    }
+
+    matchedFFXItems;
+    matchedFFXItemsCounter = 1;
+
+    for (i = 1; i <= size(ffxItems); i++)
+    {
+        if (ffxDebug == 1)
+        {
+            logger("log_info","fiberFX: Checking FFID: " + ffxItems[i].asStr());
+        }
+        ffxMatchFound = tempID.indexOf(string(ffxItems[i]));
+        if(ffxMatchFound != 0)
+        {
+            matchedFFXItems[matchedFFXItemsCounter] = ffxItems[i];
+            matchedFFXItemsCounter++;
+        }
+    }
+
+    if (matchedFFXItemsCounter == 1) // safety catch.
+    {
+        logger("warn","fiberFX: Error during ID Matching!");
+        return 0;
+    } else {
+        // logger("log_info","fiberFX: Matched " + size(matchedFFXItems) + " items");
+    }
+
+    ffxChunkLineArrayIndex = 1;
+    for (i = 1; i <= size(matchedFFXItems); i++)
+    {
+        ffxItemID = matchedFFXItems[i];
+        if (ffxDebug == 1)
+        {
+            logger("log_info","fiberFX: Processing FFID: " + ffxItemID.asStr());
+        }
+        tempFFx_r = File(ffxFile, "r");
+        tempFFx_r.line(ffxLine);
+        ffxStartString = "  Itemid " + ffxItemID.asStr();
+        ffxEndString = "  VolumeType";
+        while(!tempFFx_r.eof())
+        {
+            ffxLineTemp = tempFFx_r.read();
+            if (ffxLineTemp == ffxStartString)
+            {
+                ffxChunkStartLineArray[ffxChunkLineArrayIndex] = tempFFx_r.line() - 3; // hard-coded offset to start of block
+                ffx_s_found = 1;
+            }
+            if ((strleft(ffxLineTemp, ffxEndString.size()) == ffxEndString) && (ffx_s_found == 1))
+            {
+                ffxChunkEndLineArray[ffxChunkLineArrayIndex] = tempFFx_r.line() + 10; // hard-coded offset to end of block
+                ffx_s_found = 0;
+                if (ffxDebug == 1)
+                {
+                    logger("log_info",ffxChunkStartLineArray[ffxChunkLineArrayIndex].asStr() + "/" + ffxChunkEndLineArray[ffxChunkLineArrayIndex]);
+                }
+                ffxChunkLineArrayIndex++;
+            }
+        }
+        tempFFx_r.close();
+    }
+
+    // Now we need to write out the sections we care about.
+    ffxOutputFilename = tempDirectory + getsep() + "tempPassportFileFFx.lws";
+    ffxOutput = File(ffxOutputFilename,"w");
+    ffxInput = File(ffxFile, "r");
+    ffxLineNumber = 1;
+    while(ffxLineNumber <= ffxHeaderEndLine)
+    {
+        ffxLine = ffxInput.read();
+        ffxOutput.writeln(ffxLine);
+        ffxLineNumber++;
+    }
+
+    // Now we write out our sections from above.
+    for(i = 1; i <= size(matchedFFXItems); i++)
+    {
+        ffxItemID = matchedFFXItems[i];
+        if (ffxDebug == 1)
+        {
+            logger("log_info","fiberFX: Writing FFID: " + ffxItemID);
+        }
+        sourceLine = ffxChunkStartLineArray[i];
+        ffxInput.line(sourceLine);
+        while(sourceLine <= ffxChunkEndLineArray[i])
+        {
+            ffxLine = ffxInput.read();
+            ffxOutput.writeln(ffxLine);
+            sourceLine++;
+        }
+    }
+
+    ffxOutput.close();
+    ffxOutput = File(ffxOutputFilename, "a");
+    ffxInput.line(ffxEndLine);
+    while(!ffxInput.eof())
+    {
+        ffxOutput.writeln(ffxInput.read());
+    }
+
+    ffxInput.close();
+    ffxOutput.close();
+
+    // Push the output back to the original file.
+    filecopy(ffxOutputFilename, ffxFile);
+    filedelete(ffxOutputFilename);
+
+    return 1; // notify caller that we changed something.
+}
+
+handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, fileOuputPrefix, userOutputString // if you edit this, don't forget to extend defaultBufferExporters as well and the new/edit pass dialog to set the values accordingly. You'll also need to bump the version due to mismatches.
+{
+    if(redirectBuffersSetts == 1)
+    {
+        ::inputFileName = prepareInputFile(hbFile);
+        inputFile = File(::inputFileName, "r");
+        tempOutput = File(::newScenePath,"w");
+        while(!inputFile.eof())
+        {
+            line = inputFile.read();
             searchString = "Plugin ImageFilterHandler ";
-			if(size(line) > searchString.size())
-			{
-				if(strleft(line,searchString.size()) == searchString)
-				{
+            if(size(line) > searchString.size())
+            {
+                if(strleft(line,searchString.size()) == searchString)
+                {
                     bufferTestLineParse = parse(" ",line);
                     // compositing buffer exporter - experimental with beta 8
                     if(bufferTestLineParse[4] == "LW_CompositeBuffer")
@@ -1759,11 +1882,11 @@ handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, file
                         if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
                         {
                             compositeBaseName = baseNameArray[size(baseNameArray)];
-                            updatedCompositeSaverPath = "    \"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
+                            updatedCompositeSaverPath = "    \"" + generatePath("filter_2sep", outputFolder, outputStr, ::fileOutputPrefix, ::userOutputString, compositeBaseName);
 
                             if(platform() == INTEL)
                             {
-                                noIntroPath = "\"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
+                                noIntroPath = "\"" + generatePath("filter_2sep", outputFolder, outputStr, ::fileOutputPrefix, ::userOutputString, compositeBaseName);
                                 tempFixedPath = fixPathForWin32(noIntroPath);
                                 noIntroPath = tempFixedPath;
                                 newPathFixed = "    " + noIntroPath;
@@ -1793,11 +1916,11 @@ handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, file
                         if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
                         {
                             compositeBaseName = baseNameArray[size(baseNameArray)];
-                            updatedCompositeSaverPath = "    \"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
+                            updatedCompositeSaverPath = "    \"" + generatePath("filter_2sep", outputFolder, outputStr, ::fileOutputPrefix, ::userOutputString, compositeBaseName);
 
                             if(platform() == INTEL)
                             {
-                                noIntroPath = "\"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, compositeBaseName);
+                                noIntroPath = "\"" + generatePath("filter_2sep", outputFolder, outputStr, ::fileOutputPrefix, ::userOutputString, compositeBaseName);
                                 tempFixedPath = fixPathForWin32(noIntroPath);
                                 noIntroPath = tempFixedPath;
                                 newPathFixed = "    " + noIntroPath;
@@ -1815,229 +1938,229 @@ handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, file
                         }
                     }
 
-					// the stock render buffer exporter
-					if(bufferTestLineParse[4] == "LW_SpecialBuffers")
-					{
+                    // the stock render buffer exporter
+                    if(bufferTestLineParse[4] == "LW_SpecialBuffers")
+                    {
                         for(i = 1; i <= 2; i++)
                         {
                             tempOutput.writeln(line);
                             line = inputFile.read();
                         }
-						if(line == "0")
-						{
-							tempOutput.writeln(line);
-							line = inputFile.read();
-							baseNameArray = parse(getsep(),line);
-							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-							{
-								bufferBaseName = baseNameArray[size(baseNameArray)];
-								updatedBufferSaverPath = "\"" + generatePath("filter", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, bufferBaseName);
+                        if(line == "0")
+                        {
+                            tempOutput.writeln(line);
+                            line = inputFile.read();
+                            baseNameArray = parse(getsep(),line);
+                            if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+                            {
+                                bufferBaseName = baseNameArray[size(baseNameArray)];
+                                updatedBufferSaverPath = "\"" + generatePath("filter", outputFolder, outputStr, ::fileOutputPrefix, ::userOutputString, bufferBaseName);
 
-								if(platform() == INTEL)
-								{
-									tempFixedPath = fixPathForWin32(updatedBufferSaverPath);
-									newPathFixed = tempFixedPath;
-									toWrite = newPathFixed;
-								}
-								else
-								{
-									toWrite = updatedBufferSaverPath;
-								}
-							}
-							else
-							{
-								toWrite = line;
-							}
-						}
-						else
-						{
-							toWrite = line;
-						}
-					}
-					// end of the stock render buffer exporter
-					
-					// the psd exporter
-					if(bufferTestLineParse[4] == "LW_PSDExport")
-					{
+                                if(platform() == INTEL)
+                                {
+                                    tempFixedPath = fixPathForWin32(updatedBufferSaverPath);
+                                    newPathFixed = tempFixedPath;
+                                    toWrite = newPathFixed;
+                                }
+                                else
+                                {
+                                    toWrite = updatedBufferSaverPath;
+                                }
+                            }
+                            else
+                            {
+                                toWrite = line;
+                            }
+                        }
+                        else
+                        {
+                            toWrite = line;
+                        }
+                    }
+                    // end of the stock render buffer exporter
+                    
+                    // the psd exporter
+                    if(bufferTestLineParse[4] == "LW_PSDExport")
+                    {
                         for(i = 1; i <= 2; i++)
                         {
                             tempOutput.writeln(line);
                             line = inputFile.read();
                         }
-						if(strleft(line,5) == "Path ")
-						{
-							baseNameArray = parse(getsep(),line);
-							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-							{
-								psdBaseName = baseNameArray[size(baseNameArray)];
-								updatedPsdSaverPath = "Path \"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, psdBaseName);
+                        if(strleft(line,5) == "Path ")
+                        {
+                            baseNameArray = parse(getsep(),line);
+                            if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+                            {
+                                psdBaseName = baseNameArray[size(baseNameArray)];
+                                updatedPsdSaverPath = "Path \"" + generatePath("filter_2sep", outputFolder, outputStr, ::fileOutputPrefix, ::userOutputString, psdBaseName);
 
-								if(platform() == INTEL)
-								{
-									noIntroPath = "\"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, psdBaseName);
-									tempFixedPath = fixPathForWin32(noIntroPath);
-									noIntroPath = tempFixedPath;
-									newPathFixed = "Path " + noIntroPath;
-	
-									toWrite = newPathFixed;
-								}
-								else
-								{
-									toWrite = updatedPsdSaverPath;
-								}
-							}
-							else
-							{
-								toWrite = line;
-							}
-						}
-						else
-						{
-							toWrite = line;
-						}
-					}
-					// end of the psd exporter
-					
-					// the rla exporter
-						if(bufferTestLineParse[4] == "LW_ExtendedRLAExport")
-					{
+                                if(platform() == INTEL)
+                                {
+                                    noIntroPath = "\"" + generatePath("filter_2sep", outputFolder, outputStr, ::fileOutputPrefix, ::userOutputString, psdBaseName);
+                                    tempFixedPath = fixPathForWin32(noIntroPath);
+                                    noIntroPath = tempFixedPath;
+                                    newPathFixed = "Path " + noIntroPath;
+    
+                                    toWrite = newPathFixed;
+                                }
+                                else
+                                {
+                                    toWrite = updatedPsdSaverPath;
+                                }
+                            }
+                            else
+                            {
+                                toWrite = line;
+                            }
+                        }
+                        else
+                        {
+                            toWrite = line;
+                        }
+                    }
+                    // end of the psd exporter
+                    
+                    // the rla exporter
+                        if(bufferTestLineParse[4] == "LW_ExtendedRLAExport")
+                    {
                         for(i = 1; i <= 2; i++)
                         {
                             tempOutput.writeln(line);
                             line = inputFile.read();
                         }
-						if(strleft(line,1) != "")
-						{
-							baseNameArray = parse(getsep(),line);
-							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-							{
-								rlaBaseName = baseNameArray[size(baseNameArray)];
-								updatedRlaSaverPath = generatePath("filter", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, rlaBaseName);
-								toWrite = updatedRlaSaverPath;
-							}
-							else
-							{
-								toWrite = line;
-							}
+                        if(strleft(line,1) != "")
+                        {
+                            baseNameArray = parse(getsep(),line);
+                            if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+                            {
+                                rlaBaseName = baseNameArray[size(baseNameArray)];
+                                updatedRlaSaverPath = generatePath("filter", outputFolder, outputStr, ::fileOutputPrefix, ::userOutputString, rlaBaseName);
+                                toWrite = updatedRlaSaverPath;
+                            }
+                            else
+                            {
+                                toWrite = line;
+                            }
 
-						}
-						else
-						{
-							toWrite = line;
-						}   
-					}
-					// end of the rla exporter
-					
-					// the rpf exporter
-					if(bufferTestLineParse[4] == "LW_ExtendedRPFExport")
-					{
+                        }
+                        else
+                        {
+                            toWrite = line;
+                        }   
+                    }
+                    // end of the rla exporter
+                    
+                    // the rpf exporter
+                    if(bufferTestLineParse[4] == "LW_ExtendedRPFExport")
+                    {
                         for(i = 1; i <= 2; i++)
                         {
                             tempOutput.writeln(line);
                             line = inputFile.read();
                         }
-						if(strleft(line,1) != "")
-						{
-							baseNameArray = parse(getsep(),line);
-							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-							{
-								rpfBaseName = baseNameArray[size(baseNameArray)];
-								updatedRpfSaverPath = "\"" + generatePath("filter", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, rpfBaseName);
-								toWrite = updatedRpfSaverPath;
-							}
-							else
-							{
-								toWrite = line;
-							}
-						}
-						else
-						{
-							toWrite = line;
-						}   
-					}
-					// end of the rpf exporter
-					
-					// the aura exporter
-					if(bufferTestLineParse[4] == "Aura25Export")
-					{
+                        if(strleft(line,1) != "")
+                        {
+                            baseNameArray = parse(getsep(),line);
+                            if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+                            {
+                                rpfBaseName = baseNameArray[size(baseNameArray)];
+                                updatedRpfSaverPath = "\"" + generatePath("filter", outputFolder, outputStr, ::fileOutputPrefix, ::userOutputString, rpfBaseName);
+                                toWrite = updatedRpfSaverPath;
+                            }
+                            else
+                            {
+                                toWrite = line;
+                            }
+                        }
+                        else
+                        {
+                            toWrite = line;
+                        }   
+                    }
+                    // end of the rpf exporter
+                    
+                    // the aura exporter
+                    if(bufferTestLineParse[4] == "Aura25Export")
+                    {
                         for(i = 1; i <= 2; i++)
                         {
                             tempOutput.writeln(line);
                             line = inputFile.read();
                         }
-						if(strleft(line,1) == "\"")
-						{
-							baseNameArray = parse(getsep(),line);
-							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-							{
-								auraBaseName = baseNameArray[size(baseNameArray)];
-								updatedAuraSaverPath = "\"" + generatePath("filter_2sep", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, auraBaseName);
-								toWrite = updatedAuraSaverPath;
-							}
-							else
-							{
-								toWrite = line;
-							}
-						}
-						else
-						{
-							toWrite = line;
-						}   
-					}
-					// end of the aura exporter
-					
-					// idof channels
-					if(bufferTestLineParse[4] == "iDof_channels_IF")
-					{
+                        if(strleft(line,1) == "\"")
+                        {
+                            baseNameArray = parse(getsep(),line);
+                            if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+                            {
+                                auraBaseName = baseNameArray[size(baseNameArray)];
+                                updatedAuraSaverPath = "\"" + generatePath("filter_2sep", outputFolder, outputStr, ::fileOutputPrefix, ::userOutputString, auraBaseName);
+                                toWrite = updatedAuraSaverPath;
+                            }
+                            else
+                            {
+                                toWrite = line;
+                            }
+                        }
+                        else
+                        {
+                            toWrite = line;
+                        }   
+                    }
+                    // end of the aura exporter
+                    
+                    // idof channels
+                    if(bufferTestLineParse[4] == "iDof_channels_IF")
+                    {
                         for(i = 1; i <= 9; i++)
                         {
-    						tempOutput.writeln(line);
-    						line = inputFile.read();
+                            tempOutput.writeln(line);
+                            line = inputFile.read();
                         }
-						if(strleft(line,1) != "")
-						{
-							baseNameArray = parse(getsep(),line);
-							if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
-							{
-								idofBaseName = baseNameArray[size(baseNameArray)];
-								updatedIdofSaverPath = generatePath("filter", outputFolder, outputStr, fileOutputPrefix, userOutputString, passNames, pass, idofBaseName);
-								toWrite = updatedIdofSaverPath;
-							}
-							else
-							{
-								toWrite = line;
-							}
-						}
-						else
-						{
-							toWrite = line;
-						}
-					}       
-					// end of idof channels
-				}
-				else
-				{
-					toWrite = line;
-				}
-			}
-			else
-			{
-				toWrite = line;
-			}
-			tempOutput.writeln(toWrite);
-		}	
+                        if(strleft(line,1) != "")
+                        {
+                            baseNameArray = parse(getsep(),line);
+                            if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
+                            {
+                                idofBaseName = baseNameArray[size(baseNameArray)];
+                                updatedIdofSaverPath = generatePath("filter", outputFolder, outputStr, ::fileOutputPrefix, ::userOutputString, idofBaseName);
+                                toWrite = updatedIdofSaverPath;
+                            }
+                            else
+                            {
+                                toWrite = line;
+                            }
+                        }
+                        else
+                        {
+                            toWrite = line;
+                        }
+                    }       
+                    // end of idof channels
+                }
+                else
+                {
+                    toWrite = line;
+                }
+            }
+            else
+            {
+                toWrite = line;
+            }
+            tempOutput.writeln(toWrite);
+        }   
         inputFile.close();
         tempOutput.close();
         finishFiles();
-	}
+    }
 
-    passBufferSetup(hbFile, passNames, pass);
+    passBufferSetup(hbFile);
 }
 
 // This function is called from handleBuffers and it works to (de)activate buffer exporters (image filters) for the current pass. It's highly experimental and not scheduled for the 1.0 release.
-passBufferSetup: pbsFile, passNames, pass
+passBufferSetup: pbsFile
 {
-    pbsSettings = parse("||",passBufferExporters[pass]);
+    pbsSettings = parse("||",::passBufferExporters[::pass]);
 
     if(int(pbsSettings[1]) == 0)
     {
@@ -2101,7 +2224,7 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
         lineOffset = 0; // We'll need to modify this as we go to ensure we target the correct lines.
                         // Needs to be incremented when we insert 'PluginEnabled 0' lines for active plugins. We change 'PluginEnabled 0' to 'PluginEnabled 1' rather than removing lines,for simplicity.
 
-        tempFilePBS = tempDirectory + getsep() + "tempPassportFilePBS.lws";
+        tempFilePBS = ::tempDirectory + getsep() + "tempPassportFilePBS.lws";
         filecopy(pbsFile, tempFilePBS);
 
         for(i = 1; i <= imageFilterLinesIndex; i++)
@@ -2140,182 +2263,450 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
     scanFile.close();
 }
 
-motionMixerStuff: mmFile, passNames, pass
+motionMixerStuff: mmFile
 {
-	if(overriddenObjectID != nil)
-	{
-		// check for clones of motion mixer items
-		clonedMMItems = false;
-		for(x = 1; x <= size(overriddenObjectID); x++)
-		{
-			for(y = 1; y <= size(overriddenObjectID); y++)
-			{
-				if(x != y && overriddenObjectID[x] == overriddenObjectID[y])
-				{
-					clonedMMItems = true;
-				}
-			}
-		}
-		
-		for(x = 1; x <= size(overriddenObjectID); x++)
-		{
-			inputFile = File(mmFile, "r");
-			inputFile.line(1);
-			
-			mmItemIDLine = nil;
-			// find the line in the motion mixer stuff if it exists...
-			while(!inputFile.eof())
-			{
-				line = inputFile.read();
-				if(size(line) >= 22)
-				{
-					stringTempAdd = "      ItemAdd " + string(overriddenObjectID[x]);
-					if(strleft(line,22) == stringTempAdd)
-					{
-						mmItemIDLine = inputFile.line();
-						//info(stringTempAdd);
-					}
-				}
-			}
+    if(::overriddenObjectID != nil)
+    {
+        // check for clones of motion mixer items
+        clonedMMItems = false;
+        for(x = 1; x <= size(::overriddenObjectID); x++)
+        {
+            for(y = 1; y <= size(::overriddenObjectID); y++)
+            {
+                if(x != y && ::overriddenObjectID[x] == ::overriddenObjectID[y])
+                {
+                    clonedMMItems = true;
+                }
+            }
+        }
+        
+        for(x = 1; x <= size(::overriddenObjectID); x++)
+        {
+            inputFile = File(mmFile, "r");
+            inputFile.line(1);
+            
+            mmItemIDLine = nil;
+            // find the line in the motion mixer stuff if it exists...
+            while(!inputFile.eof())
+            {
+                line = inputFile.read();
+                if(size(line) >= 22)
+                {
+                    stringTempAdd = "      ItemAdd " + string(::overriddenObjectID[x]);
+                    if(strleft(line,22) == stringTempAdd)
+                    {
+                        mmItemIDLine = inputFile.line();
+                    }
+                }
+            }
             inputFile.close();
 
-			// if the item line exists in the motion mixer stuff, read the line before it to get the object name
-			if(mmItemIDLine != nil)
-			{
-				if(clonedMMItems == true)
-				{
-					error("PassPort has found clones being overridden in a scene with Motion Mixer.  Please resolve clone naming.");
-				}
+            // if the item line exists in the motion mixer stuff, read the line before it to get the object name
+            if(mmItemIDLine != nil)
+            {
+                if(clonedMMItems == true)
+                {
+                    logger("error","PassPort has found clones being overridden in a scene with Motion Mixer.  Please resolve clone naming.");
+                }
 
-                inputFileName = prepareInputFile(mmFile);
-                inputFile = File(inputFileName, "r");
-                tempOutput = File(newScenePath,"w");
-				
-				inputFile.line(mmItemIDLine - 2);
-				mmItemToReplace = inputFile.read();
-				mmItemStringArray = parse("\"",mmItemToReplace);
-				mmItemString = mmItemStringArray[2];
-				
-				checkForLayers = parse(":",mmItemString);
-				if(size(checkForLayers) > 1)
-				{
-					nameOfObject = checkForLayers[1];
-				}
-				else
-				{
-					nameOfObject = mmItemString;
-				}
-				
-				replaceStringOne = "      ItemName \"" + nameOfObject;
-				replaceStringTwo = "          ItemName \"" + nameOfObject;
-				replaceStringThree = "            ChannelName \"" + nameOfObject;
-				replaceStringFour = "              TrackMotionItemName \"" + nameOfObject;
-				
-				replacementStringOne = "      ItemName \"" + overriddenObjectName[x];
-				replacementStringTwo = "          ItemName \"" + overriddenObjectName[x];
-				replacementStringThree = "            ChannelName \"" + overriddenObjectName[x];
-				replacementStringFour = "              TrackMotionItemName \"" + overriddenObjectName[x];
-				
-				inputFile.line(1);
-				
-				while(!inputFile.eof())
-				{
-					line = inputFile.read();
-					linesize = size(line);
-					stringsize = size(replaceStringOne);
-					if(linesize >= stringsize)
-					{
-						if(strleft(line,size(replaceStringOne)) == replaceStringOne)
-						{
-							n = size(line) - size(replaceStringOne);
-							lineTemp = replacementStringOne + strright(line,n);
-							line = lineTemp;
-						}
-					}
-					tempOutput.writeln(line);
-				}
-				
-				inputFile.close();
-				tempOutput.close();
-				finishFiles();
+                ::inputFileName = prepareInputFile(mmFile);
+                inputFile = File(::inputFileName, "r");
+                tempOutput = File(::newScenePath,"w");
+                
+                inputFile.line(mmItemIDLine - 2);
+                mmItemToReplace = inputFile.read();
+                mmItemStringArray = parse("\"",mmItemToReplace);
+                mmItemString = mmItemStringArray[2];
+                
+                checkForLayers = parse(":",mmItemString);
+                if(size(checkForLayers) > 1)
+                {
+                    nameOfObject = checkForLayers[1];
+                }
+                else
+                {
+                    nameOfObject = mmItemString;
+                }
+                
+                replaceStringOne = "      ItemName \"" + nameOfObject;
+                replaceStringTwo = "          ItemName \"" + nameOfObject;
+                replaceStringThree = "            ChannelName \"" + nameOfObject;
+                replaceStringFour = "              TrackMotionItemName \"" + nameOfObject;
+                
+                replacementStringOne = "      ItemName \"" + ::overriddenObjectName[x];
+                replacementStringTwo = "          ItemName \"" + ::overriddenObjectName[x];
+                replacementStringThree = "            ChannelName \"" + ::overriddenObjectName[x];
+                replacementStringFour = "              TrackMotionItemName \"" + ::overriddenObjectName[x];
+                
+                inputFile.line(1);
+                
+                while(!inputFile.eof())
+                {
+                    line = inputFile.read();
+                    linesize = size(line);
+                    stringsize = size(replaceStringOne);
+                    if(linesize >= stringsize)
+                    {
+                        if(strleft(line,size(replaceStringOne)) == replaceStringOne)
+                        {
+                            n = size(line) - size(replaceStringOne);
+                            lineTemp = replacementStringOne + strright(line,n);
+                            line = lineTemp;
+                        }
+                    }
+                    tempOutput.writeln(line);
+                }
+                
+                inputFile.close();
+                tempOutput.close();
+                finishFiles();
 
-				inputFileName = prepareInputFile(mmFile);
-				inputFile = File(inputFileName, "r");
-				tempOutput = File(newScenePath,"w");
-				
-				inputFile.line(1);
-				
-				while(!inputFile.eof())
-				{
-					line = inputFile.read();
-					if(size(line) > size(replaceStringTwo))
-					{
-						if(strleft(line,size(replaceStringTwo)) == replaceStringTwo)
-						{
-							n = size(line) - size(replaceStringTwo);
-							lineTemp = replacementStringTwo + strright(line,n);
-							line = lineTemp;
-						}
-					}
-					tempOutput.writeln(line);
-				}
-				inputFile.close();
-				tempOutput.close();				
-				finishFiles();
+                ::inputFileName = prepareInputFile(mmFile);
+                inputFile = File(::inputFileName, "r");
+                tempOutput = File(::newScenePath,"w");
+                
+                inputFile.line(1);
+                
+                while(!inputFile.eof())
+                {
+                    line = inputFile.read();
+                    if(size(line) > size(replaceStringTwo))
+                    {
+                        if(strleft(line,size(replaceStringTwo)) == replaceStringTwo)
+                        {
+                            n = size(line) - size(replaceStringTwo);
+                            lineTemp = replacementStringTwo + strright(line,n);
+                            line = lineTemp;
+                        }
+                    }
+                    tempOutput.writeln(line);
+                }
+                inputFile.close();
+                tempOutput.close();             
+                finishFiles();
 
-				inputFileName = prepareInputFile(mmFile);
-				inputFile = File(inputFileName, "r");
-				tempOutput = File(newScenePath,"w");
-				
-				inputFile.line(1);
-				
-				while(!inputFile.eof())
-				{
-					line = inputFile.read();
-					if(size(line) > size(replaceStringThree))
-					{
-						if(strleft(line,size(replaceStringThree)) == replaceStringThree)
-						{
-							n = size(line) - size(replaceStringThree);
-							lineTemp = replacementStringThree + strright(line,n);
-							line = lineTemp;
-						}
-					}
-					tempOutput.writeln(line);
-				}
-				inputFile.close();
-				tempOutput.close();
-				finishFiles();
+                ::inputFileName = prepareInputFile(mmFile);
+                inputFile = File(::inputFileName, "r");
+                tempOutput = File(::newScenePath,"w");
+                
+                inputFile.line(1);
+                
+                while(!inputFile.eof())
+                {
+                    line = inputFile.read();
+                    if(size(line) > size(replaceStringThree))
+                    {
+                        if(strleft(line,size(replaceStringThree)) == replaceStringThree)
+                        {
+                            n = size(line) - size(replaceStringThree);
+                            lineTemp = replacementStringThree + strright(line,n);
+                            line = lineTemp;
+                        }
+                    }
+                    tempOutput.writeln(line);
+                }
+                inputFile.close();
+                tempOutput.close();
+                finishFiles();
 
-				inputFileName = prepareInputFile(mmFile);
-				inputFile = File(inputFileName, "r");
-				tempOutput = File(newScenePath,"w");
-				
-				inputFile.line(1);
-				
-				while(!inputFile.eof())
-				{
-					line = inputFile.read();
-					if(size(line) > size(replaceStringFour))
-					{
-						if(strleft(line,size(replaceStringFour)) == replaceStringFour)
-						{
-							n = size(line) - size(replaceStringFour);
-							lineTemp = replacementStringFour + strright(line,n);
-							line = lineTemp;
-						}
-					}
-					tempOutput.writeln(line);
-				}
-				inputFile.close();
-				tempOutput.close();
-				finishFiles();
-			}
-			// end of the mm if and else statement here
-			// write out the scene, replacing the motion mixer stuff with the object name with the overridden info
-		}
-	//end of all the mm stuff
-	}
+                ::inputFileName = prepareInputFile(mmFile);
+                inputFile = File(::inputFileName, "r");
+                tempOutput = File(::newScenePath,"w");
+                
+                inputFile.line(1);
+                
+                while(!inputFile.eof())
+                {
+                    line = inputFile.read();
+                    if(size(line) > size(replaceStringFour))
+                    {
+                        if(strleft(line,size(replaceStringFour)) == replaceStringFour)
+                        {
+                            n = size(line) - size(replaceStringFour);
+                            lineTemp = replacementStringFour + strright(line,n);
+                            line = lineTemp;
+                        }
+                    }
+                    tempOutput.writeln(line);
+                }
+                inputFile.close();
+                tempOutput.close();
+                finishFiles();
+            }
+            // end of the mm if and else statement here
+            // write out the scene, replacing the motion mixer stuff with the object name with the overridden info
+        }
+    //end of all the mm stuff
+    }
 }
 
+dependencyCheck: dcFile
+{
+    dcDebug = 1;
+    // We want to notify the user if the pass has unsatisfied references.
+    // There's no way to do this except manually, case-by-case.
+    // We don't check certain cases because other functions (e.g. the FiberFX handler) trim dependencies.
+    // Some elements reference item IDs and others reference the name. We have an ID array for the pass.
+    // We'll need to construct the name array.
 
+    dcIDArray = parse("||", ::passAssItems[::pass]); // pull decimal ID.
+    if (size(dcIDArray) == 0)
+        return;
+
+    dcArrayCounter = 0;
+    for (i = 1; i <= size(dcIDArray); i++)
+    {
+        dcIDArray[i] = int(dcIDArray[i]);
+        for (j = 1; j <= size(::displayIDs); j++)
+        {
+            if (dcIDArray[i] == ::displayIDs[j])
+            {
+                dcArrayCounter++;
+                dcIDArray[i] = int(::displayOldIDs[j]); // remap to hex based ID to align with LWS.
+                dcNameArray[dcArrayCounter] = string(::displayNames[j]);
+                dcGenusArray[dcArrayCounter] = int(::displayGenus[j]);
+            }
+        }
+    }
+
+    if(dcArrayCounter == 0)
+    {
+        // Something went wrong. Let's find out what that might be.
+        logger("warn","dependencyCheck: failed. dcNameArray is " + size(dcNameArray).asStr() + " long.");
+        return;
+    }
+
+    dcRelItemsReported =  nil; // array to hold reported breakage item names for Relativity. Allows us to avoid reporting multiple instances of the same breakage.
+    // Let's get started.
+    for (i = 1; i <= size(dcIDArray); i++)
+    {
+        dependencyCheck_Relativity(dcIDArray[i], dcGenusArray[i], dcNameArray, dcFile);
+    }
+}
+
+dependencyCheck_Relativity: dcID, dcGenus, dcNameArray, dcFile
+{
+    // Let's see if we find Relativity applied.
+    // We don't anticipate more than one instance of each type of modifier on the item.
+    // This is an issue for the channel modifier, though.
+    // Note that we get paired values back for start and end lines of each setting type.
+    relModifierTypes = @"Motion", "Channel"@;
+
+    for(i = 1; i <= size(dcNameArray); i++)
+    {
+        dcRelNameArray[i] = strlower(dcNameArray[i]); // Relativity drops all names to lower case.
+    }
+
+    for (rType = 1; rType <= size(relModifierTypes); rType++)
+    {
+        relativityLineArray = nil; // empty array.
+        relativityLineArray = getRelativityLines(relModifierTypes[rType], dcID, dcGenus, dcFile);
+
+        // OK. We have our start and end lines.
+        if(relativityLineArray != nil)
+        {
+            dcReader = File(dcFile, "r");
+            r = 0;
+            while (r < size(relativityLineArray))
+            {
+                r++;
+                dcRelLineNumber = relativityLineArray[r];
+                r++;
+                dcEndLineNumber = relativityLineArray[r];
+                dcReader.line(dcRelLineNumber);
+                while (dcRelLineNumber <= dcEndLineNumber)
+                {
+                    dcRelString = dcReader.read();
+                    // Use our custom extracter. We should get back an array
+                    dcRelItems = extractRelativityItems(dcRelString);
+
+                    if (dcRelItems != nil)
+                    {
+                        // We're not done yet - we need to check our returned array against our pass
+                        // item names.
+
+                        for (dcRelItemIndex = 1; dcRelItemIndex <= size(dcRelItems); dcRelItemIndex++)
+                        {
+                            dcRelItemMatched = dcRelNameArray.indexOf(dcRelItems[dcRelItemIndex]);
+                            if (dcRelItemMatched == 0)
+                            {
+                                // Need to filter to only report once per broken dependency against the item name in the entire scene.
+                                // Need an array to track reported errors.
+                                tempString = dcRelItems[dcRelItemIndex];
+                                relDisplayMessage = 0;
+                                if (dcRelItemsReported == nil)
+                                {
+                                    dcRelItemsReported[1] = dcRelItems[dcRelItemIndex];
+                                    relDisplayMessage = 1;
+                                }
+                                else if (dcRelItemsReported.indexOf(tempString) == 0)
+                                {
+                                    dcRelItemsReported[size(dcRelItemsReported) + 1] = dcRelItems[dcRelItemIndex];
+                                    relDisplayMessage = 1;
+                                }
+                                if (relDisplayMessage == 1)
+                                {
+                                    relStringToDisplay = "Relativity dependency for " + dcRelItems[dcRelItemIndex] + " not satisified in this pass.";
+                                    if(::errorOnDependency == 1)
+                                    {
+                                        logger("error",relStringToDisplay);
+                                    } else {
+                                        logger("warn",relStringToDisplay);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    dcRelLineNumber++;
+                }
+            }
+            dcReader.close();
+        }
+    }
+}
+
+hyperVoxels3: hv3File
+{
+    // LW only allows one instance of the plugin, so we only need one check and adjustment sequence.
+    hv3Debug = 0;
+    // Let's check if HV3 was even applied.
+    hv3Line = getVolumetricHandlerLine("HyperVoxelsFilter", hv3File);
+    if (!hv3Line)
+    {
+        // No HV3 entries
+        return 0;
+    }
+    
+    hv3HeaderEndLine = getPartialLine(hv3Line,0,"HVBlendingGroups",hv3File); // This line is the last before the item specific entries.
+
+    hv3EndLine = getPartialLine(hv3Line,0,"EndPlugin",hv3File) - 1; // End of plugin block. Decrement to capture closing brace.
+
+    // We need to extract item IDs from the scene file to then check against our pass items.
+    hv3Items = getHyperVoxels3Items(hv3File, hv3Line);
+    if (hv3Items == nil)
+    {
+        // No item IDs found. Nothing to do.
+        if (hv3Debug == 1)
+        {
+            logger("log_info","hyperVoxels3: Nothing found");
+        }
+        return 0;
+    }
+
+    // Let's get our start and end lines for each item using HV3.
+    // We'll need to make a temporary, translated array of IDs from our pass items.
+    passItems = parse("||", ::passAssItems[::pass]);
+    for (j = 1; j <= size(passItems); j++)
+    {
+        // passAssItems stores the decimal ID value. HV3 and the scene file use the hexadecimal representation (also stored in the oldIDs array)
+        // We need to get creative in comparing them.
+        tArray = parse("x",hex(int(passItems[j])));
+        tempID[j] = tArray[2];
+    }
+
+    matchedHV3Items;
+    matchedHV3ItemsCounter = 1;
+
+    for (i = 1; i <= size(hv3Items); i++)
+    {
+        if (hv3Debug == 1)
+        {
+            logger("log_info","hyperVoxels3: Checking HV3ID: " + hv3Items[i].asStr());
+        }
+        hv3MatchFound = tempID.indexOf(string(hv3Items[i]));
+        if(hv3MatchFound != 0)
+        {
+            matchedHV3Items[matchedHV3ItemsCounter] = hv3Items[i];
+            matchedHV3ItemsCounter++;
+        }
+    }
+
+    if (matchedHV3ItemsCounter == 1) // safety catch.
+    {
+        logger("log_warn","hyperVoxels3: Error during ID Matching!");
+        return 0;
+    } else {
+        // logger("log_info,"hyperVoxels3: Matched " + size(matchedHV3Items) + " items");
+    }
+
+    hv3ChunkLineArrayIndex = 1;
+    for (i = 1; i <= size(matchedHV3Items); i++)
+    {
+        hv3ItemID = matchedHV3Items[i];
+        if (hv3Debug == 1)
+        {
+            logger("log_info","hyperVoxels3: Processing HV3ID: " + hv3ItemID.asStr());
+        }
+        tempHV3_r = File(hv3File, "r");
+        tempHV3_r.line(hv3Line);
+        hv3StartString = "    { HVLink"; // object ID follows this line
+        hv3EndString = "    { HVoxelCache"; // object block ends 6 lines after this line
+        while(!tempHV3_r.eof())
+        {
+            hv3LineTemp = tempHV3_r.read();
+            if (hv3LineTemp == hv3StartString)
+            {
+                hv3ChunkStartLineArray[hv3ChunkLineArrayIndex] = tempHV3_r.line() + 1; // hard-coded offset to start of block
+                hv3_s_found = 1;
+            }
+            if ((strleft(hv3LineTemp, hv3EndString.size()) == hv3EndString) && (hv3_s_found == 1))
+            {
+                hv3ChunkEndLineArray[hv3ChunkLineArrayIndex] = tempHV3_r.line() + 6; // hard-coded offset to end of block
+                hv3_s_found = 0;
+                if (hv3Debug == 1)
+                {
+                    logger("log_info",hv3ChunkStartLineArray[hv3ChunkLineArrayIndex].asStr() + "/" + hv3ChunkEndLineArray[hv3ChunkLineArrayIndex]);
+                }
+                hv3ChunkLineArrayIndex++;
+            }
+        }
+        tempHV3_r.close();
+    }
+
+    // Now we need to write out the sections we care about.
+    hv3OutputFilename = tempDirectory + getsep() + "tempPassportFileHV3.lws";
+    hv3Output = File(hv3OutputFilename,"w");
+    hv3Input = File(hv3File, "r");
+    hv3LineNumber = 1;
+    while(hv3LineNumber <= hv3HeaderEndLine)
+    {
+        hv3Line = hv3Input.read();
+        hv3Output.writeln(hv3Line);
+        hv3LineNumber++;
+    }
+
+    // Now we write out our sections from above.
+    for(i = 1; i <= size(matchedHV3Items); i++)
+    {
+        hv3ItemID = matchedHV3Items[i];
+        if (hv3Debug == 1)
+        {
+            logger("log_info","hyperVoxels3: Writing HV3ID: " + hv3ItemID);
+        }
+        sourceLine = hv3ChunkStartLineArray[i];
+        hv3Input.line(sourceLine);
+        while(sourceLine <= hv3ChunkEndLineArray[i])
+        {
+            hv3Line = hv3Input.read();
+            hv3Output.writeln(hv3Line);
+            sourceLine++;
+        }
+    }
+
+    hv3Output.close();
+    hv3Output = File(hv3OutputFilename, "a");
+    hv3Input.line(hv3EndLine);
+    while(!hv3Input.eof())
+    {
+        hv3Output.writeln(hv3Input.read());
+    }
+
+    hv3Input.close();
+    hv3Output.close();
+
+    // Push the output back to the original file.
+    filecopy(hv3OutputFilename, hv3File);
+    filedelete(hv3OutputFilename);
+
+    return 1; // notify caller that we changed something.
+}
