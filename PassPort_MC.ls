@@ -5,7 +5,7 @@
 // @define dev 1
 
 // Build features
-// @define enableKray 1;
+@define enableKray 1;
 @if enableKray
 @define Kray_Plugins 1;
 @end
@@ -36,10 +36,10 @@ var lwlicensecheck_done = 0;
 @insert "@passEditor_UDF_Overrides.ls"
 @insert "@passEditor_NativeRenderer_Support.ls"
 @if enableKray
-@insert "@passEditor_Kray25Renderer_Support.ls"
+@insert "@kray/passEditor_Kray25Renderer_Support.ls"
 @end
 @if enableArnold043
-@insert "@passEditor_Arnold043Renderer_Support.ls"
+@insert "@lwtoa/passEditor_Arnold043Renderer_Support.ls"
 @end
 
 // icons

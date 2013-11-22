@@ -98,21 +98,34 @@ getRelativityLines: mode, objID, objGenus, inputPath
 	if (objGenus == 1)
 	{
 		relStartLine = getObjectLine(objID,inputPath);
-		relEndLine = getObjectEndLine(relStartLine + 1, objID, inputPath);
+		if (relStartLine)
+		{
+			relEndLine = getObjectEndLine(relStartLine + 1, objID, inputPath);
+		}
 	}
 	else if (objGenus == 2)
 	{
 		relStartLine = getLightLine(objID,inputPath);
-		relEndLine = getLightEndLine(relStartLine, objID, inputPath);
+		if (relStartLine)
+		{
+			relEndLine = getLightEndLine(relStartLine, objID, inputPath);
+		}
 	}
 	else if (objGenus == 3)
 	{
 		relStartLine = getCameraLine(objID,inputPath);
-		relEndLine = getCameraEndLine(relStartLine, objID, inputPath);
+		if (relStartLine)
+		{
+			relEndLine = getCameraEndLine(relStartLine, objID, inputPath);
+		}
 	}
 	else {
 		logger("warn","Genus not recognized: " + objGenus.asStr());
 		return nil; // unrecognized.
+	}
+	if(!relStartLine)
+	{
+		return nil;
 	}
 	relFile = File(inputPath, "r");
 	relFile.line(relStartLine);

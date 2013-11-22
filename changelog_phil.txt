@@ -1,3 +1,13 @@
+20131122 (Bug fix)
+========
+
+- Bug fix
+
+20131109 (Bug fix)
+========
+
+- Fixed Relativity dependency code.
+
 20131031 (LWtoA update. Native functionality build went to public beta Nov-2.)
 ========
 

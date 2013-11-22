@@ -1584,10 +1584,13 @@ getPassItemIDsByType: ::tempArray, genusCheck
     {
         // Let's get our index to query against the genus.
         index = ::displayIDs.indexOf(::tempArray[i]);
-        if(::displayGenus[index] == genusCheck)
+        if(index != 0)
         {
-            passItemsByType[passItemsByTypeCounter] = ::tempArray[i];
-            passItemsByType++;
+            if(::displayGenus[index] == genusCheck)
+            {
+                passItemsByType[passItemsByTypeCounter] = ::tempArray[i];
+                passItemsByType++;
+            }
         }
     }
     return passItemsByType;
@@ -1606,10 +1609,13 @@ getPassItemNamesByType: ::tempArray, genusCheck
     {
         // Let's get our index to query against the genus.
         index = ::displayIDs.indexOf(::tempArray[i]);
-        if(::displayGenus[index] == genusCheck)
+        if(index != 0)
         {
-            passItemsByType[passItemsByTypeCounter] = ::displayNames[index];
-            passItemsByType++;
+            if(::displayGenus[index] == genusCheck)
+            {
+                passItemsByType[passItemsByTypeCounter] = ::displayNames[index];
+                passItemsByType++;
+            }
         }
     }
     return passItemsByType;

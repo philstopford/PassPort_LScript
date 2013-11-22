@@ -51,25 +51,62 @@
 <li><a href="#overrides_light">Light Properties</a></li>
 <li><a href="#overrides_camera">Camera</a></li>
 <li><a href="#overrides_scene">Scene Master</a></li>
+<ul>
+<li><a href="#overrides_scene_native">Scene Master - Native</a></li>
+<li><a href="#overrides_scene_kray">Scene Master - Kray 2.5</a></li>
+<li><a href="#overrides_scene_lwtoa041">Scene Master - LWtoA 0.4.1</a></li>
+</ul>
 <li><a href="#overrides_lightexcl">Light Exclusion</a></li>
 </ul>
 </ul>
 <li><strong><a href="#dragons">Things to Be Aware Of</a></strong></li>
 <ul>
 <li><strong><a href="#dragons_ffx">FiberFX</a></strong></li>
-<li><strong><a href="#dragons_hv3">Hypervoxels</a></strong></li>
 <li><strong><a href="#dragons_dependencies">Dependencies</a></strong></li>
 <li><strong><a href="#dragons_lights">Lights</a></strong></li>
 <li><strong><a href="#dragons_cameras">Cameras</a></strong></li>
+<li><strong><a href="#dragons_comring">Comring</a></strong></li>
 </ul>
 <li><strong><a href="#troubleshooting">Troubleshooting.</a></strong></li>
 <li><strong><a href="#credits">Credits.</a></strong></li>
+<li><strong><a href="../changelog_phil.txt">Changelog for PPRN.</a></strong></li>
 
 <hr>
 <div class="c1">
 <h3><a name="whatispassport"></a>What is PassPort Renewed?</h3>
 </div>
-<p>PassPort Renewed is an ongoing rework of the LScript-based PassPort code. That code, designed for LightWave 3D 9.3.1, was open-sourced (GPL) by Jeremy Hardin in 2010. It was modified by Matt Gorner in 2010 to improve operation with autoscan plugins and to revise the code to work with LW10. The author of PassPort Renewed is Phil Stopford. Compared to the original PassPort plugin, the code has been substantially revised. These changes were made for this release:</p>
+<p>PassPort Renewed is an ongoing rework of the LScript-based PassPort code. That code, designed for LightWave 3D 9.3.1, was open-sourced (GPL) by Jeremy Hardin in 2010. It was modified by Matt Gorner in 2010 to improve operation with autoscan plugins and to revise the code to work with LW10. The author of PassPort Renewed is Phil Stopford. Compared to the original PassPort plugin, the code has been largely rewritten and greatly extended in capability and scalability.</p>
+<p>These changes were made for the 1.6.x releases:</p>
+<ul>
+	<li>Enabled support for Kray 2.5</li>
+	<ul>
+		<li>Not all features are supported at this time.</li>
+	</ul>
+	<li>Enabled support for Kray 2.5 Plugins</li>
+	<ul>
+		<li>Physical Sky</li>
+		<li>QuickLWF</li>
+		<li>ToneMapping</li>
+	</ul>
+	<li>Enabled support for LWtoA 0.4.1</li>
+	<li>Enabled support for dividing FiberFX items across passes</li>
+	<li>HyperVoxels 3 elements omitted from passes no longer result in artifacts.</li>
+	<li>Enabled support for Relativity dependency handling</li>
+	<ul>
+		<li>Option to either abort or warn during pass generation for broken dependencies.</li>
+	</ul>
+	<li>Comring updates (untested)</li>
+	<li>RPE version incremented and various fixes to the related code</li>
+	<li>Reworked, more robust radiosity settings handling (backported to 1.0.7)</li>
+	<li>Revised output folder structure (no more CG folder)</li>
+	<li>Restored functionality that strips PPRN from the generated pass scenes</li>
+	<ul>
+		<li>Oversight in 1.0.x that meant PPRN had to be available on nodes to avoid errors being reported (that could be ignored, but would trip monitoring systems and cause jobs to be re-scheduled)</li>
+	</ul>
+	<li>Ongoing optimizations of internals</li>
+</ul>
+<p>All 1.6.x releases require LightWave 3D 11.6 on all platforms.</p>
+<p>These changes were made for the 1.0.x releases:</p>
 <ul>
 	<li>Re-designed for LightWave 3D 11.x</li>
 	<li>Extensive internal refactoring. The plugin code is now smaller, more efficient and more cleanly structured.</li>
@@ -97,7 +134,7 @@
 	<li>PassPort has been made LWSN-safe as well. Previously, it used to crash the process.</li>
 	<li>Rendering at frame 0 is now supported. Previously, it used to fail to save an image for review.</li>
 	<li>Autoscan plugin operation is much improved.</li>
-	<li>Buffer Redirect Export extended to work with exrTrader and LightWave's Compositing Buffer Export image filters (experimental, beta 8)</li>
+	<li>Buffer Redirect Export extended to work with exrTrader and LightWave's Compositing Buffer Export image filters</li>
 	<li>Passes can now be configured to activate/deactivate supported image filters.</li>
 	<li>RPE files now contain version information (the RPE version, the PassPort version, the LightWave version).</li>
 </ul>
@@ -105,9 +142,10 @@
 <hr>
 <h3><a name="beforeinstalling"></a>Before Installing</h3>
 <ul>
-<li> This version has no compatibility with previous PassPort scenes or RPE files. The overrides and code have been radically overhauled. There is no migration path.</li>
-<li> This version is locked to a minimum of LightWave 3D 11.0. Operation under OS X requires LightWave 3D 11.5 due to unavoidable issues in LScript for prior versions.</li>
-<li>This revision of PassPort has been tested on Windows XP (32-bit), Windows 7 (32-bit and 64-bit LightWave) and OS X Mountain Lion. The previous version of PassPort was restricted to LightWave 3D 9.3.1 on Windows and 32-bit LightWave 9.3.1 on Mac.</li>
+<li> This version has compatibility with PPRN 1.0 scenes. You will see some warnings, but they can be safely ignored. RPE files, though, are not compatible due to some flaws in PPRN 1.0.x.</li>
+<li> This version continues to have no compatibility with scenes or RPE files from the original PassPort 1.0 plugin. Too much is different between PPRN and PassPort. There is no migration path.</li>
+<li> This version is locked to a minimum of LightWave 3D 11.6.</li>
+<li>This revision of PassPort has been tested on Windows 7 (64-bit LightWave) and OS X Mountain Lion/Mavericks. For previous versions of LightWave 3D 11.x, please use the 1.0.x releases.</li>
 <li>Please note, at the time of writing, PassPort Renewed is a work-in-progress. It's currently implemented in LScript and will eventually be migrated to Python.</li>
 <li>3rd party lights and camera features are not available in overrides due to the complexities of supporting them. Only shared properties with the basic light and cameras will be modified.</li>
 <li>It is also extremely important that the LightWave 3D content folder is set according to the LightWave 3D documentation.</li>
@@ -131,11 +169,12 @@
 <hr>
 <h3><a name="usage"></a>Usage</h3>
 <ul>
-<p><a name="usage"></a><strong>Preferences Panel</strong></p>
+<p><a name="preferences"></a><strong>Preferences Panel</strong></p>
 <p>PassPort needs some basic necessary information to be input via its preference panel. This panel can be brought up by highlighting the PassPort Editor and hitting the lowercase o key, or by choosing File... &gt;&gt; Preferences.</p>
 <p align="center"><img src="images/preferences.png" height="522" width="436" alt="Preferences Panel"></p>
 <p>For the output folder, use the browse button to choose a folder where the frames will be written on render. This serves the same function as LightWave’s render output location, but the name is derived from the Render file prefix and the User field. Be sure to leave the parentheses and the words (leave empty) in the output folder field.</p>
 <p>On Mac, the preference dialog provides an option whether or not to use growl for notification. Note that the Notification Center in Mountain Lion is not usable because this is only available to App Store applications. There are 3rd party re-routing systems to pass growl messages to the Notification Center, if that is desired.</p>
+<p>The default configuration is to error out if <a href="#dragons_dependencies">dependencies</a> are not found. Currently, the only dependencies that are checked are for Relativity expressions. In some cases, the user might not want to error out because the broken dependencies are intentional. Deselecting the 'Error on missing dependencies' checkbox will change those errors into warnings.</p>
 <p>Enable confirmation dialogs lets you get the usual “Are you sure...” prompt before doing anything drastic. Uncheck to remove these for faster operation.</p>
 <p>Editor resolution is the size of the PassPort Editor window. You can also quickly scroll through these sizes after the Editor is open by using the plus (+) and minus(-) keys.</p>
 <p>The next several options are render settings.  When you render a whole sequence, the first RGB type you choose will be used for the sequence render. If you were familiar with the old PassPort system, you might expect to find test render resolution multipliers here - due to the new camera and scene master overrides, the old test resolution multiplers have been removed. You can choose from any available image format in LW - including any formats supported by 3rd party addons such as exrTrader. Please note, though, that there is no ability to configure options related to these formats.</p>
@@ -180,12 +219,16 @@
 	<p><a name="overrides_camera"></a><strong>Camera Properties</strong></p>
 	<p align="center"><img src="images/override_camera.png" height="347" width="590" alt="Camera Override"></p>
 	<p><a name="overrides_scene"></a><strong>Scene Master</strong></p>
+	<p>As of PPRN 1.4.x, Kray 2.5 support is implemented in a Scene Master override. Creating a new scene master override will cause a menu to be display to determine the type of scene master override that is desired. Note that the Kray support is still in-progress and some features that are exposed may not make sense in the context of PPRN operation and may therefore be withdrawn as development proceeds.</p>
+	<p align="center"><img src="images/override_scene_menu.png" height="90" width="306" alt="Scene Master Menu"></p>
+	<ul>
+	<p><a name="overrides_scene_native"></a><strong>Scene Master - Native</strong></p>
 	<p align="center"><img src="images/override_scene.png" height="747" width="885" alt="Scene Master Override"></p>
-	<p>'Render Instances' is only supported under LightWave 3D 11.5</p>
+	<p>'Render Instances' toggles instance rendering.</p>
 	<p>'Redirect Buffer Export Paths' works with a number of image filters to redirect their output into pass-specific named files. The filters have to be configured with a valid save path (only the filenames will be changed!) and to save all information that you are interested in for all passes that you will be rendering. Passport does not attempt to adjust other settings - the range of settings and options would greatly complicate this plugin and lead to compatibility issues very quickly.</p>
 	<ul>
-		<li>LightWave's Compositing Buffer Export (experimental in beta 8)</li>
-		<li>exrTrader (experimental in beta 8)</li>
+		<li>LightWave's Compositing Buffer Export</li>
+		<li>exrTrader</li>
 		<li>LightWave's RLA Export</li>
 		<li>LightWave's Extended RLA Export</li>
 		<li>LightWave's PSD Export</li>
@@ -197,23 +240,52 @@
 	<p>The scene master is also where you can override the active camera for the pass. All cameras assigned to the pass will be contained in the scene file generated; this override will only change the setting that denotes which camera is active.</p>
 	<p>A pass and override system is not just for final renders. It can be very useful to try and determine the best render conditions for a given scene. To that end, PassPort Renewed also allows you to apply Radiosity Flag settings in the Scene Master override. You can then explore how different GI settings affect the renderer in LW in a systematic manner.</p>
 	<p align="center"><img src="images/override_scene_radflags.png" height="254" width="306" alt="Scene Master Radiosity Flags Override"></p>
+	</ul>
+	<ul>
+	<p><a name="overrides_scene_kray"></a><strong>Scene Master - Kray 2.5</strong></p>
+	<p>These screenshots indicate the subset of features currently supported by PPRN. Note that Kray's plugin system is also handled, but not reflected in the screenshots below. Note also that some features may be withdrawn as development proceeds due to the unsuitability of their combination with PPRN.</p>
+	<p>The scene override can be used to override pre-existing settings for Kray, or to apply Kray to a scene that has not had it implemented outside of PPRN. Note, though, that not all features are exposed - if you want the full range of Kray features, you may need to set up a Kray scene and then override it with the subset of features exposed in PPRN.</p>
+	<p>Rendering of Kray overrides is performed by Kray itself, so licenses must be in-order.</p>
+	<p align="center">
+	<img src="images/override_scene_kray_general.png" height="636" width="432" alt="Kray Tab - General">&nbsp;
+	<img src="images/override_scene_kray_photons.png" height="640" width="432" alt="Kray Tab - Photons"><br>
+	<img src="images/override_scene_kray_finalgather.png" height="639" width="434" alt="Kray Tab - Final Gather">&nbsp;
+	<img src="images/override_scene_kray_sampling.png" height="638" width="432" alt="Kray Tab - Sampling"><br>
+	<img src="images/override_scene_kray_quality.png" height="638" width="434" alt="Kray Tab - Quality">&nbsp;
+	<img src="images/override_scene_kray_misc.png" height="638" width="434" alt="Kray Tab - Misc"><br>
+	<img src="images/override_scene_kray_physicalsky.png" height="731" width="440" alt="Kray Tab - Plugins - Physical Sky">&nbsp;
+	<img src="images/override_scene_kray_quicklwf.png" height="251" width="293" alt="Kray Tab - Plugins - QuickLWF"></p>
+	</ul>
 	<p><a name="overrides_lightexcl"></a><strong>Light Exclusion</strong></p>
 	<p align="center"><img src="images/override_lightexcl.png" height="158" width="306" alt="Light Exclusion"></p>
 	<p>The Light Exclusions override allows you to specify per-pass light exclusions. Assigning it to an object will exclude that object from any lights in the override settings in that pass. The Light Exclusions override is unique in that it can be assigned in addition to another override. So if you want to use a surface override AND a light exclusion override, you’d simply have the surface override higher in the overrides listbox and assign both to an object. If you ever find that the light exclusion is higher in the listbox than another override (and therefore preventing its stack-ability), simply hit Page Down on your keyboard to move the selected override to the bottom of the listbox.</p>
-</ul>
+	</ul>
+	<ul>
+	<p><a name="overrides_scene_lwtoa041"></a><strong>Scene Master - LWtoA 0.4.1</strong></p>
+	<p>LWtoA 0.4.1 is also fully supported in PPRN 1.6.x. Note that LWtoA itself is in heavy development. Unlike Kray, all features of Arnold supported by LWtoA are exposed in PPRN; you can override existing settings from a LWtoA scene or set up LWtoA only within PPRN. Rendering, like Kray, is not performed by PPRN itself so license constraints are not avoided at any time.</p>
+	<p align="center">
+	<img src="images/override_scene_lwtoa041_system.png" height="892" width="467" alt="LWtoA 0.4.1 System Tab">&nbsp;
+	<img src="images/override_scene_lwtoa041_sampling.png" height="890" width="465" alt="LWtoA 0.4.1 Sampling Tab"><br>
+	<img src="images/override_scene_lwtoa041_rays.png" height="888" width="468" alt="LWtoA 0.4.1 Rays Tab">&nbsp;
+	<img src="images/override_scene_lwtoa041_misc.png" height="889" width="468" alt="LWtoA 0.4.1 Misc Tab"><br>
+	<img src="images/override_scene_lwtoa041_debug.png" height="890" width="468" alt="LWtoA 0.4.1 Debug Tab">&nbsp;
+	<img src="images/override_scene_lwtoa041_ass.png" height="892" width="470" alt="LWtoA 0.4.1 ASS Tab"><br>
+	<img src="images/override_scene_lwtoa041_text.png" height="892" width="470" alt="LWtoA 0.4.1 Text Tab">&nbsp;
+	<img src="images/override_scene_lwtoa041_aovs.png" height="892" width="470" alt="LWtoA 0.4.1 AOVs Tab">	</p>
 </ul>
 <h3><a name="dragons"></a>Things to be Aware Of</h3>
 <ul>
 	<h4><a name="dragons_ffx"></a>FiberFX</h4>
-<p>FiberFX, as of 11.5, permits its contributions to be written out to external files. We allow you to override the destination. However, by-design, FiberFX will write out all contributions from elements in the frame to a single file. At this time, due to issues in FiberFX, <strong>*all*</strong> configured FiberFX elements <strong>*must*</strong> be in the same pass. If this is not the case, FiberFX will fail to render any of its contributions. A bug has been filed with NewTek, but the way that PassPort operates on the scene file to drop out elements not contained in the current pass is not really expected by LightWave. Assigning the element to the pass and using an override to affect object visibility to the camera/rays might yield a better result.</p>
-<h4><a name="dragons_hv3"></a>Hypervoxels</h4>
-<p>Like FiberFX, the way that PassPort omits elements from the pass scene file causes compatibility issues with HV3. Unlike FiberFX, though, the missing item that has HVs applied in some manner will typically result in the rendered image containing an HV blob at the origin. Like FiberFX, there may be a mitigation using an override to make the object invisible to the camera and rays within the pass.</p>
+<p>FiberFX, as of 11.5, permits its contributions to be written out to external files. We allow you to override the destination. However, by-design, FiberFX will write out all contributions from elements in the frame to a single file.</p>
+<p>Happily, you can use passes to break out FiberFX contributions to different files - PPRN 1.6.x enables you to have the freedom to use FiberFX elements with passes without issue. You no longer have the PPRN 1.0.x restriction of bundling all such elements into a single pass because of crash issues - PPRN does all the work for you to make FiberFX play nicely.</p>
 <h4><a name="dragons_dependencies"></a>Dependencies</h4>
-<p>Any item not contained in a pass will be omitted from the pass scene file that is generated by PassPort. This means that any dependencies on that item will be broken in that scene, such expressions. You can typically find a different methodology using an override to hide the item from the renderer (visibility flags, motion overrides, etc.)</p>
+<p>Any item not contained in a pass will be omitted from the pass scene file that is generated by PassPort. This means that any dependencies on that item will be broken in that scene, such expressions. You can typically find a different methodology using an override to hide the item from the renderer (visibility flags, motion overrides, etc.). Note that PPRN 1.6.x onwards will report Relativity dependency errors for the pass. Other systems are not currently handled.</p>
 <h4><a name="dragons_lights"></a>Lights</h4>
 <p>LightWave expects at least one light in a scene, and PassPort also expects at least one light in a pass in order to reliably generate the scene. To that end, if you haven't assigned any lights, PassPort will automatically add the first light in the scene to the generated scene file. If you really don't want any lighting in a pass, you have a number of options - you can create a dummy light and assign it to the pass(es), you can use light exclusion or you can use a light override.</p>
 <h4><a name="dragons_cameras"></a>Cameras</h4>
 <p>LightWave expects at least one camera in a scene, and PassPort also expects at least one camera in a pass in order to reliably generate the scene. To that end, if you haven't assigned any cameras, PassPort will automatically add the first camera in the scene to the generated scene file. This might not be the active camera, though, so results may be odd.</p>
+<h4><a name="dragons_comring"></a>Comring</h4>
+<p>PPRN 1.0.x likely had comring issues, but no-one reported them. PPRN 1.6.x has seen work to resolve these problems, but this work has not been tested at the time of writing.</p>
 </ul>
 <h3><a name="troubleshooting"></a>Troubleshooting</h3>
 <p>Overrides cannot be stacked on an object in a pass (with the exception of the Light Exclusions override).  For example, you cannot apply both a motion override and a surface override to the same object in the same pass. Note that this will cause a failure even if the issue is located in a pass other than the one you are rendering. The error message will also be very ugly and scary. You'll have to manually figure out what you did wrong, fix it up and try again.</p>
@@ -228,9 +300,12 @@
 <p>Matt Gorner's work to make the original PassPort compatible with LightWave through 10.0 is much appreciated, as well as his effort to get the source uploaded to SourceForge. I'm also very grateful for his help in showing me some of the UI tricks that could be performed in LScript.</p>
 <p>I also have to thank James Willmott and Lernie Ang for their help as I fought my way to understanding (somewhat) LScript and its quirks. Jeremy gets another nod here for sending me his notes and insight.</p>
 <p>Deuce Bennett , patient master bug wrangler at NT - thanks ever so much for fielding various bug reports along the way.</p>
-<p>Thanks to Bob Hood for the LScript fixes for Mac in LightWave 11.5!</p>
+<p>Thanks to Bob Hood for the LScript fixes for Mac in LightWave 11.5, and for continuing to address issues with LightWave 3D 11.6. Without his help, a whole slew of the 1.6.x featureset would not have been achievable.</p>
+<p>Thanks go to the Kray developers for allowing me to use their LScript UI code (including Matt Gorner's refinements) in the PPRN codebase to enable Kray 2.5 support</p>
+<p>Thanks to SolidAngle and Juanjo González for enabling me to develop the LWtoA support.</p>
 <p>This plugin's failings and bugs are mine alone. Its robustness and ability are in large part due to the enthusiasm and diligence of the testing crew :</p>
 <ul>
+<p>1.0:</p>
 <li>Luis Lopes (zardoz) : bug reporter in chief, I'm in your debt.</li>
 <li>Javier Meroño (Netvudu) : the man who requested, quite robustly, the image filter export handling for passes. It's thanks to Javier's bug report that autoscan operation is properly handled now.</li>
 </ul>

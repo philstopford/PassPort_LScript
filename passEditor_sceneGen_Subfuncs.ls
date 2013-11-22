@@ -2503,8 +2503,9 @@ dependencyCheck_Relativity: dcID, dcGenus, dcNameArray, dcFile
         relativityLineArray = getRelativityLines(relModifierTypes[rType], dcID, dcGenus, dcFile);
 
         // OK. We have our start and end lines.
-        if(relativityLineArray != nil)
+        if(relativityLineArray)
         {
+            // logger("info_log", "Relativity found for " + dcID.asStr()); 
             dcReader = File(dcFile, "r");
             r = 0;
             while (r < size(relativityLineArray))
