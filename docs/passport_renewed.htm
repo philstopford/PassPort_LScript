@@ -54,13 +54,14 @@
 <ul>
 <li><a href="#overrides_scene_native">Scene Master - Native</a></li>
 <li><a href="#overrides_scene_kray">Scene Master - Kray 2.5</a></li>
-<li><a href="#overrides_scene_lwtoa041">Scene Master - LWtoA 0.4.1</a></li>
+<li><a href="#overrides_scene_lwtoa043">Scene Master - LWtoA 0.4.3</a></li>
 </ul>
 <li><a href="#overrides_lightexcl">Light Exclusion</a></li>
 </ul>
 </ul>
 <li><strong><a href="#dragons">Things to Be Aware Of</a></strong></li>
 <ul>
+<li><strong><a href="#dragons_performance">Performance</a></strong></li>
 <li><strong><a href="#dragons_ffx">FiberFX</a></strong></li>
 <li><strong><a href="#dragons_dependencies">Dependencies</a></strong></li>
 <li><strong><a href="#dragons_lights">Lights</a></strong></li>
@@ -88,7 +89,7 @@
 		<li>QuickLWF</li>
 		<li>ToneMapping</li>
 	</ul>
-	<li>Enabled support for LWtoA 0.4.1</li>
+	<li>Enabled support for LWtoA 0.4.3</li>
 	<li>Enabled support for dividing FiberFX items across passes</li>
 	<li>HyperVoxels 3 elements omitted from passes no longer result in artifacts.</li>
 	<li>Enabled support for Relativity dependency handling</li>
@@ -261,21 +262,23 @@
 	<p>The Light Exclusions override allows you to specify per-pass light exclusions. Assigning it to an object will exclude that object from any lights in the override settings in that pass. The Light Exclusions override is unique in that it can be assigned in addition to another override. So if you want to use a surface override AND a light exclusion override, you’d simply have the surface override higher in the overrides listbox and assign both to an object. If you ever find that the light exclusion is higher in the listbox than another override (and therefore preventing its stack-ability), simply hit Page Down on your keyboard to move the selected override to the bottom of the listbox.</p>
 	</ul>
 	<ul>
-	<p><a name="overrides_scene_lwtoa041"></a><strong>Scene Master - LWtoA 0.4.1</strong></p>
-	<p>LWtoA 0.4.1 is also fully supported in PPRN 1.6.x. Note that LWtoA itself is in heavy development. Unlike Kray, all features of Arnold supported by LWtoA are exposed in PPRN; you can override existing settings from a LWtoA scene or set up LWtoA only within PPRN. Rendering, like Kray, is not performed by PPRN itself so license constraints are not avoided at any time.</p>
+	<p><a name="overrides_scene_lwtoa043"></a><strong>Scene Master - LWtoA 0.4.3</strong></p>
+	<p>LWtoA is also fully supported in PPRN 1.6.x. Note that LWtoA itself is in heavy development and so the screenshots below might be dated. Unlike Kray, all features of Arnold supported by LWtoA are exposed in PPRN; you can override existing settings from a LWtoA scene or set up LWtoA only within PPRN. Rendering, like Kray, is not performed by PPRN itself so license constraints are not avoided at any time.</p>
 	<p align="center">
-	<img src="images/override_scene_lwtoa041_system.png" height="892" width="467" alt="LWtoA 0.4.1 System Tab">&nbsp;
-	<img src="images/override_scene_lwtoa041_sampling.png" height="890" width="465" alt="LWtoA 0.4.1 Sampling Tab"><br>
-	<img src="images/override_scene_lwtoa041_rays.png" height="888" width="468" alt="LWtoA 0.4.1 Rays Tab">&nbsp;
-	<img src="images/override_scene_lwtoa041_misc.png" height="889" width="468" alt="LWtoA 0.4.1 Misc Tab"><br>
-	<img src="images/override_scene_lwtoa041_debug.png" height="890" width="468" alt="LWtoA 0.4.1 Debug Tab">&nbsp;
-	<img src="images/override_scene_lwtoa041_ass.png" height="892" width="470" alt="LWtoA 0.4.1 ASS Tab"><br>
-	<img src="images/override_scene_lwtoa041_text.png" height="892" width="470" alt="LWtoA 0.4.1 Text Tab">&nbsp;
-	<img src="images/override_scene_lwtoa041_aovs.png" height="892" width="470" alt="LWtoA 0.4.1 AOVs Tab">	</p>
+	<img src="images/override_scene_lwtoa041_system.png" height="892" width="467" alt="LWtoA 0.4.3 System Tab">&nbsp;
+	<img src="images/override_scene_lwtoa041_sampling.png" height="890" width="465" alt="LWtoA 0.4.3 Sampling Tab"><br>
+	<img src="images/override_scene_lwtoa041_rays.png" height="888" width="468" alt="LWtoA 0.4.3 Rays Tab">&nbsp;
+	<img src="images/override_scene_lwtoa041_misc.png" height="889" width="468" alt="LWtoA 0.4.3 Misc Tab"><br>
+	<img src="images/override_scene_lwtoa041_debug.png" height="890" width="468" alt="LWtoA 0.4.3 Debug Tab">&nbsp;
+	<img src="images/override_scene_lwtoa041_ass.png" height="892" width="470" alt="LWtoA 0.4.3 ASS Tab"><br>
+	<img src="images/override_scene_lwtoa041_text.png" height="892" width="470" alt="LWtoA 0.4.3 Text Tab">&nbsp;
+	<img src="images/override_scene_lwtoa041_aovs.png" height="892" width="470" alt="LWtoA 0.4.3 AOVs Tab">	</p>
 </ul>
 <h3><a name="dragons"></a>Things to be Aware Of</h3>
 <ul>
-	<h4><a name="dragons_ffx"></a>FiberFX</h4>
+<h4><a name="dragons_performance"></a>Performance</h4>
+<p>LightWave scene files are odd beasts, full of by-design inconsistently present setting parameters. This caused problems for targeting changes. With version 1.6, PPRN generates pass scenes more robustly by forcing the matter, mainly with regard to the radiosity settings block (which is a primary example of the issue). This, sadly, has an impact on generation time. This impact is non-trivial and unavoidable. If the LightWave developers make scene files consistent in the future, this approach can be dropped and performance will be restored. There's nothing to be done. If this matters to you, please do bug the LightWave developers to address the issue.</p>
+<h4><a name="dragons_ffx"></a>FiberFX</h4>
 <p>FiberFX, as of 11.5, permits its contributions to be written out to external files. We allow you to override the destination. However, by-design, FiberFX will write out all contributions from elements in the frame to a single file.</p>
 <p>Happily, you can use passes to break out FiberFX contributions to different files - PPRN 1.6.x enables you to have the freedom to use FiberFX elements with passes without issue. You no longer have the PPRN 1.0.x restriction of bundling all such elements into a single pass because of crash issues - PPRN does all the work for you to make FiberFX play nicely.</p>
 <h4><a name="dragons_dependencies"></a>Dependencies</h4>
