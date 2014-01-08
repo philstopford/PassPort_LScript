@@ -1,3 +1,26 @@
+20140108 (Triage build)
+========
+
+- Added option to preserve scripts generated when rendering scenes/frames.
+ - Exposed as preference setting. Not saved in or loaded from scenes or RPE files.
+
+20131218 (Enhancement, Bug fix)
+========
+
+- Workaround in last build for camera handling as hotfix. Working on better solution that should also work nicely with 3rd party lights/cameras.
+
+20131217 (Enhancement, Bug fix)
+========
+
+- Addressed potential file handle leaks.
+- Fixes/enhancements to start/end line search routines.
+- Logger now prepends time and date to each logged entry.
+
+20131212 (Bug fix)
+========
+
+- Bug fix, thanks to Luis Lopes reporting a redraw glitch. Added another forced redraw event to get item highlights drawn in the override tab.
+
 20131122 (Bug fix)
 ========
 
