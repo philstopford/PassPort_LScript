@@ -148,6 +148,11 @@ preferencePanel
 
 	ui_offset_y += ::Pref_ui_row_offset;
 
+	c_doNotDeleteScripts = ctlcheckbox("Do not delete scripts",::doNotDeleteScripts);
+	ctlposition(c_doNotDeleteScripts, ::Pref_gad_x, ui_offset_y, ::Pref_gad_w, ::Pref_gad_h, ::Pref_gad_text_offset);
+
+	ui_offset_y += ::Pref_ui_row_offset;
+
 	c23 = ctlcheckbox("Enable Confirmation Dialogs",::areYouSurePrompts);
 	ctlposition(c23, ::Pref_gad_x, ui_offset_y, ::Pref_gad_w, ::Pref_gad_h, ::Pref_gad_text_offset);
 
@@ -187,6 +192,7 @@ preferencePanel
 			::useGrowl = getvalue(usegrowl);
 		::areYouSurePrompts = getvalue(c23);
 		::errorOnDependency = getvalue(dependencyError);
+		::doNotDeleteScripts = getvalue(c_doNotDeleteScripts);
 		::rgbSaveType = getvalue(c25);
 		::editorResolution = getvalue(c26);
 		::testRgbSaveType = getvalue(c29);

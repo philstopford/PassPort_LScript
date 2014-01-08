@@ -57,7 +57,6 @@ o_itemslb_event: o_items // Add items to the selected override; need to filter d
 		setvalue(gad_SceneItems_forOverrides_Listview,nil);
 		req_update();
 	}
-	req_update();
 }
 
 o_parseListItems: overrideItemsString
@@ -135,8 +134,6 @@ overrideslb_name: index
 
 overrideslb_event: overrides_list
 {   
-	o_itemslb = o_displayNamesObjectIndex;
-    overrides_array = nil;
     if(overrides_list != nil)
     {
 		::overridesSelected = true;
@@ -151,10 +148,11 @@ overrideslb_event: overrides_list
 		o_Filter(overrides_list);
 		
 		// The setvalue call below sets the highlighting on any items that are selected for the current override.
-		setvalue(gad_SceneItems_forOverrides_Listview,o_parseListItems(::passOverrideItems[::currentChosenPass][overrides_list[1]]));		
+        tempArray = o_parseListItems(::passOverrideItems[::currentChosenPass][overrides_list[1]]);
+        req_update();
+		setvalue(gad_SceneItems_forOverrides_Listview,tempArray);
+        req_update();
 		setvalue(gad_PassesListview,nil);
-		// Update to draw the highlighting. This doesn't seem to repaint the listbox list in the process, so the earlier req_update() is needed.
-		req_update();
         req_update();
     }
     else
@@ -163,8 +161,8 @@ overrideslb_event: overrides_list
 		::o_displayNamesFiltered = nil; // empty filtered list - override selected, but no assigned items.
 		// Clear any highlighting.
         setvalue(gad_OverridesListview,nil);
-        setvalue(gad_PassesListview,nil);
         req_update();
+        setvalue(gad_PassesListview,nil);
         req_update();
     }
 }

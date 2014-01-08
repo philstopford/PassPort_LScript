@@ -1,53 +1,36 @@
 getPassEditorStartLine: inputPath
 {
-	input = File(inputPath, "r");
-
-	if(startLine == 0 || startLine == nil)
-	{
-		startLine = 1;
-	}
-
-	if(endLine == 0)
-	{
-		endLine = input.linecount();
-	}
-	
-	startLine = 1;
-	endLine = input.linecount();
-
-	currentLine = 1;
+	gpesl_input = File(inputPath, "r");
 	toReturn = nil;
-	input.line(startLine);
 
-	while (currentLine <= endLine) {
-		line = input.read();
+	while (!gpesl_input.eof())
+	{
+		line = gpesl_input.read();
 		lineArray = parse(" ", line);
 		if(size(lineArray) >= 4)
 		{
 			if(lineArray[2] == "MasterHandler" && lineArray[4] == "PassPort_MC")
 			{
-				toReturn = currentLine;
+				toReturn = gpesl_input.line() - 1;
 				break;
 			}
 		}
-		currentLine++;
 	}
-
-	input.close();
+	gpesl_input.close();
 	return(toReturn);
 }
 
 getFFxItems: inputPath, startLine // unusual caller requirement, but there's a single call-site and this is specialized.
 {
-	input = File(inputPath, "r");
-	input.line(startLine);
+	gffxi_input = File(inputPath, "r");
+	gffxi_input.line(startLine);
 	ffxItemArray = @""@;
 	ffxItemArrayIndex = 1;
 	foundFFXBlock = 0;
 
-	while(!input.eof())
+	while(!gffxi_input.eof())
 	{
-		line = input.read();
+		line = gffxi_input.read();
 		lineArray = parse(" ",line);
 		if((size(lineArray) == 4) && (lineArray[1] == "Plugin") && (lineArray[2] == "PixelFilterHandler") && (lineArray[4] == "FiberFilter"))
 		{
@@ -69,7 +52,7 @@ getFFxItems: inputPath, startLine // unusual caller requirement, but there's a s
 			}
 		}
 	}
-	input.close();
+	gffxi_input.close();
 	if (ffxItemArrayIndex == 1) // we found no item IDs within the specified lines.
 	{
 		return nil;
@@ -95,7 +78,7 @@ getRelativityLines: mode, objID, objGenus, inputPath
 	{
 		logger("error","getRelativityLine: mode " + mode.asStr() + " not recognized");
 	}
-	if (objGenus == 1)
+	if (objGenus == MESH)
 	{
 		relStartLine = getObjectLine(objID,inputPath);
 		if (relStartLine)
@@ -103,29 +86,33 @@ getRelativityLines: mode, objID, objGenus, inputPath
 			relEndLine = getObjectEndLine(relStartLine + 1, objID, inputPath);
 		}
 	}
-	else if (objGenus == 2)
+	else if (objGenus == LIGHT)
 	{
 		relStartLine = getLightLine(objID,inputPath);
 		if (relStartLine)
 		{
-			relEndLine = getLightEndLine(relStartLine, objID, inputPath);
+			relEndLine = getLightEndLine(relStartLine + 1, objID, inputPath);
 		}
 	}
-	else if (objGenus == 3)
+	else if (objGenus == CAMERA)
 	{
 		relStartLine = getCameraLine(objID,inputPath);
 		if (relStartLine)
 		{
-			relEndLine = getCameraEndLine(relStartLine, objID, inputPath);
+			relEndLine = getCameraEndLine(relStartLine, objID, inputPath); // deliberately don't offset the line - see the targeted function.
 		}
 	}
 	else {
-		logger("warn","Genus not recognized: " + objGenus.asStr());
+		logger("warn","getRelativityLine: Genus not recognized: " + objGenus.asStr());
 		return nil; // unrecognized.
 	}
-	if(!relStartLine)
+	if(!relStartLine || relStartLine == 0)
 	{
 		return nil;
+	}
+	if(!relEndLine)
+	{
+		logger("error","getRelativityLine: failed to find end line for item " + objID.asStr());
 	}
 	relFile = File(inputPath, "r");
 	relFile.line(relStartLine);
@@ -161,16 +148,12 @@ getRelativityLines: mode, objID, objGenus, inputPath
 
 getObjectLine: objID,inputPath
 {
-	input = File(inputPath, "r");
-	startLine = 1;
-	endLine = input.linecount();
-	currentLine = 1;
+	gol_input = File(inputPath, "r");
 	toReturn = nil;
-	input.line(startLine);
 
-	while(currentLine != endLine)
+	while(!gol_input.eof())
 	{
-		gl_line = input.read();
+		gl_line = gol_input.read();
 		lineArray = parse(" ",gl_line);
 		if(size(lineArray) >= 3)
 		{
@@ -178,137 +161,123 @@ getObjectLine: objID,inputPath
 			{
 				if(lineArray[3] == string(objID) || lineArray[2] == string(objID))
 				{
-					toReturn = currentLine;
+					toReturn = gol_input.line() - 1;
 					break;
 				}
 			}
 		}
-		currentLine++;
 	}
-	input.close();
+	gol_input.close();
 	return(toReturn);
 }
 
 getLightLine: lightID,inputPath
 {
-	input = File(inputPath, "r");
-	startLine = 1;
-	endLine = input.linecount();
-	currentLine = 1;
+	gll_input = File(inputPath, "r");
 	toReturn = nil;
-	input.line(startLine);
-	while(currentLine != endLine)
+	while(!gll_input.eof())
 	{
-		gl_line = input.read();
+		gl_line = gll_input.read();
 		lineArray = parse(" ",gl_line);
 		if(size(lineArray) >= 2)
 		{
 			if(lineArray[1] == "AddLight" && lineArray[2] == string(lightID))
 			{
-				toReturn = currentLine;
+				toReturn = gll_input.line() - 1;
 				break;
 			}
 		}
-		currentLine++;
 	}
-	input.close();
+	gll_input.close();
 	return(toReturn);
 }
 
 getPixelFilterLine: pixelFilterString, inputPath
 {
-	input = File(inputPath, "r");
-	endLine = input.linecount();
-	currentLine = 1;
+	gpf_input = File(inputPath, "r");
 	toReturn = nil;
-	input.line(currentLine);
-	while (currentLine != endLine)
+	while (!gpf_input.eof())
 	{
-		gl_line = input.read();
+		gl_line = gpf_input.read();
 		lineArray = parse(" ", gl_line);
 		if (size(lineArray) >= 4)
 		{
 			if((lineArray[1] == "Plugin") && (lineArray[2] == "PixelFilterHandler") && (lineArray[4] == pixelFilterString))
 			{
-				toReturn = currentLine;
+				toReturn = gpf_input.line() - 1;
 			}
 		}
-		currentLine++;
 	}
+	gpf_input.close();
 	return toReturn;
 }
 
 getVolumetricHandlerLine: volumetricHandlerString, inputPath
 {
-	input = File(inputPath, "r");
-	endLine = input.linecount();
-	currentLine = 1;
+	gvl_input = File(inputPath, "r");
 	toReturn = nil;
-	input.line(currentLine);
-	while (currentLine != endLine)
+	while (!gvl_input.eof())
 	{
-		gl_line = input.read();
+		gl_line = gvl_input.read();
 		lineArray = parse(" ", gl_line);
 		if (size(lineArray) >= 4)
 		{
 			if((lineArray[1] == "Plugin") && (lineArray[2] == "VolumetricHandler") && (lineArray[4] == volumetricHandlerString))
 			{
-				toReturn = currentLine;
+				toReturn = gvl_input.line() - 1;
 			}
 		}
-		currentLine++;
 	}
+	gvl_input.close();
 	return toReturn;
 }
 
 getCameraLine: camID,inputPath
 {
-	input = File(inputPath, "r");
-	startLine = 1;
-	endLine = input.linecount();
-	currentLine = 1;
+	gcl_input = File(inputPath, "r");
 	toReturn = nil;
-	input.line(startLine);
-	while(currentLine != endLine)
+	while(!gcl_input.eof())
 	{
-		gl_line = input.read();
+		gl_line = gcl_input.read();
 		lineArray = parse(" ",gl_line);
 		if(size(lineArray) >= 2)
 		{
 			if(lineArray[1] == "AddCamera" && lineArray[2] == string(camID))
 			{
-				toReturn = currentLine;
+				toReturn = gcl_input.line() - 1;
 				break;
 			}
 		}
-		currentLine++;
 	}
-	input.close();
+	gcl_input.close();
 	return(toReturn);
 }
 
 getObjectEndLine: startLine,objID,inputPath
 {
-	input = File(inputPath, "r");
-
 	if(startLine == 0 || startLine == nil)
 	{
-		startLine = 1;
-	}
-	endLine = input.linecount();
-	currentLine = startLine;
-	toReturn = nil;
-	input.line(currentLine);
-	while(currentLine != endLine)
-	{
-		gl_line = input.read();
-		currentLineArray[1] = gl_line;
-		if(sizeof(currentLineArray[1]) >= 12)
+		startLine = getObjectLine(objID,inputPath);
+		if(startLine == 0 || startLine == nil)
 		{
-			currentLineString = strleft(gl_line,12);
+			logger("error", "getObjectEndLine: cannot find object ID (" + objID.asStr() + ") in scene");
+		}
+		startLine += 1;
+	}
+
+	goel_input = File(inputPath, "r");
+	goel_input.line(startLine);
+	toReturn = nil;
+	while(!goel_input.eof())
+	{
+		gl_line = goel_input.read();
+		currentLineArray = parse(" ", gl_line);
+		if(sizeof(currentLineArray) >= 2)
+		{
+			currentLineString = strleft(currentLineArray[1],12);
 			if(currentLineString == "LoadObjectLa" || currentLineString == "AddNullObjec" || currentLineString == "AmbientColor")
 			{
-				toReturn = currentLine;
+				toReturn = goel_input.line() - 1;
 				if (toReturn == startLine)
 				{
 					logger("error","getObjectEndLine: end line is start line! Function called incorrectly.");
@@ -317,79 +286,90 @@ getObjectEndLine: startLine,objID,inputPath
 				break;
 			}
 		}
-		currentLine++;
 	}
-	input.close();
+	goel_input.close();
 	return(toReturn);
 }
 
 getCameraEndLine: startLine,objID,inputPath
 {
-	input = File(inputPath, "r");
-
 	if(startLine == 0 || startLine == nil)
 	{
-		startLine = 1;
+		startLine = getCameraLine(objID,inputPath);
+		if(startLine == 0 || startLine == nil)
+		{
+			logger("error", "getCameraEndLine: cannot find camera ID (" + objID.asStr() + ") in scene");
+		}
 	}
-	endLine = input.linecount();
-	currentLine = startLine;
+
+	gcel_line1 = getPartialLine(startLine, 0, "Plugin CameraHandler", inputPath);
+	if (gcel_line1)
+	{
+		gcel_line2 = getPartialLine(gcel_line1, 0, "EndPlugin", inputPath);
+	}
+	return gcel_line2;
+
+	// Disabled below - doesn't seem to be reliable from multiple callsites - works only from first call site.
+	/*
+	gcel_input = File(inputPath, "r");
+	gcel_input.line(startLine);
 	toReturn = nil;
 	endMarkerString = "Plugin CameraHandler";
-	input.line(currentLine);
-	while(currentLine != endLine)
+	while(!gcel_input.eof())
 	{
-		gl_line = input.read();
-		currentLineArray[1] = gl_line;
-		if(sizeof(currentLineArray[1]) >= size(endMarkerString))
+		gl_line = gcel_input.read();
+		currentLineArray = parse(" ", gl_line);
+		if((sizeof(currentLineArray) >= 2) && (size(gl_line) >= size(endMarkerString)))
 		{
 			currentLineString = strleft(gl_line,size(endMarkerString));
 			if(currentLineString == endMarkerString)
 			{
-				toReturn = currentLine + 2; // offset to include the EndPlugin line, the whitespace afterwards and the subsequent line to match original code flow.
+				toReturn = gcel_input.line() + 1; // offset to include the EndPlugin line, the whitespace afterwards and the subsequent line to match original code flow.
 				break;
 			}
 		}
-		currentLine++;
 	}
-	input.close();
+	gcel_input.close();
 	return(toReturn);
+	*/
 }
 
 getLightEndLine: startLine,objID,inputPath
 {
-	input = File(inputPath, "r");
-
 	if(startLine == 0 || startLine == nil)
 	{
-		startLine = 1;
+		startLine = getLightLine(objID,inputPath);
+		if(startLine == 0 || startLine == nil)
+		{
+			logger("error", "getLightEndLine: cannot find light ID (" + objID.asStr() + ") in scene");
+		}
+		startLine += 1;
 	}
-	endLine = input.linecount();
-	currentLine = startLine;
+	glel_input = File(inputPath, "r");
+	glel_input.line(startLine);
 	toReturn = nil;
 	endMarkerString = "Plugin LightHandler";
-	input.line(currentLine);
-	while(currentLine != endLine)
+	while(!glel_input.eof())
 	{
-		gl_line = input.read();
-		currentLineArray[1] = gl_line;
-		if(sizeof(currentLineArray[1]) >= size(endMarkerString))
+		gl_line = glel_input.read();
+		currentLineArray = parse(" ", gl_line);
+		if((sizeof(currentLineArray) >= 2) && (size(gl_line) >= size(endMarkerString)))
 		{
 			currentLineString = strleft(gl_line,size(endMarkerString));
 			if(currentLineString == endMarkerString)
 			{
-				toReturn = currentLine + 2; // offset to include the EndPlugin line, the whitespace afterwards and the subsequent line to match original code flow.
+				toReturn = glel_input.line() + 1; // offset to include the EndPlugin line, the whitespace afterwards and the subsequent line to match original code flow.
 				break;
 			}
 		}
-		currentLine++;
 	}
-	input.close();
+	glel_input.close();
 	return(toReturn);
 }
 
 getPartialLine: currentLine, endLine, searchString, inputPath
 {
-	input = File(inputPath, "r");
+	gpl_input = File(inputPath, "r");
 
 	searchLine[1] = searchString;
 	searchStringSize = sizeof(searchLine[1]);
@@ -399,13 +379,13 @@ getPartialLine: currentLine, endLine, searchString, inputPath
 	}
 	if(endLine == 0)
 	{
-		endLine = input.linecount();
+		endLine = gpl_input.linecount();
 	}
 	toReturn = nil;
-	input.line(currentLine);
 	while(currentLine != endLine)
 	{
-		line = input.read();
+		gpl_input.line(currentLine);
+		line = gpl_input.read();
 		if(line)
 		{
 			if(size(line) >= searchStringSize)
@@ -433,21 +413,21 @@ getPartialLine: currentLine, endLine, searchString, inputPath
 		}
 		currentLine++;
 	}
-	input.close();
+	gpl_input.close();
 	return(toReturn);
 }
 
 readSpecificLine: lineToRead, inputPath
 {
-	input = File(inputPath, "r");
-	endLine = input.linecount();
+	rsl_input = File(inputPath, "r");
+	endLine = rsl_input.linecount();
 	toReturn = "";
 	if(lineToRead <= endLine)
 	{
-		input.line(lineToRead);
-		toReturn = input.read();
+		rsl_input.line(lineToRead);
+		toReturn = rsl_input.read();
 	}
-	input.close();
+	rsl_input.close();
 	return(toReturn);
 }
 
@@ -575,16 +555,15 @@ extractRelativityItems: relString
 
 getHyperVoxels3Items: inputPath, startLine
 {
-	input = File(inputPath, "r");
-	input.line(startLine);
+	ghvi_input = File(inputPath, "r");
+	ghvi_input.line(startLine);
 	hv3ItemArray = @""@;
 	hv3ItemArrayIndex = 1;
 	foundHV3Block = 0;
-	lineNumber = 1;
 
-	while(lineNumber <= input.linecount())
+	while(!ghvi_input.eof())
 	{
-		line = input.read();
+		line = ghvi_input.read();
 		lineArray = parse(" ",line);
 		if((size(lineArray) == 4) && (lineArray[1] == "Plugin") && (lineArray[2] == "VolumetricHandler") && (lineArray[4] == "HyperVoxelsFilter"))
 		{
@@ -594,10 +573,10 @@ getHyperVoxels3Items: inputPath, startLine
 		{
 			if(line == "  { HVObject")
 			{
-				line = input.read();
+				line = ghvi_input.read();
 				if(line == "    { HVLink")
 				{
-					line = input.read(); // should now get ID. Unfortunately, it's quoted and prefixed by 6 spaces. We'll take care of that.
+					line = ghvi_input.read(); // should now get ID. Unfortunately, it's quoted and prefixed by 6 spaces. We'll take care of that.
 					hv3ItemArray[hv3ItemArrayIndex] = int(unquoteString(strright(line,size(line) - 6)));
 					hv3ItemArrayIndex++;
 				}
@@ -607,9 +586,8 @@ getHyperVoxels3Items: inputPath, startLine
 				break; // hit the end of the HV3 block.
 			}
 		}
-		lineNumber = input.line() + 1;
 	}
-	input.close();
+	ghvi_input.close();
 	if (hv3ItemArrayIndex == 1) // we found no item IDs within the specified lines.
 	{
 		return nil;

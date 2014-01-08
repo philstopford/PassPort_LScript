@@ -1233,8 +1233,6 @@ radLines_native: radFileName
     }
 }
 
-// This is ~annoying. The setting locations in the scene file were determined by manual inspection.
-// I've version-controlled them in case they move/change in future.
 prepareRadiosityLines_11: radFileName
 {
     pRLStage = 1;

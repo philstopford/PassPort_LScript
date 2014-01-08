@@ -8,10 +8,11 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "1.6.2684";
+var versionString = "1.6.2693";
 var rpeVersion = "1.1";
 var parch = "Unknown";
 var icon;
+var doNotDeleteScripts;
 var passSelected = false;
 // var currentPassMenu_item; // may not need to be global.
 var overridesSelected = false;
@@ -46,6 +47,12 @@ var o_displayGenus; // used to filter the displayNames by type for compatibility
 var displayIDs;
 var o_displayIDs; // exporting ID array for override items
 var o_displayIDsFiltered; // container for IDs for filtered items.
+var o_displayNamesObject;
+var o_displayNamesObjectIndex;
+var o_displayNamesLight;
+var o_displayNamesLightIndex;
+var o_displayNamesCamera;
+var o_displayNamesCameraIndex;
 var displayOldIDs;
 var passNames;
 var overrideNames;

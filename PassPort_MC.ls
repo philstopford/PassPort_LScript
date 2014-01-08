@@ -587,6 +587,7 @@ save: what,io
 			globalstore("passEditorrgbSaveType",::rgbSaveType);
 			globalstore("passEditoreditorResolution",::editorResolution);
 			globalstore("passEditortestRgbSaveType",::testRgbSaveType);
+			globalstore("passEditordoNotDeleteScripts", ::doNotDeleteScripts);
 		}
 	}
 }
@@ -625,6 +626,7 @@ process: event, command
 		::rgbSaveType = integer(globalrecall("passEditorrgbSaveType", 1));
 		::editorResolution = integer(globalrecall("passEditoreditorResolution", 1));
 		::testRgbSaveType = integer(globalrecall("passEditortestRgbSaveType", 1));
+		::doNotDeleteScripts = integer(globalrecall("passEditordoNotDeleteScripts", 0));
 		
 		::interfaceRunYet = 0;
 		::doKeys = 1;
@@ -1340,26 +1342,26 @@ reProcess
 		
 		// do the experimental scene master override setup
 		::o_displayNames[1] = "(Scene Master)";
-		o_displayNamesObjectIndex = 1;
-		o_displayNamesLightIndex = 1;
-		o_displayNamesCameraIndex = 1;
+		::o_displayNamesObjectIndex = 1;
+		::o_displayNamesLightIndex = 1;
+		::o_displayNamesCameraIndex = 1;
 
 		for(w = 1; w <= size(::displayNames); w++)
 		{
 			::o_displayNames[w + 1] = ::displayNames[w];
 			 // Populating filtered lists - will be used in UDF functions.
 			if (::displayGenus[w] == MESH) {
-				o_displayNamesObject[o_displayNamesObjectIndex] = ::displayNames[w];
-				o_displayNamesObjectIndex++;
+				::o_displayNamesObject[::o_displayNamesObjectIndex] = ::displayNames[w];
+				::o_displayNamesObjectIndex++;
 			}
 			if (::displayGenus[w] == LIGHT) {
-				o_displayNamesLight[o_displayNamesLightIndex] = ::displayNames[w];
-				o_displayNamesLightIndex++;
+				::o_displayNamesLight[::o_displayNamesLightIndex] = ::displayNames[w];
+				::o_displayNamesLightIndex++;
 			}
 
 			if (::displayGenus[w] == CAMERA) {
-				o_displayNamesCamera[o_displayNamesCameraIndex] = ::displayNames[w];
-				o_displayNamesCameraIndex++;
+				::o_displayNamesCamera[::o_displayNamesCameraIndex] = ::displayNames[w];
+				::o_displayNamesCameraIndex++;
 			}
 		}
 

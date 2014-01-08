@@ -1549,7 +1549,10 @@ logger: mode, logString
         } else {
             logFile = File(logFileName,"a");
             logString = classification + ": " + logString;
-            logFile.writeln(logString);
+            (h, m, s, t) = time();
+            (d, m, y, w, j, sm, sw) = date();
+            date_time_string = h.asStr() + ":" + m.asStr() + ":" + s.asStr() + ", " + y.asStr() + "\/" + m.asStr() + "\/" + d.asStr();
+            logFile.writeln(date_time_string + " : " + logString);
             logFile.close();
             if (classification == "error")
             {

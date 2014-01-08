@@ -501,9 +501,7 @@ generatePassFile: mode, gPass
         if(strleft(string(::displayOldIDs[tempNumber]),1) == string(MESH))
         {
             ::objStart[::passItem] = getObjectLine(::displayOldIDs[tempNumber],::currentScenePath);
-            objStartTemp = number(::objStart[::passItem]);
-            objStartPlusOne = objStartTemp + 1;
-            ::objEnd[::passItem] = getObjectEndLine(objStartPlusOne,::displayOldIDs[tempNumber],::currentScenePath);
+            ::objEnd[::passItem] = getObjectEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber],::currentScenePath);
             ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels",::currentScenePath);
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
             // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
@@ -525,9 +523,7 @@ generatePassFile: mode, gPass
         if(strleft(string(::displayOldIDs[tempNumber]),1) == string(LIGHT))
         {
             ::objStart[::passItem] = getLightLine(::displayOldIDs[tempNumber],::currentScenePath);
-            objStartTemp = number(::objStart[::passItem]);
-            objStartPlusOne = objStartTemp + 1;
-            ::objEnd[::passItem] = getLightEndLine(objStartPlusOne,::displayOldIDs[tempNumber],::currentScenePath);
+            ::objEnd[::passItem] = getLightEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber],::currentScenePath);
             ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels",::currentScenePath);
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
             // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
@@ -559,9 +555,7 @@ generatePassFile: mode, gPass
         if(strleft(string(::displayOldIDs[tempNumber]),1) == string(CAMERA))
         {
             ::objStart[::passItem] = getCameraLine(::displayOldIDs[tempNumber],::currentScenePath);
-            objStartTemp = number(::objStart[::passItem]);
-            objStartPlusOne = objStartTemp + 1;
-            ::objEnd[::passItem] = getCameraEndLine(objStartPlusOne,::displayOldIDs[tempNumber],::currentScenePath);
+            ::objEnd[::passItem] = getCameraEndLine(::objStart[::passItem],::displayOldIDs[tempNumber],::currentScenePath);
             ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels",::currentScenePath);
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
             // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.

@@ -56,7 +56,10 @@ win_bg_frameRender: sceneFile, frameOutputPath
 
 	/* Matt Gorner - get rid of extra slashes that stops the del command in the Batch file */
     t = currentscene_patharray[1] + getsep() + strip_slashes(currentscene_patharray[2]) + "frameRender_bat.bat";
-    bashOutput.writeln("@del \"" + t + "\"\n");
+    if (::doNotDeleteScripts == 0)
+    {
+        bashOutput.writeln("@del \"" + t + "\"\n");
+    }
 
 	bashOutput.writeln("pause");
 
@@ -115,7 +118,10 @@ win_bg_sceneRender: sceneFile, frameOutputPath
 
 	/* Matt Gorner - get rid of extra slashes that stops the del command in the Batch file */
     t = currentscene_patharray[1] + getsep() + strip_slashes(currentscene_patharray[2]) + "frameRender_bat.bat";
-    bashOutput.writeln("@del \"" + t + "\"\n");
+    if (::doNotDeleteScripts == 0)
+    {
+        bashOutput.writeln("@del \"" + t + "\"\n");
+    }
 
     bashOutput.writeln("pause");
     bashOutput.close();
@@ -167,7 +173,10 @@ win_bg_allSceneRender: sceneFile, frameOutputPath
 
 	/* Matt Gorner - get rid of extra slashes that stops the del command in the Batch file */
     t = currentscene_patharray[1] + getsep() + strip_slashes(currentscene_patharray[2]) + "frameRender_bat.bat";
-    bashOutput.writeln("@del \"" + t + "\"\n");
+    if (::doNotDeleteScripts == 0)
+    {
+        bashOutput.writeln("@del \"" + t + "\"\n");
+    }
     
     bashOutput.writeln("pause");
     bashOutput.close();
@@ -252,11 +261,17 @@ UB_bg_frameRender: sceneFile, frameOutputPath
     bashOutput = File(bashFilePath,"w");
    	outputLine = install_dir + getsep() + "bin/lwsn -3 -c" + config_dir + " -d" + content_dir + " " + sceneFile + " " + currentframe + " " + currentframe + " " + "1\;\n" + "open " + actualImageOutput + "\;";
     bashOutput.writeln(outputLine);
-    bashOutput.writeln("rm " + bashFilePath);
+    if (::doNotDeleteScripts == 0)
+    {
+        bashOutput.writeln("rm " + bashFilePath);
+    }
 	if(::useGrowl == 1)
 	{
 		bashOutput.writeln("osascript \"" + growlAppleScriptPath + "\"");
-		bashOutput.writeln("rm " + growlAppleScriptPath);
+        if (::doNotDeleteScripts == 0)
+        {
+    		bashOutput.writeln("rm " + growlAppleScriptPath);
+        }
     }
 	bashOutput.writeln("echo \"Displaying Completed Frame.\"");
     bashOutput.writeln("exit");
@@ -327,11 +342,17 @@ UB_bg_sceneRender: sceneFile, frameOutputPath
     bashOutput = File(bashFilePath,"w");
    	outputLine = install_dir + getsep() + "bin/lwsn -3 -c" + config_dir + " -d" + content_dir + " " + sceneFile + " " + renderStart + " " + renderEnd + " " + renderStep + "\;\n";
     bashOutput.writeln(outputLine);
-    bashOutput.writeln("rm " + bashFilePath);
+    if (::doNotDeleteScripts == 0)
+    {
+        bashOutput.writeln("rm " + bashFilePath);
+    }
 	if(::useGrowl == 1)
 	{
 		bashOutput.writeln("osascript \"" + growlAppleScriptPath + "\"");
-		bashOutput.writeln("rm " + growlAppleScriptPath);
+        if (::doNotDeleteScripts == 0)
+        {
+    		bashOutput.writeln("rm " + growlAppleScriptPath);
+        }
     }
 	bashOutput.writeln("echo \"Sequence Render Complete.\"");
     bashOutput.writeln("exit");
@@ -418,11 +439,17 @@ UB_bg_allSceneRender: sceneFile, frameOutputPath
 		growlScriptOutput.close();
 	}
 
-    bashOutput.writeln("rm " + bashFilePath);
+    if (::doNotDeleteScripts == 0)
+    {
+        bashOutput.writeln("rm " + bashFilePath);
+    }
 	if(::useGrowl == 1)
 	{
 		bashOutput.writeln("osascript \"" + growlAppleScriptPath + "\"");
-		bashOutput.writeln("rm " + growlAppleScriptPath);
+        if (::doNotDeleteScripts == 0)
+        {
+    		bashOutput.writeln("rm " + growlAppleScriptPath);
+        }
     }
 	bashOutput.writeln("echo \"Passes Render Complete.\"");
     bashOutput.writeln("exit"); 
