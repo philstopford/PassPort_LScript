@@ -5,8 +5,7 @@ getPassEditorStartLine: inputPath
 
 	while (!gpesl_input.eof())
 	{
-		line = gpesl_input.read();
-		lineArray = parse(" ", line);
+		lineArray = parse(" ", gpesl_input.read());
 		if(size(lineArray) >= 4)
 		{
 			if(lineArray[2] == "MasterHandler" && lineArray[4] == "PassPort_MC")
@@ -78,42 +77,8 @@ getRelativityLines: mode, objID, objGenus, inputPath
 	{
 		logger("error","getRelativityLine: mode " + mode.asStr() + " not recognized");
 	}
-	if (objGenus == MESH)
-	{
-		relStartLine = getObjectLine(objID,inputPath);
-		if (relStartLine)
-		{
-			relEndLine = getObjectEndLine(relStartLine + 1, objID, inputPath);
-		}
-	}
-	else if (objGenus == LIGHT)
-	{
-		relStartLine = getLightLine(objID,inputPath);
-		if (relStartLine)
-		{
-			relEndLine = getLightEndLine(relStartLine + 1, objID, inputPath);
-		}
-	}
-	else if (objGenus == CAMERA)
-	{
-		relStartLine = getCameraLine(objID,inputPath);
-		if (relStartLine)
-		{
-			relEndLine = getCameraEndLine(relStartLine, objID, inputPath); // deliberately don't offset the line - see the targeted function.
-		}
-	}
-	else {
-		logger("warn","getRelativityLine: Genus not recognized: " + objGenus.asStr());
-		return nil; // unrecognized.
-	}
-	if(!relStartLine || relStartLine == 0)
-	{
-		return nil;
-	}
-	if(!relEndLine)
-	{
-		logger("error","getRelativityLine: failed to find end line for item " + objID.asStr());
-	}
+	relStartLine = getEntityStartLine(objID,inputPath);
+	relEndLine = getEntityEndLine(relStartLine+ 1, objID, inputPath);
 	relFile = File(inputPath, "r");
 	relFile.line(relStartLine);
 	relLineArray = nil;
@@ -146,60 +111,13 @@ getRelativityLines: mode, objID, objGenus, inputPath
 	return relLineArray;
 }
 
-getObjectLine: objID,inputPath
-{
-	gol_input = File(inputPath, "r");
-	toReturn = nil;
-
-	while(!gol_input.eof())
-	{
-		gl_line = gol_input.read();
-		lineArray = parse(" ",gl_line);
-		if(size(lineArray) >= 3)
-		{
-			if(lineArray[1] == "LoadObjectLayer" || lineArray[1] == "AddNullObject")
-			{
-				if(lineArray[3] == string(objID) || lineArray[2] == string(objID))
-				{
-					toReturn = gol_input.line() - 1;
-					break;
-				}
-			}
-		}
-	}
-	gol_input.close();
-	return(toReturn);
-}
-
-getLightLine: lightID,inputPath
-{
-	gll_input = File(inputPath, "r");
-	toReturn = nil;
-	while(!gll_input.eof())
-	{
-		gl_line = gll_input.read();
-		lineArray = parse(" ",gl_line);
-		if(size(lineArray) >= 2)
-		{
-			if(lineArray[1] == "AddLight" && lineArray[2] == string(lightID))
-			{
-				toReturn = gll_input.line() - 1;
-				break;
-			}
-		}
-	}
-	gll_input.close();
-	return(toReturn);
-}
-
 getPixelFilterLine: pixelFilterString, inputPath
 {
 	gpf_input = File(inputPath, "r");
 	toReturn = nil;
 	while (!gpf_input.eof())
 	{
-		gl_line = gpf_input.read();
-		lineArray = parse(" ", gl_line);
+		lineArray = parse(" ", gpf_input.read());
 		if (size(lineArray) >= 4)
 		{
 			if((lineArray[1] == "Plugin") && (lineArray[2] == "PixelFilterHandler") && (lineArray[4] == pixelFilterString))
@@ -218,8 +136,7 @@ getVolumetricHandlerLine: volumetricHandlerString, inputPath
 	toReturn = nil;
 	while (!gvl_input.eof())
 	{
-		gl_line = gvl_input.read();
-		lineArray = parse(" ", gl_line);
+		lineArray = parse(" ", gvl_input.read());
 		if (size(lineArray) >= 4)
 		{
 			if((lineArray[1] == "Plugin") && (lineArray[2] == "VolumetricHandler") && (lineArray[4] == volumetricHandlerString))
@@ -232,138 +149,131 @@ getVolumetricHandlerLine: volumetricHandlerString, inputPath
 	return toReturn;
 }
 
-getCameraLine: camID,inputPath
+getEntityStartLine: objID, inputPath
 {
-	gcl_input = File(inputPath, "r");
-	toReturn = nil;
-	while(!gcl_input.eof())
+	entityGenus = int(strleft(string(objID),1));
+	toReturn = 0;
+	if(entityGenus > 3 || entityGenus < 1)
 	{
-		gl_line = gcl_input.read();
-		lineArray = parse(" ",gl_line);
-		if(size(lineArray) >= 2)
-		{
-			if(lineArray[1] == "AddCamera" && lineArray[2] == string(camID))
-			{
-				toReturn = gcl_input.line() - 1;
-				break;
-			}
-		}
+		logger("error", "getEntityStartLine: invalid genus detected: " + entityGenus.asStr());
 	}
-	gcl_input.close();
-	return(toReturn);
-}
-
-getObjectEndLine: startLine,objID,inputPath
-{
-	if(startLine == 0 || startLine == nil)
+	if (entityGenus == 1)
 	{
-		startLine = getObjectLine(objID,inputPath);
-		if(startLine == 0 || startLine == nil)
-		{
-			logger("error", "getObjectEndLine: cannot find object ID (" + objID.asStr() + ") in scene");
-		}
-		startLine += 1;
+		startMarkerStringArray = @"LoadObjectLayer","AddNullObject"@;
+	}
+	if (entityGenus == 2)
+	{
+		startMarkerStringArray = @"AddLight"@;
+	}
+	if (entityGenus == 3)
+	{
+		startMarkerStringArray = @"AddCamera"@;
 	}
 
-	goel_input = File(inputPath, "r");
-	goel_input.line(startLine);
-	toReturn = nil;
-	while(!goel_input.eof())
+	gesl_input = File(inputPath, "r");
+
+	while(!gesl_input.eof())
 	{
-		gl_line = goel_input.read();
-		currentLineArray = parse(" ", gl_line);
-		if(sizeof(currentLineArray) >= 2)
+		gesl_lineArray = parse(" ", gesl_input.read());
+		if (size(gesl_lineArray) >= 2)
 		{
-			currentLineString = strleft(currentLineArray[1],12);
-			if(currentLineString == "LoadObjectLa" || currentLineString == "AddNullObjec" || currentLineString == "AmbientColor")
+			for (sms_counter = 1; sms_counter <= size(startMarkerStringArray); sms_counter++)
 			{
-				toReturn = goel_input.line() - 1;
-				if (toReturn == startLine)
+				if(gesl_lineArray[1] == startMarkerStringArray[sms_counter])
 				{
-					logger("error","getObjectEndLine: end line is start line! Function called incorrectly.");
+					if((entityGenus == 1) && (sms_counter == 1))
+					{
+						// Need to special case this handling due to the layer reference in 'LoadObjectLayer'
+						gesl_ArrayIndex = 3;
+					} else {
+						gesl_ArrayIndex = 2;
+					}
+					if (gesl_lineArray[gesl_ArrayIndex] == string(objID))
+					{
+						toReturn = gesl_input.line() - 1; // decrement for read event.
+						break;
+					}
 				}
-				toReturn += -2; // offset back to the end line.
-				break;
 			}
 		}
+		if(toReturn != 0)
+		{
+			break;
+		}
 	}
-	goel_input.close();
+	gesl_input.close();
+	if(toReturn == 0)
+	{
+		logger("error", "getEntityStartLine: failed to find start line for entity ID: " + objID.asStr() + " in " + inputPath);
+	}
 	return(toReturn);
 }
 
-getCameraEndLine: startLine,objID,inputPath
+getEntityEndLine: startLine,objID,inputPath
 {
+	entityGenus = int(strleft(string(objID),1));
+	toReturn = 0;
+	if(entityGenus > 3 || entityGenus < 1)
+	{
+		logger("error", "getEntityEndLine: invalid genus detected: " + entityGenus.asStr());
+	}
 	if(startLine == 0 || startLine == nil)
 	{
-		startLine = getCameraLine(objID,inputPath);
-		if(startLine == 0 || startLine == nil)
-		{
-			logger("error", "getCameraEndLine: cannot find camera ID (" + objID.asStr() + ") in scene");
-		}
-	}
-
-	gcel_line1 = getPartialLine(startLine, 0, "Plugin CameraHandler", inputPath);
-	if (gcel_line1)
-	{
-		gcel_line2 = getPartialLine(gcel_line1, 0, "EndPlugin", inputPath);
-	}
-	return gcel_line2;
-
-	// Disabled below - doesn't seem to be reliable from multiple callsites - works only from first call site.
-	/*
-	gcel_input = File(inputPath, "r");
-	gcel_input.line(startLine);
-	toReturn = nil;
-	endMarkerString = "Plugin CameraHandler";
-	while(!gcel_input.eof())
-	{
-		gl_line = gcel_input.read();
-		currentLineArray = parse(" ", gl_line);
-		if((sizeof(currentLineArray) >= 2) && (size(gl_line) >= size(endMarkerString)))
-		{
-			currentLineString = strleft(gl_line,size(endMarkerString));
-			if(currentLineString == endMarkerString)
-			{
-				toReturn = gcel_input.line() + 1; // offset to include the EndPlugin line, the whitespace afterwards and the subsequent line to match original code flow.
-				break;
-			}
-		}
-	}
-	gcel_input.close();
-	return(toReturn);
-	*/
-}
-
-getLightEndLine: startLine,objID,inputPath
-{
-	if(startLine == 0 || startLine == nil)
-	{
-		startLine = getLightLine(objID,inputPath);
-		if(startLine == 0 || startLine == nil)
-		{
-			logger("error", "getLightEndLine: cannot find light ID (" + objID.asStr() + ") in scene");
-		}
+		startLine = getEntityStartLine(objID,inputPath);
 		startLine += 1;
 	}
-	glel_input = File(inputPath, "r");
-	glel_input.line(startLine);
-	toReturn = nil;
-	endMarkerString = "Plugin LightHandler";
-	while(!glel_input.eof())
+	if (entityGenus == 1)
 	{
-		gl_line = glel_input.read();
-		currentLineArray = parse(" ", gl_line);
-		if((sizeof(currentLineArray) >= 2) && (size(gl_line) >= size(endMarkerString)))
+		endMarkerStringArray = @"LoadObjectLayer","AddNullObject","AmbientColor"@;
+	}
+	if (entityGenus == 2)
+	{
+		endMarkerStringArray = @"AddLight","AddCamera"@;
+	}
+	if (entityGenus == 3)
+	{
+		endMarkerStringArray = @"AddCamera","Antialiasing"@;
+	}
+
+	geel_input = File(inputPath, "r");
+	geel_input.line(startLine);
+
+	while(!geel_input.eof())
+	{
+		geel_lineArray = parse(" ", geel_input.read());
+		if(sizeof(geel_lineArray) >= 2)
 		{
-			currentLineString = strleft(gl_line,size(endMarkerString));
-			if(currentLineString == endMarkerString)
+			for (ems_counter = 1; ems_counter <= size(endMarkerStringArray); ems_counter++)
 			{
-				toReturn = glel_input.line() + 1; // offset to include the EndPlugin line, the whitespace afterwards and the subsequent line to match original code flow.
-				break;
+				if(geel_lineArray[1] == endMarkerStringArray[ems_counter])
+				{
+					toReturn = geel_input.line() - 1; // decrement for read event.
+					break;
+				}
+			}
+
+			if (toReturn != 0)
+			{
+				if(entityGenus == 1)
+				{
+					if(toReturn == startLine)
+					{
+						logger("error","getEntityEndLine: end line is start line for object entity! Function called incorrectly.");
+					}
+				}
+				toReturn += -1; // offset back to real end line.
 			}
 		}
+		if(toReturn != 0)
+		{
+			break;
+		}
 	}
-	glel_input.close();
+	geel_input.close();
+	if(toReturn == 0)
+	{
+		logger("error", "getEntityEndLine: failed to find end line for entity ID: " + objID.asStr() + " starting from line " + startLine.asStr() + " in " + inputPath);
+	}
 	return(toReturn);
 }
 

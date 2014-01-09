@@ -1,8 +1,16 @@
+20140109 (Enhancement build)
+========
+
+- We used to get a failure when all FiberFX items are omitted from a pass. LWSN would segfault. This was due to our approach of fail-safing. Revised this approach to automatically drop the entire FiberFX block out. Warnings will be displayed to the user.
+- Figured out the misfiring Relativity dependency checking issue. Needed to insert/append .lwo for all objects and indeed nulls since we use the dislay names and those don't have file suffixes. This will make the approach robust enough to pass. It won't work with edge cases where people are using OBJ or similar files directly in Layout.
+- Trying a new approach for start and end line retrieval for objects, cameras and lights.
+ - Using a set of generic handler functions instead, based on common strategy with genus-specific markers.
+
 20140108 (Triage build)
 ========
 
 - Added option to preserve scripts generated when rendering scenes/frames.
- - Exposed as preference setting. Not saved in or loaded from scenes or RPE files.
+ - Exposed as preference setting. Not saved in or loaded fromgit scenes or RPE files.
 
 20131218 (Enhancement, Bug fix)
 ========
@@ -936,7 +944,6 @@ p0043 : Passes rendering with radiosity. (Fixed 20131029, backported to 1.0.8)
 :::::::::::::::::::
 
 - Need to check if growl interaction works with current growl versions.
-- 3rd party lights/cameras end of block detection.
 - Overriding multiple surfaces on an object. Doable?
 - Save/load override configuration files.
 - Light type override would make sense?

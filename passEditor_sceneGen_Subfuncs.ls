@@ -500,8 +500,8 @@ generatePassFile: mode, gPass
         
         if(strleft(string(::displayOldIDs[tempNumber]),1) == string(MESH))
         {
-            ::objStart[::passItem] = getObjectLine(::displayOldIDs[tempNumber],::currentScenePath);
-            ::objEnd[::passItem] = getObjectEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber],::currentScenePath);
+            ::objStart[::passItem] = getEntityStartLine(::displayOldIDs[tempNumber],::currentScenePath);
+            ::objEnd[::passItem] = getEntityEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber],::currentScenePath);
             ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels",::currentScenePath);
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
             // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
@@ -522,8 +522,8 @@ generatePassFile: mode, gPass
         // then the light lines
         if(strleft(string(::displayOldIDs[tempNumber]),1) == string(LIGHT))
         {
-            ::objStart[::passItem] = getLightLine(::displayOldIDs[tempNumber],::currentScenePath);
-            ::objEnd[::passItem] = getLightEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber],::currentScenePath);
+            ::objStart[::passItem] = getEntityStartLine(::displayOldIDs[tempNumber],::currentScenePath);
+            ::objEnd[::passItem] = getEntityEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber],::currentScenePath);
             ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels",::currentScenePath);
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
             // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
@@ -554,8 +554,8 @@ generatePassFile: mode, gPass
         // then the camera lines
         if(strleft(string(::displayOldIDs[tempNumber]),1) == string(CAMERA))
         {
-            ::objStart[::passItem] = getCameraLine(::displayOldIDs[tempNumber],::currentScenePath);
-            ::objEnd[::passItem] = getCameraEndLine(::objStart[::passItem],::displayOldIDs[tempNumber],::currentScenePath);
+            ::objStart[::passItem] = getEntityStartLine(::displayOldIDs[tempNumber],::currentScenePath);
+            ::objEnd[::passItem] = getEntityEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber],::currentScenePath);
             ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels",::currentScenePath);
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
             // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
@@ -1002,7 +1002,7 @@ writeCameras: inputFile, outputFile, lineNumber
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == ::objEnd[cameraCounter])
+                            if(inputFile.line() > ::objEnd[cameraCounter])
                             {
                                 done = true;
                                 break;
@@ -1018,7 +1018,7 @@ writeCameras: inputFile, outputFile, lineNumber
                     {
                         line = inputFile.read();
                         outputFile.writeln(line);
-                        if(inputFile.line() == (::objEnd[cameraCounter]))
+                        if(inputFile.line() > (::objEnd[cameraCounter]))
                         {
                             done = true;
                             break;
@@ -1086,15 +1086,12 @@ writeObjects: inputFile, outputFile
                                 {
                                     line = inputFile.read();
                                     outputFile.writeln(line);
-                                    if(inputFile.line() == ::objEnd[objectCounter])
+                                    if(inputFile.line() > ::objEnd[objectCounter])
                                     {
                                         done = true;
                                         break;
                                     }
                                 }
-                                inputFile.line(::objEnd[objectCounter]);
-                                line = inputFile.read();
-                                outputFile.writeln(line);
                                 if(lightExclusion)
                                 {
                                     if(lightExclusion[objectCounter] != nil)
@@ -1113,15 +1110,12 @@ writeObjects: inputFile, outputFile
                                 {
                                     line = inputFile.read();
                                     outputFile.writeln(line);
-                                    if(inputFile.line() == ::objEnd[objectCounter])
+                                    if(inputFile.line() > ::objEnd[objectCounter])
                                     {
                                         done = true;
                                         break;
                                     }
                                 }
-                                inputFile.line(::objEnd[objectCounter]);
-                                line = inputFile.read();
-                                outputFile.writeln(line);
                                 if(lightExclusion)
                                 {
                                     if(lightExclusion[objectCounter] != nil)
@@ -1142,15 +1136,12 @@ writeObjects: inputFile, outputFile
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == ::objEnd[objectCounter])
+                                if(inputFile.line() > ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            inputFile.line(::objEnd[objectCounter]);
-                            line = inputFile.read();
-                            outputFile.writeln(line);
                             if(lightExclusion)
                             {
                                 if(lightExclusion[objectCounter] != nil)
@@ -1192,7 +1183,7 @@ writeObjects: inputFile, outputFile
                             {
                                 outputFile.writeln(line);
                             }
-                            if(inputFile.line() == ::objEnd[objectCounter])
+                            if(inputFile.line() > ::objEnd[objectCounter])
                             {
                                 done = true;
                                 break;
@@ -1200,9 +1191,6 @@ writeObjects: inputFile, outputFile
                         }
                         if(excludedLightsTemp == 1)
                         {
-                            inputFile.line(::objEnd[objectCounter]);
-                            line = inputFile.read();
-                            outputFile.writeln(line);
                             outputFile.writeln("");
                         }
                         else
@@ -1252,16 +1240,13 @@ writeObjects: inputFile, outputFile
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == ::objEnd[objectCounter])
+                                if(inputFile.line() > ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
                                 }
                             }
                             motFile.close();
-                            inputFile.line(::objEnd[objectCounter]);
-                            line = inputFile.read();
-                            outputFile.writeln(line);
                             if(lightExclusion)
                             {
                                 if(lightExclusion[objectCounter] != nil)
@@ -1279,15 +1264,12 @@ writeObjects: inputFile, outputFile
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == ::objEnd[objectCounter])
+                                if(inputFile.line() > ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            inputFile.line(::objEnd[objectCounter]);
-                            line = inputFile.read();
-                            outputFile.writeln(line);
                             if(lightExclusion)
                             {
                                 if(lightExclusion[objectCounter] != nil)
@@ -1327,15 +1309,12 @@ writeObjects: inputFile, outputFile
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == ::objEnd[objectCounter])
+                                if(inputFile.line() > ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            inputFile.line(::objEnd[objectCounter]);
-                            line = inputFile.read();
-                            outputFile.writeln(line);
                             if(lightExclusion)
                             {
                                 if(lightExclusion[objectCounter] != nil)
@@ -1354,15 +1333,12 @@ writeObjects: inputFile, outputFile
                             {
                                 line = inputFile.read();
                                 outputFile.writeln(line);
-                                if(inputFile.line() == ::objEnd[objectCounter])
+                                if(inputFile.line() > ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
                                 }
                             }
-                            inputFile.line(::objEnd[objectCounter]);
-                            line = inputFile.read();
-                            outputFile.writeln(line);
                             if(lightExclusion)
                             {
                                 if(lightExclusion[objectCounter] != nil)
@@ -1382,15 +1358,12 @@ writeObjects: inputFile, outputFile
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == ::objEnd[objectCounter])
+                            if(inputFile.line() > ::objEnd[objectCounter])
                             {
                                 done = true;
                                 break;
                             }
                         }
-                        inputFile.line(::objEnd[objectCounter]);
-                        line = inputFile.read();
-                        outputFile.writeln(line);
                         if(lightExclusion)
                         {
                             if(lightExclusion[objectCounter] != nil)
@@ -1408,15 +1381,12 @@ writeObjects: inputFile, outputFile
                         {
                             line = inputFile.read();
                             outputFile.writeln(line);
-                            if(inputFile.line() == ::objEnd[objectCounter])
+                            if(inputFile.line() > ::objEnd[objectCounter])
                             {
                                 done = true;
                                 break;
                             }
                         }
-                        inputFile.line(::objEnd[objectCounter]);
-                        line = inputFile.read();
-                        outputFile.writeln(line);
                         outputFile.writeln("");
                         break;
 
@@ -1438,9 +1408,6 @@ writeObjects: inputFile, outputFile
                         break;
                     }
                 }
-                inputFile.line(::objEnd[objectCounter]);
-                line = inputFile.read();
-                outputFile.writeln(line);
                 outputFile.writeln("");
             }
         }
@@ -1760,7 +1727,9 @@ fiberFX: ffxFile
 
     if (matchedFFXItemsCounter == 1) // safety catch.
     {
-        logger("warn","fiberFX: Error during ID Matching!");
+        logger("warn","fiberFX: FiberFX active, but no items in the pass or we encountered an error during ID matching. Report the latter, please.");
+        logger("info","fiberFX: Stripping FiberFX from scene, to allow render to pass.");
+        stripFiberFX(ffxFile, ffxLine, ffxEndLine);
         return 0;
     } else {
         // logger("log_info","fiberFX: Matched " + size(matchedFFXItems) + " items");
@@ -1846,6 +1815,37 @@ fiberFX: ffxFile
     filedelete(ffxOutputFilename);
 
     return 1; // notify caller that we changed something.
+}
+
+stripFiberFX: ffxFile, ffxLine, ffxEndLine
+{
+    ffxVolFilterLine = getVolumetricHandlerLine(".FiberVolume", ffxFile);
+    // Walk the scene file to strip the FiberFX entries. Fail-safe.
+    stripFiberFFX_input = File(ffxFile, "r");
+    stripffxFile = ::tempDirectory + getsep() + "tempPassportInputFile_StripFFx.lws";
+    stripFiberFFX_output = File(stripffxFile, "w");
+    stripFiberFFX_line = 1;
+    while(stripFiberFFX_line < ffxVolFilterLine)
+    {
+        stripFiberFFX_output.writeln(stripFiberFFX_input.read());
+        stripFiberFFX_line++;
+    }
+    stripFiberFFX_line += 2; // skip vol and end plugin lines
+    stripFiberFFX_input.line(stripFiberFFX_line);
+    while(stripFiberFFX_line < ffxLine)
+    {
+        stripFiberFFX_output.writeln(stripFiberFFX_input.read());
+        stripFiberFFX_line++;
+    }
+    stripFiberFFX_input.line(ffxEndLine + 1);
+    while(!stripFiberFFX_input.eof())
+    {
+        stripFiberFFX_output.writeln(stripFiberFFX_input.read());
+    }
+    stripFiberFFX_output.close();
+    stripFiberFFX_input.close();
+    filecopy(stripffxFile, ffxFile);
+    filedelete(stripffxFile);
 }
 
 handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, fileOuputPrefix, userOutputString // if you edit this, don't forget to extend defaultBufferExporters as well and the new/edit pass dialog to set the values accordingly. You'll also need to bump the version due to mismatches.
@@ -2457,8 +2457,8 @@ dependencyCheck: dcFile
             {
                 dcArrayCounter++;
                 dcIDArray[i] = int(::displayOldIDs[j]); // remap to hex based ID to align with LWS.
-                dcNameArray[dcArrayCounter] = string(::displayNames[j]);
                 dcGenusArray[dcArrayCounter] = int(::displayGenus[j]);
+                dcNameArray[dcArrayCounter] = string(::displayNames[j]);
             }
         }
     }
@@ -2474,11 +2474,11 @@ dependencyCheck: dcFile
     // Let's get started.
     for (i = 1; i <= size(dcIDArray); i++)
     {
-        dependencyCheck_Relativity(dcIDArray[i], dcGenusArray[i], dcNameArray, dcFile);
+        dependencyCheck_Relativity(dcIDArray[i], dcGenusArray[i], dcGenusArray, dcNameArray, dcFile);
     }
 }
 
-dependencyCheck_Relativity: dcID, dcGenus, dcNameArray, dcFile
+dependencyCheck_Relativity: dcID, dcGenus, dcGenusArray, dcNameArray, dcFile
 {
     // Let's see if we find Relativity applied.
     // We don't anticipate more than one instance of each type of modifier on the item.
@@ -2489,6 +2489,37 @@ dependencyCheck_Relativity: dcID, dcGenus, dcNameArray, dcFile
     for(i = 1; i <= size(dcNameArray); i++)
     {
         dcRelNameArray[i] = strlower(dcNameArray[i]); // Relativity drops all names to lower case.
+    }
+    dcRelNameArrayIndex = size(dcRelNameArray);
+    for(i = 1; i <= size(dcGenusArray); i++)
+    {
+        if(dcGenusArray[i] == MESH)
+        {
+            insertionPoint = 0;
+            // Need to append .lwo to the object name to handle the Relativity pattern matching
+            tempString = dcNameArray[i];
+            if(strsub(tempString,size(tempString),1) == "\)")
+            {
+                for (j = size(tempString); j >= 1; j--)
+                {
+                    // Find the matching opening bracket
+                    if(strsub(tempString,j,1) == "\(")
+                    {
+                        insertionPoint = j - 2; // should end up before the space preceding the bracket.
+                    }
+                }
+            }
+
+            // OK. Let's append or insert .lwo as needed. We then graft this to the end of our array
+            if(insertionPoint == 0)
+            {
+                dcRelTempString = dcRelNameArray[i] + ".lwo";
+            } else {
+                dcRelTempString = strsub(dcRelNameArray[i],1,insertionPoint) + ".lwo" + strsub(dcRelNameArray[i],insertionPoint + 1,size(dcRelNameArray[i]) - (insertionPoint));
+            }
+            dcRelNameArrayIndex++;
+            dcRelNameArray[dcRelNameArrayIndex] = dcRelTempString;
+        }
     }
 
     for (rType = 1; rType <= size(relModifierTypes); rType++)

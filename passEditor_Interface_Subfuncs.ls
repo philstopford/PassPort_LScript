@@ -192,7 +192,7 @@ preferencePanel
 			::useGrowl = getvalue(usegrowl);
 		::areYouSurePrompts = getvalue(c23);
 		::errorOnDependency = getvalue(dependencyError);
-		::doNotDeleteScripts = getvalue(c_doNotDeleteScripts);
+		::doNotDeleteScripts = int(getvalue(c_doNotDeleteScripts));
 		::rgbSaveType = getvalue(c25);
 		::editorResolution = getvalue(c26);
 		::testRgbSaveType = getvalue(c29);

@@ -8,11 +8,11 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "1.6.2693";
+var versionString = "1.6.2717";
 var rpeVersion = "1.1";
 var parch = "Unknown";
 var icon;
-var doNotDeleteScripts;
+var doNotDeleteScripts = 0;
 var passSelected = false;
 // var currentPassMenu_item; // may not need to be global.
 var overridesSelected = false;

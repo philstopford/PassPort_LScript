@@ -67,6 +67,7 @@
 <li><strong><a href="#dragons_lights">Lights</a></strong></li>
 <li><strong><a href="#dragons_cameras">Cameras</a></strong></li>
 <li><strong><a href="#dragons_comring">Comring</a></strong></li>
+<li><strong><a href="#dragons_dependencies">Dependencies</a></strong></li>
 </ul>
 <li><strong><a href="#troubleshooting">Troubleshooting.</a></strong></li>
 <li><strong><a href="#credits">Credits.</a></strong></li>
@@ -289,6 +290,8 @@
 <p>LightWave expects at least one camera in a scene, and PassPort also expects at least one camera in a pass in order to reliably generate the scene. To that end, if you haven't assigned any cameras, PassPort will automatically add the first camera in the scene to the generated scene file. This might not be the active camera, though, so results may be odd.</p>
 <h4><a name="dragons_comring"></a>Comring</h4>
 <p>PPRN 1.0.x likely had comring issues, but no-one reported them. PPRN 1.6.x has seen work to resolve these problems, but this work has not been tested at the time of writing.</p>
+<h4><a name="dragons_dependencies"></a>Dependencies</h4>
+<p>PPRN will not, at this time, attempt to rewire broken dependencies utilizing objects that are being replaced - you will get broken dependency alerts and the best approach would be to reconstruct your scene to avoid this situation.</p>
 </ul>
 <h3><a name="troubleshooting"></a>Troubleshooting</h3>
 <p>Overrides cannot be stacked on an object in a pass (with the exception of the Light Exclusions override).  For example, you cannot apply both a motion override and a surface override to the same object in the same pass. Note that this will cause a failure even if the issue is located in a pass other than the one you are rendering. The error message will also be very ugly and scary. You'll have to manually figure out what you did wrong, fix it up and try again.</p>
