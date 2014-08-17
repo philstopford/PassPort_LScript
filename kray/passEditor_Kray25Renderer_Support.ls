@@ -25,7 +25,7 @@ scnGen_kray25
     // Kray, happily, has all of its settings in the scene file so all we need to do now is to find the header line and then use hard-coded offsets to the data we care about. There are no line markers, so hard-coding is the only option.
     // It's bloating this code somewhat, but for flexibility, we'll abstract our line references with variables to make this maintainable in future.
 
-    krayHeaderLine = getMasterPluginLine("Kray", ::updatedCurrentScenePath); // Should pick up MasterHandler for Kray
+    krayHeaderLine = getMasterPluginLine("Kray"); // Should pick up MasterHandler for Kray
 
     // Startup checks to ensure we're working against a known quantity.
     if (krayHeaderLine == nil)
@@ -35,12 +35,12 @@ scnGen_kray25
         krayBuild = default_krayBuild;
     } else {
         searchString = "Plugin MasterHandler";
-        input = File(::updatedCurrentScenePath, "r");
-        input.line(krayHeaderLine + 3); // offset for the plugin header, the LSC script reference and the Kray encapsulator
-        krayLSCBuild = input.readInt();
-        krayBuild = input.readInt();
-        input.close();
-        krayPluginEndLine = getPartialLine(krayHeaderLine,0,"EndPlugin",::updatedCurrentScenePath);
+        readIndex = krayHeaderLine; // offset for the plugin header, the LSC script reference and the Kray encapsulator
+        krayLSCBuild = int(::readBuffer[readIndex]);
+        readIndex++;
+        krayBuild = int(::readBuffer[readIndex]);
+        readIndex++;
+        krayPluginEndLine = getPartialLine(krayHeaderLine,0,"EndPlugin");
         // Check known version of Kray in case of mismatch
         if((krayLSCBuild != default_krayLSCBuild) || (krayBuild != default_krayBuild))
         {
@@ -54,9 +54,11 @@ scnGen_kray25
     activeCameraID = int(::settingsArray[size(::settingsArray) - 1]);
     // logger("log_info","scnGen_kray25: activeCameraID: " + activeCameraID.asStr());
 
-    if(activeCameraID == 0) // FIXME: Needs implementation.
+    if(activeCameraID == 0)
     {
         activeCamera = 0; // first camera in scene file, matching default behaviour for no cameras in pass.
+        passCamNameArray[1] = ::cameraNames[1];
+        passCamIDArray[1] = ::cameraIDs[1];
     } else {
         passCamNameArray = nil;
         passCamIDArray = nil;
@@ -75,40 +77,37 @@ scnGen_kray25
                     {
                         if(::displayIDs[k] == passItemsIDsArray[i])
                         {
-                            nameIndex = k;
+                            passCamNameArray[passCamArrayIndex] = ::displayNames[k];
+                            passCamArrayIndex++;
                         }
                     }
-                    passCamNameArray[passCamArrayIndex] = ::displayNames[nameIndex];
-                    passCamArrayIndex++;
                 }
             }
         }
 
         activeCamera = 0;
-        counter = 0;
         for(i = 1; i <= passCamIDArray.size(); i++)
         {
             if(passCamIDArray[i] == activeCameraID)
             {
-                // logger("info","scnGen_kray25: Found match for camera: " + counter.asStr());
-                activeCamera = counter;
+                activeCamera = i - 1;
+                logger("info","scnGen_kray25: Found match for camera: " + activeCamera.asStr());
             }
-            counter++;
         }
     }
 
+
     if(passCamNameArray == nil)
     {
-        logger("error","scnGen_kray25: No camera assigned to pass!");
+        logger("error","scnGen_kray25: Something went wrong with the camera handling!");
     } else {
         activeCameraName = passCamNameArray[activeCamera + 1];
     }
 
     // We need to do both of these - the first because we will later overwrite this field because it's parked at the end of the file and gets re-written
     // from the source file very late in the scene generation process.
-    writeOverrideString(::updatedCurrentScenePath, ::updatedCurrentScenePath, "CurrentCamera ", activeCamera);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "CurrentCamera ", activeCamera);
-    
+    writeOverrideString("CurrentCamera ", activeCamera);
+
     // Kray writes out according to its functions :
     //      ::krayfile.writeln("Kray{");
     //      save_general(io);
@@ -122,70 +121,62 @@ scnGen_kray25
     // krayLineNumber = krayBuild;
     settingIndex = 2;
 
-    krayTempPath = ::tempDirectory + getsep() + "passEditorTempSceneKray.lws";
-    ::krayfile = File(krayTempPath, "w");
-    sourceFile = File(::updatedCurrentScenePath, "r");
     if (krayHeaderLine != nil)
     {
-        copyLineNumber = 1;
-        while(copyLineNumber <= krayHeaderLine)
+        readIndex = 1;
+        while(readIndex <= krayHeaderLine)
         {
-            ::krayfile.writeln(sourceFile.read());
-            copyLineNumber++;
+            ::writeBuffer[readIndex] = ::readBuffer[readIndex];
+            readIndex++;
         }
     } else {
-        masterHandlerCounter = 0;
-        mHLine = 0;
-        while(mHLine != nil)
+        mHStartLine = getPartialLine_last(0, 0, "MasterHandler");
+        if(mHStartLine != nil)
         {
-            if(masterHandlerCounter > 0)
-            {
-                mHLine_Prev = mHLine;
-            }
-            mHLine = getPartialLine(mHLine, 0, "MasterHandler", ::updatedCurrentScenePath);
-            masterHandlerCounter++;
-        }
-        if(masterHandlerCounter == 0)
-        {
-            mHStartLine = getPartialLine(0, 0, "ChangeScene", ::updatedCurrentScenePath);
+            tempArray = parse(" ", mHStartLine);
+            masterHandlerCounter = int(tempArray[3]);
+            mHStartLine = getPartialLine(mHStartLine,0, "EndPlugin");
         } else {
-            mHStartLine = mHLine_Prev;
+            masterHandlerCounter = 0;
+            mHStartLine = getPartialLine(0, 0, "ChangeScene");
         }
 
-        copyLineNumber = 1;
-        while(copyLineNumber <= mHStartLine)
+        readIndex = 1;
+
+        while(readIndex <= mHStartLine)
         {
-            ::krayfile.writeln(sourceFile.read());
-            copyLineNumber++;
+            ::writeBuffer[readIndex] = ::readBuffer[readIndex];
+            readIndex++;
         }
-        ::krayfile.writeln("Plugin MasterHandler " + string(masterHandlerCounter + 1) + " Kray");
-        ::krayfile.writeln("Script " + getKrayScriptPath().asStr());
+
+        ::writeBuffer[size(::writeBuffer) + 1] = "Plugin MasterHandler " + string(masterHandlerCounter + 1) + " Kray";
+        ::writeBuffer[size(::writeBuffer) + 1] = "Script " + getKrayScriptPath().asStr();
     }
-    ::krayfile.writeln("Kray{");
+    ::writeBuffer[size(::writeBuffer) + 1] = "Kray{";
 
     scnGen_kray25_general();
     scnGen_kray25_accuracy();
     scnGen_kray25_script();
-    ::krayfile.writeln("}");
+    ::writeBuffer[size(::writeBuffer) + 1] = "}";
 
     if (krayHeaderLine != nil)
     {
-        sourceFile.line(krayPluginEndLine);
+        readIndex = krayPluginEndLine;
     } else {
-        ::krayfile.writeln("EndPlugin");
+        readIndex = mHStartLine + 1;
+        ::writeBuffer[size(::writeBuffer) + 1]  = "EndPlugin";
     }
-    while(!sourceFile.eof())
+
+    while(readIndex <= size(::readBuffer))
     {
-        ::krayfile.writeln(sourceFile.read());
+        ::writeBuffer[size(::writeBuffer)+1] = ::readBuffer[readIndex];
+        readIndex++;
     }
 
-    ::krayfile.close();
-    sourceFile.close();
-    filecopy(krayTempPath,::newScenePath);
-    filecopy(krayTempPath,::updatedCurrentScenePath); // avoid getting our source file clobbered in a later function.
-    filedelete(krayTempPath);
+    ::readBuffer = ::writeBuffer;
+    ::writeBuffer = nil;
 
-    scnGen_kray25_plugins();
+//    scnGen_kray25_plugins();
 
     addKrayRenderer();
 }
@@ -206,36 +197,37 @@ scnGen_kray25_plugins
 
 scnGen_kray25_general
 {
-    ::krayfile.writeln(version);
+    ::writeBuffer[size(::writeBuffer)+1] = version;
 
-    if (!create_flag){  // not inited, do not save settings
-        ::krayfile.writeln(int,3605);
-        ::krayfile.writeln(int,kray25_v_gph_preset);
-        ::krayfile.writeln(int,kray25_v_cph_preset);
-        ::krayfile.writeln(int,kray25_v_fg_preset);
-        ::krayfile.writeln(int,kray25_v_aa_preset);
-        ::krayfile.writeln(int,kray25_v_quality_preset);
+    if (!create_flag)
+    {  // not inited, do not save settings
+        ::writeBuffer[size(::writeBuffer)+1] = 3605;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gph_preset;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cph_preset;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fg_preset;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_aa_preset;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_quality_preset;
         
-        ::krayfile.writeln(int,104);
-        ::krayfile.writeln(int,kray25_v_gi);
-        ::krayfile.writeln(kray25_v_gicaustics);
-        ::krayfile.writeln(kray25_v_giirrgrad);
-        ::krayfile.writeln(kray25_v_gipmmode);
+        ::writeBuffer[size(::writeBuffer)+1] = 104;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gi;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gicaustics;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_giirrgrad;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gipmmode;
 
-        ::krayfile.writeln(int,2301);
-        ::krayfile.writeln(kray25_v_girtdirect);
+        ::writeBuffer[size(::writeBuffer)+1] = 2301;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_girtdirect;
 
-        ::krayfile.writeln(int,201);
-        ::krayfile.writeln(int,kray25_v_lg);
+        ::writeBuffer[size(::writeBuffer)+1] = 201;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_lg;
         
-        ::krayfile.writeln(int,301);
-        ::krayfile.writeln(int,kray25_v_pl);
+        ::writeBuffer[size(::writeBuffer)+1] = 301;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_pl;
 
         mlsize=size(kray25_v_outname);
         if (mlsize==0)
         {
-            ::krayfile.writeln(int,3501);
-            ::krayfile.writeln("");
+            ::writeBuffer[size(::writeBuffer)+1] = 3501;
+            ::writeBuffer[size(::writeBuffer)+1] = "";
         } else {
             for (a=1 ; a<=mlsize ; a += ::maxlinelength)
             {
@@ -245,62 +237,62 @@ scnGen_kray25_general
                     t=mlsize+1;
                 }
                 t=-a+t;
-                ::krayfile.writeln(int,3501);
-                ::krayfile.writeln(strsub(kray25_v_outname,a,t));
+                ::writeBuffer[size(::writeBuffer)+1] = 3501;
+                ::writeBuffer[size(::writeBuffer)+1] = strsub(kray25_v_outname,a,t);
             }
         }
 
-        ::krayfile.writeln(int,602);
-        ::krayfile.writeln(number,kray25_v_prep);
-        ::krayfile.writeln(int,kray25_v_pxlordr);
+        ::writeBuffer[size(::writeBuffer)+1] = 602;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_prep;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_pxlordr;
 
-        ::krayfile.writeln(int,702);
-        ::krayfile.writeln(int,kray25_v_underf);
-        ::krayfile.writeln(number,kray25_v_undert);
+        ::writeBuffer[size(::writeBuffer)+1] = 702;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_underf;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_undert;
 
-        ::krayfile.writeln(int,802);
-        ::krayfile.writeln(int,kray25_v_areavis);
-        ::krayfile.writeln(int,kray25_v_areaside);
+        ::writeBuffer[size(::writeBuffer)+1] = 802;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_areavis;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_areaside;
 
-       // lights & camera
+        // lights & camera
 
-        ::krayfile.writeln(int,1003);
-        ::krayfile.writeln(kray25_v_planth);
-        ::krayfile.writeln(kray25_v_planrmin);
-        ::krayfile.writeln(kray25_v_planrmax);
+        ::writeBuffer[size(::writeBuffer)+1] = 1003;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_planth;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_planrmin;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_planrmax;
 
-        ::krayfile.writeln(int,2103);
-        ::krayfile.writeln(kray25_v_llinth);
-        ::krayfile.writeln(kray25_v_llinrmin);
-        ::krayfile.writeln(kray25_v_llinrmax);
+        ::writeBuffer[size(::writeBuffer)+1] = 2103;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_llinth;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_llinrmin;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_llinrmax;
 
-        ::krayfile.writeln(int,1103);
-        ::krayfile.writeln(kray25_v_lumith);
-        ::krayfile.writeln(kray25_v_lumirmin);
-        ::krayfile.writeln(kray25_v_lumirmax);
+        ::writeBuffer[size(::writeBuffer)+1] = 1103;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_lumith;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_lumirmin;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_lumirmax;
 
-        ::krayfile.writeln(int,2402);
+        ::writeBuffer[size(::writeBuffer)+1] = 2402;
         if(kray25_v_camobject == "__PPRN__BLANK__ENTRY__")
         {
-            ::krayfile.writeln("");
+            ::writeBuffer[size(::writeBuffer)+1] = "";
         } else {
-            ::krayfile.writeln(kray25_v_camobject);
+            ::writeBuffer[size(::writeBuffer)+1] = kray25_v_camobject;
         }
         if(kray25_v_camuvname == "__PPRN__BLANK__ENTRY__")
         {
-            ::krayfile.writeln("");
+            ::writeBuffer[size(::writeBuffer)+1] = "";
         } else {
-            ::krayfile.writeln(kray25_v_camuvname);
+            ::writeBuffer[size(::writeBuffer)+1] = kray25_v_camuvname;
         }
 
-        ::krayfile.writeln(int,1301);
-        ::krayfile.writeln(kray25_v_cptype);
+        ::writeBuffer[size(::writeBuffer)+1] = 1301;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cptype;
 
         mlsize=size(kray25_v_lenspict);
         if (mlsize==0)
         {
-            ::krayfile.writeln(int,1401);
-            ::krayfile.writeln("");
+            ::writeBuffer[size(::writeBuffer)+1] = 1401;
+            ::writeBuffer[size(::writeBuffer)+1] = "";
         } else {
             for (a=1 ; a<=mlsize ; a+=::maxlinelength)
             {
@@ -310,40 +302,40 @@ scnGen_kray25_general
                     t=mlsize+1;
                 }
                 t=-a+t;
-                ::krayfile.writeln(int,1401);
-                ::krayfile.writeln(strsub(kray25_v_lenspict,a,t));
+                ::writeBuffer[size(::writeBuffer)+1] = 1401;
+                ::writeBuffer[size(::writeBuffer)+1] = strsub(kray25_v_lenspict,a,t);
             }
         }
         
-        ::krayfile.writeln(int,1501);
+        ::writeBuffer[size(::writeBuffer)+1] = 1501;
         if(kray25_v_dofobj == "__PPRN__BLANK__ENTRY__")
         {
-            ::krayfile.writeln("");
+            ::writeBuffer[size(::writeBuffer)+1] = "";
         } else {
-            ::krayfile.writeln(kray25_v_dofobj);
+            ::writeBuffer[size(::writeBuffer)+1] = kray25_v_dofobj;
         }
 
-        ::krayfile.writeln(int,1603);
-        ::krayfile.writeln(kray25_v_cstocvar);
-        ::krayfile.writeln(kray25_v_cstocmin);
-        ::krayfile.writeln(kray25_v_cstocmax);
+        ::writeBuffer[size(::writeBuffer)+1] = 1603;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cstocvar;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cstocmin;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cstocmax;
 
-        ::krayfile.writeln(int,1804);
-        ::krayfile.writeln(kray25_v_aatype);
-        ::krayfile.writeln(kray25_v_aafscreen);
-        ::krayfile.writeln(kray25_v_aargsmpl);
-        ::krayfile.writeln(kray25_v_aagridrotate);
+        ::writeBuffer[size(::writeBuffer)+1] = 1804;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_aatype;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_aafscreen;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_aargsmpl;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_aagridrotate;
 
-        ::krayfile.writeln(int,1903);
-        ::krayfile.writeln(kray25_v_refth);
-        ::krayfile.writeln(kray25_v_refrmin);
-        ::krayfile.writeln(kray25_v_refrmax);
+        ::writeBuffer[size(::writeBuffer)+1] = 1903;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_refth;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_refrmin;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_refrmax;
 
         mlsize=size(kray25_v_prescript);
         if (mlsize==0)
         {
-            ::krayfile.writeln(int,3301);
-            ::krayfile.writeln("");
+            ::writeBuffer[size(::writeBuffer)+1] = 3301;
+            ::writeBuffer[size(::writeBuffer)+1] = "";
         } else {
             for (a=1 ; a<=mlsize ; a+=::maxlinelength)
             {
@@ -353,16 +345,16 @@ scnGen_kray25_general
                     t=mlsize+1;
                 }
                 t=-a+t;
-                ::krayfile.writeln(int,3301);
-                ::krayfile.writeln(strsub(kray25_v_prescript,a,t));
+                ::writeBuffer[size(::writeBuffer)+1] = 3301;
+                ::writeBuffer[size(::writeBuffer)+1] = strsub(kray25_v_prescript,a,t);
             }
         }
         
         mlsize=size(kray25_v_postscript);
         if (mlsize==0)
         {
-            ::krayfile.writeln(int,3401);
-            ::krayfile.writeln("");
+            ::writeBuffer[size(::writeBuffer)+1] = 3401;
+            ::writeBuffer[size(::writeBuffer)+1] = "";
         } else {
             for (a=1 ; a<=mlsize ; a+=::maxlinelength)
             {
@@ -372,356 +364,360 @@ scnGen_kray25_general
                     t=mlsize+1;
                 }
                 t=-a+t;
-                ::krayfile.writeln(int,3401);
-                ::krayfile.writeln(strsub(kray25_v_postscript,a,t));
+                ::writeBuffer[size(::writeBuffer)+1] = 3401;
+                ::writeBuffer[size(::writeBuffer)+1] = strsub(kray25_v_postscript,a,t);
             }
         }
         
-        ::krayfile.writeln(int,2101);
-        ::krayfile.writeln(kray25_v_autolumi);
+        ::writeBuffer[size(::writeBuffer)+1] = 2101;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_autolumi;
 
         //ovr_rem ::krayfile.writeln(int,2502);
         //ovr_rem ::krayfile.writeln(kray25_v_ovrsfc);
         //ovr_rem ::krayfile.writeln(kray25_v_ovrsfcolor);
 
-        ::krayfile.writeln(int,2601);
-        ::krayfile.writeln(kray25_v_conetoarea);
+        ::writeBuffer[size(::writeBuffer)+1] = 2601;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_conetoarea;
 
-        ::krayfile.writeln(int,2707);
-        ::krayfile.writeln(kray25_v_edgeabs);
-        ::krayfile.writeln(kray25_v_edgerel);
-        ::krayfile.writeln(kray25_v_edgenorm);
-        ::krayfile.writeln(kray25_v_edgezbuf);
-        ::krayfile.writeln(kray25_v_edgeup);
-        ::krayfile.writeln(kray25_v_edgethick);
-        ::krayfile.writeln(kray25_v_edgeover);
+        ::writeBuffer[size(::writeBuffer)+1] = 2707;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_edgeabs;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_edgerel;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_edgenorm;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_edgezbuf;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_edgeup;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_edgethick;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_edgeover;
 
-        ::krayfile.writeln(int,2802);
-        ::krayfile.writeln(kray25_v_pxlfltr);
-        ::krayfile.writeln(kray25_v_pxlparam);
+        ::writeBuffer[size(::writeBuffer)+1] = 2802;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_pxlfltr;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_pxlparam;
 
-        ::krayfile.writeln(int,2901);
-        ::krayfile.writeln(kray25_v_refacth);
+        ::writeBuffer[size(::writeBuffer)+1] = 2901;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_refacth;
 
-        ::krayfile.writeln(int,3004);
-        ::krayfile.writeln(number,kray25_v_tmo);
-        ::krayfile.writeln(number,kray25_v_tmhsv);
-        ::krayfile.writeln(number,kray25_v_outparam);
-        ::krayfile.writeln(number,kray25_v_outexp);
+        ::writeBuffer[size(::writeBuffer)+1] = 3004;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_tmo;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_tmhsv;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_outparam;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_outexp;
 
-        ::krayfile.writeln(int,3101);
-        ::krayfile.writeln(kray25_v_aarandsmpl);
+        ::writeBuffer[size(::writeBuffer)+1] = 3101;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_aarandsmpl;
 
-        ::krayfile.writeln(int,3207);   // do zmiany
-        ::krayfile.writeln(int,kray25_v_shgi);
-        ::krayfile.writeln(string,kray25_v_giload);
-        ::krayfile.writeln(boolean,kray25_v_ginew);
-        ::krayfile.writeln(boolean,kray25_v_tiphotons);
-        ::krayfile.writeln(boolean,kray25_v_tifg);
-        ::krayfile.writeln(int,kray25_v_tiframes);
-        ::krayfile.writeln(number,kray25_v_tiextinction);
+        ::writeBuffer[size(::writeBuffer)+1] = 3207;   // do zmiany
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_shgi;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_giload;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_ginew;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_tiphotons;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_tifg;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_tiframes;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_tiextinction;
         
-        ::krayfile.writeln(int,3701);
-        ::krayfile.writeln(int,kray25_v_cmbsubframes);
+        ::writeBuffer[size(::writeBuffer)+1] = 3701;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cmbsubframes;
 
-        ::krayfile.writeln(int,3801);
-        ::krayfile.writeln(kray25_v_refmodel);
+        ::writeBuffer[size(::writeBuffer)+1] = 3801;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_refmodel;
 
-        ::krayfile.writeln(int,4001);
-        ::krayfile.writeln(kray25_v_octdepth);
+        ::writeBuffer[size(::writeBuffer)+1] = 4001;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_octdepth;
         
-        ::krayfile.writeln(boolean,4101);
-        ::krayfile.writeln(kray25_v_output_On);
+        ::writeBuffer[size(::writeBuffer)+1] = 4101;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_output_On;
         
-        ::krayfile.writeln(int,4201);
-        ::krayfile.writeln(kray25_v_errode);
+        ::writeBuffer[size(::writeBuffer)+1] = 4201;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_errode;
         
-        ::krayfile.writeln(int,4303);
-        ::krayfile.writeln(kray25_v_eyesep);
-        ::krayfile.writeln(int,kray25_v_stereoimages);
-        ::krayfile.writeln(boolean,kray25_v_render0);
+        ::writeBuffer[size(::writeBuffer)+1] = 4303;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_eyesep;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_stereoimages;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_render0;
         
-        ::krayfile.writeln(int,4411);
-        ::krayfile.writeln(boolean,kray25_v_LogOn);
-        ::krayfile.writeln(kray25_v_Logfile);
-        ::krayfile.writeln(boolean,kray25_v_Debug);
-        ::krayfile.writeln(boolean,kray25_v_InfoOn);
-        ::krayfile.writeln(kray25_v_InfoText);
-        ::krayfile.writeln(boolean,kray25_v_IncludeOn);
-        ::krayfile.writeln(kray25_v_IncludeFile);
-        ::krayfile.writeln(boolean,kray25_v_FullPrev);
-        ::krayfile.writeln(boolean,kray25_v_Finishclose);
-        ::krayfile.writeln(boolean,kray25_v_UBRAGI);
-        ::krayfile.writeln(boolean,kray25_v_outputtolw);
+        ::writeBuffer[size(::writeBuffer)+1] = 4411;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_LogOn;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_Logfile;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_Debug;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_InfoOn;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_InfoText;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_IncludeOn;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_IncludeFile;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_FullPrev;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_Finishclose;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_UBRAGI;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_outputtolw;
     }
 
-    ::krayfile.writeln(int,3901);
-    ::krayfile.writeln(int,kray25_create_flag);
+    ::writeBuffer[size(::writeBuffer)+1] = 3901;
+    ::writeBuffer[size(::writeBuffer)+1] = kray25_create_flag;
 
-    ::krayfile.writeln(int,4301);
-    ::krayfile.writeln(int,kray25_v_outfmt);    // new outputformat (list)
+    ::writeBuffer[size(::writeBuffer)+1] = 4301;
+    ::writeBuffer[size(::writeBuffer)+1] = kray25_v_outfmt;    // new outputformat (list)
     
-    ::krayfile.writeln(int,0);  // end hunk
+    ::writeBuffer[size(::writeBuffer)+1] = 0;  // end hunk
 }
 
 scnGen_kray25_accuracy
 {
-    ::krayfile.writeln("AccuracyBegin");
-    ::krayfile.writeln(version);
+    ::writeBuffer[size(::writeBuffer)+1] = "AccuracyBegin";
+    ::writeBuffer[size(::writeBuffer)+1] = version;
 
     if (!create_flag)
     {   // not inited, do not save settings
-        ::krayfile.writeln(int,100601);
-        ::krayfile.writeln(int,kray25_v_girauto);
+        ::writeBuffer[size(::writeBuffer)+1] = 100601;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_girauto;
 
-        ::krayfile.writeln(int,100001);
-        ::krayfile.writeln(kray25_v_gir);
+        ::writeBuffer[size(::writeBuffer)+1] = 100001;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gir;
 
-        ::krayfile.writeln(int,100105);
-        ::krayfile.writeln(kray25_v_cf);
-        ::krayfile.writeln(int,kray25_v_cn);
-        ::krayfile.writeln(kray25_v_cpstart);
-        ::krayfile.writeln(kray25_v_cpstop);
-        ::krayfile.writeln(kray25_v_cpstep);
+        ::writeBuffer[size(::writeBuffer)+1] = 100105;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cf;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cn;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cpstart;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cpstop;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cpstep;
 
-        ::krayfile.writeln(int,100704);
-        ::krayfile.writeln(kray25_v_cmatic);
-        ::krayfile.writeln(kray25_v_clow);
-        ::krayfile.writeln(kray25_v_chigh);
-        ::krayfile.writeln(kray25_v_cdyn);
+        ::writeBuffer[size(::writeBuffer)+1] = 100704;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cmatic;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_clow;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_chigh;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cdyn;
 
-        ::krayfile.writeln(int,100205);
-        ::krayfile.writeln(kray25_v_gf);
-        ::krayfile.writeln(int,kray25_v_gn);
-        ::krayfile.writeln(kray25_v_gpstart);
-        ::krayfile.writeln(kray25_v_gpstop);
-        ::krayfile.writeln(kray25_v_gpstep);
+        ::writeBuffer[size(::writeBuffer)+1] = 100205;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gf;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gn;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gpstart;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gpstop;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gpstep;
 
-        ::krayfile.writeln(int,100804);
-        ::krayfile.writeln(kray25_v_gmatic);
-        ::krayfile.writeln(kray25_v_glow);
-        ::krayfile.writeln(kray25_v_ghigh);
-        ::krayfile.writeln(kray25_v_gdyn);
+        ::writeBuffer[size(::writeBuffer)+1] = 100804;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gmatic;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_glow;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_ghigh;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gdyn;
 
-        ::krayfile.writeln(int,100301);
-        ::krayfile.writeln(kray25_v_ppsize);
+        ::writeBuffer[size(::writeBuffer)+1] = 100301;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_ppsize;
 
-        ::krayfile.writeln(int,100405);
-        ::krayfile.writeln(kray25_v_fgmin);
-        ::krayfile.writeln(kray25_v_fgmax);
-        ::krayfile.writeln(kray25_v_fgscale);
-        ::krayfile.writeln(kray25_v_fgshows);
-        ::krayfile.writeln(kray25_v_fgsclr);
+        ::writeBuffer[size(::writeBuffer)+1] = 100405;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fgmin;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fgmax;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fgscale;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fgshows;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fgsclr;
 
-        ::krayfile.writeln(int,100502);
-        ::krayfile.writeln(kray25_v_cornerdist);
-        ::krayfile.writeln(kray25_v_cornerpaths);
+        ::writeBuffer[size(::writeBuffer)+1] = 100502;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cornerdist;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cornerpaths;
 
-        ::krayfile.writeln(int,100901);
-        ::krayfile.writeln(int,kray25_v_cfunit);
+        ::writeBuffer[size(::writeBuffer)+1] = 100901;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cfunit;
 
-        ::krayfile.writeln(int,101001);
-        ::krayfile.writeln(int,kray25_v_gfunit);
+        ::writeBuffer[size(::writeBuffer)+1] = 101001;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gfunit;
 
-        ::krayfile.writeln(int,101102);
-        ::krayfile.writeln(kray25_v_fgreflections);
-        ::krayfile.writeln(kray25_v_fgrefractions);
+        ::writeBuffer[size(::writeBuffer)+1] = 101102;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fgreflections;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fgrefractions;
 
-        ::krayfile.writeln(int,101201);
-        ::krayfile.writeln(int,kray25_v_gmode);
+        ::writeBuffer[size(::writeBuffer)+1] = 101201;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gmode;
 
-        ::krayfile.writeln(int,101301);
-        ::krayfile.writeln(int,kray25_v_ppcaustics);
+        ::writeBuffer[size(::writeBuffer)+1] = 101301;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_ppcaustics;
 
-        ::krayfile.writeln(int,101403);
-        ::krayfile.writeln(kray25_v_fgrmin);
-        ::krayfile.writeln(kray25_v_fgrmax);
-        ::krayfile.writeln(kray25_v_fgth);
+        ::writeBuffer[size(::writeBuffer)+1] = 101403;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fgrmin;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fgrmax;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fgth;
 
-        ::krayfile.writeln(int,101502);
-        ::krayfile.writeln(kray25_v_fga);
-        ::krayfile.writeln(kray25_v_fgb);
+        ::writeBuffer[size(::writeBuffer)+1] = 101502;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fga;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fgb;
 
-        ::krayfile.writeln(int,101601);
-        ::krayfile.writeln(kray25_v_ppmult);
+        ::writeBuffer[size(::writeBuffer)+1] = 101601;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_ppmult;
 
-        ::krayfile.writeln(int,101701);
-        ::krayfile.writeln(kray25_v_cmult);
+        ::writeBuffer[size(::writeBuffer)+1] = 101701;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_cmult;
 
-        ::krayfile.writeln(int,101801);
-        ::krayfile.writeln(kray25_v_ppblur);
+        ::writeBuffer[size(::writeBuffer)+1] = 101801;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_ppblur;
         
-        ::krayfile.writeln(int,101901);
-        ::krayfile.writeln(kray25_v_fgblur);
+        ::writeBuffer[size(::writeBuffer)+1] = 101901;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_fgblur;
 
-        ::krayfile.writeln(int,102001);
-        ::krayfile.writeln(int,kray25_v_showphotons);
+        ::writeBuffer[size(::writeBuffer)+1] = 102001;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_showphotons;
 
-        ::krayfile.writeln(int,102201);
-        ::krayfile.writeln(int,kray25_v_resetoct);
+        ::writeBuffer[size(::writeBuffer)+1] = 102201;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_resetoct;
 
-        ::krayfile.writeln(int,102301);
-        ::krayfile.writeln(int,kray25_v_limitdr);
+        ::writeBuffer[size(::writeBuffer)+1] = 102301;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_limitdr;
 
-        ::krayfile.writeln(int,102403);
-        ::krayfile.writeln(int,kray25_v_prestep);
-        ::krayfile.writeln(kray25_v_preSplDet);
-        ::krayfile.writeln(kray25_v_gradNeighbour);
+        ::writeBuffer[size(::writeBuffer)+1] = 102403;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_prestep;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_preSplDet;
+        ::writeBuffer[size(::writeBuffer)+1] = kray25_v_gradNeighbour;
     }
 
-    ::krayfile.writeln(int,0);  // end hunk
-    ::krayfile.writeln("AccuracyEnd");
+    ::writeBuffer[size(::writeBuffer)+1] = 0;  // end hunk
+    ::writeBuffer[size(::writeBuffer)+1] = "AccuracyEnd";
 }
 
 scnGen_kray25_script
 {
     if (temp_scene==""){
-        ::krayfile.writeln("KrayScriptLWSInlined -2000;");
+        ::writeBuffer[size(::writeBuffer)+1] = "KrayScriptLWSInlined -2000;";
     }
-    ::krayfile.writeln("echo '*** Kray script generated by Kray plugin for LightWave';");
-    ::krayfile.writeln("threads 0;");
+    ::writeBuffer[size(::writeBuffer)+1] = "echo '*** Kray script generated by Kray plugin for LightWave';";
+    ::writeBuffer[size(::writeBuffer)+1] = "threads 0;";
 
     if (!Scene().renderopts[1] || !Scene().renderopts[2] || !Scene().renderopts[3]){
         list = scnGen_kray25_renderOptsList();
         
-        ::krayfile.writeln("echo '!** Render global "+list+" is OFF';");        
+        ::writeBuffer[size(::writeBuffer)+1] = "echo '!** Render global "+list+" is OFF';";
     }
     if (Light().ambient(0)>0){
-        ::krayfile.writeln("echo '!** AMBIENT light is on';");      
+        ::writeBuffer[size(::writeBuffer)+1] = "echo '!** AMBIENT light is on';";
     }
 
-    ::krayfile.writeln("var pi,3.14159265;");
+    ::writeBuffer[size(::writeBuffer)+1] = "var pi,3.14159265;";
     // precached photon map
-        ::krayfile.writeln("var __ppscale,1.2;");
-        ::krayfile.writeln("var __ppstep,0;");
-        ::krayfile.writeln("var __ppstop,0;");
-        ::krayfile.writeln("var __precacheN,1;");
+        ::writeBuffer[size(::writeBuffer)+1] = "var __ppscale,1.2;";
+        ::writeBuffer[size(::writeBuffer)+1] = "var __ppstep,0;";
+        ::writeBuffer[size(::writeBuffer)+1] = "var __ppstop,0;";
+        ::writeBuffer[size(::writeBuffer)+1] = "var __precacheN,1;";
     // blend model
-        ::krayfile.writeln("var __blendss,0;");
+        ::writeBuffer[size(::writeBuffer)+1] = "var __blendss,0;";
     // irradiance gradients constants
-        ::krayfile.writeln("var __irr_elip,4;");
+        ::writeBuffer[size(::writeBuffer)+1] = "var __irr_elip,4;";
     // autophotons
-        ::krayfile.writeln("var __autogsamples,100;");
-        ::krayfile.writeln("var __autogscale,1;");
-        ::krayfile.writeln("var __autocsamples,100;");
-        ::krayfile.writeln("var __autocscale,1;");
+        ::writeBuffer[size(::writeBuffer)+1] = "var __autogsamples,100;";
+        ::writeBuffer[size(::writeBuffer)+1] = "var __autogscale,1;";
+        ::writeBuffer[size(::writeBuffer)+1] = "var __autocsamples,100;";
+        ::writeBuffer[size(::writeBuffer)+1] = "var __autocscale,1;";
     // auto gir size
-        ::krayfile.writeln("var __autogradients,0.5;");
-        ::krayfile.writeln("var __autocaustics,0.5;");
-        ::krayfile.writeln("var __autoprecached,0.5;");
-        ::krayfile.writeln("var __light_model,1;");
-        ::krayfile.writeln("var __undersample_edge,1;");
+        ::writeBuffer[size(::writeBuffer)+1] = "var __autogradients,0.5;";
+        ::writeBuffer[size(::writeBuffer)+1] = "var __autocaustics,0.5;";
+        ::writeBuffer[size(::writeBuffer)+1] = "var __autoprecached,0.5;";
+        ::writeBuffer[size(::writeBuffer)+1] = "var __light_model,1;";
+        ::writeBuffer[size(::writeBuffer)+1] = "var __undersample_edge,1;";
         
-        ::krayfile.writeln("var __caustics_try,0.3;");
+        ::writeBuffer[size(::writeBuffer)+1] = "var __caustics_try,0.3;";
         
-        ::krayfile.writeln("var __oversample,0.5;");
+        ::writeBuffer[size(::writeBuffer)+1] = "var __oversample,0.5;";
         
-        ::krayfile.writeln("var __importflags,0;");
+        ::writeBuffer[size(::writeBuffer)+1] = "var __importflags,0;";
 
-        ::krayfile.writeln("formatstring camera," + activeCamera + ";");
+        ::writeBuffer[size(::writeBuffer)+1] = "formatstring camera," + activeCamera + ";";
         
-        ::krayfile.writeln("var fgth,"+kray25_v_fgth+";");
-        ::krayfile.writeln("var fgrmin,"+kray25_v_fgrmin+";");
-        ::krayfile.writeln("var fgrmax,"+kray25_v_fgrmax+";");
-        ::krayfile.writeln("var fga,"+kray25_v_fga+";");
-        ::krayfile.writeln("var fgb,"+kray25_v_fgb+";");
-        ::krayfile.writeln("var fgmin,"+kray25_v_fgmin+";");
-        ::krayfile.writeln("var fgmax,"+kray25_v_fgmax+";");
-        ::krayfile.writeln("var fgscale,"+kray25_v_fgscale+";");
-        ::krayfile.writeln("var fgblur,"+kray25_v_fgblur+";");
-        ::krayfile.writeln("var fgreflections,"+kray25_v_fgreflections+";");
-        ::krayfile.writeln("var fgrefractions,"+kray25_v_fgrefractions+";");
+        ::writeBuffer[size(::writeBuffer)+1] = "var fgth,"+kray25_v_fgth+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var fgrmin,"+kray25_v_fgrmin+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var fgrmax,"+kray25_v_fgrmax+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var fga,"+kray25_v_fga+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var fgb,"+kray25_v_fgb+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var fgmin,"+kray25_v_fgmin+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var fgmax,"+kray25_v_fgmax+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var fgscale,"+kray25_v_fgscale+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var fgblur,"+kray25_v_fgblur+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var fgreflections,"+kray25_v_fgreflections+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var fgrefractions,"+kray25_v_fgrefractions+";";
 
-        ::krayfile.writeln("var cornerdist,"+kray25_v_cornerdist+";");
-        ::krayfile.writeln("var cornerpaths,"+kray25_v_cornerpaths+";");
+        ::writeBuffer[size(::writeBuffer)+1] = "var cornerdist,"+kray25_v_cornerdist+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var cornerpaths,"+kray25_v_cornerpaths+";";
         
-        ::krayfile.writeln("var prep,"+kray25_v_prep+";");
-        ::krayfile.writeln("var prestep,"+kray25_v_prestep+";");
-        ::krayfile.writeln("var preSplDet,"+kray25_v_preSplDet+";");
-        ::krayfile.writeln("var gradNeighbour,"+kray25_v_gradNeighbour+";");
+        ::writeBuffer[size(::writeBuffer)+1] = "var prep,"+kray25_v_prep+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var prestep,"+kray25_v_prestep+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var preSplDet,"+kray25_v_preSplDet+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "var gradNeighbour,"+kray25_v_gradNeighbour+";";
     
-        if (temp_scene==""){
-            ::krayfile.writeln("end;");
-            ::krayfile.writeln("KrayScriptLWSInlined -1000;");
+        if (temp_scene=="")
+        {
+            ::writeBuffer[size(::writeBuffer)+1] = "end;";
+            ::writeBuffer[size(::writeBuffer)+1] = "KrayScriptLWSInlined -1000;";
         }
 
-        ::krayfile.writeln("savegimode 1;cam_singleside 0;previewsize 1200,600;usemultipass 0;lwo2rayslimit 1,0.9;animmode 1;about;");
-        ::krayfile.writeln("addpathlw;addpath \""+getdir(CONTENTDIR)+"\";");    // for standalone Kray
+        ::writeBuffer[size(::writeBuffer)+1] = "savegimode 1;cam_singleside 0;previewsize 1200,600;usemultipass 0;lwo2rayslimit 1,0.9;animmode 1;about;";
+        ::writeBuffer[size(::writeBuffer)+1] = "addpathlw;addpath \""+getdir(CONTENTDIR)+"\";";    // for standalone Kray
         
-        ::krayfile.writeln("multiline 'Header commands';");
+        ::writeBuffer[size(::writeBuffer)+1] = "multiline 'Header commands';";
         mlsize=size(kray25_v_prescript);
-        for (a=1 ; a<=mlsize ; a+=::maxlinelength){
+        for (a=1 ; a<=mlsize ; a+=::maxlinelength)
+        {
             t=a+::maxlinelength;
-            if (t>(mlsize+1)){
+            if (t>(mlsize+1))
+            {
                 t=mlsize+1;
             }
             t=-a+t;
-            ::krayfile.writeln(strsub(kray25_v_prescript,a,t));
+            ::writeBuffer[size(::writeBuffer)+1] = strsub(kray25_v_prescript,a,t);
         }
-        ::krayfile.writeln(";");
-        ::krayfile.writeln("end_of_multiline;");
+        ::writeBuffer[size(::writeBuffer)+1] = ";";
+        ::writeBuffer[size(::writeBuffer)+1] = "end_of_multiline;";
 
         // general options
 
         vp_gi=0;
 
-        switch(kray25_v_gi){
-        case 1: // local
-            if (kray25_v_gicaustics)
-            {
-                vp_gi+=1;
-            }
-            break;
-        case 2: // estimate
-            if (kray25_v_gipmmode==1)
-            {
-                vp_gi=10000;
-            }
-            if (kray25_v_gipmmode==2)
-            {
-                vp_gi=10002;
-            }
-            if (kray25_v_gipmmode==3)
-            {
-                vp_gi=11000;
-            }
-            if (kray25_v_gipmmode==4)
-            {
-                if (kray25_v_girtdirect)
+        switch(kray25_v_gi)
+        {
+            case 1: // local
+                if (kray25_v_gicaustics)
                 {
-                    if (kray25_v_gicaustics)
-                    {
-                        vp_gi=12013;
-                    } else {
-                        vp_gi=12012;
-                    }
-                } else {
-                    vp_gi=11010;
+                    vp_gi+=1;
                 }
-            }
-            break;
-        case 3: // photonmapping
-            vp_gi=kray25_photon_map_model;
-            if (kray25_v_gicaustics)
-            {
-                vp_gi+=1;
-            }
-            if (kray25_v_giirrgrad)
-            {
-                vp_gi+=1000;
-            }
-            break;
-        case 4: // path tracing
-            vp_gi=40000;
-            if (kray25_v_gicaustics)
-            {
-                vp_gi+=1;
-            }
-            if (kray25_v_giirrgrad)
-            {
-                vp_gi+=1000;
-            }
-            break;
+                break;
+            case 2: // estimate
+                if (kray25_v_gipmmode==1)
+                {
+                    vp_gi=10000;
+                }
+                if (kray25_v_gipmmode==2)
+                {
+                    vp_gi=10002;
+                }
+                if (kray25_v_gipmmode==3)
+                {
+                    vp_gi=11000;
+                }
+                if (kray25_v_gipmmode==4)
+                {
+                    if (kray25_v_girtdirect)
+                    {
+                        if (kray25_v_gicaustics)
+                        {
+                            vp_gi=12013;
+                        } else {
+                            vp_gi=12012;
+                        }
+                    } else {
+                        vp_gi=11010;
+                    }
+                }
+                break;
+            case 3: // photonmapping
+                vp_gi=kray25_photon_map_model;
+                if (kray25_v_gicaustics)
+                {
+                    vp_gi+=1;
+                }
+                if (kray25_v_giirrgrad)
+                {
+                    vp_gi+=1000;
+                }
+                break;
+            case 4: // path tracing
+                vp_gi=40000;
+                if (kray25_v_gicaustics)
+                {
+                    vp_gi+=1;
+                }
+                if (kray25_v_giirrgrad)
+                {
+                    vp_gi+=1000;
+                }
+                break;
         }
 
         fgtraceflag=0;
@@ -734,27 +730,27 @@ scnGen_kray25_script
             fgtraceflag=fgtraceflag+8;
         }
 
-        ::krayfile.writeln("lwo2import "+vp_gi+",__light_model,(2-"+kray25_v_areavis);  
-        ::krayfile.writeln("),"+kray25_v_refmodel+","+fgtraceflag+"+__blendss|__importflags;");
-        ::krayfile.writeln("lwo2bluroptions "+kray25_v_refrmin+","+kray25_v_refrmax+","+kray25_v_refth+","+kray25_v_refacth+";");
-        ::krayfile.writeln("lwconetoarea "+kray25_v_conetoarea+";");
+        ::writeBuffer[size(::writeBuffer)+1] = "lwo2import "+vp_gi+",__light_model,(2-"+kray25_v_areavis;
+        ::writeBuffer[size(::writeBuffer)+1] = "),"+kray25_v_refmodel+","+fgtraceflag+"+__blendss|__importflags;";
+        ::writeBuffer[size(::writeBuffer)+1] = "lwo2bluroptions "+kray25_v_refrmin+","+kray25_v_refrmax+","+kray25_v_refth+","+kray25_v_refacth+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "lwconetoarea "+kray25_v_conetoarea+";";
         
         if (kray25_v_lg==1)
         {
-            ::krayfile.writeln("lwpassiveset2;");
+            ::writeBuffer[size(::writeBuffer)+1] = "lwpassiveset2;";
             if ((kray25_v_gi==1 || kray25_v_gi==4) && kray25_v_gicaustics==0)
             {
-                ::krayfile.writeln("lumi_minsamples 0;");
+                ::writeBuffer[size(::writeBuffer)+1] = "lumi_minsamples 0;";
             }
         } else if (kray25_v_lg==3)
         {
-            ::krayfile.writeln("autopassive "+kray25_v_autolumi+";");
+            ::writeBuffer[size(::writeBuffer)+1] = "autopassive "+kray25_v_autolumi+";";
         }
         
         if (kray25_v_output_On && !kray25_v_render0)
         {
-            ::krayfile.writeln("multiline 'Output filename';");
-            ::krayfile.writeln("outputto '");
+            ::writeBuffer[size(::writeBuffer)+1] = "multiline 'Output filename';";
+            ::writeBuffer[size(::writeBuffer)+1] = "outputto '";
             mlsize=size(kray25_v_outname);
             for (a=1 ; a<=mlsize ; a+=::maxlinelength)
             {
@@ -764,59 +760,60 @@ scnGen_kray25_script
                     t=mlsize+1;
                 }
                 t=-a+t;
-                ::krayfile.writeln(strsub(kray25_v_outname,a,t));
+                ::writeBuffer[size(::writeBuffer)+1] = strsub(kray25_v_outname,a,t);
             }
-            ::krayfile.writeln("';");
+            ::writeBuffer[size(::writeBuffer)+1] = "';";
         
-            ::krayfile.writeln("end_of_multiline;");
+            ::writeBuffer[size(::writeBuffer)+1] = "end_of_multiline;";
         }
         
         if (mlsize==0 || !kray25_v_output_On)
         {       // add alpha buffer if filename is none
-            ::krayfile.writeln("outputtolw 1;");                
-            ::krayfile.writeln("needbuffers 0+0x1+0x2;");
+            ::writeBuffer[size(::writeBuffer)+1] = "outputtolw 1;";
+            ::writeBuffer[size(::writeBuffer)+1] = "needbuffers 0+0x1+0x2;";
         }
         
-        switch(kray25_v_outfmt){
+        switch(kray25_v_outfmt)
+        {
             case 1:
-                ::krayfile.writeln("outputformat hdr;");
+                ::writeBuffer[size(::writeBuffer)+1] = "outputformat hdr;";
                 break;
             case 2:
-                ::krayfile.writeln("outputformat jpg,100;");
+                ::writeBuffer[size(::writeBuffer)+1] = "outputformat jpg,100;";
                 break;
             case 3:
-                ::krayfile.writeln("outputformat png;");
+                ::writeBuffer[size(::writeBuffer)+1] = "outputformat png;";
                 break;
             case 4:
-                ::krayfile.writeln("needbuffers 0+0x1+0x2;");
-                ::krayfile.writeln("outputformat pnga;");
+                ::writeBuffer[size(::writeBuffer)+1] = "needbuffers 0+0x1+0x2;";
+                ::writeBuffer[size(::writeBuffer)+1] = "outputformat pnga;";
                 break;
             case 5:
-                ::krayfile.writeln("outputformat tif;");
+                ::writeBuffer[size(::writeBuffer)+1] = "outputformat tif;";
                 break;
             case 6:
-                ::krayfile.writeln("needbuffers 0+0x1+0x2;");
-                ::krayfile.writeln("outputformat tifa;");
+                ::writeBuffer[size(::writeBuffer)+1] = "needbuffers 0+0x1+0x2;";
+                ::writeBuffer[size(::writeBuffer)+1] = "outputformat tifa;";
                 break;
             case 7:
-                ::krayfile.writeln("outputformat tga;");
+                ::writeBuffer[size(::writeBuffer)+1] = "outputformat tga;";
                 break;
             case 8:
-                ::krayfile.writeln("needbuffers 0+0x1+0x2;");
-                ::krayfile.writeln("outputformat tgaa;");
+                ::writeBuffer[size(::writeBuffer)+1] = "needbuffers 0+0x1+0x2;";
+                ::writeBuffer[size(::writeBuffer)+1] = "outputformat tgaa;";
                 break;
             case 9:
-                ::krayfile.writeln("outputformat bmp;");
+                ::writeBuffer[size(::writeBuffer)+1] = "outputformat bmp;";
                 break;
             case 10:
-                ::krayfile.writeln("needbuffers 0+0x1+0x2;");
-                ::krayfile.writeln("outputformat bmpa;");
+                ::writeBuffer[size(::writeBuffer)+1] = "needbuffers 0+0x1+0x2;";
+                ::writeBuffer[size(::writeBuffer)+1] = "outputformat bmpa;";
                 break;
         }
         if(kray25_v_limitdr==2)
         {
-            ::krayfile.writeln("limitdr 1;");
-            ::krayfile.writeln("echo '*** Limiting dynamic range before tonemap';");
+            ::writeBuffer[size(::writeBuffer)+1] = "limitdr 1;";
+            ::writeBuffer[size(::writeBuffer)+1] = "echo '*** Limiting dynamic range before tonemap';";
         }
 
         switch(kray25_v_tmo)
@@ -842,28 +839,28 @@ scnGen_kray25_script
                 break;
         }
 
-        ::krayfile.writeln("tonemapper "+tmp+";");
+        ::writeBuffer[size(::writeBuffer)+1] = "tonemapper "+tmp+";";
         
         if (kray25_v_limitdr==3)
         {
-            ::krayfile.writeln("postprocess tonemapper,reverse,"+tmp+";");
-            ::krayfile.writeln("postviewtonemapper "+tmp+";");
+            ::writeBuffer[size(::writeBuffer)+1] = "postprocess tonemapper,reverse,"+tmp+";";
+            ::writeBuffer[size(::writeBuffer)+1] = "postviewtonemapper "+tmp+";";
         }
         
         if (kray25_v_outfmt!=1)
         {
-            ::krayfile.writeln("dither fs;");
+            ::writeBuffer[size(::writeBuffer)+1] = "dither fs;";
         }
         
         if (temp_scene=="")
         {
-            ::krayfile.writeln("end;");
-            ::krayfile.writeln("KrayScriptLWSInlined 1000;");
+            ::writeBuffer[size(::writeBuffer)+1] = "end;";
+            ::writeBuffer[size(::writeBuffer)+1] = "KrayScriptLWSInlined 1000;";
         } else {
-            ::krayfile.writeln("lwsload \""+temp_scene+"\";");
+            ::writeBuffer[size(::writeBuffer)+1] = "lwsload \""+temp_scene+"\";";
         }
 
-        ::krayfile.writeln("square_lights (2-"+kray25_v_pl+"),"+kray25_v_areaside+";");
+        ::writeBuffer[size(::writeBuffer)+1] = "square_lights (2-"+kray25_v_pl+"),"+kray25_v_areaside+";";
 
         if (kray25_v_shgi==2)
         {
@@ -882,145 +879,145 @@ scnGen_kray25_script
             {
                 if (kray25_v_tiphotons)
                 {
-                    ::krayfile.writeln("timeprecached "+fparam+","+ca);
+                    ::writeBuffer[size(::writeBuffer)+1] = "timeprecached "+fparam+","+ca;
 
                     if (frames==0)
                     {
-                        ::krayfile.writeln(",0,"+cb);
+                        ::writeBuffer[size(::writeBuffer)+1] = ",0,"+cb;
                     } else {
-                        ::krayfile.writeln(","+ca+","+cb);
+                        ::writeBuffer[size(::writeBuffer)+1] = ","+ca+","+cb;
                     }
 
                     for (loop=1 ; loop<frames ; loop++)
                     {
-                        ::krayfile.writeln(","+ca+",0");
+                        ::writeBuffer[size(::writeBuffer)+1] = ","+ca+",0";
                     }
 
-                    ::krayfile.writeln(";");
+                    ::writeBuffer[size(::writeBuffer)+1] = ";";
                 }
                 if (kray25_v_tifg)
                 {
-                    ::krayfile.writeln("timegradients "+fparam+","+ca);
+                    ::writeBuffer[size(::writeBuffer)+1] = "timegradients "+fparam+","+ca;
 
                     if (frames==0)
                     {
-                        ::krayfile.writeln(",0,"+cb);
+                        ::writeBuffer[size(::writeBuffer)+1] = ",0,"+cb;
                     } else {
-                        ::krayfile.writeln(","+ca+","+cb);
+                        ::writeBuffer[size(::writeBuffer)+1] = ","+ca+","+cb;
                     }
 
                     for (loop=1 ; loop<frames ; loop++)
                     {
-                        ::krayfile.writeln(","+ca+",0");
+                        ::writeBuffer[size(::writeBuffer)+1] = ","+ca+",0";
                     }
 
-                    ::krayfile.writeln(";");
+                    ::writeBuffer[size(::writeBuffer)+1] = ";";
                 }
             }
         } else if (kray25_v_shgi==3)
         {
-            ::krayfile.writeln("resetgi 0;");
-            ::krayfile.writeln("resetoct "+kray25_v_resetoct+";");
-            ::krayfile.writeln("lmanim;");
+            ::writeBuffer[size(::writeBuffer)+1] = "resetgi 0;";
+            ::writeBuffer[size(::writeBuffer)+1] = "resetoct "+kray25_v_resetoct+";";
+            ::writeBuffer[size(::writeBuffer)+1] = "lmanim;";
             if (kray25_v_render0)
             {
-                    ::krayfile.writeln("render 0;");
+                    ::writeBuffer[size(::writeBuffer)+1] = "render 0;";
             }
             if (kray25_v_giload)
             {
                 if (kray25_v_ginew&1)
                 {
-                    ::krayfile.writeln("loadgis \""+kray25_v_giload+"\";");
+                    ::writeBuffer[size(::writeBuffer)+1] = "loadgis \""+kray25_v_giload+"\";";
                 }
                 if (kray25_v_ginew&2)
                 {
-                    ::krayfile.writeln("savegis \""+kray25_v_giload+"\";");
+                    ::writeBuffer[size(::writeBuffer)+1] = "savegis \""+kray25_v_giload+"\";";
                 }
             }
 
         }
         if (kray25_v_single)
         {
-            ::krayfile.writeln("singleframe;");
+            ::writeBuffer[size(::writeBuffer)+1] = "singleframe;";
         }
 
         switch(kray25_v_pxlordr)
         {
             case 1:
-                ::krayfile.writeln("splitscreen betterauto;pixelorder scanline;");
+                ::writeBuffer[size(::writeBuffer)+1] = "splitscreen betterauto;pixelorder scanline;";
                 break;
             case 2:
-                ::krayfile.writeln("splitscreen betterauto;pixelorder scanrow;");
+                ::writeBuffer[size(::writeBuffer)+1] = "splitscreen betterauto;pixelorder scanrow;";
                 break;
             case 3:
-                ::krayfile.writeln("splitscreen none;pixelorder random;");
+                ::writeBuffer[size(::writeBuffer)+1] = "splitscreen none;pixelorder random;";
                 break;
             case 4:
-                ::krayfile.writeln("undersampleprerender 1;pixelorder scanline;");
+                ::writeBuffer[size(::writeBuffer)+1] = "undersampleprerender 1;pixelorder scanline;";
                 if (kray25_v_underf==1)
                 {
-                    ::krayfile.writeln("undersample 1,0,0;");
+                    ::writeBuffer[size(::writeBuffer)+1] = "undersample 1,0,0;";
                 }
                 break;
             case 5:
-                ::krayfile.writeln("splitscreen none;pixelorder worm;");
+                ::writeBuffer[size(::writeBuffer)+1] = "splitscreen none;pixelorder worm;";
                 break;
             case 6:
-                ::krayfile.writeln("splitscreen none;pixelorder frost;");
+                ::writeBuffer[size(::writeBuffer)+1] = "splitscreen none;pixelorder frost;";
                 break;
         }
         if(kray25_v_limitdr==1)
         {
-            ::krayfile.writeln("limitdr 1;");
-            ::krayfile.writeln("echo '*** Limiting dynamic range after tonemap';");
+            ::writeBuffer[size(::writeBuffer)+1] = "limitdr 1;";
+            ::writeBuffer[size(::writeBuffer)+1] = "echo '*** Limiting dynamic range after tonemap';";
         }
         
-        ::krayfile.writeln("prerender prep,prestep,preSplDet; gradients_neighbour gradNeighbour;");
+        ::writeBuffer[size(::writeBuffer)+1] = "prerender prep,prestep,preSplDet; gradients_neighbour gradNeighbour;";
 
         if (kray25_v_underf>1)
         {
             if (kray25_v_fgshows==1 || !kray25_v_giirrgrad)
             {
-                ::krayfile.writeln("undersample ("+kray25_v_underf+"-1),"+kray25_v_undert+",__undersample_edge;");
+                ::writeBuffer[size(::writeBuffer)+1] = "undersample ("+kray25_v_underf+"-1),"+kray25_v_undert+",__undersample_edge;";
             }
         }
 
-        ::krayfile.writeln("linadaptive "+kray25_v_llinth+","+kray25_v_llinrmin+","+kray25_v_llinrmax+";");
-        ::krayfile.writeln("squareplanar "+kray25_v_planth+","+kray25_v_planrmin+","+kray25_v_planrmax+";");
-        ::krayfile.writeln("planar ("+kray25_v_lumith+"*"+kray25_v_lumith+"),"+kray25_v_lumirmin+","+kray25_v_lumirmax+";");
+        ::writeBuffer[size(::writeBuffer)+1] = "linadaptive "+kray25_v_llinth+","+kray25_v_llinrmin+","+kray25_v_llinrmax+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "squareplanar "+kray25_v_planth+","+kray25_v_planrmin+","+kray25_v_planrmax+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "planar ("+kray25_v_lumith+"*"+kray25_v_lumith+"),"+kray25_v_lumirmin+","+kray25_v_lumirmax+";";
 
         // accuracy settings
 
         switch(kray25_v_octdepth)
         {
             case 1: // very low
-                ::krayfile.writeln("octree 25,22;var sep,2;var ds,4;var fs,0;");
+                ::writeBuffer[size(::writeBuffer)+1] = "octree 25,22;var sep,2;var ds,4;var fs,0;";
                 break;
             case 2: // low
-                ::krayfile.writeln("octree 30,17;var sep,0.7;var ds,2;var fs,0;");
+                ::writeBuffer[size(::writeBuffer)+1] = "octree 30,17;var sep,0.7;var ds,2;var fs,0;";
                 break;
             case 3: // normal
-                ::krayfile.writeln("octree 35,15;var sep,0.7;var ds,1;var fs,90;");
+                ::writeBuffer[size(::writeBuffer)+1] = "octree 35,15;var sep,0.7;var ds,1;var fs,90;";
                 break;
             case 4: // high
-                ::krayfile.writeln("octree 40,15;var sep,0.5;var ds,0.5;var fs,90;");
+                ::writeBuffer[size(::writeBuffer)+1] = "octree 40,15;var sep,0.5;var ds,0.5;var fs,90;";
                 break;
         }
-        ::krayfile.writeln("octbuild sep,(ds*0.2,ds*1,ds*0.2),(fs*0.2,fs*1,fs*0.2);");
-        ::krayfile.writeln("outsidesize -1;");    // automatic
+        ::writeBuffer[size(::writeBuffer)+1] = "octbuild sep,(ds*0.2,ds*1,ds*0.2),(fs*0.2,fs*1,fs*0.2);";
+        ::writeBuffer[size(::writeBuffer)+1] = "outsidesize -1;";    // automatic
 
         if (kray25_v_girauto)
         {
-            ::krayfile.writeln("var _gi_res,1;");
-            ::krayfile.writeln("autophotons gscalegradients,__autogradients;");
-            ::krayfile.writeln("autophotons gscalecaustics,__autocaustics;");
-            ::krayfile.writeln("autophotons gscaleprecached,__autoprecached;");
+            ::writeBuffer[size(::writeBuffer)+1] = "var _gi_res,1;";
+            ::writeBuffer[size(::writeBuffer)+1] = "autophotons gscalegradients,__autogradients;";
+            ::writeBuffer[size(::writeBuffer)+1] = "autophotons gscalecaustics,__autocaustics;";
+            ::writeBuffer[size(::writeBuffer)+1] = "autophotons gscaleprecached,__autoprecached;";
         } else {
-            ::krayfile.writeln("var _gi_res,"+kray25_v_gir+";");
+            ::writeBuffer[size(::writeBuffer)+1] = "var _gi_res,"+kray25_v_gir+";";
         }
         if (kray25_v_showphotons!=1)
         {
-            ::krayfile.writeln("showphotons 0;");
+            ::writeBuffer[size(::writeBuffer)+1] = "showphotons 0;";
         }   
         tstop=0;
         if (kray25_v_cpstep>1)
@@ -1033,8 +1030,8 @@ scnGen_kray25_script
             tsign=-1;
         }
 
-        ::krayfile.writeln("causticspm "+(kray25_v_cf*tsign)+","+kray25_v_cn+",_gi_res*"+kray25_v_cpstart+",");
-        ::krayfile.writeln("_gi_res*"+kray25_v_cpstop+","+kray25_v_cpstep+",__caustics_try;");
+        ::writeBuffer[size(::writeBuffer)+1] = "causticspm "+(kray25_v_cf*tsign)+","+kray25_v_cn+",_gi_res*"+kray25_v_cpstart+",";
+        ::writeBuffer[size(::writeBuffer)+1] = "_gi_res*"+kray25_v_cpstop+","+kray25_v_cpstep+",__caustics_try;";
 
         tstop=0;
         if (kray25_v_gpstep>1)
@@ -1049,43 +1046,43 @@ scnGen_kray25_script
 
         if (kray25_v_gmode==1)
         {
-            ::krayfile.writeln("globalpm "+(kray25_v_gf*tsign)+","+kray25_v_gn+",_gi_res*"+kray25_v_gpstart+",");
-            ::krayfile.writeln("_gi_res*"+tstop+","+kray25_v_gpstep+";");
+            ::writeBuffer[size(::writeBuffer)+1] = "globalpm "+(kray25_v_gf*tsign)+","+kray25_v_gn+",_gi_res*"+kray25_v_gpstart+",";
+            ::writeBuffer[size(::writeBuffer)+1] = "_gi_res*"+tstop+","+kray25_v_gpstep+";";
             } else {
                 lmcaustics=0;
                 if (kray25_v_gicaustics || kray25_v_gi==2)
                 {   // caustics enabled or estimate mode
                     lmcaustics=kray25_v_ppcaustics;
                 }
-            ::krayfile.writeln("globallm "+(kray25_v_gf*tsign)+","+kray25_v_gn+",_gi_res*"+kray25_v_gpstart+",");
-            ::krayfile.writeln("_gi_res*"+tstop+","+kray25_v_gpstep+","+lmcaustics+";");
+            ::writeBuffer[size(::writeBuffer)+1] = "globallm "+(kray25_v_gf*tsign)+","+kray25_v_gn+",_gi_res*"+kray25_v_gpstart+",";
+            ::writeBuffer[size(::writeBuffer)+1] = "_gi_res*"+tstop+","+kray25_v_gpstep+","+lmcaustics+";";
         }
 
-        ::krayfile.writeln("precachedpm _gi_res*__ppscale*"+kray25_v_ppsize+",_gi_res*__ppscale*__ppstop,");
-        ::krayfile.writeln("__ppstep,__precacheN,_gi_res*"+kray25_v_ppsize+";");
-        ::krayfile.writeln("precachedblur "+kray25_v_ppblur+";");
-        ::krayfile.writeln("globalmultiplier "+kray25_v_ppmult+";");
-        ::krayfile.writeln("causticsmultiplier "+kray25_v_cmult+";");
+        ::writeBuffer[size(::writeBuffer)+1] = "precachedpm _gi_res*__ppscale*"+kray25_v_ppsize+",_gi_res*__ppscale*__ppstop,";
+        ::writeBuffer[size(::writeBuffer)+1] = "__ppstep,__precacheN,_gi_res*"+kray25_v_ppsize+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "precachedblur "+kray25_v_ppblur+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "globalmultiplier "+kray25_v_ppmult+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "causticsmultiplier "+kray25_v_cmult+";";
 
         if (kray25_v_gmatic)
         {
-            ::krayfile.writeln("autophotons global,__autogsamples,"+kray25_v_glow+","+kray25_v_ghigh+","+kray25_v_gdyn+",__autogscale;");
+            ::writeBuffer[size(::writeBuffer)+1] = "autophotons global,__autogsamples,"+kray25_v_glow+","+kray25_v_ghigh+","+kray25_v_gdyn+",__autogscale;";
         }
         if (kray25_v_cmatic)
         {
-            ::krayfile.writeln("autophotons caustics,__autocsamples,"+kray25_v_clow+","+kray25_v_chigh+","+kray25_v_cdyn+",");
-            ::krayfile.writeln("__autocscale;");
+            ::writeBuffer[size(::writeBuffer)+1] = "autophotons caustics,__autocsamples,"+kray25_v_clow+","+kray25_v_chigh+","+kray25_v_cdyn+",";
+            ::writeBuffer[size(::writeBuffer)+1] = "__autocscale;";
         }
 
-        ::krayfile.writeln("irradiancerays "+kray25_v_fgrmin+","+kray25_v_fgrmax+",1,"+kray25_v_fgth+"*"+kray25_v_fgth+";");
+        ::writeBuffer[size(::writeBuffer)+1] = "irradiancerays "+kray25_v_fgrmin+","+kray25_v_fgrmax+",1,"+kray25_v_fgth+"*"+kray25_v_fgth+";";
 
-        ::krayfile.writeln("pmcorner _gi_res*"+kray25_v_cornerdist+","+kray25_v_cornerpaths+";");
+        ::writeBuffer[size(::writeBuffer)+1] = "pmcorner _gi_res*"+kray25_v_cornerdist+","+kray25_v_cornerpaths+";";
 
-        ::krayfile.writeln("gradients _gi_res*"+kray25_v_fgmax+","+kray25_v_fga+";");
-        ::krayfile.writeln("gradients2 _gi_res*"+kray25_v_fgmin+","+kray25_v_fgscale+";");
-        ::krayfile.writeln("gradients3 __oversample,"+kray25_v_fgb+"*pi/180;");
-        ::krayfile.writeln("gradients4 _gi_res*"+(kray25_v_fgmax*10)+",_gi_res*"+(kray25_v_fgmax*10)+",__irr_elip;");
-        ::krayfile.writeln("irradianceblur 0,1+sqr("+kray25_v_fgblur+");");
+        ::writeBuffer[size(::writeBuffer)+1] = "gradients _gi_res*"+kray25_v_fgmax+","+kray25_v_fga+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "gradients2 _gi_res*"+kray25_v_fgmin+","+kray25_v_fgscale+";";
+        ::writeBuffer[size(::writeBuffer)+1] = "gradients3 __oversample,"+kray25_v_fgb+"*pi/180;";
+        ::writeBuffer[size(::writeBuffer)+1] = "gradients4 _gi_res*"+(kray25_v_fgmax*10)+",_gi_res*"+(kray25_v_fgmax*10)+",__irr_elip;";
+        ::writeBuffer[size(::writeBuffer)+1] = "irradianceblur 0,1+sqr("+kray25_v_fgblur+");";
 
         if (kray25_v_fgshows!=1)
         {
@@ -1096,9 +1093,9 @@ scnGen_kray25_script
             b=dot3d(clr,<0,0,1>);
             if (kray25_v_fgshows==3)
             {
-                ::krayfile.writeln("showgisamples ("+(r/255)+","+(g/255)+","+(b/255)+");");
+                ::writeBuffer[size(::writeBuffer)+1] = "showgisamples ("+(r/255)+","+(g/255)+","+(b/255)+");";
             } else {
-                ::krayfile.writeln("showcornersamples ("+(r/255)+","+(g/255)+","+(b/255)+");");
+                ::writeBuffer[size(::writeBuffer)+1] = "showcornersamples ("+(r/255)+","+(g/255)+","+(b/255)+");";
             }
         }
 
@@ -1107,12 +1104,12 @@ scnGen_kray25_script
 
         if (kray25_dof_active && !kray25_v_aafscreen)
         {
-            ::krayfile.writeln("echo '!!! Full screen AA is off. DOF disabled.';");
+            ::writeBuffer[size(::writeBuffer)+1] = "echo '!!! Full screen AA is off. DOF disabled.';";
         }
 
         if (kray25_v_aatype==1)
         {
-            ::krayfile.writeln("imagesampler none;");
+            ::writeBuffer[size(::writeBuffer)+1] = "imagesampler none;";
         } else {
             if (kray25_v_aafscreen)
             {
@@ -1120,27 +1117,27 @@ scnGen_kray25_script
                 {
                     if (kray25_v_aagridrotate)
                     {
-                        ::krayfile.writeln("imagesampler total_rot_uniform,"+kray25_v_aargsmpl+";");
+                        ::writeBuffer[size(::writeBuffer)+1] = "imagesampler total_rot_uniform,"+kray25_v_aargsmpl+";";
                     } else {
-                        ::krayfile.writeln("imagesampler total_uniform,"+kray25_v_aargsmpl+";");
+                        ::writeBuffer[size(::writeBuffer)+1] = "imagesampler total_uniform,"+kray25_v_aargsmpl+";";
                     }
                 }
                 if (kray25_v_aatype==3)
                 {
                     if (kray25_v_cstocmin>=kray25_v_cstocmax || kray25_v_cstocvar==0 || mb_active || kray25_dof_active)
                     {   // Added fix for FS#414 check if MB or DOF is on
-                        ::krayfile.writeln("imagesampler total_qmc,"+kray25_v_cstocmin+";");
+                        ::writeBuffer[size(::writeBuffer)+1] = "imagesampler total_qmc,"+kray25_v_cstocmin+";";
                     } else {
-                        ::krayfile.writeln("imagesampler total_qmcadaptive,"+kray25_v_cstocmin+","+kray25_v_cstocmax+","+kray25_v_cstocvar+";");
+                        ::writeBuffer[size(::writeBuffer)+1] = "imagesampler total_qmcadaptive,"+kray25_v_cstocmin+","+kray25_v_cstocmax+","+kray25_v_cstocvar+";";
                     }
                 }
                 if (kray25_v_aatype==4)
                 {
                         if (mb_active)
                         {
-                            ::krayfile.writeln("imagesampler total_mb_random,"+kray25_v_aarandsmpl+","+kray25_v_cmbsubframes+";");
+                            ::writeBuffer[size(::writeBuffer)+1] = "imagesampler total_mb_random,"+kray25_v_aarandsmpl+","+kray25_v_cmbsubframes+";";
                         } else {
-                            ::krayfile.writeln("imagesampler total_random,"+kray25_v_aarandsmpl+";");
+                            ::writeBuffer[size(::writeBuffer)+1] = "imagesampler total_random,"+kray25_v_aarandsmpl+";";
                         }
                 }
             } else {
@@ -1148,14 +1145,14 @@ scnGen_kray25_script
                 {
                     if (kray25_v_aagridrotate)
                     {
-                        ::krayfile.writeln("imagesampler rot_uniform,"+kray25_v_aargsmpl+";");
+                        ::writeBuffer[size(::writeBuffer)+1] = "imagesampler rot_uniform,"+kray25_v_aargsmpl+";";
                     } else {
-                        ::krayfile.writeln("imagesampler uniform,"+kray25_v_aargsmpl+";");
+                        ::writeBuffer[size(::writeBuffer)+1] = "imagesampler uniform,"+kray25_v_aargsmpl+";";
                     }
                 }
                 if (kray25_v_aatype==3)
                 {
-                    ::krayfile.writeln("imagesampler qmcadaptive,"+kray25_v_cstocmin+","+kray25_v_cstocmax+","+kray25_v_cstocvar+";");
+                    ::writeBuffer[size(::writeBuffer)+1] = "imagesampler qmcadaptive,"+kray25_v_cstocmin+","+kray25_v_cstocmax+","+kray25_v_cstocvar+";";
                 }
             }
         }
@@ -1163,41 +1160,41 @@ scnGen_kray25_script
         if (1)
         {
             // edgedetector (deprecated but still working)
-            ::krayfile.writeln("edgedetector "+kray25_v_edgeabs+","+kray25_v_edgerel+","+kray25_v_edgenorm+","+kray25_v_edgezbuf+",");
-            ::krayfile.writeln(""+kray25_v_edgethick+","+kray25_v_edgeover+","+kray25_v_edgeup+";");
+            ::writeBuffer[size(::writeBuffer)+1] = "edgedetector "+kray25_v_edgeabs+","+kray25_v_edgerel+","+kray25_v_edgenorm+","+kray25_v_edgezbuf+",";
+            ::writeBuffer[size(::writeBuffer)+1] = ""+kray25_v_edgethick+","+kray25_v_edgeover+","+kray25_v_edgeup+";";
         } else {
             // edgedetector (new)
-            ::krayfile.writeln("edgedetectorglobals "+kray25_v_edgethick+","+kray25_v_edgeup+";");
-            ::krayfile.writeln("edgedetectorslot 0,"+kray25_v_edgeabs+","+kray25_v_edgerel+","+kray25_v_edgenorm+","+kray25_v_edgezbuf+",");
-            ::krayfile.writeln(""+kray25_v_edgeover+";");
+            ::writeBuffer[size(::writeBuffer)+1] = "edgedetectorglobals "+kray25_v_edgethick+","+kray25_v_edgeup+";";
+            ::writeBuffer[size(::writeBuffer)+1] = "edgedetectorslot 0,"+kray25_v_edgeabs+","+kray25_v_edgerel+","+kray25_v_edgenorm+","+kray25_v_edgezbuf+",";
+            ::writeBuffer[size(::writeBuffer)+1] = ""+kray25_v_edgeover+";";
         }
 
         // pixel filter
         switch(kray25_v_pxlfltr)
         {
             case 1:
-                ::krayfile.writeln("pixelfilter box,"+kray25_v_pxlparam+";");
+                ::writeBuffer[size(::writeBuffer)+1] = "pixelfilter box,"+kray25_v_pxlparam+";";
                 break;
             case 2:
-                ::krayfile.writeln("pixelfilter cone,"+kray25_v_pxlparam+";");
+                ::writeBuffer[size(::writeBuffer)+1] = "pixelfilter cone,"+kray25_v_pxlparam+";";
                 break;
             case 3:
-                ::krayfile.writeln("pixelfilter cubic,"+kray25_v_pxlparam+";");
+                ::writeBuffer[size(::writeBuffer)+1] = "pixelfilter cubic,"+kray25_v_pxlparam+";";
                 break;
             case 4:
-                ::krayfile.writeln("pixelfilter quadric,"+kray25_v_pxlparam+";");
+                ::writeBuffer[size(::writeBuffer)+1] = "pixelfilter quadric,"+kray25_v_pxlparam+";";
                 break;
             case 5:
-                ::krayfile.writeln("pixelfilter lanczos,"+kray25_v_pxlparam+";");
+                ::writeBuffer[size(::writeBuffer)+1] = "pixelfilter lanczos,"+kray25_v_pxlparam+";";
                 break;
             case 6:
-                ::krayfile.writeln("pixelfilter mitchell;");
+                ::writeBuffer[size(::writeBuffer)+1] = "pixelfilter mitchell;";
                 break;
             case 7:
-                ::krayfile.writeln("pixelfilter spline;");
+                ::writeBuffer[size(::writeBuffer)+1] = "pixelfilter spline;";
                 break;
             case 8:
-                ::krayfile.writeln("pixelfilter catmull;");
+                ::writeBuffer[size(::writeBuffer)+1] = "pixelfilter catmull;";
                 break;
         }
 
@@ -1207,13 +1204,13 @@ scnGen_kray25_script
             case 1:
                 break;
             case 2:
-                ::krayfile.writeln("lwcammode 1;");
+                ::writeBuffer[size(::writeBuffer)+1] = "lwcammode 1;";
                 break;
             case 3:
-                ::krayfile.writeln("lwcammode 4;");
+                ::writeBuffer[size(::writeBuffer)+1] = "lwcammode 4;";
                 break;
             case 4:
-                ::krayfile.writeln("lwcammode 3;");
+                ::writeBuffer[size(::writeBuffer)+1] = "lwcammode 3;";
 
                 kray25_v_camobjectfile="";
                 vmapObj = Mesh();
@@ -1226,8 +1223,8 @@ scnGen_kray25_script
                     vmapObj = vmapObj.next();
                 }
 
-                ::krayfile.writeln("multiline 'TextureBaker';");
-                ::krayfile.writeln("camera mesh,'");
+                ::writeBuffer[size(::writeBuffer)+1] = "multiline 'TextureBaker';";
+                ::writeBuffer[size(::writeBuffer)+1] = "camera mesh,'";
                 
                 mlsize=size(kray25_v_camobjectfile);
                 for (a=1 ; a<=mlsize ; a+=::maxlinelength)
@@ -1238,21 +1235,21 @@ scnGen_kray25_script
                         t=mlsize+1;
                     }
                     t=-a+t;
-                    ::krayfile.writeln(strsub(kray25_v_camobjectfile,a,t));
+                    ::writeBuffer[size(::writeBuffer)+1] = strsub(kray25_v_camobjectfile,a,t);
                 }           
-                ::krayfile.writeln("',"+kray25_v_camobject+",'"+kray25_v_camuvname+"',0,0,(0,0,0),<>;");
-                ::krayfile.writeln("end_of_multiline;");
+                ::writeBuffer[size(::writeBuffer)+1] = "',"+kray25_v_camobject+",'"+kray25_v_camuvname+"',0,0,(0,0,0),<>;";
+                ::writeBuffer[size(::writeBuffer)+1] = "end_of_multiline;";
                 break;
             case 5:
-                ::krayfile.writeln("lwcammode 8;camera stereo,0,0,0,(0,0,0),<>,"+kray25_v_eyesep+","+kray25_v_stereoimages+";");
+                ::writeBuffer[size(::writeBuffer)+1] = "lwcammode 8;camera stereo,0,0,0,(0,0,0),<>,"+kray25_v_eyesep+","+kray25_v_stereoimages+";";
                 break;
         }
 
         if (kray25_v_lenspict!="" && kray25_dof_active)
         {
-            ::krayfile.writeln("echo '*** Loading lens bitmap';");
-            ::krayfile.writeln("multiline 'LensImage';");
-            ::krayfile.writeln("pixmap __lens_bitmap,'");
+            ::writeBuffer[size(::writeBuffer)+1] = "echo '*** Loading lens bitmap';";
+            ::writeBuffer[size(::writeBuffer)+1] = "multiline 'LensImage';";
+            ::writeBuffer[size(::writeBuffer)+1] = "pixmap __lens_bitmap,'";
             
             mlsize=size(kray25_v_lenspict);
             for (a=1 ; a<=mlsize ; a+=::maxlinelength)
@@ -1263,12 +1260,12 @@ scnGen_kray25_script
                     t=mlsize+1;
                 }
                 t=-a+t;
-                ::krayfile.writeln(strsub(kray25_v_lenspict,a,t));
+                ::writeBuffer[size(::writeBuffer)+1] = strsub(kray25_v_lenspict,a,t);
             }
 
-            ::krayfile.writeln("',0;");
-            ::krayfile.writeln("end_of_multiline;");
-            ::krayfile.writeln("lensbitmap __lens_bitmap;");
+            ::writeBuffer[size(::writeBuffer)+1] = "',0;";
+            ::writeBuffer[size(::writeBuffer)+1] = "end_of_multiline;";
+            ::writeBuffer[size(::writeBuffer)+1] = "lensbitmap __lens_bitmap;";
         }
 
         index=-1;
@@ -1290,50 +1287,50 @@ scnGen_kray25_script
 
         if (index>=0)
         {
-            ::krayfile.writeln("lwdoftargetobject "+index+";");
+            ::writeBuffer[size(::writeBuffer)+1] = "lwdoftargetobject "+index+";";
         }
 
-    ::krayfile.writeln("remglobalpm 1;");
-    ::krayfile.writeln("pmsidethreshold 0.5;");
-    ::krayfile.writeln("octcache 3;");
+    ::writeBuffer[size(::writeBuffer)+1] = "remglobalpm 1;";
+    ::writeBuffer[size(::writeBuffer)+1] = "pmsidethreshold 0.5;";
+    ::writeBuffer[size(::writeBuffer)+1] = "octcache 3;";
     kray25_v_errode = kray25_v_errode + (-1);
-    ::krayfile.writeln("postprocess erode," +kray25_v_errode+ ";");
+    ::writeBuffer[size(::writeBuffer)+1] = "postprocess erode," +kray25_v_errode+ ";";
         
 
     if (kray25_v_LogOn)
     {
-        ::krayfile.writeln("logfile '" +kray25_v_Logfile+ "';");
+        ::writeBuffer[size(::writeBuffer)+1] = "logfile '" +kray25_v_Logfile+ "';";
     }
     if (kray25_v_Debug)
     {
-        ::krayfile.writeln("debug -1;");
+        ::writeBuffer[size(::writeBuffer)+1] = "debug -1;";
     }
     if (kray25_v_InfoOn)
     {
-        ::krayfile.writeln("renderinfo '" +kray25_v_InfoText+ "';");
+        ::writeBuffer[size(::writeBuffer)+1] = "renderinfo '" +kray25_v_InfoText+ "';";
     }
     if (kray25_v_IncludeOn)
     {
-        ::krayfile.writeln("include '" +kray25_v_IncludeFile+ "';");
+        ::writeBuffer[size(::writeBuffer)+1] = "include '" +kray25_v_IncludeFile+ "';";
     }
     if (kray25_v_FullPrev)
     {
-        ::krayfile.writeln("previewsize 99999,99999;");
+        ::writeBuffer[size(::writeBuffer)+1] = "previewsize 99999,99999;";
     }
     if (kray25_v_Finishclose)
     {
-        ::krayfile.writeln("finishclose;");
+        ::writeBuffer[size(::writeBuffer)+1] = "finishclose;";
     }
     if (kray25_v_UBRAGI)
     {
-        ::krayfile.writeln("lwo2unseenbyrays_affectsgi 0;");
+        ::writeBuffer[size(::writeBuffer)+1] = "lwo2unseenbyrays_affectsgi 0;";
     }
     if (kray25_v_outputtolw)
     {
-        ::krayfile.writeln("outputtolw 1;");
+        ::writeBuffer[size(::writeBuffer)+1] = "outputtolw 1;";
     }
 
-    ::krayfile.writeln("multiline 'Tailer commands';");
+    ::writeBuffer[size(::writeBuffer)+1] = "multiline 'Tailer commands';";
     mlsize=size(kray25_v_postscript);
     mlsize=size(kray25_v_postscript);
     for (a=1 ; a<=mlsize ; a+=::maxlinelength)
@@ -1344,11 +1341,11 @@ scnGen_kray25_script
             t=mlsize+1;
         }
         t=-a+t;
-        ::krayfile.writeln(strsub(kray25_v_postscript,a,t));
+        ::writeBuffer[size(::writeBuffer)+1] = strsub(kray25_v_postscript,a,t);
     }
-    ::krayfile.writeln(";");
-    ::krayfile.writeln("end_of_multiline;");
-    ::krayfile.writeln("end;");
+    ::writeBuffer[size(::writeBuffer)+1] = ";";
+    ::writeBuffer[size(::writeBuffer)+1] = "end_of_multiline;";
+    ::writeBuffer[size(::writeBuffer)+1] = "end;";
 }
 
 addKrayRenderer
@@ -1360,10 +1357,10 @@ addKrayRenderer
     */
 
     // Check if we have any external renderer configured.
-    rendererCheck = getRendererPluginLine("any", ::newScenePath);
+    rendererCheck = getRendererPluginLine("any");
     if(rendererCheck)
     {
-        krayRPCheck = getRendererPluginLine("KrayRenderer", ::newScenePath);
+        krayRPCheck = getRendererPluginLine("KrayRenderer");
     }
     if(!krayRPCheck)
     {
@@ -1371,12 +1368,13 @@ addKrayRenderer
         {
             strip3rdPartyRenderers();
         }
-        output = File(::newScenePath, "a");
-        output.writeln("");
-        output.writeln("ExternalRenderer KrayRenderer");
-        output.writeln("Plugin ExtRendererHandler 1 KrayRenderer");
-        output.writeln("EndPlugin");
-        output.close();
+        ::writeBuffer = ::readBuffer;
+        ::writeBuffer[size(::writeBuffer)+1] = "";
+        ::writeBuffer[size(::writeBuffer)+1] = "ExternalRenderer KrayRenderer";
+        ::writeBuffer[size(::writeBuffer)+1] = "Plugin ExtRendererHandler 1 KrayRenderer";
+        ::writeBuffer[size(::writeBuffer)+1] = "EndPlugin";
+        ::readBuffer = ::writeBuffer;
+        ::writeBuffer = nil;
     }
 }
 

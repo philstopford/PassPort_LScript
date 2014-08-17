@@ -19,9 +19,11 @@ scnGen_arnold043
 
     // logger("info","activeCameraID: " + activeCameraID.asStr());
 
-    if(activeCameraID == 0) // FIXME: Needs implementation.
+    if(activeCameraID == 0)
     {
         activeCamera = 0; // first camera in scene file, matching default behaviour for no cameras in pass.
+        passCamNameArray[1] = ::cameraNames[1];
+        passCamIDArray[1] = ::cameraIDs[1];
     } else {
         passCamNameArray = nil;
         passCamIDArray = nil;
@@ -71,12 +73,9 @@ scnGen_arnold043
 
     // We need to do both of these - the first because we will later overwrite this field because it's parked at the end of the file and gets re-written
     // from the source file very late in the scene generation process.
-    writeOverrideString(::updatedCurrentScenePath, ::updatedCurrentScenePath, "CurrentCamera ", activeCamera);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "CurrentCamera ", activeCamera);
+    writeOverrideString("CurrentCamera ", activeCamera);
+    writeOverrideString("CurrentCamera ", activeCamera);
 	
-	arnoldTempPath = ::tempDirectory + getsep() + "passEditorTempSceneArnold.lws";
-	arnoldfile = File(arnoldTempPath, "w");
-	sourceFile = File(::updatedCurrentScenePath, "r");
 	/* Anticipating a structure like :
 	ExternalRenderer LWtoA
 	Plugin ExtRendererHandler 1 LWtoA
@@ -85,10 +84,10 @@ scnGen_arnold043
 	*/
 
 	// Check if we have any external renderer configured.
-	rendererCheck = getRendererPluginLine("any", ::newScenePath);
+	rendererCheck = getRendererPluginLine("any");
 	if(rendererCheck)
 	{
-		arnoldCheck = getRendererPluginLine("LWtoA", ::newScenePath);
+		arnoldCheck = getRendererPluginLine("LWtoA");
 	}
 
 	if(!arnoldCheck)
@@ -101,145 +100,141 @@ scnGen_arnold043
 		{
 	   		strip3rdPartyRenderers();
 		}
-		insertionLine = getPartialLine(0,0,"PixelFilterForceMT",::updatedCurrentScenePath);
+		insertionLine = getPartialLine(0,0,"PixelFilterForceMT");
 		arnoldVolLine = -1; // set because we need to pass it, but it's not going to be used.
 		arnoldEndLine = -1; // we'll check for this specific condition later.
 	} else {
 		insertionLine = arnoldCheck;
-		sourceFile.line(insertionLine + 2); // offset
-		arnoldMajor = sourceFile.readInt();
-		arnoldMinor = sourceFile.readInt();
-		arnoldPatch = sourceFile.readInt();
+		readIndex = insertionLine + 2; // offset
+		arnoldMajor = int(::readBuffer[readIndex]);
+		readIndex++;
+		arnoldMinor = int(::readBuffer[readIndex]);
+		readIndex++;
+		arnoldPatch = int(::readBuffer[readIndex]);
+		readIndex++;
 		// Check known version of Arnold in case of mismatch
-		arnoldVolLine = getPartialLine(insertionLine,0,"Arnold_Volume_Scattering",::updatedCurrentScenePath); // enable workaround for currently unsupported volumetric section of Arnold block.
-		arnoldEndLine = getPartialLine(insertionLine,0,"EndPlugin",::updatedCurrentScenePath);
+		arnoldVolLine = getPartialLine(insertionLine,0,"Arnold_Volume_Scattering"); // enable workaround for currently unsupported volumetric section of Arnold block.
+		arnoldEndLine = getPartialLine(insertionLine,0,"EndPlugin");
 		if((arnoldMajor != lwtoa043_default_arnoldMajor) || (arnoldMinor != lwtoa043_default_arnoldMinor) || (arnoldPatch != lwtoa043_default_arnoldPatch))
 		{
 			logger("error","scnGen_arnold043: Arnold version mismatch: " + lwtoa043_arnoldMajor.asStr() + "." + lwtoa043_arnoldMinor.asStr() + "." + lwtoa043_arnoldPatch.asStr());
 		}
 		
 	}
-	lineNumber = 0; // might need to be 1 - need to check; LScript references can be either 1 or 0 based, case depending.
-	sourceFile.line(lineNumber);
-	arnoldFile = File(::newScenePath, "w");
-	while (lineNumber < insertionLine)
+	readIndex = 1;
+	while (readIndex < insertionLine)
 	{
-		line = sourceFile.read();
-		arnoldFile.writeln(line);
-		lineNumber++;
+		::writeBuffer[readIndex] = ::readBuffer[readIndex];
+		readIndex++;
 	}
 
-	arnoldFile.writeln("ExternalRenderer LWtoA");
-	arnoldFile.writeln("Plugin ExtRendererHandler 1 LWtoA"); // only ever have one external renderer block.
-	scnGen_arnold043_settings(arnoldFile); // long chunk of writes, so make a specific function to contain them. Easier to maintain and debug.
-	scnGen_arnold043_volumetrics(sourceFile, arnoldVolLine, arnoldEndLine, arnoldFile);
-	arnoldFile.writeln("EndPlugin");
+	::writeBuffer[size(::writeBuffer) + 1] = "ExternalRenderer LWtoA";
+	::writeBuffer[size(::writeBuffer) + 1] = "Plugin ExtRendererHandler 1 LWtoA"; // only ever have one external renderer block.
+	scnGen_arnold043_settings(); // long chunk of writes, so make a specific function to contain them. Easier to maintain and debug.
+	scnGen_arnold043_volumetrics(arnoldVolLine, arnoldEndLine);
+	::writeBuffer[size(::writeBuffer) + 1] = "EndPlugin";
 
 	// Need to then append output from current position in the input file until hit end of file.
 	if (arnoldEndLine != -1)
 	{
-		sourceFile.line(arnoldEndLine + 1); // offset our source file to read from after the Arnold block.
+		readIndex = arnoldEndLine + 1; // offset our source file to read from after the Arnold block.
+	} else {
+		readIndex = insertionLine;
 	}
-    while(!sourceFile.eof())
+    while(readIndex <= size(::readBuffer))
     {
-		line = sourceFile.read();
-		arnoldFile.writeln(line);
+		::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+		readIndex++;
     }
-	sourceFile.close();
-	arnoldFile.close();
-
-	filecopy(arnoldTempPath,::newScenePath);
-	filecopy(arnoldTempPath,::updatedCurrentScenePath); // avoid getting our source file clobbered in a later function.
-	filedelete(arnoldTempPath);
+    ::readBuffer = ::writeBuffer;
+    ::writeBuffer = nil;
 }
 
-scnGen_arnold043_settings: arnoldFile
+scnGen_arnold043_settings
 {
     // Offset in our settings array to go past the version values above and start pushing the other values out to the scene file.
     settingIndex = 6;
     while(settingIndex <= settingIndex.size())
     {
-    	arnoldFile.writeln(::settingsArray[settingIndex]);
+    	::writeBuffer[size(::writeBuffer) + 1] = ::settingsArray[settingIndex];
     	settingIndex++;
     }
 }
 
-scnGen_arnold043_volumetrics: sourceFile, arnoldVolLine, arnoldEndLine, arnoldFile
+scnGen_arnold043_volumetrics: arnoldVolLine, arnoldEndLine
 {
     if (arnoldVolLine == -1) // no arnold in original scene - write out standard volumetric section.
 	{
-    	arnoldFile.writeln("{ Arnold_Volume_Scattering");
-		arnoldFile.writeln("  Scatter_Density 0.20000000000000001");
-		arnoldFile.writeln("  Scatter_Samples 4");
-		arnoldFile.writeln("  Scatter_Eccentricity 0");
-		arnoldFile.writeln("  Scatter_Attenuation 0");
-		arnoldFile.writeln("  Scatter_Camera_contribution 1");
-		arnoldFile.writeln("  Scatter_Diffuse_contribution 0");
-		arnoldFile.writeln("  Scatter_Reflection_contribution 1");
-		arnoldFile.writeln("  Scatter_Color 1 1 1");
-		arnoldFile.writeln("  Scatter_Attenuation_Color 1 1 1");
-		arnoldFile.writeln("  { Scatter_node_editor");
-		arnoldFile.writeln("    { Root");
-		arnoldFile.writeln("      Location 0 0");
-		arnoldFile.writeln("      Zoom 1");
-		arnoldFile.writeln("      Disabled 1");
-		arnoldFile.writeln("    }");
-		arnoldFile.writeln("    Version 1");
-		arnoldFile.writeln("    { Nodes");
-		arnoldFile.writeln("      Server \"Arnold Volume Scattering\"");
-		arnoldFile.writeln("      { Tag");
-		arnoldFile.writeln("        RealName \"Arnold Volume Scattering\"");
-		arnoldFile.writeln("        Name \"Arnold Volume Scattering\"");
-		arnoldFile.writeln("        Coordinates -10 -10");
-		arnoldFile.writeln("        Mode 1");
-		arnoldFile.writeln("        { Data");
-		arnoldFile.writeln("        }");
-		arnoldFile.writeln("        Preview \"\"");
-		arnoldFile.writeln("        Comment \"\"");
-		arnoldFile.writeln("      }");
-		arnoldFile.writeln("    }");
-		arnoldFile.writeln("    { Connections");
-		arnoldFile.writeln("    }");
-		arnoldFile.writeln("  }");
-		arnoldFile.writeln("}");
-		arnoldFile.writeln("{ Arnold_Fog");
-		arnoldFile.writeln("  Fog_distance 0.02");
-		arnoldFile.writeln("  Fog_height 5");
-		arnoldFile.writeln("  Fog_color 1 1 1");
-		arnoldFile.writeln("  Fog_ground_point 0 0 0");
-		arnoldFile.writeln("  Fog_ground_color 0 0 1");
-		arnoldFile.writeln("  { Fog_node_editor");
-		arnoldFile.writeln("    { Root");
-		arnoldFile.writeln("      Location 0 0");
-		arnoldFile.writeln("      Zoom 1");
-		arnoldFile.writeln("      Disabled 1");
-		arnoldFile.writeln("    }");
-		arnoldFile.writeln("    Version 1");
-		arnoldFile.writeln("    { Nodes");
-		arnoldFile.writeln("      Server \"Arnold Volumetric Fog\"");
-		arnoldFile.writeln("      { Tag");
-		arnoldFile.writeln("        RealName \"Arnold Volumetric Fog\"");
-		arnoldFile.writeln("        Name \"Arnold Volumetric Fog\"");
-		arnoldFile.writeln("        Coordinates -10 -10");
-		arnoldFile.writeln("        Mode 1");
-		arnoldFile.writeln("        { Data");
-		arnoldFile.writeln("        }");
-		arnoldFile.writeln("        Preview \"\"");
-		arnoldFile.writeln("        Comment \"\"");
-		arnoldFile.writeln("      }");
-		arnoldFile.writeln("    }");
-		arnoldFile.writeln("    { Connections");
-		arnoldFile.writeln("    }");
-		arnoldFile.writeln("  }");
-		arnoldFile.writeln("}");
+    	::writeBuffer[size(::writeBuffer) + 1] = "{ Arnold_Volume_Scattering";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Scatter_Density 0.20000000000000001";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Scatter_Samples 4";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Scatter_Eccentricity 0";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Scatter_Attenuation 0";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Scatter_Camera_contribution 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Scatter_Diffuse_contribution 0";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Scatter_Reflection_contribution 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Scatter_Color 1 1 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Scatter_Attenuation_Color 1 1 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "  { Scatter_node_editor";
+		::writeBuffer[size(::writeBuffer) + 1] = "    { Root";
+		::writeBuffer[size(::writeBuffer) + 1] = "      Location 0 0";
+		::writeBuffer[size(::writeBuffer) + 1] = "      Zoom 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "      Disabled 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "    }";
+		::writeBuffer[size(::writeBuffer) + 1] = "    Version 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "    { Nodes";
+		::writeBuffer[size(::writeBuffer) + 1] = "      Server \"Arnold Volume Scattering\"";
+		::writeBuffer[size(::writeBuffer) + 1] = "      { Tag";
+		::writeBuffer[size(::writeBuffer) + 1] = "        RealName \"Arnold Volume Scattering\"";
+		::writeBuffer[size(::writeBuffer) + 1] = "        Name \"Arnold Volume Scattering\"";
+		::writeBuffer[size(::writeBuffer) + 1] = "        Coordinates -10 -10";
+		::writeBuffer[size(::writeBuffer) + 1] = "        Mode 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "        { Data";
+		::writeBuffer[size(::writeBuffer) + 1] = "        }";
+		::writeBuffer[size(::writeBuffer) + 1] = "        Preview \"\"";
+		::writeBuffer[size(::writeBuffer) + 1] = "        Comment \"\"";
+		::writeBuffer[size(::writeBuffer) + 1] = "      }";
+		::writeBuffer[size(::writeBuffer) + 1] = "    }";
+		::writeBuffer[size(::writeBuffer) + 1] = "    { Connections";
+		::writeBuffer[size(::writeBuffer) + 1] = "    }";
+		::writeBuffer[size(::writeBuffer) + 1] = "  }";
+		::writeBuffer[size(::writeBuffer) + 1] = "}";
+		::writeBuffer[size(::writeBuffer) + 1] = "{ Arnold_Fog";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Fog_distance 0.02";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Fog_height 5";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Fog_color 1 1 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Fog_ground_point 0 0 0";
+		::writeBuffer[size(::writeBuffer) + 1] = "  Fog_ground_color 0 0 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "  { Fog_node_editor";
+		::writeBuffer[size(::writeBuffer) + 1] = "    { Root";
+		::writeBuffer[size(::writeBuffer) + 1] = "      Location 0 0";
+		::writeBuffer[size(::writeBuffer) + 1] = "      Zoom 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "      Disabled 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "    }";
+		::writeBuffer[size(::writeBuffer) + 1] = "    Version 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "    { Nodes";
+		::writeBuffer[size(::writeBuffer) + 1] = "      Server \"Arnold Volumetric Fog\"";
+		::writeBuffer[size(::writeBuffer) + 1] = "      { Tag";
+		::writeBuffer[size(::writeBuffer) + 1] = "        RealName \"Arnold Volumetric Fog\"";
+		::writeBuffer[size(::writeBuffer) + 1] = "        Name \"Arnold Volumetric Fog\"";
+		::writeBuffer[size(::writeBuffer) + 1] = "        Coordinates -10 -10";
+		::writeBuffer[size(::writeBuffer) + 1] = "        Mode 1";
+		::writeBuffer[size(::writeBuffer) + 1] = "        { Data";
+		::writeBuffer[size(::writeBuffer) + 1] = "        }";
+		::writeBuffer[size(::writeBuffer) + 1] = "        Preview \"\"";
+		::writeBuffer[size(::writeBuffer) + 1] = "        Comment \"\"";
+		::writeBuffer[size(::writeBuffer) + 1] = "      }";
+		::writeBuffer[size(::writeBuffer) + 1] = "    }";
+		::writeBuffer[size(::writeBuffer) + 1] = "    { Connections";
+		::writeBuffer[size(::writeBuffer) + 1] = "    }";
+		::writeBuffer[size(::writeBuffer) + 1] = "  }";
+		::writeBuffer[size(::writeBuffer) + 1] = "}";
     } else {
-    	lineNumber = arnoldVolLine;
-    	sourceFile.line(lineNumber); // should already be here, but do this as a safety check.
-    	while(lineNumber < arnoldEndLine) // we write out EndPlugin line in our parent function, so don't hit it here.
+    	readIndex = arnoldVolLine;
+    	while(readIndex < arnoldEndLine) // we write out EndPlugin line in our parent function, so don't hit it here.
     	{
-    		line = sourceFile.read();
-    		arnoldFile.writeln(line);
-    		lineNumber++;
+    		::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+    		readIndex++;
     	}
     }
 }

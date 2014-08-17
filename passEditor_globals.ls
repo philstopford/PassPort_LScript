@@ -8,7 +8,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "1.6.2717";
+var versionString = "1.7.2730";
 var rpeVersion = "1.1";
 var parch = "Unknown";
 var icon;
@@ -134,12 +134,12 @@ var overriddenObjectID;
 var overriddenObjectName;
 
 // file variables.
-var newScenePath;
+var sceneFile;
 var currentScenePath;
-var updatedCurrentScenePath;
-var inputFileName;
-var filesPrepared = 0;
 var tempDirectory = getdir("Temp");
+// RAM buffer variables
+var readBuffer;
+var writeBuffer;
 
 // Mac stuff
 var useGrowl = 0; // shut off Growl by default.

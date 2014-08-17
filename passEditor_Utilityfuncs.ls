@@ -1,39 +1,3 @@
-generateNewScenePath: outputFolder, outputStr
-{
-    if(chdir(outputFolder[1]))
-    {
-        if(chdir("temp"))
-        {
-            if(chdir("tempScenes"))
-            {
-            }
-            else
-            {
-                mkdir("tempScenes");
-                chdir("tempScenes");
-            }
-        }
-        else
-        {
-            mkdir("temp");
-            chdir("temp");
-            mkdir("tempScenes");
-            chdir("tempScenes");
-        }
-    }
-    else
-    {
-        mkdir(outputFolder[1]);
-        chdir(outputFolder[1]);
-        mkdir("temp");
-        chdir("temp");
-        mkdir("tempScenes");
-        chdir("tempScenes");
-    }
-    ::newScenePath = outputFolder[1] + getsep() + "temp" + getsep() + "tempScenes" + getsep() + outputStr + ::fileOutputPrefix + "_" + ::userOutputString + "_" + ::passNames[::pass] + ".lws";
-    return ::newScenePath;
-}
-
 generateSaveRGBPath: mode, outputFolder, outputStr
 {
     chdirString = outputFolder[1]; // + getsep() + getsep();
@@ -101,22 +65,13 @@ generatePath: mode, outputFolder, outputStr, fileOutputPrefix, userOutputString,
     return genPath;
 }
 
-writeOverrideString: inputFileName, outputFileName, outputString, outputValue
+writeOverrideString: outputString, outputValue
 {
-    if(::filesPrepared == 0)
+    ::writeBuffer = ::readBuffer;
+    outputString_len = size(outputString);
+    for (i = 1; i <= size(::readBuffer); i++)
     {
-        // We get back a different string - don't be fooled!
-        inputFileName = prepareInputFile(inputFileName);
-    }
-    
-    inputFile = File(inputFileName, "r");
-    tempOutput = File(outputFileName, "w");
-
-    parameterFound = 0;
-    while(!inputFile.eof())
-    {
-        line = inputFile.read();
-        outputString_len = size(outputString);
+        line = ::readBuffer[i];
         if(size(line) > outputString_len)
         {
             if(strleft(line,outputString_len) == outputString)
@@ -144,19 +99,15 @@ writeOverrideString: inputFileName, outputFileName, outputString, outputValue
         {
             toWrite = line;
         }
-        tempOutput.writeln(toWrite);
+        ::writeBuffer[i] = toWrite;
     }
-    
-    // Finished with our input file, so close it.
-    inputFile.close();
-    
+
     // Didn't find the string, so assume it's one of those settings that LW drops from the scene file
     // and opt to append it to force the condition. Don't do this if the global 'noAppend' flag has been set.
     if (parameterFound == 0 && ::noAppend == 0)
     {
-        tempOutput.reopen("a"); // append mode.
         toWrite  = outputString + string(outputValue);
-        tempOutput.writeln(toWrite);
+        ::writeBuffer[size(::writeBuffer) + 1] = toWrite;
     }
 
     // reset parameterFound.
@@ -165,74 +116,33 @@ writeOverrideString: inputFileName, outputFileName, outputString, outputValue
         parameterFound = 0;
     }
 
-    // Finished with our output file, so close it.
-    tempOutput.close();
-    filecopy(outputFileName, inputFileName);
+    ::readBuffer = ::writeBuffer;
+    ::writeBuffer = nil;
 }
 
-// Duplicate user's input file to a temp file and send back the path to the temp file to process elsewhere..
-prepareInputFile: inputFileName
+changeScnLine: stringToWrite, lineToChange
 {
-    if(::filesPrepared == 1)
-        logger("error","prepareInputFile: prepareInputFile() already called.");
-    tempFileName = ::tempDirectory + getsep() + "tempPassportInputFile.lws";
-    filecopy(inputFileName, tempFileName);
-    ::filesPrepared = 1;
-    return tempFileName;
+    ::writeBuffer = ::readBuffer;
+    ::writeBuffer[lineToChange] = stringToWrite;
+    ::readBuffer = ::writeBuffer;
+    ::writeBuffer = nil;
 }
 
-finishFiles
+insertScnLine: stringToInsert, lineToInsertAfter
 {
-    if(::filesPrepared == 0)
-        logger("error","finishFiles: finishFiles() already called.");
-    tempFileName = ::tempDirectory + getsep() + "tempPassportInputFile.lws";
-    filedelete(tempFileName);
-    ::filesPrepared = 0;
-}
-
-changeScnLine: stringToWrite, fileToAdjust, lineToChange
-{
-    fileAdjust = File(fileToAdjust, "r");
-    tempFileToAdjust = ::tempDirectory + getsep() + "tempPassportInputFileAdjust.lws";
-    tempFileAdjust = File(tempFileToAdjust, "w");
-
-    for(i = 1; i < lineToChange; i++)
+    i = 1;
+    while (i <= lineToInsertAfter)
     {
-        tempFileAdjust.writeln(fileAdjust.read());
+        ::writeBuffer[i] = ::readBuffer[i];
+        i++;
     }
-    tempFileAdjust.writeln(stringToWrite);
-    fileAdjust.line(lineToChange + 1);
-    tempFileAdjust.reopen("a"); // append mode
-    while(!fileAdjust.eof())
+    ::writeBuffer[size(::writeBuffer) + 1] = stringToInsert;
+    while (i <= size(::readBuffer))
     {
-        tempFileAdjust.writeln(fileAdjust.read());
+        ::writeBuffer[i + 1] = ::readBuffer[i];
     }
-    fileAdjust.close();
-    tempFileAdjust.close();
-    filecopy(tempFileToAdjust, fileToAdjust);
-    filedelete(tempFileToAdjust);
-}
-
-insertScnLine: stringToInsert, fileToAdjust, lineToInsertAfter
-{
-    fileAdjust = File(fileToAdjust, "r");
-    tempFileToAdjust = ::tempDirectory + getsep() + "tempPassportInputFileAdjust.lws";
-    tempFileAdjust = File(tempFileToAdjust, "w");
-
-    for(i = 1; i <= lineToInsertAfter; i++)
-    {
-        tempFileAdjust.writeln(fileAdjust.read());
-    }
-    tempFileAdjust.writeln(stringToInsert);
-    tempFileAdjust.reopen("a"); // append mode
-    while(!fileAdjust.eof())
-    {
-        tempFileAdjust.writeln(fileAdjust.read());
-    }
-    fileAdjust.close();
-    tempFileAdjust.close();
-    filecopy(tempFileToAdjust, fileToAdjust);
-    filedelete(tempFileToAdjust);
+    ::readBuffer = ::writeBuffer;
+    ::writeBuffer = nil;
 }
 
 generateSurfaceObjects: ::srfLWOInputID,::srfInputTemp,::currentScenePath,objStartLine
@@ -1181,44 +1091,26 @@ makeStringGood: string
     }
 }
 
-stripPassEditor: sceneFile
+stripPassEditor
 {
     // get the plugin lines so we don't copy those into the render scenes
-    passEditorStartLine = getPassEditorStartLine(sceneFile);
-
+    passEditorStartLine = getPassEditorStartLine();
     if(passEditorStartLine == nil)
     {
         logger("error","stripPassEditor: PassEditor not installed.  Please install and run.");
     }
     
-    passEditorEndLine = getPartialLine(passEditorStartLine,0,"EndPlugin",sceneFile);
-    lineNumber = 1;
-    tempFileName = ::tempDirectory + getsep() + "passEditorTempScene_trim.lws";
-    tempFile = File(tempFileName, "w");
-    input = File(sceneFile, "r");
-    endLineNumber = input.linecount();
-    while(lineNumber < passEditorStartLine)
+    passEditorEndLine = getPartialLine(passEditorStartLine,0,"EndPlugin");
+    for (i = 1; i < passEditorStartLine; i++)
     {
-        line = input.read();
-        tempFile.writeln(line);
-        lineNumber = input.line();
+        ::writeBuffer[i] = ::readBuffer[i];
     }
-    for(i = 1; i <= (passEditorEndLine - passEditorStartLine) + 1; i++)
+    for (i = passEditorEndLine + 1; i <= size(::readBuffer); i++)
     {
-        tempFile.writeln("");
+        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[i];
     }
-    input.line(passEditorEndLine + 1);
-    tempFile.reopen("a");
-    while(lineNumber <= endLineNumber)
-    {
-        line = input.read();
-        tempFile.writeln(line);
-        lineNumber = input.line();
-    }
-    input.close();
-    tempFile.close();
-    filecopy(tempFileName, sceneFile);
-    filedelete(tempFileName);
+    ::readBuffer = ::writeBuffer;
+    ::writeBuffer = nil;
     return ((passEditorEndLine + 1) - passEditorStartLine);
 }
 
@@ -1238,39 +1130,26 @@ strip3rdPartyRenderers
     EndPlugin
     */
 
-    rendererHandlerLine = getRendererPluginLine("any", ::newScenePath);
-
+    rendererHandlerLine = getRendererPluginLine("any");
     if (rendererHandlerLine)
     {
         extRendererLine = rendererHandlerLine - 1;
-        rendererHandlerEndLine = getPartialLine(rendererHandlerLine,0,"EndPlugin",::newScenePath);
-        tempOutputPath = ::tempDirectory + getsep() + "passEditorTempSceneS3PR.lws";
-        input = File(::newScenePath, "r");
-        tempFile = File(tempOutputPath, "w");
-        lineNumber = 1;
-
-        while(lineNumber < extRendererLine)
+        rendererHandlerEndLine = getPartialLine(rendererHandlerLine,0,"EndPlugin");
+        i = 1;
+        while (i < extRendererLine)
         {
-            line = input.read();
-            tempFile.writeln(line);
-            lineNumber = input.line();
+            ::writeBuffer[i] = ::readBuffer[i];
+            i++;
+        }
+        i = rendererHandlerEndLine + 1;
+        while (i <= size(::readBuffer))
+        {
+            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[i];
+            i++;
         }
 
-        input.line(rendererHandlerEndLine + 1);
-
-        while(!input.eof())
-        {
-            line = input.read();
-            tempFile.writeln(line);
-        }
-
-        input.close();
-        tempFile.close();
-        filecopy(tempOutputPath,::newScenePath);
-        filecopy(tempOutputPath,::updatedCurrentScenePath);
-        filedelete(tempOutputPath);
-    } else {
-        // Nothing to do.
+        ::readBuffer = ::writeBuffer;
+        ::writeBuffer = nil;
     }
 }
 
@@ -1658,4 +1537,16 @@ prefixArrayWithBlank: ::tempArray
     }
     ::tempArray[1] = "";
     return ::tempArray;
+}
+
+prepareReadBuffer: sceneToRead
+{
+    prb_sceneFile = File(sceneToRead, "r");
+    ::readBuffer = nil;
+    i = 1;
+    while(!prb_sceneFile.eof())
+    {
+        ::readBuffer[prb_sceneFile.line()] = prb_sceneFile.read();
+    }
+    prb_sceneFile.close();
 }

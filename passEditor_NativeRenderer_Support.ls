@@ -984,25 +984,23 @@ scnGen_native
         }
     }
 
-    // We need to do both of these - the first because we will later overwrite this field because it's parked at the end of the file and gets re-written
-    // from the source file very late in the scene generation process.
-    writeOverrideString(::updatedCurrentScenePath, updatedCurrentScenePath, "CurrentCamera ", activeCamera);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "CurrentCamera ", activeCamera);
+    writeOverrideString("CurrentCamera ", activeCamera);
 
     renderModeSetts = integer(::settingsArray[4]) - 1;
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RenderMode ", renderModeSetts);
+    writeOverrideString("RenderMode ", renderModeSetts);
     
     depthBufferAASetts = integer(::settingsArray[5]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "DepthBufferAA ", depthBufferAASetts);
+    writeOverrideString("DepthBufferAA ", depthBufferAASetts);
     
     renderLinesSetts = integer(::settingsArray[6]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RenderLines ", renderLinesSetts);
+    writeOverrideString("RenderLines ", renderLinesSetts);
 
     rayRecursionLimitSetts = integer(::settingsArray[7]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RayRecursionLimit ", rayRecursionLimitSetts);
+    writeOverrideString("RayRecursionLimit ", rayRecursionLimitSetts);
 
-    if(disableAASetts == 1) {
-        writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "AASamples ", "1");
+    if(disableAASetts == 1)
+    {
+        writeOverrideString("AASamples ", "1");
     }
     
     raytraceShadows             = integer(::settingsArray[10]);
@@ -1025,74 +1023,74 @@ scnGen_native
     raytraceOccl_Flag           = 16;
     raytraceFlags               += (raytraceOccl * raytraceOccl_Flag);
     
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RayTraceEffects ", raytraceFlags);
+    writeOverrideString("RayTraceEffects ", raytraceFlags);
 
     volumetricAA = integer(::settingsArray[15]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "VolumetricAA ", volumetricAA);
+    writeOverrideString("VolumetricAA ", volumetricAA);
 
     gLensFlares = integer(::settingsArray[16]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "EnableLensFlares ", gLensFlares);
+    writeOverrideString("EnableLensFlares ", gLensFlares);
 
     shadowMaps = integer(::settingsArray[17]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "EnableShadowMaps ", shadowMaps);
+    writeOverrideString("EnableShadowMaps ", shadowMaps);
 
     volLights = integer(::settingsArray[18]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "EnableVolumetricLights ", volLights);
+    writeOverrideString("EnableVolumetricLights ", volLights);
 
     twoSidedALgts = integer(::settingsArray[19]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "DoubleSidedAreaLights ", twoSidedALgts);
+    writeOverrideString("DoubleSidedAreaLights ", twoSidedALgts);
 
     renderInstances = integer(::settingsArray[20]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RenderInstances ", renderInstances);
+    writeOverrideString("RenderInstances ", renderInstances);
 
     rayPrecision = number(::settingsArray[21]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RayPrecision ", rayPrecision);
+    writeOverrideString("RayPrecision ", rayPrecision);
 
     rayCutoff = number(::settingsArray[22]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RayCutoff ", rayCutoff);
+    writeOverrideString("RayCutoff ", rayCutoff);
 
     shadingSamples = integer(::settingsArray[23]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "ShadingSamples ", shadingSamples);
+    writeOverrideString("ShadingSamples ", shadingSamples);
 
     lightSamples = integer(::settingsArray[24]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "LightSamples ", lightSamples);
+    writeOverrideString("LightSamples ", lightSamples);
 
     gLightIntensity = number(::settingsArray[25]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "GlobalLightIntensity ", gLightIntensity);
+    writeOverrideString("GlobalLightIntensity ", gLightIntensity);
 
     gFlareIntensity = number(::settingsArray[26]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "GlobalFlareIntensity ", gFlareIntensity);
+    writeOverrideString("GlobalFlareIntensity ", gFlareIntensity);
 
     enableGI = number(::settingsArray[27]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "EnableRadiosity ", enableGI);
+    writeOverrideString("EnableRadiosity ", enableGI);
 
     giMode = integer(::settingsArray[28]);
     giMode = giMode - 1; // decrement by one to match index in LW. Menus are 1-indexed.
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityType ", giMode);
+    writeOverrideString("RadiosityType ", giMode);
 
     interpolateGI = integer(::settingsArray[29]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityInterpolated ", interpolateGI);
+    writeOverrideString("RadiosityInterpolated ", interpolateGI);
 
     blurBGGI = integer(::settingsArray[30]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "BlurRadiosity ", blurBGGI);
+    writeOverrideString("BlurRadiosity ", blurBGGI);
 
     transparencyGI = integer(::settingsArray[31]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityTransparency ", transparencyGI);
+    writeOverrideString("RadiosityTransparency ", transparencyGI);
 
     volumetricGI = integer(::settingsArray[32]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "VolumetricRadiosity ", volumetricGI);
+    writeOverrideString("VolumetricRadiosity ", volumetricGI);
 
     ambOcclGI = integer(::settingsArray[33]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityUseAmbient ", ambOcclGI);
+    writeOverrideString("RadiosityUseAmbient ", ambOcclGI);
 
     directionalGI = integer(::settingsArray[34]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityDirectionalRays ", directionalGI);
+    writeOverrideString("RadiosityDirectionalRays ", directionalGI);
 
     gradientsGI = integer(::settingsArray[35]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityUseGradients ", gradientsGI);
+    writeOverrideString("RadiosityUseGradients ", gradientsGI);
 
     behindTestGI = integer(::settingsArray[36]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityUseBehindTest ", behindTestGI);
+    writeOverrideString("RadiosityUseBehindTest ", behindTestGI);
 
     useBumpsGI = integer(::settingsArray[37]);
     bradFlagsValue = useBumpsGI * (-2147483648);
@@ -1123,76 +1121,73 @@ scnGen_native
     {
         radFlagsValue -= 1;
     }
-
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityFlags ", radFlagsValue);
+    writeOverrideString("RadiosityFlags ", radFlagsValue);
 
     giIntensity = integer(::settingsArray[38]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityIntensity ", giIntensity);
+    writeOverrideString("RadiosityIntensity ", giIntensity);
 
     giAngTol = integer(::settingsArray[39]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityTolerance ", giAngTol);
+    writeOverrideString("RadiosityTolerance ", giAngTol);
 
     giIndBounces = integer(::settingsArray[40]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "IndirectBounces ", giIndBounces);
+    writeOverrideString("IndirectBounces ", giIndBounces);
     
     giMinSpacing = number(::settingsArray[41]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityMinPixelSpacing ", giMinSpacing);
+    writeOverrideString("RadiosityMinPixelSpacing ", giMinSpacing);
 
     giRPE = number(::settingsArray[42]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityRays ", giRPE);
+    writeOverrideString("RadiosityRays ", giRPE);
 
     giMaxSpacing = number(::settingsArray[43]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityMaxPixelSpacing ", giMaxSpacing);
+    writeOverrideString("RadiosityMaxPixelSpacing ", giMaxSpacing);
 
     gi2ndBounces = integer(::settingsArray[44]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "SecondaryBounceRays ", gi2ndBounces);
+    writeOverrideString("SecondaryBounceRays ", gi2ndBounces);
 
     giMultiplier = number(::settingsArray[45]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "RadiosityMultiplier ", giMultiplier);
+    writeOverrideString("RadiosityMultiplier ", giMultiplier);
 
     enableCaustics = number(::settingsArray[46]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "EnableCaustics ", enableCaustics);
+    writeOverrideString("EnableCaustics ", enableCaustics);
 
     causticsAccuracy = integer(::settingsArray[47]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "CausticAccuracy ", causticsAccuracy);
+    writeOverrideString("CausticAccuracy ", causticsAccuracy);
 
     causticsIntensity = number(::settingsArray[48]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "CausticIntensity ", causticsIntensity);
+    writeOverrideString("CausticIntensity ", causticsIntensity);
 
     causticsSoftness = number(::settingsArray[49]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "CausticSoftness ", causticsSoftness);
-
-    // FiberFX settings are written out in the main scene gen code. At least for now.
+    writeOverrideString("CausticSoftness ", causticsSoftness);
 
     fogType = integer(::settingsArray[56]) - 1;
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "FogType ", fogType);
+    writeOverrideString("FogType ", fogType);
 
     fogColorLine = string(number(::settingsArray[57]) / 255) + " " + string(number(::settingsArray[58]) / 255) + " " + string(number(::settingsArray[59]) / 255);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "FogColor ", fogColorLine);
+    writeOverrideString("FogColor ", fogColorLine);
 
     fogBackdropColor = integer(::settingsArray[60]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "BackdropFog ", fogBackdropColor);
+    writeOverrideString("BackdropFog ", fogBackdropColor);
 
     useBackgroundColor = integer(::settingsArray[61]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "UseBackgroundColor ", useBackgroundColor);
+    writeOverrideString("UseBackgroundColor ", useBackgroundColor);
 
     bgColorLine = string(number(::settingsArray[62]) / 255) + " " + string(number(::settingsArray[63]) / 255) + " " + string(number(::settingsArray[64]) / 255);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "BackgroundColor ", bgColorLine);
+    writeOverrideString("BackgroundColor ", bgColorLine);
 
     bdColorLine = string(number(::settingsArray[65]) / 255) + " " + string(number(::settingsArray[66]) / 255) + " " + string(number(::settingsArray[67]) / 255);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "BackdropColor ", bdColorLine);
+    writeOverrideString("BackdropColor ", bdColorLine);
 
     zenithColorLine = string(number(::settingsArray[68]) / 255) + " " + string(number(::settingsArray[69]) / 255) + " " + string(number(::settingsArray[70]) / 255);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "ZenithColor ", zenithColorLine);
+    writeOverrideString("ZenithColor ", zenithColorLine);
 
     skyColorLine = string(number(::settingsArray[71]) / 255) + " " + string(number(::settingsArray[72]) / 255) + " " + string(number(::settingsArray[73]) / 255);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "SkyColor ", skyColorLine);
+    writeOverrideString("SkyColor ", skyColorLine);
 
     groundColorLine = string(number(::settingsArray[74]) / 255) + " " + string(number(::settingsArray[75]) / 255) + " " + string(number(::settingsArray[76]) / 255);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "GroundColor ", groundColorLine);
+    writeOverrideString("GroundColor ", groundColorLine);
 
     nadirColorLine = string(number(::settingsArray[77]) / 255) + " " + string(number(::settingsArray[78]) / 255) + " " + string(number(::settingsArray[79]) / 255);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "NadirColor ", nadirColorLine);
+    writeOverrideString("NadirColor ", nadirColorLine);
 
     useSolidBackdrop = integer(::settingsArray[80]); // The scene file uses a solid backdrop tag. LW's UI denotes this as a gradient switch.
     if (useSolidBackdrop == 0) // So we have to flip the polarity to match the UI intent.
@@ -1201,31 +1196,29 @@ scnGen_native
     } else {
         useSolidBackdrop = 0;
     }
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "SolidBackdrop ", useSolidBackdrop);
+    writeOverrideString("SolidBackdrop ", useSolidBackdrop);
 
     adaptiveSampling = integer(::settingsArray[81]);
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "AdaptiveSampling ", adaptiveSampling);
+    writeOverrideString("AdaptiveSampling ", adaptiveSampling);
 
     // FIXME : Move to camera override.
     disableAASetts = integer(::settingsArray[9]);
     if(disableAASetts == 1)
         disableAASetts = 0;
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "Antialiasing ", disableAASetts);
+    writeOverrideString("Antialiasing ", disableAASetts);
 
-    writeOverrideString(::updatedCurrentScenePath, ::newScenePath, "AntiAliasingLevel ", "-1");
-
-    finishFiles();
+    writeOverrideString("AntiAliasingLevel ", "-1");
 
     strip3rdPartyRenderers();
 }
 
 // Called from scene generation code if native renderer set for override.
-radLines_native: radFileName
+radLines_native
 {
     switch (int(hostVersion()))
     {
         case 11:
-            prepareRadiosityLines_11(radFileName);
+            prepareRadiosityLines_11();
             break;
         
         default:
@@ -1233,7 +1226,7 @@ radLines_native: radFileName
     }
 }
 
-prepareRadiosityLines_11: radFileName
+prepareRadiosityLines_11
 {
     pRLStage = 1;
     pRLArray = @"EnableRadiosity 0","RadiosityType 1","RadiosityInterpolated 0","RadiosityTransparency 0","CacheRadiosity 0","PreprocessRadiosity 0","RadiosityIntensity 1",
@@ -1243,29 +1236,25 @@ prepareRadiosityLines_11: radFileName
 
     // Let's just write the entire standard block. The appropriate settings will be adjusted by any override in a subsequent action.
 
-    pRL11StartLine = getPartialLine(0,0,"EnableRadiosity",radFileName);
+    pRL11StartLine = getPartialLine(0,0,"EnableRadiosity");
     if (pRL11StartLine == nil)
     {
-        pRL11StartLine = getPartialLine(0,0,"RadiosityType",radFileName);
+        pRL11StartLine = getPartialLine(0,0,"RadiosityType");
     }
-    pRL11EndLine = getPartialLine(0,0,"PixelFilterForceMT", radFileName);
+    pRL11EndLine = getPartialLine(0,0,"PixelFilterForceMT");
     if (pRL11StartLine == nil)
     {
         logger("error","Something went wrong - please report with bug ref pRL11_1 and attach scene file");
     }
 
-    pRLSource = File(radFileName,"r");
-    tempFilePRL = ::tempDirectory + getsep() + "tempPassportFilePRL.lws";
-    pRLTarget = File(tempFilePRL, "w");
+    totalNumberOfActions = size(::readBuffer) + size(pRLArray);
 
-    totalNumberOfActions = pRLSource.linecount() + size(pRLArray);
-
-    for (line = 1; line < pRL11StartLine; line++)
+    for (i = 1; i < pRL11StartLine; i++)
     {
-        progressString = string(line / totalNumberOfActions);
+        progressString = string(i / totalNumberOfActions);
         msgString = "{" + progressString + "}Radiosity: Phase 1/3 - Preparing target scene...";
         StatusMsg(msgString);
-        pRLTarget.writeln(pRLSource.read());
+        ::writeBuffer[i] = ::readBuffer[i];
     }
 
     for (i = 1; i <= size(pRLArray); i++)
@@ -1276,27 +1265,25 @@ prepareRadiosityLines_11: radFileName
         pRLString = pRLArray[i];
         pRLString_a = parse(" ", pRLString);
         pRLString_t = pRLString_a[1];
-        pRLSLine = getPartialLine(0,0,pRLString_t,radFileName);
+        pRLSLine = getPartialLine(0,0,pRLString_t);
         if(pRLSLine != nil)
         {
-            pRLSource.line(pRLSLine);
-            pRLString = pRLSource.read();
+            pRLString = ::readBuffer[pRLSLine];
         }
-        pRLTarget.writeln(pRLString);
+        ::writeBuffer[size(::writeBuffer) + 1] = pRLString;
     }
 
-    pRLSource.line(pRL11EndLine);
-    while(!pRLSource.eof())
+    i = pRL11EndLine;
+    while(i <= size(::readBuffer))
     {
-        progressString = string((pRLSource.line() + size(pRLArray)) / totalNumberOfActions);
+        progressString = string((i + size(pRLArray)) / totalNumberOfActions);
         msgString = "{" + progressString + "}Radiosity: Phase 3/3 - Finishing target scene...";
         StatusMsg(msgString);
-        pRLTarget.writeln(pRLSource.read());
+        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[i];
+        i++;
     }
-    pRLTarget.close();
-    pRLSource.close();
-    filecopy(tempFilePRL, radFileName);
-    filedelete(tempFilePRL);
+    ::readBuffer = ::writeBuffer;
+    ::writeBuffer = nil;
 }
 
 radFlags

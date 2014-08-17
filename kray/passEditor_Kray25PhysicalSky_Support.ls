@@ -13,7 +13,7 @@ scnGen_kray25_physky
 	// Kray, happily, has all of its settings in the scene file so all we need to do now is to find the header line and then use hard-coded offsets to the data we care about. There are no line markers, so hard-coding is the only option.
 	// It's bloating this code somewhat, but for flexibility, we'll abstract our line references with variables to make this maintainable in future.
 
-	kray_physsky_PluginHeaderLine = getMasterPluginLine("KrayPhySky", ::updatedCurrentScenePath); // Should pick up MasterHandler for Kray
+	kray_physsky_PluginHeaderLine = getMasterPluginLine("KrayPhySky"); // Should pick up MasterHandler for Kray
 
 	// Startup checks to ensure we're working against a known quantity.
     if (kray_physsky_PluginHeaderLine == nil)
@@ -23,12 +23,12 @@ scnGen_kray25_physky
 		kray_physsky_sectionTag = default_kray_physky_sectionTag;
 	} else {
 		searchString = "Plugin MasterHandler";
-		input = File(::updatedCurrentScenePath, "r");
-		input.line(kray_physsky_PluginHeaderLine + 3); // offset for the plugin header, the LSC script reference and the Kray encapsulator
-		kray_physsky_pluginBuild = input.readInt();
-		kray_physsky_sectionTag = input.readInt();
-		input.close();
-		kray_physsky_PluginEndLine = getPartialLine(kray_physsky_PluginHeaderLine,0,"EndPlugin",::updatedCurrentScenePath);
+		readIndex = kray_physsky_PluginHeaderLine + 3; // offset for the plugin header, the LSC script reference and the Kray encapsulator
+		kray_physsky_pluginBuild = int(::readBuffer[readIndex]);
+		readIndex++;
+		kray_physsky_sectionTag = int(::readBuffer[readIndex]);
+		readIndex++;
+		kray_physsky_PluginEndLine = getPartialLine(kray_physsky_PluginHeaderLine,0,"EndPlugin");
 		// Check known version of Kray in case of mismatch
 		if((kray_physsky_pluginBuild != default_kray_physky_pluginBuild) || (kray_physsky_sectionTag != default_kray_physky_sectionTag))
 		{
@@ -46,44 +46,34 @@ scnGen_kray25_physky
 	// krayLineNumber = kray_physsky_pluginBuild;
 	settingIndex = 2;
 
-	krayTempPath = ::tempDirectory + getsep() + "passEditorTempSceneKray.lws";
-	::krayfile = File(krayTempPath, "w");
-	sourceFile = File(::updatedCurrentScenePath, "r");
 	if (kray_physsky_PluginHeaderLine != nil)
 	{
-		copyLineNumber = 1;
-		while(copyLineNumber <= kray_physsky_PluginHeaderLine)
+		readIndex = 1;
+		while(readIndex <= kray_physsky_PluginHeaderLine)
 		{
-			::krayfile.writeln(sourceFile.read());
-			copyLineNumber++;
+			::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+			readIndex++;
 		}
 	} else {
-		masterHandlerCounter = 0;
-		mHLine = 0;
-		while(mHLine != nil)
-		{
-			if(masterHandlerCounter > 0)
-			{
-				mHLine_Prev = mHLine;
-			}
-			mHLine = getPartialLine(mHLine, 0, "MasterHandler", ::updatedCurrentScenePath);
-			masterHandlerCounter++;
-		}
-		if(masterHandlerCounter == 0)
-		{
-			mHStartLine = getPartialLine(0, 0, "ChangeScene", ::updatedCurrentScenePath);
-		} else {
-			mHStartLine = mHLine_Prev;
-		}
+        mHStartLine = getPartialLine_last(0, 0, "MasterHandler");
+        if(mHStartLine != nil)
+        {
+            tempArray = parse(" ", mHStartLine);
+            masterHandlerCounter = int(tempArray[3]);
+            mHStartLine = getPartialLine(mHStartLine,0, "EndPlugin");
+        } else {
+            masterHandlerCounter = 0;
+            mHStartLine = getPartialLine(0, 0, "ChangeScene");
+        }
 
-		copyLineNumber = 1;
-		while(copyLineNumber <= mHStartLine)
+		readIndex = 1;
+		while(readIndex <= mHStartLine)
 		{
-			::krayfile.writeln(sourceFile.read());
-			copyLineNumber++;
+			::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+			readIndex++;
 		}
-		::krayfile.writeln("Plugin MasterHandler " + string(masterHandlerCounter + 1) + " KrayPhySky");
-		::krayfile.writeln("Script " + SCRIPTID.asStr());
+		::writeBuffer[size(::writeBuffer) + 1] = "Plugin MasterHandler " + string(masterHandlerCounter + 1) + " KrayPhySky";
+		::writeBuffer[size(::writeBuffer) + 1] = "Script " + SCRIPTID.asStr();
 	}
 
 	::kray25_PhySky_settings = scnGen_kray25_PhySky_settings();
@@ -92,93 +82,88 @@ scnGen_kray25_physky
 
 	if (kray_physsky_PluginHeaderLine != nil)
 	{
-		sourceFile.line(kray_physsky_PluginEndLine);
+		readIndex = kray_physsky_PluginEndLine;
 	} else {
-		::krayfile.writeln("EndPlugin");
+		::writeBuffer[size(::writeBuffer) + 1] = "EndPlugin";
 	}
-	while(!sourceFile.eof())
+	while(readIndex <= size(::readBuffer))
 	{
-		::krayfile.writeln(sourceFile.read());
+		::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+		readIndex++;
 	}
-
-	::krayfile.close();
-	sourceFile.close();
-	filecopy(krayTempPath,::newScenePath);
-	filecopy(krayTempPath,::updatedCurrentScenePath); // avoid getting our source file clobbered in a later function.
-	filedelete(krayTempPath);
 }
 
 scnGen_kray25_physky_general
 {
 
-	::krayfile.writeln(kray25_PhySky_default_version);    // version number
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_default_version;    // version number
 
     /* ::kray25_PhySky_settings = @kray25_PhySky_pluginTagString, string(kray25_PhySky_v_onFlag), string(kray25_PhySky_v_city_preset), string(kray25_PhySky_v_hour), string(kray25_PhySky_v_minute), string(kray25_PhySky_v_second), string(kray25_PhySky_v_day), string(kray25_PhySky_v_month), string(kray25_PhySky_v_year), string(kray25_PhySky_v_longitude), string(kray25_PhySky_v_north), string(kray25_PhySky_v_lattitude), string(kray25_PhySky_v_time_zone), string(kray25_PhySky_v_turbidity), string(kray25_PhySky_v_exposure), string(kray25_PhySky_v_volumetric), string(kray25_PhySky_v_ignore), string(kray25_PhySky_skyON), string(kray25_PhySky_sunON), string(kray25_PhySky_v_SunIntensity), string(kray25_PhySky_v_SunShadow), string(kray25_PhySky_v_sunpower)@;
     */
 
-	::krayfile.writeln(int,117);
+	::writeBuffer[size(::writeBuffer) + 1] = 117;
 	kray25_PhySky_v_north = ::kray25_PhySky_settings[11];
-	::krayfile.writeln(kray25_PhySky_v_north);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_north;
 	kray25_PhySky_v_second = ::kray25_PhySky_settings[6];
-	::krayfile.writeln(int,kray25_PhySky_v_second);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_second;
 	kray25_PhySky_v_minute = ::kray25_PhySky_settings[5];
-	::krayfile.writeln(int,kray25_PhySky_v_minute);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_minute;
 	kray25_PhySky_v_hour = ::kray25_PhySky_settings[4];
-	::krayfile.writeln(int,kray25_PhySky_v_hour);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_hour;
 	kray25_PhySky_v_day = ::kray25_PhySky_settings[7];
-	::krayfile.writeln(int,kray25_PhySky_v_day);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_day;
 	kray25_PhySky_v_month = ::kray25_PhySky_settings[8];
-	::krayfile.writeln(int,kray25_PhySky_v_month);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_month;
 	kray25_PhySky_v_year = ::kray25_PhySky_settings[9];
-	::krayfile.writeln(int,kray25_PhySky_v_year);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_year;
 	kray25_PhySky_v_lattitude = ::kray25_PhySky_settings[12];
-	::krayfile.writeln(kray25_PhySky_v_lattitude);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_lattitude;
 	kray25_PhySky_v_longitude = ::kray25_PhySky_settings[10];
-	::krayfile.writeln(kray25_PhySky_v_longitude);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_longitude;
 	kray25_PhySky_v_time_zone = ::kray25_PhySky_settings[13];
-	::krayfile.writeln(kray25_PhySky_v_time_zone);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_time_zone;
 	kray25_PhySky_v_turbidity = ::kray25_PhySky_settings[14];
-	::krayfile.writeln(kray25_PhySky_v_turbidity);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_turbidity;
 	kray25_PhySky_v_exposure = ::kray25_PhySky_settings[15];
-	::krayfile.writeln(kray25_PhySky_v_exposure);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_exposure;
 	
 	kray25_PhySky_v_ignore = ::kray25_PhySky_settings[17];
 	if (kray25_PhySky_v_ignore != nil)
 	{
-		::krayfile.writeln(kray25_PhySky_v_ignore.id); // FIXME: probably broken here in PPRN.
+		::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_ignore.id; // FIXME: probably broken here in PPRN.
 	} else {
-		::krayfile.writeln(0);
+		::writeBuffer[size(::writeBuffer) + 1] = 0;
 	}
 
 	kray25_PhySky_v_volumetric = ::kray25_PhySky_settings[16];
-	::krayfile.writeln(kray25_PhySky_v_volumetric);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_volumetric;
 	kray25_PhySky_skyON = ::kray25_PhySky_settings[18];
-	::krayfile.writeln(kray25_PhySky_skyON);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_skyON;
 	kray25_PhySky_sunON = ::kray25_PhySky_settings[19];
-	::krayfile.writeln(kray25_PhySky_sunON);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_sunON;
 	kray25_PhySky_v_city_preset = ::kray25_PhySky_settings[3];
-	::krayfile.writeln(int,kray25_PhySky_v_city_preset);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_city_preset;
 	
-	::krayfile.writeln(int,201);
+	::writeBuffer[size(::writeBuffer) + 1] = 201;
 	kray25_PhySky_v_onFlag = ::kray25_PhySky_settings[2];
-	::krayfile.writeln(bool,kray25_PhySky_v_onFlag);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_onFlag;
 	
-	::krayfile.writeln(int,302);	
+	::writeBuffer[size(::writeBuffer) + 1] = 302;
 	kray25_PhySky_v_SunIntensity = ::kray25_PhySky_settings[20];
-	::krayfile.writeln(kray25_PhySky_v_SunIntensity);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_SunIntensity;
 	kray25_PhySky_v_SunShadow = ::kray25_PhySky_settings[21];
-	::krayfile.writeln(kray25_PhySky_v_SunShadow);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_SunShadow;
 	
 	// These are hard-coded values in the globals; not sure if they are ever user-adjustable. Might be legacy.
-	::krayfile.writeln(int,402);
-	::krayfile.writeln(kray25_PhySky_sunarea_min);
-	::krayfile.writeln(kray25_PhySky_sunarea_max);
+	::writeBuffer[size(::writeBuffer) + 1] = 402;
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_sunarea_min;
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_sunarea_max;
 	
-	::krayfile.writeln(int,501);
+	::writeBuffer[size(::writeBuffer) + 1] = 501;
 	kray25_PhySky_v_sunpower = ::kray25_PhySky_settings[22];
-	::krayfile.writeln(kray25_PhySky_v_sunpower);
+	::writeBuffer[size(::writeBuffer) + 1] = kray25_PhySky_v_sunpower;
 	
-	::krayfile.writeln(int,0);  // end hunk
+	::writeBuffer[size(::writeBuffer) + 1] = 0;  // end hunk
 }
 
 scnGen_kray25_physky_script
@@ -231,54 +216,54 @@ scnGen_kray25_physky_script
 		// and script for Kray
 		// will be executed after header commands (-1000) and scene load (0), but before tailer commands (1000)
 
-		::krayfile.writeln("KrayScriptLWSInlined 100;");
-		::krayfile.writeln("onevent framesetup;");
-		::krayfile.writeln("var time_of_day,"+kray25_PhySky_v_hour+"+("+kray25_PhySky_v_minute+"/60)+("+kray25_PhySky_v_second+"/3600);");
-		::krayfile.writeln("var day_of_year,floor("+kray25_PhySky_v_day+"+30.5*("+kray25_PhySky_v_month+"-1));");
-		::krayfile.writeln("hpbaxes sky_axes,"+kray25_PhySky_v_north+"+90,-180,0;");
-		::krayfile.writeln("physkysundir sun_direction,"+kray25_PhySky_v_lattitude+","+kray25_PhySky_v_longitude+",day_of_year,time_of_day,"+kray25_PhySky_v_time_zone+";");
+		::writeBuffer[size(::writeBuffer) + 1] = "KrayScriptLWSInlined 100;";
+		::writeBuffer[size(::writeBuffer) + 1] = "onevent framesetup;";
+		::writeBuffer[size(::writeBuffer) + 1] = "var time_of_day,"+kray25_PhySky_v_hour+"+("+kray25_PhySky_v_minute+"/60)+("+kray25_PhySky_v_second+"/3600);";
+		::writeBuffer[size(::writeBuffer) + 1] = "var day_of_year,floor("+kray25_PhySky_v_day+"+30.5*("+kray25_PhySky_v_month+"-1));";
+		::writeBuffer[size(::writeBuffer) + 1] = "hpbaxes sky_axes,"+kray25_PhySky_v_north+"+90,-180,0;";
+		::writeBuffer[size(::writeBuffer) + 1] = "physkysundir sun_direction,"+kray25_PhySky_v_lattitude+","+kray25_PhySky_v_longitude+",day_of_year,time_of_day,"+kray25_PhySky_v_time_zone+";";
 		// reverse west and east
-		::krayfile.writeln("axes rev_east_west_axes,(1,0,0),(0,1,0),(0,0,-1);");
-		::krayfile.writeln("vecaxismult sun_direction,rev_east_west_axes;");
-		::krayfile.writeln("vecaxisdiv sun_direction,sky_axes;");
-		::krayfile.writeln("physky mysky,sun_direction,"+kray25_PhySky_v_turbidity+","+kray25_PhySky_v_exposure+",sky_axes;");
-		::krayfile.writeln("physkyparam mysky,sunintensity,"+kray25_PhySky_v_SunIntensity+";");
-		::krayfile.writeln("physkyparam mysky,sunspotangle,"+kray25_PhySky_v_SunShadow+";");
-		::krayfile.writeln("echo '*** Kray physical sky applied ***';");
+		::writeBuffer[size(::writeBuffer) + 1] = "axes rev_east_west_axes,(1,0,0),(0,1,0),(0,0,-1);";
+		::writeBuffer[size(::writeBuffer) + 1] = "vecaxismult sun_direction,rev_east_west_axes;";
+		::writeBuffer[size(::writeBuffer) + 1] = "vecaxisdiv sun_direction,sky_axes;";
+		::writeBuffer[size(::writeBuffer) + 1] = "physky mysky,sun_direction,"+kray25_PhySky_v_turbidity+","+kray25_PhySky_v_exposure+",sky_axes;";
+		::writeBuffer[size(::writeBuffer) + 1] = "physkyparam mysky,sunintensity,"+kray25_PhySky_v_SunIntensity+";";
+		::writeBuffer[size(::writeBuffer) + 1] = "physkyparam mysky,sunspotangle,"+kray25_PhySky_v_SunShadow+";";
+		::writeBuffer[size(::writeBuffer) + 1] = "echo '*** Kray physical sky applied ***';";
 		
 		if (kray25_PhySky_skyON)
 		{
-			::krayfile.writeln("background physky,mysky;");
-			::krayfile.writeln("echo '*** Applying Physical Sky Backdrop ***';");		
+			::writeBuffer[size(::writeBuffer) + 1] = "background physky,mysky;";
+			::writeBuffer[size(::writeBuffer) + 1] = "echo '*** Applying Physical Sky Backdrop ***';";		
 		}
 		switch(kray25_PhySky_v_volumetric)
 		{
 		case 1:
-			::krayfile.writeln("echo '*** No Volumetrics Applied ***';");
+			::writeBuffer[size(::writeBuffer) + 1] = "echo '*** No Volumetrics Applied ***';";
 			break;
 		case 2:
-			::krayfile.writeln("environment physky,mysky,8;");
-			::krayfile.writeln("echo '*** Applying Physical Sky Volumetrics to backdrop ***';");
+			::writeBuffer[size(::writeBuffer) + 1] = "environment physky,mysky,8;";
+			::writeBuffer[size(::writeBuffer) + 1] = "echo '*** Applying Physical Sky Volumetrics to backdrop ***';";
 			break;
 		case 3:
-			::krayfile.writeln("environment physky,mysky,4;");
-			::krayfile.writeln("echo '*** Applying Physical Sky Volumetrics to shadows ***';");					
+			::writeBuffer[size(::writeBuffer) + 1] = "environment physky,mysky,4;";
+			::writeBuffer[size(::writeBuffer) + 1] = "echo '*** Applying Physical Sky Volumetrics to shadows ***';";
 			break;					
 		case 4:
-			::krayfile.writeln("environment physky,mysky,2;");
-			::krayfile.writeln("echo '*** Applying Physical Sky Volumetrics to FG ***';");					
+			::writeBuffer[size(::writeBuffer) + 1] = "environment physky,mysky,2;";
+			::writeBuffer[size(::writeBuffer) + 1] = "echo '*** Applying Physical Sky Volumetrics to FG ***';";
 			break;
 		}
-		::krayfile.writeln("echo '*** Time: "+kray25_PhySky_v_hour+" h "+kray25_PhySky_v_minute+" min "+kray25_PhySky_v_second+" sec, Month: "+kray25_PhySky_v_month+" Day: "+kray25_PhySky_v_day+" Year: "+kray25_PhySky_v_year+" Timezone: "+kray25_PhySky_v_time_zone+" ***';");
-		::krayfile.writeln("echo '*** Lattitude: "+kray25_PhySky_v_lattitude+" Longitude: "+kray25_PhySky_v_longitude+" North direction: "+kray25_PhySky_v_north+" ***';");
-		::krayfile.writeln("echo '*** Turbidity: "+kray25_PhySky_v_turbidity+" Exposure: "+kray25_PhySky_v_exposure+" ***';");
+		::writeBuffer[size(::writeBuffer) + 1] = "echo '*** Time: "+kray25_PhySky_v_hour+" h "+kray25_PhySky_v_minute+" min "+kray25_PhySky_v_second+" sec, Month: "+kray25_PhySky_v_month+" Day: "+kray25_PhySky_v_day+" Year: "+kray25_PhySky_v_year+" Timezone: "+kray25_PhySky_v_time_zone+" ***';";
+		::writeBuffer[size(::writeBuffer) + 1] = "echo '*** Lattitude: "+kray25_PhySky_v_lattitude+" Longitude: "+kray25_PhySky_v_longitude+" North direction: "+kray25_PhySky_v_north+" ***';";
+		::writeBuffer[size(::writeBuffer) + 1] = "echo '*** Turbidity: "+kray25_PhySky_v_turbidity+" Exposure: "+kray25_PhySky_v_exposure+" ***';";
 
 		lcmd="light ";
 		lightname="mysun";
 		if(kray25_PhySky_v_ignore)
 		{
-			::krayfile.writeln("ignorelwitemid "+hex(kray25_PhySky_v_ignore.id)+";");
-			::krayfile.writeln("echo '*** Ignoring Light: "+hex(kray25_PhySky_v_ignore.id)+" ***';");
+			::writeBuffer[size(::writeBuffer) + 1] = "ignorelwitemid "+hex(kray25_PhySky_v_ignore.id)+";";
+			::writeBuffer[size(::writeBuffer) + 1] = "echo '*** Ignoring Light: "+hex(kray25_PhySky_v_ignore.id)+" ***';";
 
 			SelectedLight = hex(kray25_PhySky_v_ignore.id);
 			lcmd="replacelwlight "+SelectedLight+",";
@@ -291,12 +276,12 @@ scnGen_kray25_physky_script
 		}
 		if (kray25_PhySky_sunON)
 		{
-			::krayfile.writeln(lcmd+"physky,mysky,adaptive,10000000,0.002,"+kray25_PhySky_sunarea_min+","+kray25_PhySky_sunarea_max+";");
-			::krayfile.writeln("lightphotonmultiplier "+lightname+",1,"+kray25_PhySky_v_sunpower+";");
+			::writeBuffer[size(::writeBuffer) + 1] = lcmd+"physky,mysky,adaptive,10000000,0.002,"+kray25_PhySky_sunarea_min+","+kray25_PhySky_sunarea_max+";";
+			::writeBuffer[size(::writeBuffer) + 1] = "lightphotonmultiplier "+lightname+",1,"+kray25_PhySky_v_sunpower+";";
 		}
-		::krayfile.writeln("end;");
+		::writeBuffer[size(::writeBuffer) + 1] = "end;";
 		// end of our script
-		::krayfile.writeln("end;");
+		::writeBuffer[size(::writeBuffer) + 1] = "end;";
 	}
 }
 

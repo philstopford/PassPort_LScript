@@ -1,36 +1,30 @@
-getPassEditorStartLine: inputPath
+getPassEditorStartLine
 {
-	gpesl_input = File(inputPath, "r");
 	toReturn = nil;
-
-	while (!gpesl_input.eof())
+	for (i = 1; i <= size(::readBuffer); i++)
 	{
-		lineArray = parse(" ", gpesl_input.read());
+		lineArray = parse(" ", ::readBuffer[i]);
 		if(size(lineArray) >= 4)
 		{
 			if(lineArray[2] == "MasterHandler" && lineArray[4] == "PassPort_MC")
 			{
-				toReturn = gpesl_input.line() - 1;
+				toReturn = i;
 				break;
 			}
 		}
 	}
-	gpesl_input.close();
 	return(toReturn);
 }
 
-getFFxItems: inputPath, startLine // unusual caller requirement, but there's a single call-site and this is specialized.
+getFFxItems: startLine
 {
-	gffxi_input = File(inputPath, "r");
-	gffxi_input.line(startLine);
 	ffxItemArray = @""@;
 	ffxItemArrayIndex = 1;
 	foundFFXBlock = 0;
 
-	while(!gffxi_input.eof())
+	for(i = startLine; i <= size(::readBuffer); i++)
 	{
-		line = gffxi_input.read();
-		lineArray = parse(" ",line);
+		lineArray = parse(" ", ::readBuffer[i]);
 		if((size(lineArray) == 4) && (lineArray[1] == "Plugin") && (lineArray[2] == "PixelFilterHandler") && (lineArray[4] == "FiberFilter"))
 		{
 			foundFFXBlock = 1;
@@ -51,7 +45,6 @@ getFFxItems: inputPath, startLine // unusual caller requirement, but there's a s
 			}
 		}
 	}
-	gffxi_input.close();
 	if (ffxItemArrayIndex == 1) // we found no item IDs within the specified lines.
 	{
 		return nil;
@@ -60,7 +53,7 @@ getFFxItems: inputPath, startLine // unusual caller requirement, but there's a s
 	}
 }
 
-getRelativityLines: mode, objID, objGenus, inputPath
+getRelativityLines: mode, objID, objGenus
 {
 	if(mode == "Motion")
 	{
@@ -77,15 +70,14 @@ getRelativityLines: mode, objID, objGenus, inputPath
 	{
 		logger("error","getRelativityLine: mode " + mode.asStr() + " not recognized");
 	}
-	relStartLine = getEntityStartLine(objID,inputPath);
-	relEndLine = getEntityEndLine(relStartLine+ 1, objID, inputPath);
-	relFile = File(inputPath, "r");
-	relFile.line(relStartLine);
+	relStartLine = getEntityStartLine(objID);
+	relEndLine = getEntityEndLine(relStartLine + 1, objID);
+
 	relLineArray = nil;
 	relLineArrayCounter = 0;
-	for (line = relStartLine; line <= relEndLine; line++)
+	for (i = relStartLine; i <= relEndLine; i++)
 	{
-		relLine = relFile.read();
+		relLine = ::readBuffer[i];
 		if(strleft(relLine, size(searchLinePrefix)) == searchLinePrefix)
 		{
 			matchFound = 0;
@@ -102,54 +94,52 @@ getRelativityLines: mode, objID, objGenus, inputPath
 			{
 				// We found a Relativity instance!
 				relLineArrayCounter++;
-				relLineArray[relLineArrayCounter] = relFile.line() - 1; // since the read() moved the line forward.
+				relLineArray[relLineArrayCounter] = i;
 				relLineArrayCounter++; // now to store the end line
-				relLineArray[relLineArrayCounter] = getPartialLine(relFile.line(), 0, searchEndLine, inputPath);
+				relLineArray[relLineArrayCounter] = getPartialLine(i, 0, searchEndLine);
 			}
 		}
 	}
 	return relLineArray;
 }
 
-getPixelFilterLine: pixelFilterString, inputPath
+getPixelFilterLine: pixelFilterString
 {
-	gpf_input = File(inputPath, "r");
 	toReturn = nil;
-	while (!gpf_input.eof())
+	for (i = 1; i <= size(::readBuffer); i++)
 	{
-		lineArray = parse(" ", gpf_input.read());
+		lineArray = parse(" ", ::readBuffer[i]);
 		if (size(lineArray) >= 4)
 		{
 			if((lineArray[1] == "Plugin") && (lineArray[2] == "PixelFilterHandler") && (lineArray[4] == pixelFilterString))
 			{
-				toReturn = gpf_input.line() - 1;
+				toReturn = i;
+				break;
 			}
 		}
 	}
-	gpf_input.close();
 	return toReturn;
 }
 
-getVolumetricHandlerLine: volumetricHandlerString, inputPath
+getVolumetricHandlerLine: volumetricHandlerString
 {
-	gvl_input = File(inputPath, "r");
 	toReturn = nil;
-	while (!gvl_input.eof())
+	for (i = 1; i <= size(::readBuffer); i++)
 	{
-		lineArray = parse(" ", gvl_input.read());
+		lineArray = parse(" ", ::readBuffer[i]);
 		if (size(lineArray) >= 4)
 		{
 			if((lineArray[1] == "Plugin") && (lineArray[2] == "VolumetricHandler") && (lineArray[4] == volumetricHandlerString))
 			{
-				toReturn = gvl_input.line() - 1;
+				toReturn = i;
+				break;
 			}
 		}
 	}
-	gvl_input.close();
 	return toReturn;
 }
 
-getEntityStartLine: objID, inputPath
+getEntityStartLine: objID
 {
 	entityGenus = int(strleft(string(objID),1));
 	toReturn = 0;
@@ -170,27 +160,25 @@ getEntityStartLine: objID, inputPath
 		startMarkerStringArray = @"AddCamera"@;
 	}
 
-	gesl_input = File(inputPath, "r");
-
-	while(!gesl_input.eof())
+	for(i = 1; i <= size(::readBuffer); i++)
 	{
-		gesl_lineArray = parse(" ", gesl_input.read());
-		if (size(gesl_lineArray) >= 2)
+		lineArray = parse(" ", ::readBuffer[i]);
+		if (size(lineArray) >= 2)
 		{
 			for (sms_counter = 1; sms_counter <= size(startMarkerStringArray); sms_counter++)
 			{
-				if(gesl_lineArray[1] == startMarkerStringArray[sms_counter])
+				if(lineArray[1] == startMarkerStringArray[sms_counter])
 				{
 					if((entityGenus == 1) && (sms_counter == 1))
 					{
 						// Need to special case this handling due to the layer reference in 'LoadObjectLayer'
-						gesl_ArrayIndex = 3;
+						arrayIndex = 3;
 					} else {
-						gesl_ArrayIndex = 2;
+						arrayIndex = 2;
 					}
-					if (gesl_lineArray[gesl_ArrayIndex] == string(objID))
+					if (lineArray[arrayIndex] == string(objID))
 					{
-						toReturn = gesl_input.line() - 1; // decrement for read event.
+						toReturn = i;
 						break;
 					}
 				}
@@ -201,15 +189,14 @@ getEntityStartLine: objID, inputPath
 			break;
 		}
 	}
-	gesl_input.close();
 	if(toReturn == 0)
 	{
-		logger("error", "getEntityStartLine: failed to find start line for entity ID: " + objID.asStr() + " in " + inputPath);
+		logger("error", "getEntityStartLine: failed to find start line for entity ID: " + objID.asStr() + " in array");
 	}
 	return(toReturn);
 }
 
-getEntityEndLine: startLine,objID,inputPath
+getEntityEndLine: startLine,objID
 {
 	entityGenus = int(strleft(string(objID),1));
 	toReturn = 0;
@@ -219,7 +206,7 @@ getEntityEndLine: startLine,objID,inputPath
 	}
 	if(startLine == 0 || startLine == nil)
 	{
-		startLine = getEntityStartLine(objID,inputPath);
+		startLine = getEntityStartLine(objID);
 		startLine += 1;
 	}
 	if (entityGenus == 1)
@@ -235,19 +222,16 @@ getEntityEndLine: startLine,objID,inputPath
 		endMarkerStringArray = @"AddCamera","Antialiasing"@;
 	}
 
-	geel_input = File(inputPath, "r");
-	geel_input.line(startLine);
-
-	while(!geel_input.eof())
+	for(i = startLine; i <= size(::readBuffer); i++)
 	{
-		geel_lineArray = parse(" ", geel_input.read());
-		if(sizeof(geel_lineArray) >= 2)
+		lineArray = parse(" ", ::readBuffer[i]);
+		if(sizeof(lineArray) >= 2)
 		{
 			for (ems_counter = 1; ems_counter <= size(endMarkerStringArray); ems_counter++)
 			{
-				if(geel_lineArray[1] == endMarkerStringArray[ems_counter])
+				if(lineArray[1] == endMarkerStringArray[ems_counter])
 				{
-					toReturn = geel_input.line() - 1; // decrement for read event.
+					toReturn = i;
 					break;
 				}
 			}
@@ -269,15 +253,14 @@ getEntityEndLine: startLine,objID,inputPath
 			break;
 		}
 	}
-	geel_input.close();
 	if(toReturn == 0)
 	{
-		logger("error", "getEntityEndLine: failed to find end line for entity ID: " + objID.asStr() + " starting from line " + startLine.asStr() + " in " + inputPath);
+		logger("error", "getEntityEndLine: failed to find end line for entity ID: " + objID.asStr() + " starting from line " + startLine.asStr() + " in array");
 	}
 	return(toReturn);
 }
 
-getPartialLine: currentLine, endLine, searchString, inputPath
+getPartialLineFromFile: currentLine, endLine, searchString, inputPath
 {
 	gpl_input = File(inputPath, "r");
 
@@ -327,21 +310,95 @@ getPartialLine: currentLine, endLine, searchString, inputPath
 	return(toReturn);
 }
 
-readSpecificLine: lineToRead, inputPath
+getPartialLine: currentLine, endLine, searchString
 {
-	rsl_input = File(inputPath, "r");
-	endLine = rsl_input.linecount();
-	toReturn = "";
-	if(lineToRead <= endLine)
+	searchLine[1] = searchString;
+	searchStringSize = sizeof(searchLine[1]);
+	if(currentLine == 0 || currentLine == nil)
 	{
-		rsl_input.line(lineToRead);
-		toReturn = rsl_input.read();
+		currentLine = 1;
 	}
-	rsl_input.close();
+	if(endLine == 0)
+	{
+		endLine = size(::readBuffer);
+	}
+	toReturn = nil;
+	while(currentLine != endLine)
+	{
+		line = ::readBuffer[currentLine];
+		if(line)
+		{
+			if(size(line) >= searchStringSize)
+			{
+				linePart = strleft(line,searchStringSize);
+				if(linePart == searchString)
+				{
+					if(currentLine == 0)
+					{
+						toReturn = nil;
+						break;
+					}
+					else
+					{
+						toReturn = currentLine;
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			toReturn = nil;
+			break;
+		}
+		currentLine++;
+	}
 	return(toReturn);
 }
 
-getMasterPluginLine: masterPluginString, searchPath
+getPartialLine_last: currentLine, endLine, searchString
+{
+	searchLine[1] = searchString;
+	searchStringSize = sizeof(searchLine[1]);
+	if(currentLine == 0)
+	{
+		currentLine = 1;
+	}
+	if(endLine == 0)
+	{
+		endLine = size(::readBuffer);
+	}
+	toReturn = nil;
+	while(currentLine != endLine)
+	{
+		line = ::readBuffer[endLine];
+		if(line)
+		{
+			if(size(line) >= searchStringSize)
+			{
+				linePart = strleft(line,searchStringSize);
+				if(linePart == searchString)
+				{
+					toReturn = endLine;
+					break;
+				}
+			}
+		}
+		endLine--;
+	}
+	return(toReturn);
+}
+
+readSpecificLine: lineToRead
+{
+	if (lineToRead > size(::readBuffer))
+	{
+		logger("error","readSpecificLine: tried to read a line beyond the array itself");
+	}
+	return(::readBuffer[lineToRead]);
+}
+
+getMasterPluginLine: masterPluginString
 {
 	// Let's get organized
 	prefixMPStr = "Plugin MasterHandler";
@@ -351,10 +408,10 @@ getMasterPluginLine: masterPluginString, searchPath
 
 	while(mPOK != nil)
 	{
-		mPStartLine = getPartialLine(mPStartLine,0,prefixMPStr, searchPath);
+		mPStartLine = getPartialLine(mPStartLine,0,prefixMPStr);
 		if(mPStartLine)
 		{
-			mPLine = readSpecificLine(mPStartLine, searchPath);
+			mPLine = readSpecificLine(mPStartLine);
 			mPLineArray = parse(" ", mPLine);
 			if (mPLineArray[4] == masterPluginString)
 			{
@@ -370,15 +427,15 @@ getMasterPluginLine: masterPluginString, searchPath
 	return nil;
 }
 
-getRendererPluginLine: rendererString, searchPath
+getRendererPluginLine: rendererString
 {
 	prefixRPStr = "Plugin ExtRendererHandler";
-	rPLine = getPartialLine(0,0,prefixRPStr, searchPath);
+	rPLine = getPartialLine(0,0,prefixRPStr);
 	if(rendererString != "any")
 	{
 		return rPLine;
 	} else {
-		rPStr = readSpecificLine(rPLine, searchPath);
+		rPStr = readSpecificLine(rPLine);
 		rPStrArray = parse(" ", rPLine);
 		if(rPStrArray[4] == rendererString)
 		{
@@ -463,17 +520,16 @@ extractRelativityItems: relString
 	return relItemArray;
 }
 
-getHyperVoxels3Items: inputPath, startLine
+getHyperVoxels3Items: startLine
 {
-	ghvi_input = File(inputPath, "r");
-	ghvi_input.line(startLine);
 	hv3ItemArray = @""@;
 	hv3ItemArrayIndex = 1;
 	foundHV3Block = 0;
+	i = startLine;
 
-	while(!ghvi_input.eof())
+	while(i <= startLine)
 	{
-		line = ghvi_input.read();
+		line = ::readBuffer[i];
 		lineArray = parse(" ",line);
 		if((size(lineArray) == 4) && (lineArray[1] == "Plugin") && (lineArray[2] == "VolumetricHandler") && (lineArray[4] == "HyperVoxelsFilter"))
 		{
@@ -483,10 +539,12 @@ getHyperVoxels3Items: inputPath, startLine
 		{
 			if(line == "  { HVObject")
 			{
-				line = ghvi_input.read();
+				i++;
+				line = ::readBuffer[i];
 				if(line == "    { HVLink")
 				{
-					line = ghvi_input.read(); // should now get ID. Unfortunately, it's quoted and prefixed by 6 spaces. We'll take care of that.
+					i++;
+					line = ::readBuffer[i]; // should now get ID. Unfortunately, it's quoted and prefixed by 6 spaces. We'll take care of that.
 					hv3ItemArray[hv3ItemArrayIndex] = int(unquoteString(strright(line,size(line) - 6)));
 					hv3ItemArrayIndex++;
 				}
@@ -496,8 +554,8 @@ getHyperVoxels3Items: inputPath, startLine
 				break; // hit the end of the HV3 block.
 			}
 		}
+		i++;
 	}
-	ghvi_input.close();
 	if (hv3ItemArrayIndex == 1) // we found no item IDs within the specified lines.
 	{
 		return nil;

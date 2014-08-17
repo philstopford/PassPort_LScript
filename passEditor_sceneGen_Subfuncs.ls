@@ -24,10 +24,9 @@ generatePassFile: mode, gPass
     chdir(::tempDirectory);
     SaveSceneCopy("passEditorTempSceneCopy.lws");
     ::currentScenePath = ::tempDirectory + getsep() + "passEditorTempSceneCopy.lws";
-
+    prepareReadBuffer(::tempDirectory + getsep() + "passEditorTempSceneCopy.lws");
      // Insert missing radiosity lines in the file passed in.
-    radLines_native(::currentScenePath);
-
+    radLines_native();
     chdir(contentDirectory);
 
     // get the item start and stop lines for copying. We also use the setItems array later for dep checking.
@@ -500,18 +499,18 @@ generatePassFile: mode, gPass
         
         if(strleft(string(::displayOldIDs[tempNumber]),1) == string(MESH))
         {
-            ::objStart[::passItem] = getEntityStartLine(::displayOldIDs[tempNumber],::currentScenePath);
-            ::objEnd[::passItem] = getEntityEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber],::currentScenePath);
-            ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels",::currentScenePath);
+            ::objStart[::passItem] = getEntityStartLine(::displayOldIDs[tempNumber]);
+            ::objEnd[::passItem] = getEntityEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber]);
+            ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels");
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
             // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
             // We use parse to split the line by spaces, the second is assumed to be the number of channels. We cast that to an integer.
-            noc_Array = parse(" ",readSpecificLine(::objMotStart[::passItem],::currentScenePath));
+            noc_Array = parse(" ",readSpecificLine(::objMotStart[::passItem]));
             numberOfChannels = integer(noc_Array[2]);
             ::objMotEnd[::passItem] = ::objMotStart[::passItem];
             for(b = 1; b <= numberOfChannels; b++)
             {
-                ::objMotEnd[::passItem] = getPartialLine((::objMotEnd[::passItem] + 1),::objEnd[::passItem],"}",::currentScenePath);
+                ::objMotEnd[::passItem] = getPartialLine((::objMotEnd[::passItem] + 1),::objEnd[::passItem],"}");
             }
             ::lastObject = ::passItem;
             // logger("info","objstart: " + ::objStart[::passItem].asStr());
@@ -522,28 +521,28 @@ generatePassFile: mode, gPass
         // then the light lines
         if(strleft(string(::displayOldIDs[tempNumber]),1) == string(LIGHT))
         {
-            ::objStart[::passItem] = getEntityStartLine(::displayOldIDs[tempNumber],::currentScenePath);
-            ::objEnd[::passItem] = getEntityEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber],::currentScenePath);
-            ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels",::currentScenePath);
+            ::objStart[::passItem] = getEntityStartLine(::displayOldIDs[tempNumber]);
+            ::objEnd[::passItem] = getEntityEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber]);
+            ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels");
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
             // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
             // We use parse to split the line by spaces, the second is assumed to be the number of channels. We cast that to an integer.
-            noc_Array = parse(" ",readSpecificLine(::objMotStart[::passItem],::currentScenePath));
+            noc_Array = parse(" ",readSpecificLine(::objMotStart[::passItem]));
             numberOfChannels = integer(noc_Array[2]);
             ::objMotEnd[::passItem] = ::objMotStart[::passItem];
             for(b = 1; b <= numberOfChannels; b++)
             {
-                ::objMotEnd[::passItem] = getPartialLine((::objMotEnd[::passItem] + 1),::objEnd[::passItem],"}",::currentScenePath);
+                ::objMotEnd[::passItem] = getPartialLine((::objMotEnd[::passItem] + 1),::objEnd[::passItem],"}");
             }
-            IKInitialState[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"IKInitialState",::currentScenePath);
-            objAffectCausticsLine[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"AffectCaustics",::currentScenePath);
-            objLightTypeLine[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"LightType ",::currentScenePath);
-            objLensFlareLine[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"LensFlare ",::currentScenePath);
+            IKInitialState[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"IKInitialState");
+            objAffectCausticsLine[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"AffectCaustics");
+            objLightTypeLine[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"LightType ");
+            objLensFlareLine[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"LensFlare ");
             if(objLensFlareLine[::passItem])
             {
                 objLensFlareLine[::passItem] += lightSettingOffset;
             }
-            objVolLightLine[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"VolumetricLighting ",::currentScenePath);
+            objVolLightLine[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"VolumetricLighting ");
             if(objVolLightLine[::passItem])
                 objVolLightLine[::passItem] += lightSettingOffset;
             ::lastLight++;
@@ -554,20 +553,20 @@ generatePassFile: mode, gPass
         // then the camera lines
         if(strleft(string(::displayOldIDs[tempNumber]),1) == string(CAMERA))
         {
-            ::objStart[::passItem] = getEntityStartLine(::displayOldIDs[tempNumber],::currentScenePath);
-            ::objEnd[::passItem] = getEntityEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber],::currentScenePath);
-            ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels",::currentScenePath);
+            ::objStart[::passItem] = getEntityStartLine(::displayOldIDs[tempNumber]);
+            ::objEnd[::passItem] = getEntityEndLine(::objStart[::passItem] + 1,::displayOldIDs[tempNumber]);
+            ::objMotStart[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"NumChannels");
             // We no longer make assumptions about the number of channels for an entity. We retrieve it directly from the scene file.
             // Happily, the line was retrieved above by the getPartialLine call, so it's available for use.
             // We use parse to split the line by spaces, the second is assumed to be the number of channels. We cast that to an integer.
-            noc_Array = parse(" ",readSpecificLine(::objMotStart[::passItem],::currentScenePath));
+            noc_Array = parse(" ",readSpecificLine(::objMotStart[::passItem]));
             numberOfChannels = integer(noc_Array[2]);
             ::objMotEnd[::passItem] = ::objMotStart[::passItem];
             for(b = 1; b <= numberOfChannels; b++)
             {
-                ::objMotEnd[::passItem] = getPartialLine((::objMotEnd[::passItem] + 1),::objEnd[::passItem],"}",::currentScenePath);
+                ::objMotEnd[::passItem] = getPartialLine((::objMotEnd[::passItem] + 1),::objEnd[::passItem],"}");
             }
-            IKInitialState[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"IKInitialState",::currentScenePath);
+            IKInitialState[::passItem] = getPartialLine(::objStart[::passItem],::objEnd[::passItem],"IKInitialState");
             ::lastCamera++;
             // logger("info","camstart: " + ::objStart[::passItem].asStr());
             // logger("info","camend: " + ::objEnd[::passItem].asStr());
@@ -586,150 +585,116 @@ generatePassFile: mode, gPass
         logger("error","Output folder is invalid! Please choose a valid output folder in Preferences.");
     }
 
-    chdir(contentDirectory);
-
-    ::newScenePath = generateNewScenePath(outputFolder, outputStr);
-
-    if(platform() == INTEL)
-    {
-        ::newScenePath = fixPathForWin32(::newScenePath);        
-        ::currentScenePath = fixPathForWin32(::currentScenePath);
-    }
-
-    inputFile = File(::currentScenePath, "r");
-    outputFile = File(::newScenePath, "w");
-
     // write out the header stuff
-    writeHeader(inputFile, outputFile);
-    
+    writeHeader();
+
     // write out the objects
-    writeObjects(inputFile, outputFile);
+    writeObjects();
 
     // write out the stuff between the lights and objects
     // get the start light line
-    startLightsLine = getPartialLine(0,0,"AddLight",::currentScenePath);
+    startLightsLine = getPartialLine(0,0,"AddLight");
     // then the ambient color line
-    ambientColorLine = getPartialLine(0,0,"AmbientColor",::currentScenePath);
-    lineNumber = ambientColorLine;
-    inputFile.line(lineNumber);
-    while(lineNumber < (startLightsLine - 1))
+    ambientColorLine = getPartialLine(0,0,"AmbientColor");
+
+    i = ambientColorLine;
+    while(i < startLightsLine - 1)
     {
-        lineNumber = inputFile.line();
-        line = inputFile.read();
-        outputFile.writeln(line);
+        ::writeBuffer[size(::writeBuffer) + 1] = readBuffer[i];
+        i++;
     }
 
     // write out the lights
-    writeLights(inputFile, outputFile, IKInitialState);
+    writeLights(IKInitialState);
 
     // then the camera line
-    cameraStartLine = getPartialLine(0,0,"AddCamera",::currentScenePath);
-    lineNumber = cameraStartLine;
-    inputFile.line(lineNumber);
-
-    // write out the cameras
-    writeCameras(inputFile, outputFile, lineNumber);
+    cameraStartLine = getPartialLine(0,0,"AddCamera");
+    readIndex = cameraStartLine;
+    writeCameras(readIndex);
 
     //  lineNumber = ::objEnd[::lastLight + ::lastObject + ::lastCamera];
     // then the AA line
-    antialiasingLine = getPartialLine(0,0,"Antialiasing",::currentScenePath);
+    antialiasingLine = getPartialLine(0,0,"Antialiasing");
     // data overlay label
-    dataOverlayLabelLine = getPartialLine(0,0,"DataOverlayLabel",::currentScenePath);
-    lineNumber = antialiasingLine;
-    inputFile.line(lineNumber);
-    while(lineNumber <= dataOverlayLabelLine)
+    dataOverlayLabelLine = getPartialLine(0,0,"DataOverlayLabel");
+    readIndex = antialiasingLine;
+    while(readIndex <= dataOverlayLabelLine)
     {
         if(hvStartLine)
         {
-            if(lineNumber = (hvStartLine + 1) && (hvDataLine != nil || includedHvObjects != nil))
+            if(readIndex = (hvStartLine + 1) && (hvDataLine != nil || includedHvObjects != nil))
             {
                 for(x = 1; x < 4; x++)
                 {
-                    line = inputFile.read();
-                    outputFile.writeln(line);
+                        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                        readIndex++;
                 }
 
                 for(x = 1; x <= size(includedHvObjects); x++)
                 {
                     tempIterationNumber = includedHvObjects[x];
-                    lineNumber = hvObjectLine[tempIterationNumber];
-                    inputFile.line(lineNumber);
-                    while(lineNumber <= hvObjectEndLine[tempIterationNumber])
+                    readIndex = hvObjectLine[tempIterationNumber];
+                    while(readIndex <= hvObjectEndLine[tempIterationNumber])
                     {
-                        line = inputFile.read();
-                        outputFile.writeln(line);
-                        lineNumber = inputFile.line();
+                        ::writeBuffer[size(::writeBuffer)+1] = ::readBuffer[readIndex];
+                        readIndex++;
                     }
                 }
                 
                 tempSizeNumber = size(hvObjectEndLine);
-                lineNumber = hvObjectEndLine[tempSizeNumber];
-                inputFile.line(lineNumber);
+                readIndex = hvObjectEndLine[tempSizeNumber];
             }
         }
-        line = inputFile.read();
-        outputFile.writeln(line);
-        lineNumber = inputFile.line();
+        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+        readIndex++;
     }
-  
+
     progressString = string(0.995);
     msgString = "{" + progressString + "}Generating Render Scene:  Finishing...";
     StatusMsg(msgString);
     sleep(1);
     
     // get the save RGB line
-    saveRGBLine = getPartialLine(cameraStartLine,0,"SaveRGB ",::currentScenePath);
+    saveRGBLine = getPartialLine(cameraStartLine,0,"SaveRGB ");
 
     ::saveRGBImagesPrefix = generateSaveRGBPath(mode, outputFolder, outputStr);
-    outputFile.writeln("OutputFilenameFormat 3");
-    outputFile.writeln("SaveRGB 1");
-    outputFile.writeln("SaveRGBImagesPrefix " + ::saveRGBImagesPrefix);
+    ::writeBuffer[size(::writeBuffer) + 1] = "OutputFilenameFormat 3";
+    ::writeBuffer[size(::writeBuffer) + 1] = "SaveRGB 1";
+    ::writeBuffer[size(::writeBuffer) + 1] = "SaveRGBImagesPrefix " + ::saveRGBImagesPrefix;
     if (mode == "frame")
     {
-        outputFile.writeln("RGBImageSaver " + ::image_formats_array[::testRgbSaveType]);
+        ::writeBuffer[size(::writeBuffer) + 1] = "RGBImageSaver " + ::image_formats_array[::testRgbSaveType];
     } else {
-        outputFile.writeln("RGBImageSaver " + ::image_formats_array[::rgbSaveType]);
+        ::writeBuffer[size(::writeBuffer) + 1] = "RGBImageSaver " + ::image_formats_array[::rgbSaveType];
     }
-    outputFile.writeln("SaveAlpha 0");
+    ::writeBuffer[size(::writeBuffer) + 1] = "SaveAlpha 0";
 
     // try to get the alpha multiplication settings line
-    alphaMultSettingsLine =  getPartialLine(saveRGBLine,0,"AlphaMode ",::currentScenePath);
+    alphaMultSettingsLine =  getPartialLine(saveRGBLine,0,"AlphaMode ");
     if(alphaMultSettingsLine != nil)
     {
         // write out the alpha multiplication settings if they exist
-        lineNumber = alphaMultSettingsLine;
-        inputFile.line(lineNumber);
-        line = inputFile.read();
+        readIndex = alphaMultSettingsLine;
+        line = ::readBuffer[readIndex];
+        readIndex++;
         if(line != nil && line != "")
         {
-            outputFile.writeln(line);
+            ::writeBuffer[size(::writeBuffer) + 1] = line;
         }
     }
-    outputFile.writeln("");
-    
+    ::writeBuffer[size(::writeBuffer) + 1] = "";
+
     // write out the rest of the scene file
     // get the ViewConfiguration line
-    viewConfigurationLine = getPartialLine(0,0,"ViewConfiguration ",::currentScenePath);
-    lineNumber = viewConfigurationLine;
-    inputFile.line(lineNumber);
-
-    outputFile.close();
-    outputFile = File(::newScenePath, "a");
-    while(!inputFile.eof())
+    readIndex = getPartialLine(0,0,"ViewConfiguration ");
+    while(readIndex <= size(::readBuffer))
     {
-        line = inputFile.read();
-        outputFile.writeln(line);
-        lineNumber = inputFile.line();
+        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+        readIndex++;
     }
+    ::readBuffer = ::writeBuffer;
+    ::writeBuffer = nil;
 
-    // close them up
-    inputFile.close();
-    outputFile.close();
-
-    ::updatedCurrentScenePath = ::tempDirectory + getsep() + "passEditorTempSceneUpdated.lws";
-    filecopy(::newScenePath, ::updatedCurrentScenePath);
-
-    // ::newScenePath
     if(::overrideNames[1] != "empty")
     {
         z = 1;
@@ -785,69 +750,76 @@ generatePassFile: mode, gPass
                 scnGen_native();
                 break;
             }
-            fiberFXOverride(::newScenePath);
+            fiberFXOverride();
         }
     }
 
     // FiberFX stuff. Overrides are handled earlier - this is just about pass alignment.
-    fiberFX(::newScenePath);
+    fiberFX();
 
     // Hypervoxel 3 pass alignment.
-    hyperVoxels3(::newScenePath);
+    hyperVoxels3();
 
     // deal with the buffer savers now.
     if(!redirectBuffersSetts)
         redirectBuffersSetts = 0;
-    handleBuffers(mode, redirectBuffersSetts, ::newScenePath, outputFolder, outputStr, fileOuputPrefix, ::userOutputString);
+    handleBuffers(mode, redirectBuffersSetts, outputFolder, outputStr, fileOuputPrefix, ::userOutputString);
     
     // and as a tack-on fix, replace motion-mixer stuff for overridden objects. Calls finishFiles() for us.
-    motionMixerStuff(::newScenePath);
+    motionMixerStuff();
 
-    dependencyCheck(::newScenePath);
+    dependencyCheck();
     
-    stripPassEditor(::newScenePath);
+    stripPassEditor();
+
+    commitSceneBufferToDisk();
 
     ::pass = tempPass;
-    return(::newScenePath);
+    return(::currentScenePath);
 } // generatePass
 
-writeHeader: inputFile, outputFile
+commitSceneBufferToDisk
 {
-    lineNumber = 1;
-    endLine;
-    inputFile.line(lineNumber);
+    readIndex = 1;
+    diskFile = File(::currentScenePath, "w");
+    while(readIndex <= size(::readBuffer))
+    {
+        diskFile.writeln(::readBuffer[readIndex]);
+        readIndex++;
+    }
+    diskFile.close();
+}
+
+writeHeader
+{
     switch(int(hostVersion()))
     {
         case 11:
-            endLine = getPartialLine(0, 0, "NavigationDesiredDevice", ::currentScenePath);
+            endLine = getPartialLine(0, 0, "NavigationDesiredDevice");
             if(hostVersion() < 11.5 && hostVersion() >= 11)
             {
-                endLine = getPartialLine(0, 0, "FirstBackgroundImageSyncFrame", ::currentScenePath);
+                endLine = getPartialLine(0, 0, "FirstBackgroundImageSyncFrame");
             }
             break;
         default:
-            inputFile.close();
-            outputFile.close();
             logger("error","Unsupported version of LW!");
             break;
     }
     if(!endLine || endLine == nil || endLine == 0)
     {
-        inputFile.close();
-        outputFile.close();
         logger("error","writeHeader: couldn't find endLine");
     }
 
-    while(lineNumber <= endLine)
+    i = 1;
+    while(i <= endLine)
     {
-        line = inputFile.read();
-        outputFile.writeln(line);
-        lineNumber = inputFile.line();
+        ::writeBuffer[i] = ::readBuffer[i];
+        i++;
     }
-    outputFile.writeln("");
+    ::writeBuffer[size(::writeBuffer) + 1] = "";
 }
 
-writeCameras: inputFile, outputFile, lineNumber
+writeCameras: lineNumber
 {
     for(cameraCounter = ::lastObject + ::lastLight + 1; cameraCounter <= ::lastObject + ::lastLight + ::lastCamera; cameraCounter++)
     {
@@ -866,13 +838,13 @@ writeCameras: inputFile, outputFile, lineNumber
                     {
                         fileCheck(::motInputTemp[cameraCounter]);
                         motFile = File(::motInputTemp[cameraCounter], "r");
-                        inputFile.line(::objStart[cameraCounter]);
+                        readIndex = ::objStart[cameraCounter];
                         done = nil;
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() == (::objMotStart[cameraCounter]))
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex == (::objMotStart[cameraCounter]))
                             {
                                 done = true;
                                 break;
@@ -880,20 +852,20 @@ writeCameras: inputFile, outputFile, lineNumber
                         }
                         lineNumber = 4;
                         motFile.line(lineNumber);
-                        endLine = getPartialLine(0,0,"Channel 6",::motInputTemp[cameraCounter]); // cameras don't support scale channels (the last 3 in a traditional LW .mot file).
+                        endLine = getPartialLineFromFile(0,0,"Channel 6",::motInputTemp[cameraCounter]); // cameras don't support scale channels (the last 3 in a traditional LW .mot file).
                         while(lineNumber < endLine)
                         {
                             line = motFile.read();
-                            outputFile.writeln(line);
+                            ::writeBuffer[size(::writeBuffer) + 1] = line;
                             lineNumber = motFile.line();
                         }
-                        inputFile.line(::objMotEnd[cameraCounter] + 1);
+                        readIndex = (::objMotEnd[cameraCounter] + 1);
                         done = nil;
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() == (::objEnd[cameraCounter]))
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex == (::objEnd[cameraCounter]))
                             {
                                 done = true;
                                 break;
@@ -903,13 +875,13 @@ writeCameras: inputFile, outputFile, lineNumber
                     }
                     else
                     {
-                        inputFile.line(::objStart[cameraCounter]);
+                        readIndex = ::objStart[cameraCounter];
                         done = nil;
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() == (::objEnd[cameraCounter]))
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex == (::objEnd[cameraCounter]))
                             {
                                 done = true;
                                 break;
@@ -924,13 +896,13 @@ writeCameras: inputFile, outputFile, lineNumber
                        ::cameraSettingsPartThree[cameraCounter] != nil && ::cameraSettingsPartFour[cameraCounter] != nil)
                     {
                         // write out the beginning of the camera
-                        inputFile.line(::objStart[cameraCounter]);
+                        readIndex = ::objStart[cameraCounter];
                         done = nil;
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() == IKInitialState[cameraCounter] + 1)
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex == IKInitialState[cameraCounter] + 1)
                             {
                                 done = true;
                                 break;
@@ -938,71 +910,76 @@ writeCameras: inputFile, outputFile, lineNumber
                         }
                         
                         // write out the custom parameters
-                        outputFile.write(::cameraSettingsPartOne[cameraCounter]);
+                        tempArray = parse("\\n", ::cameraSettingsPartOne[cameraCounter]);
+                        for (i = 1; i <= size(tempArray); i++)
+                        {
+                            ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                        }
 
                         // Fill out content until the next .
-                        lineNumber = getPartialLine(::objStart[cameraCounter],0,"Oversampling",::currentScenePath) + 1;
-                        tempEndNumber = getPartialLine(lineNumber,0,"FieldRendering",::currentScenePath);
+                        readIndex = getPartialLine(::objStart[cameraCounter],0,"Oversampling") + 1;
+                        tempEndNumber = getPartialLine(readIndex,0,"FieldRendering");
                         if(!tempEndNumber)
                         {
-                            inputFile.close();
-                            outputFile.close();
                             logger("error","writeCameras: Failed to find FieldRendering!");
                         }
-                        for(i = lineNumber; i < tempEndNumber; i++)
+                        while(readIndex < tempEndNumber)
                         {
-                           inputFile.line(i);
-                           line = inputFile.read();
-                           outputFile.writeln(line);
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
                         }
 
                         // Next set of changes.
-                        outputFile.write(::cameraSettingsPartTwo[cameraCounter]);
+                        tempArray = parse("\\n", ::cameraSettingsPartTwo[cameraCounter]);
+                        for (i = 1; i <= size(tempArray); i++)
+                        {
+                            ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                        }
 
                         lineNumber = tempEndNumber + ::cameraSettingsPartTwoCount[cameraCounter] + 1;
-                        tempEndNumber = getPartialLine(lineNumber,0,"DepthOfField",::currentScenePath);
+                        tempEndNumber = getPartialLine(lineNumber,0,"DepthOfField");
                         if(!tempEndNumber)
                         {
-                            inputFile.close();
-                            outputFile.close();
                             logger("error","writeCameras: Failed to find DepthOfField!");
                         }
-                        for(i = lineNumber; i < tempEndNumber; i++)
+                        for(readIndex = lineNumber; readIndex < tempEndNumber; readIndex++)
                         {
-                           inputFile.line(i);
-                           line = inputFile.read();
-                           outputFile.writeln(line);
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
                         }
 
                         // Next set of changes.
-                        outputFile.write(::cameraSettingsPartThree[cameraCounter]);
+                        tempArray = parse("\\n", ::cameraSettingsPartThree[cameraCounter]);
+                        for (i = 1; i <= size(tempArray); i++)
+                        {
+                            ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                        }
 
                         lineNumber = tempEndNumber + ::cameraSettingsPartThreeCount[cameraCounter] + 1;
-                        tempEndNumber = getPartialLine(lineNumber,0,"Sampler",::currentScenePath);
+                        tempEndNumber = getPartialLine(lineNumber,0,"Sampler");
                         if(!tempEndNumber)
                         {
-                            inputFile.close();
-                            outputFile.close();
                             logger("error","writeCameras: Failed to find Sampler!");
                         }
-                        for(i = lineNumber; i < tempEndNumber; i++)
+                        for(readIndex = lineNumber; readIndex < tempEndNumber; readIndex++)
                         {
-                           inputFile.line(i);
-                           line = inputFile.read();
-                           outputFile.writeln(line);
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
                         }
 
                         // Next set of changes.
-                        outputFile.write(::cameraSettingsPartFour[cameraCounter]);
+                        tempArray = parse("\\n", ::cameraSettingsPartFour[cameraCounter]);
+                        for (i = 1; i <= size(tempArray); i++)
+                        {
+                            ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                        }
 
-                        inputFile.line(inputFile.line() + ::cameraSettingsPartFourCount[cameraCounter] + 1);
+                        readIndex += (::cameraSettingsPartFourCount[cameraCounter] + 1);
 
                         // Finish up
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() > ::objEnd[cameraCounter])
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex > ::objEnd[cameraCounter])
                             {
                                 done = true;
                                 break;
@@ -1012,13 +989,13 @@ writeCameras: inputFile, outputFile, lineNumber
                     break;
 
                 default:
-                    inputFile.line(::objStart[cameraCounter]);
+                    readIndex = (::objStart[cameraCounter]);
                     done = nil;
                     while(!done)
                     {
-                        line = inputFile.read();
-                        outputFile.writeln(line);
-                        if(inputFile.line() > (::objEnd[cameraCounter]))
+                        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                        readIndex++;
+                        if(readIndex > (::objEnd[cameraCounter]))
                         {
                             done = true;
                             break;
@@ -1029,19 +1006,17 @@ writeCameras: inputFile, outputFile, lineNumber
         }
         else
         {
-            lineCounter = ::objStart[cameraCounter]; // first camera line.
-            inputFile.line(lineCounter);
-            while(lineCounter <= ::objEnd[cameraCounter])
+            readIndex = ::objStart[cameraCounter]; // first camera line.
+            while(readIndex <= ::objEnd[cameraCounter])
             {
-                line = inputFile.read();
-                outputFile.writeln(line);
-                lineCounter++;
+                ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                readIndex++;
             }
         }
     }
 }
 
-writeObjects: inputFile, outputFile
+writeObjects
 {
     if(::lastObject != nil)
     {
@@ -1064,8 +1039,8 @@ writeObjects: inputFile, outputFile
                             surfacedLWO = generateSurfaceObjects(::srfLWOInputID[objectCounter],::srfInputTemp[objectCounter],::currentScenePath,::objStart[objectCounter]);
                             if(surfacedLWO != nil)
                             {
-                                inputFile.line(::objStart[objectCounter]);
-                                line = inputFile.read();
+                                readIndex = ::objStart[objectCounter];
+                                line = ::readBuffer[readIndex];
                                 if(line != nil && line != "")
                                 {
                                     parseObjLineTemp = parse(" ",line);
@@ -1080,13 +1055,14 @@ writeObjects: inputFile, outputFile
                                         mmInt = mmInt + 1;
                                     }
                                 }
-                                outputFile.writeln(line);
+                                ::writeBuffer[size(::writeBuffer) + 1] = line;
+                                readIndex++;
                                 done = nil;
                                 while(!done)
                                 {
-                                    line = inputFile.read();
-                                    outputFile.writeln(line);
-                                    if(inputFile.line() > ::objEnd[objectCounter])
+                                    ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                                    readIndex++;
+                                    if(readIndex > ::objEnd[objectCounter])
                                     {
                                         done = true;
                                         break;
@@ -1096,21 +1072,24 @@ writeObjects: inputFile, outputFile
                                 {
                                     if(lightExclusion[objectCounter] != nil)
                                     {
-                                        outputFile.write(lightExclusion[objectCounter]);
+                                        tempArray = parse("\\n", lightExclusion[objectCounter]);
+                                        for (i = 1; i <= size(tempArray); i++)
+                                        {
+                                            ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                        }
                                     }
                                 }
-    
-                                outputFile.writeln("");
+                                ::writeBuffer[size(::writeBuffer) + 1] = "";
                             }
                             else
                             {
-                                inputFile.line(::objStart[objectCounter]);
+                                readIndex = ::objStart[objectCounter];
                                 done = nil;
                                 while(!done)
                                 {
-                                    line = inputFile.read();
-                                    outputFile.writeln(line);
-                                    if(inputFile.line() > ::objEnd[objectCounter])
+                                    ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                                    readIndex++;
+                                    if(readIndex > ::objEnd[objectCounter])
                                     {
                                         done = true;
                                         break;
@@ -1120,23 +1099,26 @@ writeObjects: inputFile, outputFile
                                 {
                                     if(lightExclusion[objectCounter] != nil)
                                     {
-                                        outputFile.write(lightExclusion[objectCounter]);
+                                        tempArray = parse("\\n", lightExclusion[objectCounter]);
+                                        for (i = 1; i <= size(tempArray); i++)
+                                        {
+                                            ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                        }
                                     }
                                 }
-    
-                                outputFile.writeln(""); 
+                                ::writeBuffer[size(::writeBuffer) + 1] = "";
                             }   
                             
                         }
                         else
                         {
-                            inputFile.line(::objStart[objectCounter]);
+                            readIndex = ::objStart[objectCounter];
                             done = nil;
                             while(!done)
                             {
-                                line = inputFile.read();
-                                outputFile.writeln(line);
-                                if(inputFile.line() > ::objEnd[objectCounter])
+                                ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                                readIndex++;
+                                if(readIndex > ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
@@ -1146,44 +1128,56 @@ writeObjects: inputFile, outputFile
                             {
                                 if(lightExclusion[objectCounter] != nil)
                                 {
-                                    outputFile.write(lightExclusion[objectCounter]);
+                                    tempArray = parse("\\n", lightExclusion[objectCounter]);
+                                    for (i = 1; i <= size(tempArray); i++)
+                                    {
+                                        ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                    }
                                 }
                             }
-
-                            outputFile.writeln(""); 
+                            ::writeBuffer[size(::writeBuffer) + 1] = "";
                         }
                         // end case 1 here, which is the surface type
                         break;
                     
                     case 2:
                         // begin case 2 here, which is the object properties override type
-                        inputFile.line(::objStart[objectCounter]);
+                        readIndex = ::objStart[objectCounter];
                         done = nil;
                         excludedLightsTemp = 0;
                         while(!done)
                         {
-                            line = inputFile.read();
+                            line = ::readBuffer[readIndex];
+                            readIndex++;
                             mystring = "ShadowOptions ";
                             mystring_len = size(mystring);
                             if(size(line) > mystring_len)
                             {
                                 if(strleft(line,mystring_len) != mystring)
                                 {
-                                    outputFile.writeln(line);
+                                    ::writeBuffer[size(::writeBuffer) + 1] = line;
                                     //excludedLightsTemp = 0;
                                 }
                                 else
                                 {
-                                    outputFile.write(::objPropOverrideSets[objectCounter]);
-                                    outputFile.write(::objPropOverrideShadowOpts[objectCounter]);
+                                    tempArray = parse("\\n", ::objPropOverrideSets[objectCounter]);
+                                    for (i = 1; i <= size(tempArray); i++)
+                                    {
+                                        ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                    }
+                                    tempArray = parse("\\n", ::objPropOverrideShadowOpts[objectCounter]);
+                                    for (i = 1; i <= size(tempArray); i++)
+                                    {
+                                        ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                    }
                                     excludedLightsTemp = 1;
                                 }
                             }
                             else
                             {
-                                outputFile.writeln(line);
+                                ::writeBuffer[size(::writeBuffer) + 1] = line;
                             }
-                            if(inputFile.line() > ::objEnd[objectCounter])
+                            if(readIndex > ::objEnd[objectCounter])
                             {
                                 done = true;
                                 break;
@@ -1191,18 +1185,30 @@ writeObjects: inputFile, outputFile
                         }
                         if(excludedLightsTemp == 1)
                         {
-                            outputFile.writeln("");
+                            ::writeBuffer[size(::writeBuffer) + 1] = "";
                         }
                         else
                         {
-                            outputFile.write(::objPropOverrideSets[objectCounter]);
-                            outputFile.writeln(::objPropOverrideShadowOpts[objectCounter]);
+                            tempArray = parse("\\n", ::objPropOverrideSets[objectCounter]);
+                            for (i = 1; i <= size(tempArray); i++)
+                            {
+                                ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                            }
+                            tempArray = parse("\\n", ::objPropOverrideShadowOpts[objectCounter]);
+                            for (i = 1; i <= size(tempArray); i++)
+                            {
+                                ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                            }
                         }
                         if(lightExclusion)
                         {
                             if(lightExclusion[objectCounter] != nil)
                             {
-                                outputFile.write(lightExclusion[objectCounter]);
+                                tempArray = parse("\\n", lightExclusion[objectCounter]);
+                                for (i = 1; i <= size(tempArray); i++)
+                                {
+                                    ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                }
                             }
                         }
 
@@ -1216,13 +1222,13 @@ writeObjects: inputFile, outputFile
                             // Check that we can find the motion file.
                             fileCheck(::motInputTemp[objectCounter]);
                             motFile = File(::motInputTemp[objectCounter], "r");
-                            inputFile.line(::objStart[objectCounter]);
+                            readIndex = ::objStart[objectCounter];
                             done = nil;
                             while(!done)
                             {
-                                line = inputFile.read();
-                                outputFile.writeln(line);
-                                if(inputFile.line() == ::objMotStart[objectCounter])
+                                ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                                readIndex++;
+                                if(readIndex == ::objMotStart[objectCounter])
                                 {
                                     done = true;
                                     break;
@@ -1231,16 +1237,15 @@ writeObjects: inputFile, outputFile
                             motFile.line(4);
                             while(!motFile.eof())
                             {
-                                line = motFile.read();
-                                outputFile.writeln(line);
+                                ::writeBuffer[size(::writeBuffer) + 1] = motFile.read();
                             }
-                            inputFile.line(::objMotEnd[objectCounter] + 1);
+                            readIndex = ::objMotEnd[objectCounter] + 1;
                             done = nil;
                             while(!done)
                             {
-                                line = inputFile.read();
-                                outputFile.writeln(line);
-                                if(inputFile.line() > ::objEnd[objectCounter])
+                                ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                                readIndex++;
+                                if(readIndex > ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
@@ -1251,20 +1256,24 @@ writeObjects: inputFile, outputFile
                             {
                                 if(lightExclusion[objectCounter] != nil)
                                 {
-                                    outputFile.write(lightExclusion[objectCounter]);
+                                    tempArray = parse("\\n", lightExclusion[objectCounter]);
+                                    for (i = 1; i <= size(tempArray); i++)
+                                    {
+                                        ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                    }
                                 }
                             }
-                            outputFile.writeln("");
+                            ::writeBuffer[size(::writeBuffer) + 1] = "";
                         }
                         else
                         {
-                            inputFile.line(::objStart[objectCounter]);
+                            readIndex = ::objStart[objectCounter];
                             done = nil;
                             while(!done)
                             {
-                                line = inputFile.read();
-                                outputFile.writeln(line);
-                                if(inputFile.line() > ::objEnd[objectCounter])
+                                ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                                readIndex++;
+                                if(readIndex > ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
@@ -1274,10 +1283,14 @@ writeObjects: inputFile, outputFile
                             {
                                 if(lightExclusion[objectCounter] != nil)
                                 {
-                                    outputFile.write(lightExclusion[objectCounter]);
+                                    tempArray = parse("\\n", lightExclusion[objectCounter]);
+                                    for (i = 1; i <= size(tempArray); i++)
+                                    {
+                                        ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                    }
                                 }
                             }
-                            outputFile.writeln("");
+                            ::writeBuffer[size(::writeBuffer) + 1] = "";
                         }
                         // end case 3 here, which is the motion override type
                         break;
@@ -1288,8 +1301,9 @@ writeObjects: inputFile, outputFile
                         {
                             // Check that we can find the file.
                             fileCheck(::lwoInputTemp[objectCounter]);
-                            inputFile.line(::objStart[objectCounter]);
-                            line = inputFile.read();
+                            readIndex = ::objStart[objectCounter];
+                            line = ::readBuffer[readIndex];
+                            readIndex++;
                             if(line != nil && line != "")
                             {
                                 parseObjLineTemp = parse(" ",line);
@@ -1303,13 +1317,13 @@ writeObjects: inputFile, outputFile
                                     mmInt = mmInt + 1;
                                 }
                             }
-                            outputFile.writeln(line);
+                            ::writeBuffer[size(::writeBuffer) + 1] = line;
                             done = nil;
                             while(!done)
                             {
-                                line = inputFile.read();
-                                outputFile.writeln(line);
-                                if(inputFile.line() > ::objEnd[objectCounter])
+                                ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                                readIndex++;
+                                if(readIndex > ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
@@ -1319,21 +1333,24 @@ writeObjects: inputFile, outputFile
                             {
                                 if(lightExclusion[objectCounter] != nil)
                                 {
-                                    outputFile.write(lightExclusion[objectCounter]);
+                                    tempArray = parse("\\n", lightExclusion[objectCounter]);
+                                    for (i = 1; i <= size(tempArray); i++)
+                                    {
+                                        ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                    }
                                 }
                             }
-                            outputFile.writeln(""); 
-                            
+                            ::writeBuffer[size(::writeBuffer) + 1] = "";
                         }
                         else
                         {
-                            inputFile.line(::objStart[objectCounter]);
+                            readIndex = ::objStart[objectCounter];
                             done = nil;
                             while(!done)
                             {
-                                line = inputFile.read();
-                                outputFile.writeln(line);
-                                if(inputFile.line() > ::objEnd[objectCounter])
+                                ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                                readIndex++;
+                                if(readIndex > ::objEnd[objectCounter])
                                 {
                                     done = true;
                                     break;
@@ -1343,22 +1360,26 @@ writeObjects: inputFile, outputFile
                             {
                                 if(lightExclusion[objectCounter] != nil)
                                 {
-                                    outputFile.write(lightExclusion[objectCounter]);
+                                    tempArray = parse("\\n", lightExclusion[objectCounter]);
+                                    for (i = 1; i <= size(tempArray); i++)
+                                    {
+                                        ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                    }
                                 }
                             }
-                            outputFile.writeln(""); 
+                            ::writeBuffer[size(::writeBuffer) + 1] = "";
                         }
                         // end case 4 here, which is the alternate object type
                         break;
                         
                     case 7:
-                        inputFile.line(::objStart[objectCounter]);
+                        readIndex = ::objStart[objectCounter];
                         done = nil;
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() > ::objEnd[objectCounter])
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex > ::objEnd[objectCounter])
                             {
                                 done = true;
                                 break;
@@ -1368,26 +1389,30 @@ writeObjects: inputFile, outputFile
                         {
                             if(lightExclusion[objectCounter] != nil)
                             {
-                                outputFile.write(lightExclusion[objectCounter]);
+                                tempArray = parse("\\n", lightExclusion[objectCounter]);
+                                for (i = 1; i <= size(tempArray); i++)
+                                {
+                                    ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                }
                             }
                         }                   
-                        outputFile.writeln("");
+                        ::writeBuffer[size(::writeBuffer) + 1] = "";
                         break;
                         
                     default:
-                        inputFile.line(::objStart[objectCounter]);
+                        readIndex = ::objStart[objectCounter];
                         done = nil;
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() > ::objEnd[objectCounter])
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex > ::objEnd[objectCounter])
                             {
                                 done = true;
                                 break;
                             }
                         }
-                        outputFile.writeln("");
+                        ::writeBuffer[size(::writeBuffer) + 1] = "";
                         break;
 
                 // end override type switch statement here
@@ -1396,19 +1421,19 @@ writeObjects: inputFile, outputFile
             }
             else
             {
-                inputFile.line(::objStart[objectCounter]);
+                readIndex = ::objStart[objectCounter];
                 done = nil;
                 while(!done)
                 {
-                    line = inputFile.read();
-                    outputFile.writeln(line);
-                    if(inputFile.line() == (::objEnd[objectCounter]))
+                    ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                    readIndex++;
+                    if(readIndex == ::objEnd[objectCounter])
                     {
                         done = true;
                         break;
                     }
                 }
-                outputFile.writeln("");
+                ::writeBuffer[size(::writeBuffer) + 1] = "";
             }
         }
     }
@@ -1418,7 +1443,7 @@ writeObjects: inputFile, outputFile
     }
 }
 
-writeLights: inputFile, outputFile, IKInitialState
+writeLights: IKInitialState
 {
     for(lightCounter = ::lastObject + 1; lightCounter <= ::lastObject + ::lastLight; lightCounter++)
     {
@@ -1436,13 +1461,13 @@ writeLights: inputFile, outputFile, IKInitialState
                     if(::lightSettingsPartOne[lightCounter] != nil)
                     {
                         // write out the beginning of the light
-                        inputFile.line(::objStart[lightCounter]);
+                        readIndex = ::objStart[lightCounter];
                         done = nil;
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() == (IKInitialState[lightCounter]) + 1)
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex == (IKInitialState[lightCounter]) + 1)
                             {
                                 done = true;
                                 break;
@@ -1450,21 +1475,29 @@ writeLights: inputFile, outputFile, IKInitialState
                         }
                         
                         // write out the custom parameters
-                        outputFile.write(::lightSettingsPartOne[lightCounter]);
+                        tempArray = parse("\\n", ::lightSettingsPartOne[lightCounter]);
+                        for (i = 1; i <= size(tempArray); i++)
+                        {
+                            ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                        }
 
                         // write out the rest of the light, first volumetrics, then flare, then rest
-                        inputFile.line(::objAffectCausticsLine[lightCounter]);
+                        readIndex = ::objAffectCausticsLine[lightCounter];
                         if(::objVolLightLine[lightCounter] != nil)
                         {
                             done = nil;
                             endLine = ::objVolLightLine[lightCounter];
                             while(!done)
                             {
-                                line = inputFile.read();
-                                outputFile.writeln(line);
-                                if(inputFile.line() == endLine)
+                                ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                                readIndex++;
+                                if(readIndex == endLine)
                                 {
-                                    outputFile.writeln(::lightSettingsPartThree[lightCounter]);
+                                    tempArray = parse("\\n", ::lightSettingsPartThree[lightCounter]);
+                                    for (i = 1; i <= size(tempArray); i++)
+                                    {
+                                        ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                    }
                                     done = true;
                                     break;
                                 }
@@ -1476,11 +1509,15 @@ writeLights: inputFile, outputFile, IKInitialState
                             done = nil;
                             while(!done)
                             {
-                                line = inputFile.read();
-                                outputFile.writeln(line);
-                                if(inputFile.line() == endLine)
+                                ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                                readIndex++;
+                                if(readIndex == endLine)
                                 {
-                                    outputFile.writeln(::lightSettingsPartTwo[lightCounter]);
+                                    tempArray = parse("\\n", ::lightSettingsPartTwo[lightCounter]);
+                                    for (i = 1; i <= size(tempArray); i++)
+                                    {
+                                        ::writeBuffer[size(::writeBuffer) + 1] = tempArray[i];
+                                    }
                                     done = true;
                                     break;
                                 }
@@ -1489,9 +1526,9 @@ writeLights: inputFile, outputFile, IKInitialState
                         done = nil;
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() == (::objEnd[lightCounter]))
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex == ::objEnd[lightCounter])
                             {
                                 done = true;
                                 break;
@@ -1500,13 +1537,13 @@ writeLights: inputFile, outputFile, IKInitialState
                     }
                     else
                     {
-                        inputFile.line(::objStart[lightCounter]);
+                        readIndex = ::objStart[lightCounter];
                         done = nil;
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() == (::objEnd[lightCounter]))
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex == ::objEnd[lightCounter])
                             {
                                 done = true;
                                 break;
@@ -1523,13 +1560,13 @@ writeLights: inputFile, outputFile, IKInitialState
                         // Check file is valid.
                         fileCheck(::motInputTemp[lightCounter]);
                         motFile = File(::motInputTemp[lightCounter],"r");
-                        inputFile.line(::objStart[lightCounter]);
+                        readIndex = ::objStart[lightCounter];
                         done = nil;
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() == (::objMotStart[lightCounter]))
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex == (::objMotStart[lightCounter]))
                             {
                                 done = true;
                                 break;
@@ -1539,15 +1576,15 @@ writeLights: inputFile, outputFile, IKInitialState
                         while(!motFile.eof())
                         {
                             line = motFile.read();
-                            outputFile.writeln(line);
+                            ::writeBuffer[size(::writeBuffer) + 1] = line;
                         }
                         inputFile.line(::objMotEnd[lightCounter] + 1);
                         done = nil;
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() == (::objEnd[lightCounter]))
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex == ::objEnd[lightCounter])
                             {
                                 done = true;
                                 break;
@@ -1557,13 +1594,13 @@ writeLights: inputFile, outputFile, IKInitialState
                     }
                     else
                     {
-                        inputFile.line(::objStart[lightCounter]);
+                        readIndex = ::objStart[lightCounter];
                         done = nil;
                         while(!done)
                         {
-                            line = inputFile.read();
-                            outputFile.writeln(line);
-                            if(inputFile.line() == (::objEnd[lightCounter]))
+                            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                            readIndex++;
+                            if(readIndex == ::objEnd[lightCounter])
                             {
                                 done = true;
                                 break;
@@ -1574,13 +1611,13 @@ writeLights: inputFile, outputFile, IKInitialState
                     break;
                 
                 default:
-                    inputFile.line(::objStart[lightCounter]);
+                    readIndex = ::objStart[lightCounter];
                     done = nil;
                     while(!done)
                     {
-                        line = inputFile.read();
-                        outputFile.writeln(line);
-                        if(inputFile.line() == (::objEnd[lightCounter]))
+                        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                        readIndex++;
+                        if(readIndex == ::objEnd[lightCounter])
                         {
                             done = true;
                             break;
@@ -1591,13 +1628,13 @@ writeLights: inputFile, outputFile, IKInitialState
         }
         else
         {
-            inputFile.line(::objStart[lightCounter]);
+            readIndex = ::objStart[lightCounter];
             done = nil;
             while(!done)
             {
-                line = inputFile.read();
-                outputFile.writeln(line);
-                if(inputFile.line() == (::objEnd[lightCounter]))
+                ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+                readIndex++;
+                if(readIndex == ::objEnd[lightCounter])
                 {
                     done = true;
                     break;
@@ -1605,12 +1642,12 @@ writeLights: inputFile, outputFile, IKInitialState
             }
         }
     }
-    outputFile.writeln("");
+    ::writeBuffer[size(::writeBuffer) + 1] = "";
 }
 
-fiberFXOverride: ffxFile
+fiberFXOverride
 {
-    ffxLine = getPixelFilterLine("FiberFilter", ffxFile);
+    ffxLine = getPixelFilterLine("FiberFilter");
     if (!ffxLine)
     {
         // No FFx entries
@@ -1618,10 +1655,7 @@ fiberFXOverride: ffxFile
     }
 
     // Let's check if it's version 3 or 4 - we support both.
-    checkFile = File(ffxFile, "r");
-    checkFile.line(ffxLine + 2);
-    ffxVersion = int(strright(checkFile.read(),1));
-    checkFile.close();
+    ffxVersion = int(strright(::readBuffer[ffxLine + 2],1));
     if(ffxVersion != "3" && ffxVersion != "4")
     {
         logger("warn","FiberFX detected, but version mismatched - we support version 3 or version 4.");
@@ -1637,32 +1671,32 @@ fiberFXOverride: ffxFile
 
     // Hard-coded offsets from the detected pixel filter line, based on scene file inspection.
     ffxString = "SaveRGBA " + string(fiberFXSaveRGBA);
-    changeScnLine(ffxString, ffxFile, ffxLine + 8);
+    changeScnLine(ffxString, ffxLine + 8);
 
     ffxString = "SaveDepth " + string(fiberFXSaveDepth);
-    changeScnLine(ffxString, ffxFile, ffxLine + 9);
+    changeScnLine(ffxString, ffxLine + 9);
 
     ffxString = "RGBType " + string(::image_formats_array[fiberFXSaveRGBAType]);
-    changeScnLine(ffxString, ffxFile, ffxLine + 10);
+    changeScnLine(ffxString, ffxLine + 10);
 
     ffxString = "DepthType " + string(::image_formats_array[fiberFXSaveDepthType]);
-    changeScnLine(ffxString, ffxFile, ffxLine + 11);
+    changeScnLine(ffxString, ffxLine + 11);
 
     ffxString = "RGBName " + string(fiberFXSaveRGBAName);
-    changeScnLine(ffxString, ffxFile, ffxLine + 12);
+    changeScnLine(ffxString, ffxLine + 12);
 
     ffxString = "DepthName " + string(fiberFXSaveDepthName);
-    changeScnLine(ffxString, ffxFile, ffxLine + 13);
+    changeScnLine(ffxString, ffxLine + 13);
 
     return 1;
 }
 
-fiberFX: ffxFile
+fiberFX
 {
     // LW only allows one instance of the plugin, so we only need one check and adjustment sequence.
     ffxDebug = 0;
     // Let's check if FiberFX was even applied.
-    ffxLine = getPixelFilterLine("FiberFilter", ffxFile);
+    ffxLine = getPixelFilterLine("FiberFilter");
     if (!ffxLine)
     {
         // No FFx entries
@@ -1670,23 +1704,20 @@ fiberFX: ffxFile
     }
     
     // Let's check if it's version 3 or later - we support both.
-    checkFile = File(ffxFile, "r");
-    checkFile.line(ffxLine + 2);
-    ffxVersion = int(strright(checkFile.read(),1));
-    checkFile.close();
+    ffxVersion = int(strright(::readBuffer[ffxLine + 2],1));
     if(ffxVersion != "4")
     {
         logger("warn","FiberFX detected, but version mismatched - we only support 11.6-authored FiberFX scenes!");
         return 0;
     }
 
-    ffxHeaderEndLine = getPartialLine(ffxLine,0,"ToggleOff",ffxFile); // This line is the last before the item specific entries.
+    ffxHeaderEndLine = getPartialLine(ffxLine,0,"ToggleOff"); // This line is the last before the item specific entries.
 
-    ffxEndLine = getPartialLine(ffxLine,0,"EndPlugin",ffxFile); // End of plugin block.
+    ffxEndLine = getPartialLine(ffxLine,0,"EndPlugin"); // End of plugin block.
 
 
     // We need to extract item IDs from the scene file to then check against our pass items.
-    ffxItems = getFFxItems(ffxFile, ffxLine);
+    ffxItems = getFFxItems(ffxLine);
     if (ffxItems == nil)
     {
         // No item IDs found. Nothing to do.
@@ -1729,7 +1760,7 @@ fiberFX: ffxFile
     {
         logger("warn","fiberFX: FiberFX active, but no items in the pass or we encountered an error during ID matching. Report the latter, please.");
         logger("info","fiberFX: Stripping FiberFX from scene, to allow render to pass.");
-        stripFiberFX(ffxFile, ffxLine, ffxEndLine);
+        stripFiberFX(ffxLine, ffxEndLine);
         return 0;
     } else {
         // logger("log_info","fiberFX: Matched " + size(matchedFFXItems) + " items");
@@ -1743,21 +1774,22 @@ fiberFX: ffxFile
         {
             logger("log_info","fiberFX: Processing FFID: " + ffxItemID.asStr());
         }
-        tempFFx_r = File(ffxFile, "r");
-        tempFFx_r.line(ffxLine);
+
+        readIndex = ffxLine;
         ffxStartString = "  Itemid " + ffxItemID.asStr();
         ffxEndString = "  VolumeType";
-        while(!tempFFx_r.eof())
+        while(readIndex <= size(::readBuffer))
         {
-            ffxLineTemp = tempFFx_r.read();
+            ffxLineTemp = ::readBuffer[readIndex];
+            readIndex++;
             if (ffxLineTemp == ffxStartString)
             {
-                ffxChunkStartLineArray[ffxChunkLineArrayIndex] = tempFFx_r.line() - 3; // hard-coded offset to start of block
+                ffxChunkStartLineArray[ffxChunkLineArrayIndex] = readIndex - 3; // hard-coded offset to start of block
                 ffx_s_found = 1;
             }
             if ((strleft(ffxLineTemp, ffxEndString.size()) == ffxEndString) && (ffx_s_found == 1))
             {
-                ffxChunkEndLineArray[ffxChunkLineArrayIndex] = tempFFx_r.line() + 10; // hard-coded offset to end of block
+                ffxChunkEndLineArray[ffxChunkLineArrayIndex] = readIndex + 11; // hard-coded offset to end of block
                 ffx_s_found = 0;
                 if (ffxDebug == 1)
                 {
@@ -1766,19 +1798,14 @@ fiberFX: ffxFile
                 ffxChunkLineArrayIndex++;
             }
         }
-        tempFFx_r.close();
     }
 
     // Now we need to write out the sections we care about.
-    ffxOutputFilename = tempDirectory + getsep() + "tempPassportFileFFx.lws";
-    ffxOutput = File(ffxOutputFilename,"w");
-    ffxInput = File(ffxFile, "r");
-    ffxLineNumber = 1;
-    while(ffxLineNumber <= ffxHeaderEndLine)
+    readIndex = 1;
+    while(readIndex <= ffxHeaderEndLine)
     {
-        ffxLine = ffxInput.read();
-        ffxOutput.writeln(ffxLine);
-        ffxLineNumber++;
+        ::writeBuffer[readIndex] = ::readBuffer[readIndex];
+        readIndex++;
     }
 
     // Now we write out our sections from above.
@@ -1789,75 +1816,67 @@ fiberFX: ffxFile
         {
             logger("log_info","fiberFX: Writing FFID: " + ffxItemID);
         }
-        sourceLine = ffxChunkStartLineArray[i];
-        ffxInput.line(sourceLine);
-        while(sourceLine <= ffxChunkEndLineArray[i])
+        readIndex = ffxChunkStartLineArray[i];
+        while(readIndex <= ffxChunkEndLineArray[i])
         {
-            ffxLine = ffxInput.read();
-            ffxOutput.writeln(ffxLine);
-            sourceLine++;
+            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+            readIndex++;
         }
     }
 
-    ffxOutput.close();
-    ffxOutput = File(ffxOutputFilename, "a");
-    ffxInput.line(ffxEndLine);
-    while(!ffxInput.eof())
+    readIndex = ffxEndLine;
+    while(readIndex <= size(::readBuffer))
     {
-        ffxOutput.writeln(ffxInput.read());
+        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+        readIndex++;
     }
 
-    ffxInput.close();
-    ffxOutput.close();
-
     // Push the output back to the original file.
-    filecopy(ffxOutputFilename, ffxFile);
-    filedelete(ffxOutputFilename);
+    ::readBuffer = ::writeBuffer;
+    ::writeBuffer = nil;
 
     return 1; // notify caller that we changed something.
 }
 
-stripFiberFX: ffxFile, ffxLine, ffxEndLine
+stripFiberFX: ffxLine, ffxEndLine
 {
-    ffxVolFilterLine = getVolumetricHandlerLine(".FiberVolume", ffxFile);
+    ffxVolFilterLine = getVolumetricHandlerLine(".FiberVolume");
     // Walk the scene file to strip the FiberFX entries. Fail-safe.
     stripFiberFFX_input = File(ffxFile, "r");
     stripffxFile = ::tempDirectory + getsep() + "tempPassportInputFile_StripFFx.lws";
     stripFiberFFX_output = File(stripffxFile, "w");
-    stripFiberFFX_line = 1;
-    while(stripFiberFFX_line < ffxVolFilterLine)
+    readIndex = 1;
+    while(readIndex < ffxVolFilterLine)
     {
-        stripFiberFFX_output.writeln(stripFiberFFX_input.read());
-        stripFiberFFX_line++;
+        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+        readIndex++;
     }
-    stripFiberFFX_line += 2; // skip vol and end plugin lines
-    stripFiberFFX_input.line(stripFiberFFX_line);
-    while(stripFiberFFX_line < ffxLine)
+    readIndex += 2; // skip vol and end plugin lines
+
+    while(readIndex < ffxLine)
     {
-        stripFiberFFX_output.writeln(stripFiberFFX_input.read());
-        stripFiberFFX_line++;
+        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+        readIndex++;
     }
-    stripFiberFFX_input.line(ffxEndLine + 1);
-    while(!stripFiberFFX_input.eof())
+    readIndex = (ffxEndLine + 1);
+    while(readIndex <= size(::readBuffer))
     {
-        stripFiberFFX_output.writeln(stripFiberFFX_input.read());
+        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+        readIndex++;
     }
-    stripFiberFFX_output.close();
-    stripFiberFFX_input.close();
-    filecopy(stripffxFile, ffxFile);
-    filedelete(stripffxFile);
+    ::readBuffer = ::writeBuffer;
+    ::writeBuffer = nil;
 }
 
-handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, fileOuputPrefix, userOutputString // if you edit this, don't forget to extend defaultBufferExporters as well and the new/edit pass dialog to set the values accordingly. You'll also need to bump the version due to mismatches.
+handleBuffers: mode, redirectBuffersSetts, outputFolder, outputStr, fileOuputPrefix, userOutputString // if you edit this, don't forget to extend defaultBufferExporters as well and the new/edit pass dialog to set the values accordingly. You'll also need to bump the version due to mismatches.
 {
     if(redirectBuffersSetts == 1)
     {
-        ::inputFileName = prepareInputFile(hbFile);
-        inputFile = File(::inputFileName, "r");
-        tempOutput = File(::newScenePath,"w");
-        while(!inputFile.eof())
+        readIndex = 1;
+        while(readIndex <= size(::readBuffer))
         {
-            line = inputFile.read();
+            line = ::readBuffer[readIndex];
+            readIndex++;
             searchString = "Plugin ImageFilterHandler ";
             if(size(line) > searchString.size())
             {
@@ -1869,8 +1888,9 @@ handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, file
                     {
                         for(i = 1; i <= 3; i++)
                         {
-                            tempOutput.writeln(line);
-                            line = inputFile.read();
+                            ::writeBuffer[size(::writeBuffer) + 1] = line;
+                            line = ::readBuffer[readIndex];
+                            readIndex++;
                         }
                         baseNameArray = parse(getsep(),line);
                         if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
@@ -1903,8 +1923,9 @@ handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, file
                     {
                         for(i = 1; i <= 3; i++)
                         {
-                            tempOutput.writeln(line);
-                            line = inputFile.read();
+                            ::writeBuffer[size(::writeBuffer) + 1] = line;
+                            line = ::readBuffer[readIndex];
+                            readIndex++;
                         }
                         baseNameArray = parse(getsep(),line);
                         if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
@@ -1937,13 +1958,15 @@ handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, file
                     {
                         for(i = 1; i <= 2; i++)
                         {
-                            tempOutput.writeln(line);
-                            line = inputFile.read();
+                            ::writeBuffer[size(::writeBuffer) + 1] = line;
+                            line = ::readBuffer[readIndex];
+                            readIndex++;
                         }
                         if(line == "0")
                         {
-                            tempOutput.writeln(line);
-                            line = inputFile.read();
+                            ::writeBuffer[size(::writeBuffer) + 1] = line;
+                            line = ::readBuffer[readIndex];
+                            readIndex++;
                             baseNameArray = parse(getsep(),line);
                             if(baseNameArray[size(baseNameArray)] != nil && baseNameArray[size(baseNameArray)] != "")
                             {
@@ -1978,8 +2001,9 @@ handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, file
                     {
                         for(i = 1; i <= 2; i++)
                         {
-                            tempOutput.writeln(line);
-                            line = inputFile.read();
+                            ::writeBuffer[size(::writeBuffer) + 1] = line;
+                            line = ::readBuffer[readIndex];
+                            readIndex++;
                         }
                         if(strleft(line,5) == "Path ")
                         {
@@ -2016,12 +2040,13 @@ handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, file
                     // end of the psd exporter
                     
                     // the rla exporter
-                        if(bufferTestLineParse[4] == "LW_ExtendedRLAExport")
+                    if(bufferTestLineParse[4] == "LW_ExtendedRLAExport")
                     {
                         for(i = 1; i <= 2; i++)
                         {
-                            tempOutput.writeln(line);
-                            line = inputFile.read();
+                            ::writeBuffer[size(::writeBuffer) + 1] = line;
+                            line = ::readBuffer[readIndex];
+                            readIndex++;
                         }
                         if(strleft(line,1) != "")
                         {
@@ -2044,14 +2069,15 @@ handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, file
                         }   
                     }
                     // end of the rla exporter
-                    
+                     
                     // the rpf exporter
                     if(bufferTestLineParse[4] == "LW_ExtendedRPFExport")
                     {
                         for(i = 1; i <= 2; i++)
                         {
-                            tempOutput.writeln(line);
-                            line = inputFile.read();
+                            ::writeBuffer[size(::writeBuffer) + 1] = line;
+                            line = ::readBuffer[readIndex];
+                            readIndex++;
                         }
                         if(strleft(line,1) != "")
                         {
@@ -2079,8 +2105,9 @@ handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, file
                     {
                         for(i = 1; i <= 2; i++)
                         {
-                            tempOutput.writeln(line);
-                            line = inputFile.read();
+                            ::writeBuffer[size(::writeBuffer) + 1] = line;
+                            line = ::readBuffer[readIndex];
+                            readIndex++;
                         }
                         if(strleft(line,1) == "\"")
                         {
@@ -2108,8 +2135,9 @@ handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, file
                     {
                         for(i = 1; i <= 9; i++)
                         {
-                            tempOutput.writeln(line);
-                            line = inputFile.read();
+                            ::writeBuffer[size(::writeBuffer) + 1] = line;
+                            line = ::readBuffer[readIndex];
+                            readIndex++;
                         }
                         if(strleft(line,1) != "")
                         {
@@ -2141,18 +2169,16 @@ handleBuffers: mode, redirectBuffersSetts, hbFile, outputFolder, outputStr, file
             {
                 toWrite = line;
             }
-            tempOutput.writeln(toWrite);
-        }   
-        inputFile.close();
-        tempOutput.close();
-        finishFiles();
+            ::writeBuffer[size(::writeBuffer) + 1] = toWrite;
+        }
+        ::readBuffer = ::writeBuffer;
+        ::writeBuffer = nil;
     }
-
-    passBufferSetup(hbFile);
+    passBufferSetup();
 }
 
-// This function is called from handleBuffers and it works to (de)activate buffer exporters (image filters) for the current pass. It's highly experimental and not scheduled for the 1.0 release.
-passBufferSetup: pbsFile
+// This function is called from handleBuffers and it works to (de)activate buffer exporters (image filters) for the current pass.
+passBufferSetup
 {
     pbsSettings = parse("||",::passBufferExporters[::pass]);
 
@@ -2171,26 +2197,25 @@ passBufferSetup: pbsFile
         auraBuffersSetting      = int(pbsSettings[8]);
         iDOFBuffersSetting      = int(pbsSettings[9]);
 
-        passBufferSetup_processBufferSetting(pbsFile, "LW_CompositeBuffer", compBuffSetting);
-        passBufferSetup_processBufferSetting(pbsFile, "exrTrader", exrTraderSetting);
-        passBufferSetup_processBufferSetting(pbsFile, "LW_SpecialBuffers", specBuffersSetting);
-        passBufferSetup_processBufferSetting(pbsFile, "LW_PSDExport", psdBuffersSetting);
-        passBufferSetup_processBufferSetting(pbsFile, "LW_ExtendedRLAExport", extRLABuffersSetting);
-        passBufferSetup_processBufferSetting(pbsFile, "LW_ExtendedRPFExport", extRPFBuffersSetting);
-        passBufferSetup_processBufferSetting(pbsFile, "Aura25Export", auraBuffersSetting);
-        passBufferSetup_processBufferSetting(pbsFile, "iDof_channels_IF", iDOFBuffersSetting);
+        passBufferSetup_processBufferSetting("LW_CompositeBuffer", compBuffSetting);
+        passBufferSetup_processBufferSetting("exrTrader", exrTraderSetting);
+        passBufferSetup_processBufferSetting("LW_SpecialBuffers", specBuffersSetting);
+        passBufferSetup_processBufferSetting("LW_PSDExport", psdBuffersSetting);
+        passBufferSetup_processBufferSetting("LW_ExtendedRLAExport", extRLABuffersSetting);
+        passBufferSetup_processBufferSetting("LW_ExtendedRPFExport", extRPFBuffersSetting);
+        passBufferSetup_processBufferSetting("Aura25Export", auraBuffersSetting);
+        passBufferSetup_processBufferSetting("iDof_channels_IF", iDOFBuffersSetting);
     }
 }
 
-passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSetting
+passBufferSetup_processBufferSetting: imageFilterString, imageFilterSetting
 {
-    scanFile = File(pbsFile, "r"); // We know this file exists - we got here from our caller function that validated its existence.
-
     imageFilterLinesIndex = 0;
-    lineNumber = 1;
-    while(!scanFile.eof())
+    readIndex = 1;
+    while(readIndex <= size(::readBuffer))
     {
-        line = scanFile.read();
+        line = ::readBuffer[readIndex];
+        readIndex++;
         searchString = "Plugin ImageFilterHandler ";
         if(size(line) > size(searchString))
         {
@@ -2205,7 +2230,7 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
                 if(pbsTestLineParse[4] == imageFilterString)
                 {
                     imageFilterLinesIndex++;
-                    endPluginLine = getPartialLine(lineNumber,0,"EndPlugin", pbsFile);
+                    endPluginLine = getPartialLine(lineNumber,0,"EndPlugin");
                     imageFilterLines[imageFilterLinesIndex] = endPluginLine;
                 }
             }
@@ -2218,16 +2243,14 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
         lineOffset = 0; // We'll need to modify this as we go to ensure we target the correct lines.
                         // Needs to be incremented when we insert 'PluginEnabled 0' lines for active plugins. We change 'PluginEnabled 0' to 'PluginEnabled 1' rather than removing lines,for simplicity.
 
-        tempFilePBS = ::tempDirectory + getsep() + "tempPassportFilePBS.lws";
-        filecopy(pbsFile, tempFilePBS);
+        ::writeBuffer = ::readBuffer;
 
         for(i = 1; i <= imageFilterLinesIndex; i++)
         {
             // Assume plugin is currently enabled.
             state = 1;
             // Let's figure out what state this plugin is in.
-            scanFile.line(imageFilterLines[i] + 1);
-            line = scanFile.read();
+            line = ::readdBuffer[imageFilterLines[i] + 1];
             if(strleft(line,14) == "PluginEnabled ")
             {
                 state = int(parse(" ", line));
@@ -2239,25 +2262,22 @@ passBufferSetup_processBufferSetting: pbsFile, imageFilterString, imageFilterSet
                 makeChange = 1;
                 if(state == 0)
                 {
-                    changeScnLine("PluginEnabled 1", tempFilePBS, imageFilterLines[i] + 1 + lineOffset);
+                    changeScnLine("PluginEnabled 1", imageFilterLines[i] + 1 + lineOffset);
                 } else {
-                    insertScnLine("PluginEnabled 0", tempFilePBS, imageFilterLines[i] + lineOffset);
+                    insertScnLine("PluginEnabled 0", imageFilterLines[i] + lineOffset);
                     lineOffset++;
                 }
             }
         }
         if(makeChange == 1)
         {
-            filecopy(tempFilePBS, pbsFile);
+            ::readBuffer = ::writeBuffer;
         }
-        filedelete(tempFilePBS);
+        ::writeBuffer = nil;
     }
-
-    // Tidy up after outselves.
-    scanFile.close();
 }
 
-motionMixerStuff: mmFile
+motionMixerStuff
 {
     if(::overriddenObjectID != nil)
     {
@@ -2276,24 +2296,23 @@ motionMixerStuff: mmFile
         
         for(x = 1; x <= size(::overriddenObjectID); x++)
         {
-            inputFile = File(mmFile, "r");
-            inputFile.line(1);
+            readIndex = 2;
             
             mmItemIDLine = nil;
             // find the line in the motion mixer stuff if it exists...
-            while(!inputFile.eof())
+            while(readIndex <= size(::readBuffer))
             {
-                line = inputFile.read();
+                line = ::readBuffer[readIndex];
+                readIndex++;
                 if(size(line) >= 22)
                 {
                     stringTempAdd = "      ItemAdd " + string(::overriddenObjectID[x]);
                     if(strleft(line,22) == stringTempAdd)
                     {
-                        mmItemIDLine = inputFile.line();
+                        mmItemIDLine = readIndex;
                     }
                 }
             }
-            inputFile.close();
 
             // if the item line exists in the motion mixer stuff, read the line before it to get the object name
             if(mmItemIDLine != nil)
@@ -2303,12 +2322,9 @@ motionMixerStuff: mmFile
                     logger("error","PassPort has found clones being overridden in a scene with Motion Mixer.  Please resolve clone naming.");
                 }
 
-                ::inputFileName = prepareInputFile(mmFile);
-                inputFile = File(::inputFileName, "r");
-                tempOutput = File(::newScenePath,"w");
-                
-                inputFile.line(mmItemIDLine - 2);
-                mmItemToReplace = inputFile.read();
+                readIndex = mmItemIDLine - 2;
+                mmItemToReplace = ::readBuffer[readIndex];
+                readIndex++;
                 mmItemStringArray = parse("\"",mmItemToReplace);
                 mmItemString = mmItemStringArray[2];
                 
@@ -2332,11 +2348,12 @@ motionMixerStuff: mmFile
                 replacementStringThree = "            ChannelName \"" + ::overriddenObjectName[x];
                 replacementStringFour = "              TrackMotionItemName \"" + ::overriddenObjectName[x];
                 
-                inputFile.line(1);
+                readIndex = 1;
                 
-                while(!inputFile.eof())
+                while(readIndex <= size(::readBuffer))
                 {
-                    line = inputFile.read();
+                    line = ::readBuffer[readIndex];
+                    readIndex++;
                     linesize = size(line);
                     stringsize = size(replaceStringOne);
                     if(linesize >= stringsize)
@@ -2348,22 +2365,17 @@ motionMixerStuff: mmFile
                             line = lineTemp;
                         }
                     }
-                    tempOutput.writeln(line);
+                    ::writeBuffer[size(::writeBuffer) + 1] = line;
                 }
                 
-                inputFile.close();
-                tempOutput.close();
-                finishFiles();
-
-                ::inputFileName = prepareInputFile(mmFile);
-                inputFile = File(::inputFileName, "r");
-                tempOutput = File(::newScenePath,"w");
+                ::readBuffer = ::writeBuffer;
+                ::writeBuffer = nil;
+                readIndex = 1;
                 
-                inputFile.line(1);
-                
-                while(!inputFile.eof())
+                while(readIndex <= size(::readBuffer))
                 {
-                    line = inputFile.read();
+                    line = ::readBuffer[readIndex];
+                    readIndex++;
                     if(size(line) > size(replaceStringTwo))
                     {
                         if(strleft(line,size(replaceStringTwo)) == replaceStringTwo)
@@ -2373,21 +2385,17 @@ motionMixerStuff: mmFile
                             line = lineTemp;
                         }
                     }
-                    tempOutput.writeln(line);
+                    ::writeBuffer[size(::writeBuffer) + 1] = line;
                 }
-                inputFile.close();
-                tempOutput.close();             
-                finishFiles();
 
-                ::inputFileName = prepareInputFile(mmFile);
-                inputFile = File(::inputFileName, "r");
-                tempOutput = File(::newScenePath,"w");
-                
-                inputFile.line(1);
-                
-                while(!inputFile.eof())
+                ::readBuffer = ::writeBuffer;
+                ::writeBuffer = nil;
+                readIndex = 1;
+
+                while(readIndex <= size(::readBuffer))
                 {
-                    line = inputFile.read();
+                    line = ::readBuffer[readIndex];
+                    readIndex++;
                     if(size(line) > size(replaceStringThree))
                     {
                         if(strleft(line,size(replaceStringThree)) == replaceStringThree)
@@ -2397,21 +2405,17 @@ motionMixerStuff: mmFile
                             line = lineTemp;
                         }
                     }
-                    tempOutput.writeln(line);
+                    ::writeBuffer[size(::writeBuffer) + 1] = line;
                 }
-                inputFile.close();
-                tempOutput.close();
-                finishFiles();
 
-                ::inputFileName = prepareInputFile(mmFile);
-                inputFile = File(::inputFileName, "r");
-                tempOutput = File(::newScenePath,"w");
+                ::readBuffer = ::writeBuffer;
+                ::writeBuffer = nil;
+                readIndex = 1;
                 
-                inputFile.line(1);
-                
-                while(!inputFile.eof())
+                while(readIndex <= size(::readBuffer))
                 {
-                    line = inputFile.read();
+                    line = ::readBuffer[readIndex];
+                    readIndex++;
                     if(size(line) > size(replaceStringFour))
                     {
                         if(strleft(line,size(replaceStringFour)) == replaceStringFour)
@@ -2421,11 +2425,10 @@ motionMixerStuff: mmFile
                             line = lineTemp;
                         }
                     }
-                    tempOutput.writeln(line);
+                    ::writeBuffer[size(::writeBuffer) + 1] = line;
                 }
-                inputFile.close();
-                tempOutput.close();
-                finishFiles();
+                ::readBuffer = ::writeBuffer;
+                ::writeBuffer = nil;
             }
             // end of the mm if and else statement here
             // write out the scene, replacing the motion mixer stuff with the object name with the overridden info
@@ -2434,7 +2437,7 @@ motionMixerStuff: mmFile
     }
 }
 
-dependencyCheck: dcFile
+dependencyCheck
 {
     dcDebug = 1;
     // We want to notify the user if the pass has unsatisfied references.
@@ -2474,11 +2477,11 @@ dependencyCheck: dcFile
     // Let's get started.
     for (i = 1; i <= size(dcIDArray); i++)
     {
-        dependencyCheck_Relativity(dcIDArray[i], dcGenusArray[i], dcGenusArray, dcNameArray, dcFile);
+        dependencyCheck_Relativity(dcIDArray[i], dcGenusArray[i], dcGenusArray, dcNameArray);
     }
 }
 
-dependencyCheck_Relativity: dcID, dcGenus, dcGenusArray, dcNameArray, dcFile
+dependencyCheck_Relativity: dcID, dcGenus, dcGenusArray, dcNameArray
 {
     // Let's see if we find Relativity applied.
     // We don't anticipate more than one instance of each type of modifier on the item.
@@ -2525,13 +2528,12 @@ dependencyCheck_Relativity: dcID, dcGenus, dcGenusArray, dcNameArray, dcFile
     for (rType = 1; rType <= size(relModifierTypes); rType++)
     {
         relativityLineArray = nil; // empty array.
-        relativityLineArray = getRelativityLines(relModifierTypes[rType], dcID, dcGenus, dcFile);
+        relativityLineArray = getRelativityLines(relModifierTypes[rType], dcID, dcGenus);
 
         // OK. We have our start and end lines.
         if(relativityLineArray)
         {
             // logger("info_log", "Relativity found for " + dcID.asStr()); 
-            dcReader = File(dcFile, "r");
             r = 0;
             while (r < size(relativityLineArray))
             {
@@ -2539,10 +2541,10 @@ dependencyCheck_Relativity: dcID, dcGenus, dcGenusArray, dcNameArray, dcFile
                 dcRelLineNumber = relativityLineArray[r];
                 r++;
                 dcEndLineNumber = relativityLineArray[r];
-                dcReader.line(dcRelLineNumber);
-                while (dcRelLineNumber <= dcEndLineNumber)
+                readIndex = dcRelLineNumber;
+                while (readIndex <= dcEndLineNumber)
                 {
-                    dcRelString = dcReader.read();
+                    dcRelString = ::readBuffer[readIndex];
                     // Use our custom extracter. We should get back an array
                     dcRelItems = extractRelativityItems(dcRelString);
 
@@ -2583,32 +2585,31 @@ dependencyCheck_Relativity: dcID, dcGenus, dcGenusArray, dcNameArray, dcFile
                             }
                         }
                     }
-                    dcRelLineNumber++;
+                    readIndex++;
                 }
             }
-            dcReader.close();
         }
     }
 }
 
-hyperVoxels3: hv3File
+hyperVoxels3
 {
     // LW only allows one instance of the plugin, so we only need one check and adjustment sequence.
     hv3Debug = 0;
     // Let's check if HV3 was even applied.
-    hv3Line = getVolumetricHandlerLine("HyperVoxelsFilter", hv3File);
+    hv3Line = getVolumetricHandlerLine("HyperVoxelsFilter");
     if (!hv3Line)
     {
         // No HV3 entries
         return 0;
     }
     
-    hv3HeaderEndLine = getPartialLine(hv3Line,0,"HVBlendingGroups",hv3File); // This line is the last before the item specific entries.
+    hv3HeaderEndLine = getPartialLine(hv3Line,0,"HVBlendingGroups"); // This line is the last before the item specific entries.
 
-    hv3EndLine = getPartialLine(hv3Line,0,"EndPlugin",hv3File) - 1; // End of plugin block. Decrement to capture closing brace.
+    hv3EndLine = getPartialLine(hv3Line,0,"EndPlugin") - 1; // End of plugin block. Decrement to capture closing brace.
 
     // We need to extract item IDs from the scene file to then check against our pass items.
-    hv3Items = getHyperVoxels3Items(hv3File, hv3Line);
+    hv3Items = getHyperVoxels3Items(hv3Line);
     if (hv3Items == nil)
     {
         // No item IDs found. Nothing to do.
@@ -2663,21 +2664,21 @@ hyperVoxels3: hv3File
         {
             logger("log_info","hyperVoxels3: Processing HV3ID: " + hv3ItemID.asStr());
         }
-        tempHV3_r = File(hv3File, "r");
-        tempHV3_r.line(hv3Line);
+        readIndex = hv3Line;
         hv3StartString = "    { HVLink"; // object ID follows this line
         hv3EndString = "    { HVoxelCache"; // object block ends 6 lines after this line
-        while(!tempHV3_r.eof())
+        while(readIndex <= size(::readBuffer))
         {
-            hv3LineTemp = tempHV3_r.read();
+            hv3LineTemp = ::readBuffer[readIndex];
+            readIndex++;
             if (hv3LineTemp == hv3StartString)
             {
-                hv3ChunkStartLineArray[hv3ChunkLineArrayIndex] = tempHV3_r.line() + 1; // hard-coded offset to start of block
+                hv3ChunkStartLineArray[hv3ChunkLineArrayIndex] = readIndex + 1; // hard-coded offset to start of block
                 hv3_s_found = 1;
             }
             if ((strleft(hv3LineTemp, hv3EndString.size()) == hv3EndString) && (hv3_s_found == 1))
             {
-                hv3ChunkEndLineArray[hv3ChunkLineArrayIndex] = tempHV3_r.line() + 6; // hard-coded offset to end of block
+                hv3ChunkEndLineArray[hv3ChunkLineArrayIndex] = readIndex + 6; // hard-coded offset to end of block
                 hv3_s_found = 0;
                 if (hv3Debug == 1)
                 {
@@ -2686,19 +2687,14 @@ hyperVoxels3: hv3File
                 hv3ChunkLineArrayIndex++;
             }
         }
-        tempHV3_r.close();
     }
 
     // Now we need to write out the sections we care about.
-    hv3OutputFilename = tempDirectory + getsep() + "tempPassportFileHV3.lws";
-    hv3Output = File(hv3OutputFilename,"w");
-    hv3Input = File(hv3File, "r");
-    hv3LineNumber = 1;
-    while(hv3LineNumber <= hv3HeaderEndLine)
+    readIndex = 1;
+    while(readIndex <= hv3HeaderEndLine)
     {
-        hv3Line = hv3Input.read();
-        hv3Output.writeln(hv3Line);
-        hv3LineNumber++;
+        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+        readIndex++;
     }
 
     // Now we write out our sections from above.
@@ -2709,30 +2705,25 @@ hyperVoxels3: hv3File
         {
             logger("log_info","hyperVoxels3: Writing HV3ID: " + hv3ItemID);
         }
-        sourceLine = hv3ChunkStartLineArray[i];
-        hv3Input.line(sourceLine);
-        while(sourceLine <= hv3ChunkEndLineArray[i])
+        readIndex = hv3ChunkStartLineArray[i];
+        while(readIndex <= hv3ChunkEndLineArray[i])
         {
-            hv3Line = hv3Input.read();
-            hv3Output.writeln(hv3Line);
-            sourceLine++;
+            ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+            readIndex++;
         }
     }
 
-    hv3Output.close();
-    hv3Output = File(hv3OutputFilename, "a");
-    hv3Input.line(hv3EndLine);
-    while(!hv3Input.eof())
+    readIndex = hv3EndLine;
+    while(readIndex <= size(::readBuffer))
     {
-        hv3Output.writeln(hv3Input.read());
+        ::writeBuffer[size(::writeBuffer) + 1] = ::readBuffer[readIndex];
+        readIndex++;
     }
 
-    hv3Input.close();
-    hv3Output.close();
-
     // Push the output back to the original file.
-    filecopy(hv3OutputFilename, hv3File);
-    filedelete(hv3OutputFilename);
+    ::readBuffer = ::writeBuffer;
+    ::writeBuffer = nil;
 
     return 1; // notify caller that we changed something.
 }
+

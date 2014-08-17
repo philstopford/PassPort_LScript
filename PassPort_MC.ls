@@ -5,7 +5,7 @@
 // @define dev 1
 
 // Build features
-@define enableKray 1;
+// @define enableKray 1;
 @if enableKray
 @define Kray_Plugins 1;
 @end
@@ -15,7 +15,7 @@
 @define Kray_ToneMap 1;
 @end
 
-@define enableArnold043 1;
+// @define enableArnold043 1;
 // End of build features
 
 var supportedplatform = 1;
