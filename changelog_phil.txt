@@ -1,3 +1,40 @@
+20140912
+========
+
+- Odd bug fix in external render handling code that seems to surface in very specific cases. Root cause to trigger not fully understood, but code had a weakness that seems to trigger the problem.
+
+20140415 (LWtoA update)
+========
+
+- Starting LWtoA 0.4.8 work.
+ - Settings added; UI needed.
+
+20140304 (Engineering build)
+========
+
+- Small bug fixes to handling of 3rd party renderers w/ writeBuffer initialization.
+- Scoping work for LWtoA 0.4.8. Needs a whole new UI implementation.
+
+20140302 (Engineering build)
+========
+
+- Beginning to try and scratch itch for RAM-based scene generation, to mitigate the impact of heavy file operations in current file-based engine.
+ - No obvious performance gain on SSD. Spinning media and network locations will likely be made much more usable with this change.
+ - Status :
+   - Utility functions done.
+   - Scene parsing done.
+   - Native scene gen
+    - HV code in RAM-mode needs checking carefully.
+    - Camera settings part / light exclusion arrays need review for write action. Parse may not be valid.
+    - FiberFX had a bug, fixed. Probably also in mainline, where the endline is not correctly set for the chunks.
+   - Kray migration underway.
+    - Main script migrated.
+    - Minor change to the plugin call chains.
+    - ToneMap, QuickLWF, PhysicalSky migrated.
+   - LWtoA migration will occur with the update to 0.4.8 support.
+ - Lots of legacy variables being purged.
+  - Check that we also clear ::writeBuffer after it is pushed to ::readBuffer.
+
 20140109 (Enhancement build)
 ========
 
@@ -10,7 +47,7 @@
 ========
 
 - Added option to preserve scripts generated when rendering scenes/frames.
- - Exposed as preference setting. Not saved in or loaded fromgit scenes or RPE files.
+ - Exposed as preference setting. Not saved in or loaded from scenes or RPE files.
 
 20131218 (Enhancement, Bug fix)
 ========
@@ -878,13 +915,6 @@ Brace yourself. Here's the big set of UI changes related to filtering the overri
 - Fixed indenting in original code.
 - Moved UDF code to a dedicated file.
 - Worked around About box corruption (bug p0001) by disabling drawline calls in the req_redraw function. Added an explicit line drawing call in the about box function instead.
-
-+++++++++++++++
-+ In Progress +
-+++++++++++++++
-
-- Prototype w/ Arnold support.
-- Kray plugin support.
 
 ********
 * Bugs *

@@ -431,6 +431,10 @@ getRendererPluginLine: rendererString
 {
 	prefixRPStr = "Plugin ExtRendererHandler";
 	rPLine = getPartialLine(0,0,prefixRPStr);
+	if(!rPLine)
+	{
+		return nil;
+	}
 	if(rendererString != "any")
 	{
 		return rPLine;

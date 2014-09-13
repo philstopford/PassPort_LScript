@@ -8,7 +8,7 @@ var debugmode = integer(globalrecall("passEditorDebugMode", 0)); // default to o
 @else
 var debugmode = 0;
 @end
-var versionString = "1.7.2730";
+var versionString = "1.7.2743";
 var rpeVersion = "1.1";
 var parch = "Unknown";
 var icon;
@@ -150,15 +150,15 @@ renderers_krayLabel = "Kray 2.5";
 @else
 renderers_krayLabel = "Kray 2.5 (not available)";
 @end
-@if enableArnold043
-renderers_arnold043Label = "LWtoA 0.4.3";
+@if enableArnold048
+renderers_arnold048Label = "LWtoA 0.4.8";
 @else
-renderers_arnold043Label = "LWtoA 0.4.3 (not available)";
+renderers_arnold048Label = "LWtoA 0.4.8 (not available)";
 @end
 
 var scnGen_Line_Offset = 0;
 
-var renderers = @"Native",renderers_krayLabel,renderers_arnold043Label@;
+var renderers = @"Native",renderers_krayLabel,renderers_arnold048Label@;
 var overrideRenderer = 1; // default, native.
 
 var objStart;

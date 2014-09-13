@@ -653,8 +653,8 @@ generatePassFile: mode, gPass
     msgString = "{" + progressString + "}Generating Render Scene:  Finishing...";
     StatusMsg(msgString);
     sleep(1);
-    
-    // get the save RGB line
+
+        // get the save RGB line
     saveRGBLine = getPartialLine(cameraStartLine,0,"SaveRGB ");
 
     ::saveRGBImagesPrefix = generateSaveRGBPath(mode, outputFolder, outputStr);
@@ -695,6 +695,7 @@ generatePassFile: mode, gPass
     ::readBuffer = ::writeBuffer;
     ::writeBuffer = nil;
 
+
     if(::overrideNames[1] != "empty")
     {
         z = 1;
@@ -713,6 +714,7 @@ generatePassFile: mode, gPass
             }
         }
     }
+
     if(itemsParsedArray != nil)
     {
         a = itemsParsedArray[1];
@@ -739,8 +741,8 @@ generatePassFile: mode, gPass
 
                 case 3:
                 // arnold renderer - call the support
-@if enableArnold043
-                scnGen_arnold043();
+@if enableArnold048
+                scnGen_arnold048();
 @else
                 logger("error","Scene Master override calls for LWtoA 0.4.3, but this build doesn't offer support.");
 @end

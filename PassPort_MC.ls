@@ -18,6 +18,9 @@
 // @define enableArnold043 1;
 // End of build features
 
+// @define enableArnold048 1;
+// End of build features
+
 var supportedplatform = 1;
 var lwlicensecheck_done = 0;
 
@@ -40,6 +43,9 @@ var lwlicensecheck_done = 0;
 @end
 @if enableArnold043
 @insert "@lwtoa/passEditor_Arnold043Renderer_Support.ls"
+@end
+@if enableArnold048
+@insert "@lwtoa/passEditor_Arnold048Renderer_Support.ls"
 @end
 
 // icons
